@@ -1,0 +1,81 @@
+{
+  "approvalId": "approval-20260703-github-repo-create",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "commandCategory": "connect_service",
+  "requestedAction": "Create one private GitHub repository named ag-test-construction-website and add a starter README only if required by the execution plan.",
+  "target": "github:gurnoorbassi/ag-test-construction-website",
+  "scope": "This approval allows exactly one future live GitHub action: create one private repository named ag-test-construction-website under the owner GitHub account. Starter README creation is allowed only if the execution plan requires it and it contains no credentials, customer data, production data, deployment hooks, private endpoints, live service instructions, or paid-service setup. This approval does not allow Netlify, n8n, deployments, domain or DNS changes, paid services, credentials, production data, customer data, Lead Gen changes, AI Receptionist repository changes, branch creation, pull requests, CI polling, or merges.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-runtime-github-construction-website-repo-20260703.json"
+  },
+  "approvalRequiredFor": [
+    "create_repo",
+    "create_starter_readme_if_required"
+  ],
+  "approvedActions": [
+    "create_repo",
+    "create_starter_readme_if_required"
+  ],
+  "prohibitedActions": [
+    "create_more_than_one_repo",
+    "create_public_repo",
+    "create_branch",
+    "create_non_readme_files",
+    "update_files",
+    "open_pr",
+    "poll_ci",
+    "merge_pr",
+    "deploy_staging",
+    "deploy_production",
+    "connect_netlify",
+    "connect_n8n",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "use_credentials",
+    "access_production_data",
+    "access_customer_data",
+    "change_lead_gen",
+    "change_ai_receptionist"
+  ],
+  "revocationPath": "Owner can revoke this approval by setting approval status to revoked before execution. This approval also expires automatically after expiresAt, and is invalidated if the repository name changes, repository visibility is not private, validation or boot check fails, an incident opens for this scope, the action expands beyond creating one private GitHub repo, starter README content exceeds the approved scope, or any prohibited action becomes necessary.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner approval confirmed for PR #57: create actual approval lock for first live GitHub repo creation named ag-test-construction-website.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/github/github-plan-runtime-github-construction-website-repo-20260703.json",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/github/github-mcp-gate-runtime-github-construction-website-repo-20260703.json",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/audit/audit-runtime-github-construction-website-repo-20260703-github-dry-run.json",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run validate must pass immediately before execution.",
+      "verified": false
+    }
+  ],
+  "approvalText": "Owner approval confirmed. Create approval lock for first live GitHub repo creation. Repo name: ag-test-construction-website. Visibility: private. Allowed: create one private GitHub repo named ag-test-construction-website and add starter README only if required by the execution plan. Not allowed: Netlify, n8n, deployment, domain/DNS, paid services, credentials, production/customer data, Lead Gen changes, or AI Receptionist changes.",
+  "approvedAt": "2026-07-03T21:06:41Z",
+  "expiresAt": "2026-07-04T21:06:41Z",
+  "createdAt": "2026-07-03T21:06:41Z",
+  "updatedAt": "2026-07-03T21:06:41Z"
+}
