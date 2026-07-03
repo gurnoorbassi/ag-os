@@ -26,6 +26,8 @@ const requiredPaths = [
   ".codex/security/policy.json",
   ".codex/watchdog/README.md",
   ".codex/watchdog/policy.json",
+  ".codex/capabilities/README.md",
+  ".codex/capabilities/registry.json",
   ".codex/commands/registry.json",
   ".codex/connectors/registry.json",
   ".codex/projects/README.md",
@@ -35,6 +37,7 @@ const requiredPaths = [
   ".codex/agents/agent.template.json",
   "docs/connector-registry.md",
   "docs/command-registry.md",
+  "docs/capability-registry.md",
   "docs/cost-os.md",
   "docs/memory-os.md",
   "docs/quality-os.md",
@@ -42,6 +45,7 @@ const requiredPaths = [
   "docs/watchdog-os.md",
   "docs/project-registry.md",
   "schemas/idea.schema.json",
+  "schemas/capability-registry.schema.json",
   "schemas/command-registry.schema.json",
   "schemas/connector-registry.schema.json",
   "schemas/cost-budget.schema.json",
@@ -126,6 +130,11 @@ const schemaValidatedRecords = [
     name: "memory policy",
     recordPath: ".codex/memory/policy.json",
     schemaPath: "schemas/memory-policy.schema.json"
+  },
+  {
+    name: "capability registry",
+    recordPath: ".codex/capabilities/registry.json",
+    schemaPath: "schemas/capability-registry.schema.json"
   },
   {
     name: "project registry",
@@ -538,6 +547,28 @@ function validateMemoryPolicy(record) {
   }
 }
 
+function validateCapabilityRegistry(record) {
+  if (record.status === "foundation" && record.capabilities?.length !== 0) {
+    fail("capability registry foundation must not include capability records yet");
+  }
+
+  if (record.rules?.credentialsAllowed !== false) {
+    fail("capability registry must disallow credentials");
+  }
+
+  if (record.rules?.liveActionsAllowedByDefault !== false) {
+    fail("capability registry must disallow live actions by default");
+  }
+
+  if (record.rules?.ownerApprovalRequiredForLiveActions !== true) {
+    fail("capability registry must require owner approval for live actions");
+  }
+
+  if (record.rules?.ownerApprovalRequiredForPaidActions !== true) {
+    fail("capability registry must require owner approval for paid actions");
+  }
+}
+
 for (const templateRecord of templateRecords) {
   try {
     const record = readJson(templateRecord.recordPath);
@@ -595,6 +626,10 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     if (schemaValidatedRecord.recordPath === ".codex/memory/policy.json") {
       validateMemoryPolicy(record);
+    }
+
+    if (schemaValidatedRecord.recordPath === ".codex/capabilities/registry.json") {
+      validateCapabilityRegistry(record);
     }
 
     if (failures === failuresBeforeRecord) {
