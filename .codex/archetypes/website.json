@@ -21,6 +21,12 @@
     "Page titles and descriptions are unique and descriptive.",
     "Local validation passes before any PR merges."
   ],
+  "commonModules": [
+    "Public information pages for offer, proof, about, and contact paths.",
+    "Content sections for services, process, testimonials or proof, frequently asked questions, and calls to action.",
+    "SEO metadata, sitemap planning, structured headings, and conversion path review.",
+    "Contact surface prepared as a non-live shell until owner-approved routing, storage, or messaging exists."
+  ],
   "commonPages": [
     "Home",
     "Services or Products",
@@ -123,6 +129,23 @@
     "No placeholder content in the final output.",
     "Local validation and CI pass.",
     "Cost stayed within Cost OS limits."
+  ],
+  "whatToBuildFirst": [
+    "Information architecture and page inventory.",
+    "Static first-pass pages with owner-approved business facts and clean responsive layout.",
+    "Reusable sections for services, proof, process, and contact intent.",
+    "Local validation and build checks before hosting or domain work."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Custom CMS or database before the owner confirms editing needs.",
+    "User accounts, dashboards, or portals unless the website is explicitly part of an app.",
+    "Advanced animation, personalization, analytics, or marketing automation before the core offer is clear.",
+    "Payment, booking, messaging, or form delivery integrations before approval gates are complete."
+  ],
+  "stopConditions": [
+    "Stop before creating or modifying a live deployment, domain, DNS record, paid service, credential, or production data path.",
+    "Stop before connecting analytics, forms, payments, booking, email, SMS, or CRM integrations without owner approval.",
+    "Stop if the requested work would touch Lead Gen production or the AI Receptionist repo outside an approved project scope."
   ],
   "sources": [
     ".codex/plans/plan-construction-website-20260703.json",

@@ -1,0 +1,111 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-dashboard",
+  "name": "Dashboard Internal Tool",
+  "category": "dashboard",
+  "status": "active",
+  "professionalExpectations": [
+    "An internal dashboard must answer operational questions quickly using trusted records and clear status indicators.",
+    "It should be dense, restrained, scannable, and built around repeated work rather than marketing presentation.",
+    "Read-only dashboard foundations must not imply write capability or live connector access.",
+    "Every displayed metric must have a known source, freshness expectation, and limitation."
+  ],
+  "minimumQualityBar": [
+    "Source, status, timestamp, and uncertainty are visible for each important data area.",
+    "No live connector, database, production data, customer data, or deployment connection exists without approval.",
+    "Navigation, filtering, responsive layout, and empty states are clear.",
+    "Risk, approval, validation, boot, cost, and incident surfaces are not hidden."
+  ],
+  "commonModules": [
+    "Health overview, status cards, registry summaries, project list, approval queue, cost panel, and incident panel.",
+    "Validation, boot, CI, connector, watchdog, and storage-risk status surfaces.",
+    "Audit trail, recent changes, blocked actions, and next required owner approval.",
+    "Read-only data adapters from repository records before live runtime adapters exist."
+  ],
+  "uxExpectations": [
+    "Use compact tables, status chips, filters, and clear timestamps.",
+    "Avoid landing-page layout, oversized hero sections, or decorative cards inside cards.",
+    "Make blocked, stale, failed, and approval-needed states visually distinct.",
+    "Keep write actions absent until a separate governed command model exists."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Static dashboard generated from repository records",
+      "Local build and check scripts",
+      "GitHub-governed source updates",
+      "Netlify only after approved read-only deployment",
+      "Live adapters only after connector and data approval"
+    ],
+    "notes": "Start read-only from existing records. Do not add live connectors or write controls in the first dashboard."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-read-only",
+      "name": "Read-Only Visibility",
+      "goals": [
+        "Display registry, project, cost, approval, boot, and watchdog status from repository data.",
+        "Validate build and dashboard checks locally."
+      ]
+    },
+    {
+      "phaseId": "phase-operational-context",
+      "name": "Operational Context",
+      "goals": [
+        "Add filtering, source timestamps, limitations, and blocked-action explanations.",
+        "Expose what needs owner approval without creating write controls."
+      ]
+    },
+    {
+      "phaseId": "phase-approved-runtime",
+      "name": "Approved Runtime",
+      "goals": [
+        "Add live adapters only after owner approval, connector review, and data classification.",
+        "Keep rollback, audit, and stale-data indicators visible."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Showing metrics without source, timestamp, or limitation.",
+    "Adding write controls before command intake, approvals, and audit are runtime-ready.",
+    "Connecting live data before repository-backed read-only value is proven.",
+    "Using decorative layouts that slow operational scanning."
+  ],
+  "approvalGates": [
+    "Owner approval is required before live connectors, database access, deployment, domain or DNS changes, paid tools, or credentials.",
+    "Owner approval is required before displaying customer, production, confidential, or restricted data.",
+    "Owner approval is required before adding write buttons, forms, destructive actions, or command execution.",
+    "Owner approval is required before Netlify production deployment."
+  ],
+  "qualityChecklist": [
+    "Every data surface has source, timestamp, and limitation context.",
+    "Dashboard remains read-only unless a separate approved command model exists.",
+    "Responsive layout is dense, scannable, accessible, and free of overlapping text.",
+    "Blocked actions, approvals, incidents, costs, and validation state are visible."
+  ],
+  "whatToBuildFirst": [
+    "Read-only status overview from repository records.",
+    "Project, connector, command, cost, capability, watchdog, and memory panels.",
+    "Source and freshness labels.",
+    "Local dashboard build and check validation."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Live database, Netlify, n8n, or GitHub adapters before approval.",
+    "Write controls, command bars, or destructive actions.",
+    "Complex charting before source reliability is clear.",
+    "Role-based access beyond documented owner and future placeholders."
+  ],
+  "stopConditions": [
+    "Stop before live connectors, deployment, domain or DNS, paid tools, credentials, production data, or customer data.",
+    "Stop before adding write actions, command execution, or destructive controls.",
+    "Stop before modifying Lead Gen production or the AI Receptionist repo."
+  ],
+  "sources": [
+    "docs/dashboard-os-plan.md",
+    "docs/dashboard-usefulness-plan.md",
+    "docs/runtime-direction.md"
+  ],
+  "notes": "Archetype knowledge record only. It does not deploy or enable live dashboard actions.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}

@@ -11,12 +11,16 @@
     "status",
     "professionalExpectations",
     "minimumQualityBar",
+    "commonModules",
     "uxExpectations",
     "recommendedStack",
     "phases",
     "knownPitfalls",
     "approvalGates",
     "qualityChecklist",
+    "whatToBuildFirst",
+    "whatNotToOverbuildEarly",
+    "stopConditions",
     "createdAt",
     "updatedAt"
   ],
@@ -48,6 +52,11 @@
       "items": { "type": "string", "minLength": 1 }
     },
     "minimumQualityBar": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "commonModules": {
       "type": "array",
       "minItems": 1,
       "items": { "type": "string", "minLength": 1 }
@@ -112,6 +121,21 @@
       "items": { "type": "string", "minLength": 1 }
     },
     "qualityChecklist": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "whatToBuildFirst": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "whatNotToOverbuildEarly": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "stopConditions": {
       "type": "array",
       "minItems": 1,
       "items": { "type": "string", "minLength": 1 }

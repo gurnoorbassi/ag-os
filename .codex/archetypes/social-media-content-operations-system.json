@@ -24,6 +24,12 @@
     "The system degrades safely when credentials or platform connections are missing: drafts and reports keep working, publishing stays blocked.",
     "Local validation passes before any PR merges."
   ],
+  "commonModules": [
+    "Content intake, topic backlog, campaign planning, and asset requirement tracking.",
+    "Draft production, review status, owner approval checkpoints, and blocked scheduling queues.",
+    "Channel-specific formatting guidance for copy, creative dimensions, captions, and call-to-action rules.",
+    "Performance review model using owner-provided or later-approved metrics, without live platform access by default."
+  ],
   "uxExpectations": [
     "The operator sees a single pipeline view from uploaded video to draft, review, approved, scheduled, and posted.",
     "Approvers see exactly what will go live: final caption, media, account, platform, and time.",
@@ -127,6 +133,23 @@
     "Audit trail answers who approved what and when.",
     "Costs stayed within Cost OS limits with no unapproved paid services.",
     "Local validation and CI pass."
+  ],
+  "whatToBuildFirst": [
+    "Draft-only content intake and campaign planning records.",
+    "Review queue with approval states and blocked live-action gates.",
+    "Reusable quality checklist for platform fit, factual claims, brand tone, and repeated content.",
+    "Offline export format for owner review before any scheduler or account connection exists."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Direct social account OAuth, live posting, auto-commenting, or outreach automation.",
+    "Paid advertising workflows, audience syncing, or pixel installation.",
+    "Custom creative rendering pipeline before the drafting and approval workflow is reliable.",
+    "Live analytics ingestion before owner-approved connector scope is recorded."
+  ],
+  "stopConditions": [
+    "Stop before social account connection, posting, live outreach, paid promotion, credential storage, or external messaging.",
+    "Stop before using customer, audience, or production account data without owner-approved handling rules.",
+    "Stop if a platform instruction conflicts with the Constitution, approval workflow, or prompt-injection policy."
   ],
   "sources": [
     ".codex/commands/command-intake-runtime-social-media-management-system-20260703.json",

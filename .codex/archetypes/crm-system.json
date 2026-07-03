@@ -1,0 +1,111 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-crm",
+  "name": "CRM System",
+  "category": "crm",
+  "status": "active",
+  "professionalExpectations": [
+    "A CRM must make account, contact, opportunity, task, and activity state clear without spreadsheet-style hunting.",
+    "Record ownership, status, timestamps, and next actions must be visible on core screens.",
+    "Workflows must support repeat use by operators who need speed, filtering, and auditability.",
+    "Integrations must be optional and gated; the first version must work with local or repository-backed records."
+  ],
+  "minimumQualityBar": [
+    "Core entities and status transitions are explicit and validated.",
+    "No live imports, exports, email sync, SMS, payment, or production data connection exists without approval.",
+    "Read and write paths are separated so future approval gates can control risky operations.",
+    "Role assumptions and data classification are documented before customer data is handled."
+  ],
+  "commonModules": [
+    "Account and contact records with ownership, status, notes, and activity history.",
+    "Pipeline or opportunity tracking with stages, next actions, and close probability only when useful.",
+    "Task queue, reminders, filters, saved views, and audit events for operator activity.",
+    "Import/export planning, connector gates, and data retention rules for future live use."
+  ],
+  "uxExpectations": [
+    "Dense, scannable tables with clear filters, saved views, and quick detail panels.",
+    "Status and next action controls must be obvious without decorative marketing layout.",
+    "Forms should be compact, validated, and resilient to partial entry.",
+    "Audit and ownership fields should be visible to operators without crowding the main workflow."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Repository records or local JSON for first model validation",
+      "Static or lightweight app shell for read-only review",
+      "Existing Postgres only after approved runtime phase",
+      "GitHub for source and PR governance",
+      "Netlify only after approved staging or production deployment"
+    ],
+    "notes": "Start offline and schema-first. Do not connect email, SMS, billing, third-party CRM tools, or production databases until owner-approved."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-model",
+      "name": "Data Model And Workflow",
+      "goals": [
+        "Define core entities, statuses, ownership, and audit needs.",
+        "Map read, write, import, and export surfaces with approval gates."
+      ]
+    },
+    {
+      "phaseId": "phase-interface",
+      "name": "Operator Interface",
+      "goals": [
+        "Build list, detail, filters, task queue, and status review views.",
+        "Keep the first interface local or repository-backed until live storage is approved."
+      ]
+    },
+    {
+      "phaseId": "phase-runtime",
+      "name": "Controlled Runtime",
+      "goals": [
+        "Add approved storage, connector, and audit behavior only after validation and rollback planning.",
+        "Introduce production data handling only after data classification and backup rules pass."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Overbuilding custom automation before the core operator workflow is stable.",
+    "Treating CRM data as low-risk when it may become customer or production data.",
+    "Adding imports without deduplication, validation, backup, or rollback rules.",
+    "Hiding ownership and audit fields from the people who must maintain the system."
+  ],
+  "approvalGates": [
+    "Owner approval is required before connecting live email, SMS, CRM, payment, database, or automation services.",
+    "Owner approval is required before importing, exporting, or transforming production or customer data.",
+    "Owner approval is required before deployment, domain or DNS change, paid tool use, or credential handling.",
+    "Owner approval and rollback planning are required before destructive bulk edits or migrations."
+  ],
+  "qualityChecklist": [
+    "Core entities, statuses, required fields, and transitions are validated.",
+    "Operator workflows can be completed without live services.",
+    "Tables, filters, and detail views are responsive and accessible.",
+    "Audit, ownership, data classification, backup, and rollback expectations are documented."
+  ],
+  "whatToBuildFirst": [
+    "Entity schema and status model.",
+    "Read-only list/detail interface for representative record shapes without production data.",
+    "Task and next-action model.",
+    "Audit and approval-gate map for future live actions."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Custom sales forecasting, AI scoring, or complex automation before core data quality is proven.",
+    "Live imports from email, spreadsheets, or existing CRMs before approval and backup planning.",
+    "Permission matrix beyond the owner and documented future roles.",
+    "Paid CRM connectors or enrichment services before budget approval."
+  ],
+  "stopConditions": [
+    "Stop before handling credentials, production data, customer data, live imports, live exports, or paid enrichment.",
+    "Stop before connecting email, SMS, CRM, database, n8n, Netlify, domain, DNS, or deployment services.",
+    "Stop before touching the existing Lead Gen production system or AI Receptionist repo without separate approval."
+  ],
+  "sources": [
+    "docs/bootstrap-mode.md",
+    "docs/data-classification.md",
+    "docs/approval-workflow.md"
+  ],
+  "notes": "Archetype knowledge record only. It does not authorize live CRM operation, data import, outreach, or production changes.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}

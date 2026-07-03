@@ -1,0 +1,111 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-ai-tool",
+  "name": "AI Receptionist System",
+  "category": "ai_tool",
+  "status": "active",
+  "professionalExpectations": [
+    "An AI receptionist system must separate intake, conversation policy, handoff, escalation, logging, and human review.",
+    "Voice, phone, SMS, email, calendar, CRM, and live customer interactions must remain gated until explicitly approved.",
+    "The existing AG Digitalz AI Receptionist repo is a separate product project and must not be modified by this archetype record.",
+    "The first version must prove conversation scope, fallback behavior, and reviewability before live channels exist."
+  ],
+  "minimumQualityBar": [
+    "Conversation boundaries, allowed actions, prohibited actions, escalation triggers, and fallback copy are documented.",
+    "No phone, voice, SMS, email, booking, CRM, payment, or production customer-data connection exists without approval.",
+    "Transcripts, memory, and contact details are classified before storage or processing.",
+    "Prompt-injection and untrusted-user-input risks are handled explicitly."
+  ],
+  "commonModules": [
+    "Business intake profile, conversation policy, knowledge boundaries, and escalation rules.",
+    "Transcript review, handoff queue, appointment-intent model, and blocked live-channel gates.",
+    "Prompt-injection handling, safe refusal rules, and sensitive-data redaction plan.",
+    "Future connector plan for phone, SMS, email, calendar, CRM, and booking systems."
+  ],
+  "uxExpectations": [
+    "Operator views should make conversation status, risk, escalation, and next action visible.",
+    "Configuration should be plain-language and reviewable by the owner.",
+    "Testing views should clearly distinguish simulated conversation from live customer interaction.",
+    "Logs should be readable, redacted where appropriate, and linked to audit expectations."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Local policy and conversation test records",
+      "GitHub-governed source for any future implementation",
+      "Existing Postgres only after approved transcript and customer-data handling",
+      "n8n only after approved modular workflow and backup plan",
+      "Phone, SMS, email, or voice providers only after owner approval"
+    ],
+    "notes": "Start with local policy, conversation simulation, and review records. No live phone or voice action is allowed by default."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-policy",
+      "name": "Policy And Scope",
+      "goals": [
+        "Define receptionist role, allowed topics, blocked actions, escalation, and data handling.",
+        "Map prompt-injection and live-channel approval gates."
+      ]
+    },
+    {
+      "phaseId": "phase-simulation",
+      "name": "Offline Simulation",
+      "goals": [
+        "Run local conversation scenarios with audit-friendly transcripts.",
+        "Validate fallback, refusal, and handoff behavior."
+      ]
+    },
+    {
+      "phaseId": "phase-approved-live-channel",
+      "name": "Approved Live Channel",
+      "goals": [
+        "Add one owner-approved live channel only after rollback, monitoring, and data rules are ready.",
+        "Keep human review and emergency stop behavior available."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Connecting phone, SMS, email, or booking before safety policy is validated.",
+    "Letting the assistant make commitments the business has not approved.",
+    "Storing transcripts or customer details before classification, retention, and redaction rules exist.",
+    "Mixing this archetype with the existing AI Receptionist product repo without explicit project approval."
+  ],
+  "approvalGates": [
+    "Owner approval is required before phone, voice, SMS, email, calendar, booking, CRM, n8n, database, or deployment connection.",
+    "Owner approval is required before using production customer data, transcripts, credentials, paid services, or live conversations.",
+    "Owner approval is required before modifying the existing AI Receptionist repo.",
+    "Owner approval is required before any AI-generated message is sent to a real customer or external party."
+  ],
+  "qualityChecklist": [
+    "Conversation policy, escalation, prohibited actions, and fallback behavior are explicit.",
+    "Prompt-injection, sensitive-data, transcript, and audit rules are documented.",
+    "Offline scenarios validate the first workflow without live channels.",
+    "All phone, voice, SMS, email, booking, CRM, and deployment actions remain blocked until approval."
+  ],
+  "whatToBuildFirst": [
+    "Receptionist policy and blocked-action list.",
+    "Offline conversation scenario runner or record model.",
+    "Transcript review and handoff state model.",
+    "Approval-gate map for one future live channel."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Live voice or phone integration before policy and handoff quality are proven.",
+    "Multi-channel automation before one channel is safe.",
+    "Advanced personalization or memory before data handling rules exist.",
+    "Autonomous booking, quote, payment, or commitment actions before explicit approval."
+  ],
+  "stopConditions": [
+    "Stop before phone, voice, SMS, email, booking, CRM, n8n, database, deployment, domain, DNS, paid service, or credential connection.",
+    "Stop before live customer interaction or production customer-data handling.",
+    "Stop before touching the existing AI Receptionist repo without a separate approved scope."
+  ],
+  "sources": [
+    "docs/product-project-policy.md",
+    "docs/prompt-injection-policy.md",
+    "docs/data-classification.md"
+  ],
+  "notes": "Uses the existing intake archetype ID for AI-tool routing while defining the AI Receptionist product pattern. It does not modify the separate AI Receptionist repo.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}

@@ -1,0 +1,111 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-ecommerce-store",
+  "name": "Ecommerce Store",
+  "category": "web_app",
+  "status": "active",
+  "professionalExpectations": [
+    "An ecommerce store must make products, pricing, inventory, cart, checkout, fulfillment, support, and policies understandable.",
+    "Payment, tax, shipping, inventory, customer data, and production order handling are high-risk and gated by default.",
+    "The first version should prove catalog structure, product presentation, and buying flow without live payment processing.",
+    "Quality depends on trust, clarity, performance, and a controlled path to live commerce."
+  ],
+  "minimumQualityBar": [
+    "Product, collection, pricing, cart, checkout-intent, order, and policy concepts are modeled before live payment exists.",
+    "No payment processor, tax service, shipping service, inventory system, production order data, or paid service is connected without approval.",
+    "Customer data handling, refund policy, fulfillment assumptions, backup, and rollback are documented.",
+    "Static catalog and non-live checkout intent can be reviewed locally before live commerce."
+  ],
+  "commonModules": [
+    "Product catalog, collections, product detail, cart intent, checkout gate, order model, policies, and support information.",
+    "Inventory and fulfillment planning, pricing and tax assumptions, shipping rules, and return policy checklist.",
+    "Analytics and conversion planning without live tracking by default.",
+    "Future connector gates for payments, tax, shipping, inventory, email, and customer support."
+  ],
+  "uxExpectations": [
+    "Product pages must show price, value, options, proof, delivery expectations, and support policies clearly.",
+    "Cart and checkout-intent flows must make blocked live payment status obvious until approved.",
+    "Navigation, filters, search, and mobile layout should be clean and fast.",
+    "Trust elements such as policies, contact path, and secure checkout expectations must be visible."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Static product catalog or local records first",
+      "GitHub-governed storefront source",
+      "Payment provider only after owner approval",
+      "Existing Postgres only after approved order and customer-data handling",
+      "Netlify only after approved staging or production deployment"
+    ],
+    "notes": "Start with catalog and checkout-intent model. Do not process payments or orders until owner-approved."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-catalog",
+      "name": "Catalog And Policies",
+      "goals": [
+        "Define product, collection, pricing, policy, fulfillment, and support structure.",
+        "Map payment, customer-data, and paid-service approval gates."
+      ]
+    },
+    {
+      "phaseId": "phase-storefront",
+      "name": "Storefront Prototype",
+      "goals": [
+        "Build catalog, product detail, cart intent, and blocked checkout views locally.",
+        "Validate responsiveness, accessibility, and trust signals."
+      ]
+    },
+    {
+      "phaseId": "phase-approved-commerce",
+      "name": "Approved Commerce",
+      "goals": [
+        "Add payments, orders, shipping, tax, and notifications only after approval and rollback planning.",
+        "Document monitoring, support, refund, and incident procedures."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Connecting payments before policies, product data, tax, and fulfillment are ready.",
+    "Treating checkout and order data as low-risk.",
+    "Overbuilding loyalty, recommendations, or advanced analytics before basic buying flow is trusted.",
+    "Using paid apps or storefront services without budget approval."
+  ],
+  "approvalGates": [
+    "Owner approval is required before payment, tax, shipping, inventory, email, SMS, analytics, deployment, domain, DNS, credentials, or paid tools.",
+    "Owner approval is required before handling customer data, production orders, refunds, or fulfillment records.",
+    "Owner approval is required before activating live checkout or collecting money.",
+    "Owner approval is required before connecting third-party storefront apps or paid extensions."
+  ],
+  "qualityChecklist": [
+    "Catalog, product details, policies, cart intent, and checkout gate are clear.",
+    "No live payment, order, customer-data, deployment, or paid path exists without approval.",
+    "Mobile shopping flow, performance, accessibility, and trust signals are reviewed.",
+    "Backup, rollback, support, refund, and incident expectations are documented before live commerce."
+  ],
+  "whatToBuildFirst": [
+    "Catalog data model and product page structure.",
+    "Static storefront with cart intent and blocked checkout state.",
+    "Policy, fulfillment, support, and trust sections.",
+    "Approval-gate map for payments, orders, and customer data."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Payment processing, tax automation, shipping labels, inventory sync, or live checkout.",
+    "Advanced recommendation engines, loyalty programs, or subscriptions.",
+    "Paid storefront apps before the basic catalog and buying flow are proven.",
+    "Production order management before backup and rollback planning."
+  ],
+  "stopConditions": [
+    "Stop before payment, checkout activation, tax, shipping, inventory, customer data, production orders, credentials, paid tools, deployment, domain, or DNS changes.",
+    "Stop before collecting money or sending order-related messages.",
+    "Stop before connecting production databases or third-party commerce apps without approval."
+  ],
+  "sources": [
+    "docs/bootstrap-mode.md",
+    "docs/data-classification.md",
+    "docs/cost-os.md"
+  ],
+  "notes": "Archetype knowledge record only. It does not activate commerce, payments, orders, or storefront deployment.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}
