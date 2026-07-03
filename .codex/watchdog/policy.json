@@ -1,0 +1,43 @@
+{
+  "$schema": "../../schemas/watchdog-policy.schema.json",
+  "policyVersion": 1,
+  "policyType": "watchdog-os-policy",
+  "status": "foundation",
+  "defaults": {
+    "monitoringEnabled": false,
+    "liveChecksAllowed": false,
+    "mutationsAllowed": false,
+    "notificationsAllowed": false,
+    "paidMonitoringAllowed": false
+  },
+  "plannedCheckTypes": [
+    "local_validation",
+    "ci_status_review",
+    "registry_consistency",
+    "stale_memory_review",
+    "cost_budget_review",
+    "security_policy_review"
+  ],
+  "approvalRules": {
+    "liveMonitoringRequiresOwnerApproval": true,
+    "externalNotificationsRequireOwnerApproval": true,
+    "paidMonitoringRequiresOwnerApproval": true,
+    "mutationsRequireOwnerApproval": true,
+    "productionTargetsRequireOwnerApproval": true
+  },
+  "allowedFoundationActions": [
+    "document_checks",
+    "validate_local_files",
+    "review_ci_status",
+    "prepare_owner_approval_packet"
+  ],
+  "blockedFoundationActions": [
+    "monitor_live_systems",
+    "scrape_external_sites",
+    "ping_production_services",
+    "send_external_notifications",
+    "mutate_external_systems",
+    "trigger_paid_monitoring"
+  ],
+  "notes": "Foundation policy only. Watchdog checks are documented but disabled by default; no live monitoring, scraping, pings, notifications, paid monitoring, or mutations are authorized."
+}

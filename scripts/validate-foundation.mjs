@@ -24,6 +24,7 @@ const requiredPaths = [
   ".codex/security/README.md",
   ".codex/security/policy.json",
   ".codex/watchdog/README.md",
+  ".codex/watchdog/policy.json",
   ".codex/commands/registry.json",
   ".codex/connectors/registry.json",
   ".codex/projects/README.md",
@@ -36,6 +37,7 @@ const requiredPaths = [
   "docs/cost-os.md",
   "docs/quality-os.md",
   "docs/security-os.md",
+  "docs/watchdog-os.md",
   "docs/project-registry.md",
   "schemas/idea.schema.json",
   "schemas/command-registry.schema.json",
@@ -43,6 +45,7 @@ const requiredPaths = [
   "schemas/cost-budget.schema.json",
   "schemas/quality-policy.schema.json",
   "schemas/security-policy.schema.json",
+  "schemas/watchdog-policy.schema.json",
   "schemas/project.schema.json",
   "schemas/project-registry.schema.json",
   "schemas/agent.schema.json",
@@ -110,6 +113,11 @@ const schemaValidatedRecords = [
     name: "security policy",
     recordPath: ".codex/security/policy.json",
     schemaPath: "schemas/security-policy.schema.json"
+  },
+  {
+    name: "watchdog policy",
+    recordPath: ".codex/watchdog/policy.json",
+    schemaPath: "schemas/watchdog-policy.schema.json"
   },
   {
     name: "project registry",
@@ -470,6 +478,32 @@ function validateSecurityPolicy(record) {
   }
 }
 
+function validateWatchdogPolicy(record) {
+  if (record.defaults?.monitoringEnabled !== false) {
+    fail("watchdog policy must disable monitoring by default");
+  }
+
+  if (record.defaults?.liveChecksAllowed !== false) {
+    fail("watchdog policy must disallow live checks by default");
+  }
+
+  if (record.defaults?.mutationsAllowed !== false) {
+    fail("watchdog policy must disallow mutations by default");
+  }
+
+  if (record.defaults?.notificationsAllowed !== false) {
+    fail("watchdog policy must disallow notifications by default");
+  }
+
+  if (record.approvalRules?.liveMonitoringRequiresOwnerApproval !== true) {
+    fail("watchdog policy must require owner approval for live monitoring");
+  }
+
+  if (record.approvalRules?.externalNotificationsRequireOwnerApproval !== true) {
+    fail("watchdog policy must require owner approval for external notifications");
+  }
+}
+
 for (const templateRecord of templateRecords) {
   try {
     const record = readJson(templateRecord.recordPath);
@@ -519,6 +553,10 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     if (schemaValidatedRecord.recordPath === ".codex/security/policy.json") {
       validateSecurityPolicy(record);
+    }
+
+    if (schemaValidatedRecord.recordPath === ".codex/watchdog/policy.json") {
+      validateWatchdogPolicy(record);
     }
 
     if (failures === failuresBeforeRecord) {
