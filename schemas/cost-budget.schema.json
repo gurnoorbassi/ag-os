@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/cost-budget.schema.json",
+  "title": "AG Digitalz OS Cost Budget",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "budgetVersion",
+    "budgetType",
+    "status",
+    "currency",
+    "limits",
+    "approvalRules",
+    "sourcingRules",
+    "defaultRestrictions",
+    "reviewCadence",
+    "notes"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../schemas/cost-budget.schema.json" },
+    "budgetVersion": { "type": "integer", "minimum": 1 },
+    "budgetType": { "type": "string", "const": "cost-os-budget" },
+    "status": { "type": "string", "enum": ["foundation", "active", "archived"] },
+    "currency": { "type": "string", "const": "USD" },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "monthlyMaxUsd",
+        "dailyMaxUsd",
+        "perTaskMaxUsd"
+      ],
+      "properties": {
+        "monthlyMaxUsd": { "type": "number", "const": 50 },
+        "dailyMaxUsd": { "type": "number", "const": 10 },
+        "perTaskMaxUsd": { "type": "number", "const": 5 }
+      }
+    },
+    "approvalRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "paidToolsRequireOwnerApproval",
+        "liveApiUsageRequiresOwnerApprovalUnlessApproved",
+        "billingChangesRequireOwnerApproval",
+        "newRecurringSpendRequiresOwnerApproval"
+      ],
+      "properties": {
+        "paidToolsRequireOwnerApproval": { "type": "boolean", "const": true },
+        "liveApiUsageRequiresOwnerApprovalUnlessApproved": { "type": "boolean", "const": true },
+        "billingChangesRequireOwnerApproval": { "type": "boolean", "const": true },
+        "newRecurringSpendRequiresOwnerApproval": { "type": "boolean", "const": true }
+      }
+    },
+    "sourcingRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preferExistingToolsAndInfrastructure",
+        "useCheapestOptionThatMeetsQuality",
+        "neverSacrificeQualityForTinyCostSavings"
+      ],
+      "properties": {
+        "preferExistingToolsAndInfrastructure": { "type": "boolean", "const": true },
+        "useCheapestOptionThatMeetsQuality": { "type": "boolean", "const": true },
+        "neverSacrificeQualityForTinyCostSavings": { "type": "boolean", "const": true }
+      }
+    },
+    "defaultRestrictions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "liveApiCallsAllowedByDefault",
+        "billingChangesAllowedByDefault",
+        "credentialsAllowed",
+        "deploymentsAllowedByDefault",
+        "paidActionsAllowedByDefault"
+      ],
+      "properties": {
+        "liveApiCallsAllowedByDefault": { "type": "boolean", "const": false },
+        "billingChangesAllowedByDefault": { "type": "boolean", "const": false },
+        "credentialsAllowed": { "type": "boolean", "const": false },
+        "deploymentsAllowedByDefault": { "type": "boolean", "const": false },
+        "paidActionsAllowedByDefault": { "type": "boolean", "const": false }
+      }
+    },
+    "reviewCadence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "budgetReview",
+        "taskCostReview"
+      ],
+      "properties": {
+        "budgetReview": { "type": "string", "enum": ["monthly"] },
+        "taskCostReview": { "type": "string", "enum": ["before_paid_or_live_usage"] }
+      }
+    },
+    "notes": { "type": "string", "minLength": 1 }
+  }
+}
