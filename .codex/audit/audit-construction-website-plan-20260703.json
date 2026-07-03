@@ -1,0 +1,36 @@
+{
+  "id": "audit-construction-website-plan-20260703",
+  "occurredAt": "2026-07-03T19:45:00Z",
+  "actor": "codex",
+  "eventType": "validation_run",
+  "summary": "Created a plan-only dry-run record chain for the owner command to make a construction website.",
+  "scope": "offline plan-only command dry run",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "document",
+      "reference": ".codex/commands/command-intake-construction-website-20260703.json"
+    },
+    {
+      "type": "document",
+      "reference": ".codex/jobs/job-construction-website-plan-20260703.json"
+    },
+    {
+      "type": "document",
+      "reference": ".codex/router/route-construction-website-plan-20260703.json"
+    },
+    {
+      "type": "document",
+      "reference": ".codex/plans/plan-construction-website-20260703.json"
+    },
+    {
+      "type": "document",
+      "reference": ".codex/boot/boot-construction-website-plan-20260703.json"
+    }
+  ],
+  "riskLevel": "low",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "No repository was created, no deployment was made, no credentials were used, and no paid tool was used.",
+  "createdAt": "2026-07-03T19:45:00Z"
+}

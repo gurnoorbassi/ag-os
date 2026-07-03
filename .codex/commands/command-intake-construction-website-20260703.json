@@ -1,0 +1,31 @@
+{
+  "commandIntakeId": "command-intake-construction-website-20260703",
+  "status": "converted_to_job",
+  "rawCommand": "make me a construction website",
+  "normalizedCommand": "Create a plan-only construction website build plan.",
+  "commandCategory": "plan_only",
+  "projectId": "project-unregistered-construction-website",
+  "riskLevel": "R1",
+  "classification": {
+    "requiresPlan": true,
+    "requiresApproval": false,
+    "requiresLiveService": false,
+    "requiresDeployment": false,
+    "requiresDomainChange": false,
+    "requiresPaidAction": false,
+    "requiresProductionData": false
+  },
+  "plannedOutput": "Plan-only website build proposal with project type identified as website and construction industry context.",
+  "nextRecord": {
+    "jobId": "job-construction-website-plan-20260703",
+    "planId": "plan-construction-website-20260703"
+  },
+  "safety": {
+    "executesCommand": false,
+    "createsLiveSideEffect": false,
+    "usesCredentials": false,
+    "callsConnector": false
+  },
+  "createdAt": "2026-07-03T19:45:00Z",
+  "updatedAt": "2026-07-03T19:45:00Z"
+}

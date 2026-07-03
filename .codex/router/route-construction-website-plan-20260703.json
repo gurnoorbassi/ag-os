@@ -1,0 +1,27 @@
+{
+  "routeId": "route-construction-website-plan-20260703",
+  "jobId": "job-construction-website-plan-20260703",
+  "commandType": "plan_only",
+  "projectId": "project-unregistered-construction-website",
+  "riskLevel": "R1",
+  "connectorNeeds": [],
+  "targetDomain": "planner",
+  "targetAgent": "planner-foundation",
+  "approvalGates": [
+    "future_build_requires_owner_confirmation",
+    "future_deployment_requires_owner_approval",
+    "future_domain_change_requires_owner_approval",
+    "future_paid_tool_use_requires_owner_approval"
+  ],
+  "routingReason": "The owner command requests a website outcome, so AG OS routes it to Planner for an offline plan-only website build proposal.",
+  "blockedBy": [],
+  "safety": {
+    "executionAuthorized": false,
+    "liveConnectorUseAllowed": false,
+    "deploymentAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-03T19:45:00Z",
+  "updatedAt": "2026-07-03T19:45:00Z"
+}

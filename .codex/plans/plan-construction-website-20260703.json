@@ -1,0 +1,73 @@
+{
+  "planId": "plan-construction-website-20260703",
+  "jobId": "job-construction-website-plan-20260703",
+  "commandId": "command-intake-construction-website-20260703",
+  "projectId": "project-unregistered-construction-website",
+  "summary": "Plan-only construction website proposal. Project type is website. Cost estimate is 0 USD for local dry-run planning.",
+  "riskLevel": "R1",
+  "estimatedCostUsd": 0,
+  "tools": [
+    "local_repository_files"
+  ],
+  "tasks": [
+    {
+      "taskId": "work-identify-website-type",
+      "description": "Classify the command as a website build request for a construction business context.",
+      "owner": "owner-gurnoor-bassi",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-plan-site-structure",
+      "description": "Prepare a future site structure plan with pages, sections, quality gates, and approval gates before any build work.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-list-approval-gates",
+      "description": "List gates for any future build, deployment, domain, paid tool, credential, or live-service work.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    }
+  ],
+  "approvalGates": [
+    {
+      "gateId": "gate-future-build-confirmation",
+      "approvalRequired": true,
+      "reason": "Building files for a new website requires a separate owner-approved scope."
+    },
+    {
+      "gateId": "gate-future-deployment",
+      "approvalRequired": true,
+      "reason": "Any staging or production deployment requires owner approval and rollback planning."
+    },
+    {
+      "gateId": "gate-future-domain",
+      "approvalRequired": true,
+      "reason": "Any domain or DNS change requires owner approval."
+    },
+    {
+      "gateId": "gate-future-paid-tool",
+      "approvalRequired": true,
+      "reason": "Any paid tool or live API use requires owner approval and cost ledger review."
+    }
+  ],
+  "expectedOutput": "Validated plan-only record chain proving AG OS can classify and plan a website request without live actions.",
+  "stopConditions": [
+    "credentials_needed",
+    "live_service_needed",
+    "deployment_requested",
+    "domain_or_dns_change_requested",
+    "paid_action_requested",
+    "production_or_customer_data_needed",
+    "repository_creation_requested"
+  ],
+  "safety": {
+    "executionAuthorized": false,
+    "liveServiceUseAllowed": false,
+    "deploymentAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-03T19:45:00Z",
+  "updatedAt": "2026-07-03T19:45:00Z"
+}
