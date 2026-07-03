@@ -9,6 +9,8 @@
     "name",
     "status",
     "owner",
+    "projectType",
+    "managementMode",
     "goal",
     "scope",
     "outOfScope",
@@ -29,7 +31,13 @@
     "name": { "type": "string", "minLength": 3 },
     "status": { "type": "string", "enum": ["idea", "planned", "active", "blocked", "paused", "complete", "archived"] },
     "owner": { "type": "string", "minLength": 1 },
+    "projectType": { "type": "string", "enum": ["internal_project", "product_project", "ag_os_core"] },
+    "managementMode": {
+      "type": "string",
+      "enum": ["observe_only", "read_only", "active_build", "managed_staging", "production_managed"]
+    },
     "goal": { "type": "string", "minLength": 1 },
+    "knownFacts": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "scope": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "outOfScope": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "trustLevel": { "type": "integer", "minimum": 0, "maximum": 4 },

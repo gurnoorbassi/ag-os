@@ -1,0 +1,58 @@
+{
+  "id": "project-ag-digitalz-ai-receptionist",
+  "name": "AG Digitalz AI Receptionist",
+  "status": "active",
+  "owner": "REQUIRED_OWNER",
+  "projectType": "product_project",
+  "managementMode": "active_build",
+  "goal": "Track AG Digitalz AI Receptionist as a separate product build project, not AG OS core.",
+  "knownFacts": [
+    "GitHub repo exists at https://github.com/gurnoorbassi/ag-digitalz-ai-receptionist.",
+    "This is a product project, not AG OS core.",
+    "The project is currently building under GitHub workflow.",
+    "No live services are connected unless repository records show otherwise."
+  ],
+  "scope": [
+    "Register production-clean project metadata in AG OS.",
+    "Keep AI Receptionist separate from AG OS core.",
+    "Track current build posture using known repository metadata only."
+  ],
+  "outOfScope": [
+    "Do not treat AI Receptionist as AG OS core.",
+    "Do not connect live services from AG OS.",
+    "Do not deploy.",
+    "Do not add credentials.",
+    "Do not use production or customer data.",
+    "Do not infer live service status beyond known records."
+  ],
+  "trustLevel": 0,
+  "stack": [
+    "GitHub"
+  ],
+  "risks": [
+    {
+      "risk": "AI Receptionist is a separate product project and could be confused with AG OS core work.",
+      "mitigation": "Keep its record marked as product_project and require separate approval for live service, deployment, credential, or production-data work."
+    }
+  ],
+  "approvalRequiredFor": [
+    "live service connection",
+    "deployments",
+    "credential handling",
+    "production or customer data handling",
+    "domain or DNS changes",
+    "workflow activation",
+    "management mode promotion"
+  ],
+  "qualityGates": [
+    "Project record remains production-clean.",
+    "No live service connection is added.",
+    "No credentials or production data are stored.",
+    "Future product work uses the product repository and a separate scoped PR."
+  ],
+  "securityReview": "Production-clean registry metadata only. No credentials, live endpoints, private configuration, production exports, or customer data are recorded.",
+  "costTracking": "No paid actions authorized. Future paid work requires Cost OS approval.",
+  "deploymentPlan": "No deployment from AG OS. Any deployment requires future owner-approved scope and rollback planning.",
+  "createdAt": "2026-07-03T11:32:35Z",
+  "updatedAt": "2026-07-03T11:32:35Z"
+}
