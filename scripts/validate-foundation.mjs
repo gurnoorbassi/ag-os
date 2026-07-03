@@ -17,6 +17,7 @@ const requiredPaths = [
   ".codex/locks/README.md",
   ".codex/ideas/README.md",
   ".codex/memory/README.md",
+  ".codex/memory/policy.json",
   ".codex/costs/README.md",
   ".codex/costs/budget.json",
   ".codex/quality/README.md",
@@ -35,6 +36,7 @@ const requiredPaths = [
   "docs/connector-registry.md",
   "docs/command-registry.md",
   "docs/cost-os.md",
+  "docs/memory-os.md",
   "docs/quality-os.md",
   "docs/security-os.md",
   "docs/watchdog-os.md",
@@ -43,6 +45,7 @@ const requiredPaths = [
   "schemas/command-registry.schema.json",
   "schemas/connector-registry.schema.json",
   "schemas/cost-budget.schema.json",
+  "schemas/memory-policy.schema.json",
   "schemas/quality-policy.schema.json",
   "schemas/security-policy.schema.json",
   "schemas/watchdog-policy.schema.json",
@@ -118,6 +121,11 @@ const schemaValidatedRecords = [
     name: "watchdog policy",
     recordPath: ".codex/watchdog/policy.json",
     schemaPath: "schemas/watchdog-policy.schema.json"
+  },
+  {
+    name: "memory policy",
+    recordPath: ".codex/memory/policy.json",
+    schemaPath: "schemas/memory-policy.schema.json"
   },
   {
     name: "project registry",
@@ -504,6 +512,32 @@ function validateWatchdogPolicy(record) {
   }
 }
 
+function validateMemoryPolicy(record) {
+  if (record.windows?.shortTermDays !== 30) {
+    fail("memory policy short-term window must be 30 days");
+  }
+
+  if (record.rules?.secretsAllowed !== false) {
+    fail("memory policy must disallow secrets");
+  }
+
+  if (record.rules?.customerDataAllowed !== false) {
+    fail("memory policy must disallow customer data");
+  }
+
+  if (record.rules?.sourceRequired !== true) {
+    fail("memory policy must require a source");
+  }
+
+  if (record.rules?.verifiedCurrentFactsRequireVerifiedAt !== true) {
+    fail("memory policy must require verifiedAt for verified current facts");
+  }
+
+  if (record.rules?.staleMemoryRequiresRefreshTrigger !== true) {
+    fail("memory policy must require refresh triggers for stale memory");
+  }
+}
+
 for (const templateRecord of templateRecords) {
   try {
     const record = readJson(templateRecord.recordPath);
@@ -557,6 +591,10 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     if (schemaValidatedRecord.recordPath === ".codex/watchdog/policy.json") {
       validateWatchdogPolicy(record);
+    }
+
+    if (schemaValidatedRecord.recordPath === ".codex/memory/policy.json") {
+      validateMemoryPolicy(record);
     }
 
     if (failures === failuresBeforeRecord) {

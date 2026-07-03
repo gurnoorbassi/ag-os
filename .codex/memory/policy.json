@@ -1,0 +1,43 @@
+{
+  "$schema": "../../schemas/memory-policy.schema.json",
+  "policyVersion": 1,
+  "policyType": "memory-os-policy",
+  "status": "foundation",
+  "windows": {
+    "shortTermDays": 30,
+    "mediumTermReviewDays": 90,
+    "longTermReviewRequired": true
+  },
+  "rules": {
+    "secretsAllowed": false,
+    "customerDataAllowed": false,
+    "productionDataAllowed": false,
+    "sourceRequired": true,
+    "verifiedCurrentFactsRequireVerifiedAt": true,
+    "staleMemoryRequiresRefreshTrigger": true,
+    "ownerApprovalRequiredForSensitiveMemory": true
+  },
+  "memoryStates": [
+    "verified_current",
+    "short_term",
+    "stale_needs_review",
+    "archived"
+  ],
+  "allowedRecordTypes": [
+    "decision",
+    "fact",
+    "preference",
+    "rule",
+    "state",
+    "runbook"
+  ],
+  "blockedContentTypes": [
+    "credentials",
+    "api_keys",
+    "passwords",
+    "private_keys",
+    "customer_data",
+    "production_data"
+  ],
+  "notes": "Foundation policy only. This file defines memory windows and privacy rules; it does not add memory records or store sensitive data."
+}

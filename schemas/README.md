@@ -16,6 +16,7 @@ Current validation checks schema metadata plus selected template and registry re
 - `agent.schema.json`
 - `task.schema.json`
 - `memory.schema.json`
+- `memory-policy.schema.json`
 - `cost.schema.json`
 - `quality-check.schema.json`
 - `security-review.schema.json`
