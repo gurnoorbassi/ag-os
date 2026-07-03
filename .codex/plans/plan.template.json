@@ -1,0 +1,41 @@
+{
+  "planId": "REQUIRED_PLAN_ID",
+  "jobId": "REQUIRED_JOB_ID",
+  "commandId": "REQUIRED_COMMAND_ID",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "summary": "REQUIRED_PLAN_SUMMARY",
+  "riskLevel": "R0",
+  "estimatedCostUsd": 0,
+  "tools": [
+    "REQUIRED_TOOL_OR_NONE"
+  ],
+  "tasks": [
+    {
+      "taskId": "REQUIRED_TASK_ID",
+      "description": "REQUIRED_TASK_DESCRIPTION",
+      "owner": "REQUIRED_OWNER_OR_SYSTEM",
+      "status": "planned"
+    }
+  ],
+  "approvalGates": [
+    {
+      "gateId": "REQUIRED_GATE_ID_OR_NONE",
+      "approvalRequired": true,
+      "approvalId": "REQUIRED_APPROVAL_ID_OR_NOT_REQUIRED",
+      "reason": "REQUIRED_GATE_REASON"
+    }
+  ],
+  "expectedOutput": "REQUIRED_EXPECTED_OUTPUT",
+  "stopConditions": [
+    "REQUIRED_STOP_CONDITION_OR_NONE"
+  ],
+  "safety": {
+    "executionAuthorized": false,
+    "liveServiceUseAllowed": false,
+    "deploymentAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
