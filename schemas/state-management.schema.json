@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/state-management.schema.json",
+  "title": "AG Digitalz OS State Management Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "stateId",
+    "stateType",
+    "status",
+    "generatedFrom",
+    "projects",
+    "tasks",
+    "jobs",
+    "pullRequests",
+    "approvals",
+    "incidents",
+    "costs",
+    "connectors",
+    "capabilities",
+    "validation",
+    "boot",
+    "watchdog",
+    "engine",
+    "rules",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "template": { "type": "boolean", "const": true },
+    "stateId": { "type": "string", "pattern": "^state-[a-z0-9-]+$" },
+    "stateType": { "type": "string", "enum": ["snapshot", "checkpoint", "health_report"] },
+    "status": { "type": "string", "enum": ["draft", "current", "stale", "blocked", "archived"] },
+    "generatedFrom": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "projects": { "type": "array", "items": { "type": "string" } },
+    "tasks": { "type": "array", "items": { "type": "string" } },
+    "jobs": { "type": "array", "items": { "type": "string" } },
+    "pullRequests": { "type": "array", "items": { "type": "string" } },
+    "approvals": { "type": "array", "items": { "type": "string" } },
+    "incidents": { "type": "array", "items": { "type": "string" } },
+    "costs": { "type": "array", "items": { "type": "string" } },
+    "connectors": { "type": "array", "items": { "type": "string" } },
+    "capabilities": { "type": "array", "items": { "type": "string" } },
+    "validation": { "$ref": "#/$defs/statusCheck" },
+    "boot": { "$ref": "#/$defs/statusCheck" },
+    "watchdog": { "$ref": "#/$defs/statusCheck" },
+    "engine": { "$ref": "#/$defs/statusCheck" },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "readOnly",
+        "sourceControlledOnly",
+        "liveServicesAllowed",
+        "credentialsAllowed",
+        "productionDataAllowed",
+        "customerDataAllowed"
+      ],
+      "properties": {
+        "readOnly": { "type": "boolean", "const": true },
+        "sourceControlledOnly": { "type": "boolean", "const": true },
+        "liveServicesAllowed": { "type": "boolean", "const": false },
+        "credentialsAllowed": { "type": "boolean", "const": false },
+        "productionDataAllowed": { "type": "boolean", "const": false },
+        "customerDataAllowed": { "type": "boolean", "const": false }
+      }
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "statusCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "lastCheckedAt"],
+      "properties": {
+        "status": { "type": "string", "enum": ["unknown", "pass", "warn", "fail", "blocked"] },
+        "lastCheckedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}
