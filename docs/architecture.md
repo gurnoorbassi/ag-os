@@ -58,6 +58,12 @@ Security records threat models, access reviews, secret handling, data sensitivit
 
 Watchdog records future monitoring plans and local checks. It must not ping, scrape, mutate, or monitor live services until explicitly authorized.
 
+### Governance
+
+Governance defines authority order, command categories, connector permissions, approval locks, owner roles, audit events, data classification, incident response, rollback rules, validation limits, and future Constitution rules.
+
+During foundation mode, governance is docs, schemas, READMEs, registries, and policy records only. It does not authorize live services, deployments, credentials, production data, customer data, paid actions, or domain changes.
+
 ## Current System Shape
 
 ```text
@@ -65,7 +71,7 @@ GitHub repo
   |
   |-- docs: operating intent and runbooks
   |-- schemas: JSON contracts for future state
-  |-- .codex: file-based operating artifacts
+  |-- .codex: file-based operating artifacts, registries, policy records, and governance folders
   |-- scripts: local validation
   `-- CI: local validation in GitHub Actions
 ```

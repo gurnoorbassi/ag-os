@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/approval-lock.schema.json",
+  "title": "AG Digitalz OS Approval Lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "status",
+    "ownerId",
+    "requestedBy",
+    "commandCategory",
+    "requestedAction",
+    "scope",
+    "riskLevel",
+    "approvalRequiredFor",
+    "approvedActions",
+    "prohibitedActions",
+    "evidence",
+    "expiresAt",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^approval-[a-z0-9-]+$" },
+    "status": { "type": "string", "enum": ["requested", "approved", "rejected", "expired", "revoked"] },
+    "ownerId": { "type": "string", "pattern": "^owner-[a-z0-9-]+$" },
+    "requestedBy": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "pattern": "^project-[a-z0-9-]+$" },
+    "taskId": { "type": "string", "pattern": "^task-[a-z0-9-]+$" },
+    "commandCategory": {
+      "type": "string",
+      "enum": [
+        "discuss_only",
+        "plan_only",
+        "build",
+        "deploy_staging",
+        "deploy_production",
+        "connect_service",
+        "change_domain",
+        "send_message",
+        "stop_all",
+        "rollback",
+        "audit"
+      ]
+    },
+    "requestedAction": { "type": "string", "minLength": 1 },
+    "scope": { "type": "string", "minLength": 1 },
+    "riskLevel": { "type": "string", "enum": ["tier_0", "tier_1", "tier_2", "owner_approval_required", "blocked"] },
+    "approvalRequiredFor": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[a-z0-9_]+$" }
+    },
+    "approvedActions": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9_]+$" }
+    },
+    "prohibitedActions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[a-z0-9_]+$" }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "reference", "verified"],
+        "properties": {
+          "type": { "type": "string", "enum": ["owner_instruction", "pr_link", "ci_status", "validation_output", "review_note", "other"] },
+          "reference": { "type": "string", "minLength": 1 },
+          "verified": { "type": "boolean" }
+        }
+      }
+    },
+    "approvalText": { "type": "string", "minLength": 1 },
+    "approvedAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}
