@@ -187,6 +187,49 @@ const schemaValidatedRecordDirectories = [
     schemaPath: "schemas/owner.schema.json"
   }
 ];
+const engineRecordDirectories = [
+  {
+    name: "job",
+    recordDir: ".codex/jobs",
+    schemaPath: "schemas/job.schema.json"
+  },
+  {
+    name: "plan",
+    recordDir: ".codex/plans",
+    schemaPath: "schemas/plan.schema.json"
+  },
+  {
+    name: "route",
+    recordDir: ".codex/router",
+    schemaPath: "schemas/task-route.schema.json"
+  },
+  {
+    name: "boot run",
+    recordDir: ".codex/boot",
+    schemaPath: "schemas/boot-sequence-run.schema.json"
+  },
+  {
+    name: "execution step",
+    recordDir: ".codex/execution",
+    schemaPath: "schemas/execution-step.schema.json"
+  },
+  {
+    name: "command intake",
+    recordDir: ".codex/commands",
+    schemaPath: "schemas/command-intake.schema.json",
+    excludeFiles: ["registry.json"]
+  },
+  {
+    name: "audit event",
+    recordDir: ".codex/audit",
+    schemaPath: "schemas/audit-event.schema.json"
+  },
+  {
+    name: "approval lock",
+    recordDir: ".codex/approvals",
+    schemaPath: "schemas/approval-lock.schema.json"
+  }
+];
 let failures = 0;
 
 function fail(message) {
@@ -257,6 +300,51 @@ function listJsonRecords(relativeDir) {
 
 function isPlaceholder(value) {
   return typeof value === "string" && placeholderPattern.test(value);
+}
+
+function isTemplateRecordPath(recordPath) {
+  return path.basename(recordPath) === "registry.json" ? false : recordPath.endsWith(".template.json");
+}
+
+function listEngineJsonRecords(recordDirectory) {
+  const excludedFiles = new Set(recordDirectory.excludeFiles ?? []);
+  return listJsonRecords(recordDirectory.recordDir).filter((recordPath) => !excludedFiles.has(path.basename(recordPath)));
+}
+
+function assertNoPlaceholders(value, location) {
+  if (isPlaceholder(value)) {
+    fail(`${location} must not use REQUIRED_* placeholders in active records`);
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertNoPlaceholders(item, `${location}[${index}]`));
+    return;
+  }
+
+  if (value && typeof value === "object") {
+    for (const [key, childValue] of Object.entries(value)) {
+      assertNoPlaceholders(childValue, `${location}.${key}`);
+    }
+  }
+}
+
+function assertNoFixtureMarkers(value, location) {
+  if (typeof value === "string" && /\b(?:fake|demo)\b/i.test(value)) {
+    fail(`${location} must not contain fake/demo markers in active records`);
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertNoFixtureMarkers(item, `${location}[${index}]`));
+    return;
+  }
+
+  if (value && typeof value === "object") {
+    for (const [key, childValue] of Object.entries(value)) {
+      assertNoFixtureMarkers(childValue, `${location}.${key}`);
+    }
+  }
 }
 
 function validateSchemaValue(value, schema, location, options = {}) {
@@ -901,6 +989,42 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
     }
   } catch (error) {
     fail(`${schemaValidatedRecord.name} could not be validated: ${error.message}`);
+  }
+}
+
+for (const engineRecordDirectory of engineRecordDirectories) {
+  try {
+    const schema = readJson(engineRecordDirectory.schemaPath);
+    const recordPaths = listEngineJsonRecords(engineRecordDirectory);
+    let activeRecordCount = 0;
+
+    for (const recordPath of recordPaths) {
+      const record = readJson(recordPath);
+      const failuresBeforeRecord = failures;
+
+      if (isTemplateRecordPath(recordPath)) {
+        validateTemplateObject(record, schema, recordPath);
+        if (failures === failuresBeforeRecord) {
+          pass(`${engineRecordDirectory.name} template structurally valid: ${recordPath}`);
+        }
+        continue;
+      }
+
+      activeRecordCount += 1;
+      assertNoPlaceholders(record, recordPath);
+      assertNoFixtureMarkers(record, recordPath);
+      validateSchemaObject(record, schema, recordPath);
+
+      if (failures === failuresBeforeRecord) {
+        pass(`${engineRecordDirectory.name} active record structurally valid: ${recordPath}`);
+      }
+    }
+
+    if (activeRecordCount === 0) {
+      pass(`no active ${engineRecordDirectory.name} records found in ${engineRecordDirectory.recordDir}`);
+    }
+  } catch (error) {
+    fail(`${engineRecordDirectory.name} records could not be validated: ${error.message}`);
   }
 }
 
