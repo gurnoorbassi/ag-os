@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/github-mcp-execution-gate.schema.json",
+  "title": "AG OS GitHub MCP Execution Gate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "githubMcpExecutionGateId",
+    "status",
+    "mode",
+    "connectorId",
+    "githubExecutionPlanId",
+    "projectId",
+    "riskLevel",
+    "validationPassed",
+    "actions",
+    "mergeGuard",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "githubMcpExecutionGateId": {
+      "type": "string",
+      "pattern": "^github-mcp-gate-[a-z0-9-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["blocked", "ready", "cancelled"]
+    },
+    "mode": {
+      "type": "string",
+      "const": "execution_gate_only"
+    },
+    "connectorId": {
+      "type": "string",
+      "const": "connector-github-mcp"
+    },
+    "githubExecutionPlanId": {
+      "type": "string",
+      "pattern": "^github-plan-[a-z0-9-]+$"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": ["R0", "R1", "R2", "R3", "R4", "R5", "R6"]
+    },
+    "validationPassed": {
+      "type": "boolean"
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "actionType",
+          "approvalGate",
+          "executionState",
+          "ownerApprovalRequired",
+          "requiresApprovalLock",
+          "requiresAuditEvent",
+          "requiresCiPassed",
+          "requiresValidationPassed",
+          "allowedAfterApproval",
+          "permittedWhen",
+          "blockedWhen"
+        ],
+        "properties": {
+          "actionType": {
+            "type": "string",
+            "enum": ["create_repo", "create_branch", "create_files", "update_files", "open_pr", "poll_ci", "merge_pr"]
+          },
+          "approvalGate": {
+            "type": "string",
+            "minLength": 1
+          },
+          "approvalId": {
+            "type": "string",
+            "pattern": "^approval-[0-9]{8}-[a-z0-9-]+$"
+          },
+          "executionState": {
+            "type": "string",
+            "enum": ["blocked", "ready_after_approval"]
+          },
+          "ownerApprovalRequired": {
+            "type": "boolean",
+            "const": true
+          },
+          "requiresApprovalLock": {
+            "type": "boolean",
+            "const": true
+          },
+          "requiresAuditEvent": {
+            "type": "boolean",
+            "const": true
+          },
+          "requiresCiPassed": {
+            "type": "boolean"
+          },
+          "requiresValidationPassed": {
+            "type": "boolean"
+          },
+          "allowedAfterApproval": {
+            "type": "boolean"
+          },
+          "permittedWhen": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "blockedWhen": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "mergeGuard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requiresApprovalGate",
+        "requiresCiPassed",
+        "requiresValidationPassed",
+        "requiresSafeMergeRulesPassed",
+        "requiresNoBlockedFiles",
+        "requiresNoLiveProductionPaidDomainOrCustomerDataAction",
+        "requiresAuditEvent"
+      ],
+      "properties": {
+        "requiresApprovalGate": { "type": "boolean", "const": true },
+        "requiresCiPassed": { "type": "boolean", "const": true },
+        "requiresValidationPassed": { "type": "boolean", "const": true },
+        "requiresSafeMergeRulesPassed": { "type": "boolean", "const": true },
+        "requiresNoBlockedFiles": { "type": "boolean", "const": true },
+        "requiresNoLiveProductionPaidDomainOrCustomerDataAction": { "type": "boolean", "const": true },
+        "requiresAuditEvent": { "type": "boolean", "const": true }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executesGitHubAction",
+        "createsRepository",
+        "writesRepositoryContent",
+        "opensPullRequest",
+        "pollsCi",
+        "mergesPullRequest",
+        "usesCredentials",
+        "touchesProductionData",
+        "usesPaidAction"
+      ],
+      "properties": {
+        "executesGitHubAction": { "type": "boolean", "const": false },
+        "createsRepository": { "type": "boolean", "const": false },
+        "writesRepositoryContent": { "type": "boolean", "const": false },
+        "opensPullRequest": { "type": "boolean", "const": false },
+        "pollsCi": { "type": "boolean", "const": false },
+        "mergesPullRequest": { "type": "boolean", "const": false },
+        "usesCredentials": { "type": "boolean", "const": false },
+        "touchesProductionData": { "type": "boolean", "const": false },
+        "usesPaidAction": { "type": "boolean", "const": false }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
