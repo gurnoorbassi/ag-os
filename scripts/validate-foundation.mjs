@@ -21,13 +21,16 @@ const requiredPaths = [
   ".codex/quality/README.md",
   ".codex/security/README.md",
   ".codex/watchdog/README.md",
+  ".codex/connectors/registry.json",
   ".codex/projects/README.md",
   ".codex/projects/registry.json",
   ".codex/projects/project.template.json",
   ".codex/tasks/task.template.json",
   ".codex/agents/agent.template.json",
+  "docs/connector-registry.md",
   "docs/project-registry.md",
   "schemas/idea.schema.json",
+  "schemas/connector-registry.schema.json",
   "schemas/project.schema.json",
   "schemas/project-registry.schema.json",
   "schemas/agent.schema.json",
@@ -71,6 +74,11 @@ const templateRecords = [
   }
 ];
 const schemaValidatedRecords = [
+  {
+    name: "connector registry",
+    recordPath: ".codex/connectors/registry.json",
+    schemaPath: "schemas/connector-registry.schema.json"
+  },
   {
     name: "project registry",
     recordPath: ".codex/projects/registry.json",
@@ -242,6 +250,31 @@ function validateTemplateObject(record, schema, location) {
   validateSchemaObject(record, schema, location, { allowPlaceholders: true });
 }
 
+function validateConnectorRegistry(record) {
+  const connectorIds = new Set((record.connectors ?? []).map((connector) => connector.id));
+  for (const requiredConnectorId of ["connector-github-mcp", "connector-n8n-mcp", "connector-netlify-mcp"]) {
+    if (!connectorIds.has(requiredConnectorId)) {
+      fail(`connector registry missing required connected MCP record: ${requiredConnectorId}`);
+    }
+  }
+
+  for (const connector of record.connectors ?? []) {
+    if (connector.connectionStatus !== "connected") {
+      fail(`connector ${connector.id} must be marked connected or moved out of connectors`);
+    }
+    if (/base44/i.test(`${connector.id} ${connector.name} ${connector.provider}`)) {
+      fail("Base44 must not be listed as a connected connector until a Base44 MCP is available");
+    }
+  }
+
+  const base44Entry = (record.availableButNotConnected ?? []).find((entry) => /base44/i.test(`${entry.name} ${entry.provider}`));
+  if (!base44Entry) {
+    fail("connector registry must mention Base44 as available but not connected");
+  } else if (base44Entry.connectionStatus !== "available_not_connected") {
+    fail("Base44 must be marked available_not_connected");
+  }
+}
+
 for (const templateRecord of templateRecords) {
   try {
     const record = readJson(templateRecord.recordPath);
@@ -271,6 +304,10 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     if (schemaValidatedRecord.recordPath === ".codex/projects/registry.json" && record.projects?.length !== 0) {
       fail("project registry foundation must not include project records yet");
+    }
+
+    if (schemaValidatedRecord.recordPath === ".codex/connectors/registry.json") {
+      validateConnectorRegistry(record);
     }
 
     if (failures === failuresBeforeRecord) {
