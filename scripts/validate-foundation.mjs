@@ -11,6 +11,7 @@ const requiredPaths = [
   "docs/hosting-plan.md",
   "docs/project-creation.md",
   "docs/lead-gen-migration-plan.md",
+  "docs/safe-merge-policy.md",
   ".codex/agents/README.md",
   ".codex/tasks/README.md",
   ".codex/locks/README.md",

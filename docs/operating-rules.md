@@ -26,6 +26,12 @@ Approval is required before:
 - Deleting, overwriting, or bulk-moving business data
 - Touching the existing lead generation system
 
+## Safe Merge Policy
+
+Codex-controlled merging is governed by `docs/safe-merge-policy.md`.
+
+Tier 0 docs, templates, schemas, and metadata may be merged automatically after CI, local validation, and safety checks pass. Tier 1 validation and test infrastructure may also be merged automatically when it has no live service access. Credentials, live services, deployments, DNS, paid tools, production data, customer data, database migrations, merge conflicts, failed CI, unclear scope, or risky file changes require owner approval before merge.
+
 ## Agent Rules
 
 Agents must have:
