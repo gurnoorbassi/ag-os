@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/approval-ledger.schema.json",
+  "title": "AG OS Approval Ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ledgerId",
+    "status",
+    "approvalLocks",
+    "summary",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "ledgerId": {
+      "type": "string",
+      "pattern": "^approval-ledger-[a-z0-9-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "template",
+        "draft",
+        "active",
+        "blocked",
+        "archived"
+      ]
+    },
+    "approvalLocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "approvalId",
+          "status",
+          "scope",
+          "riskLevel",
+          "approvalRequiredFor"
+        ],
+        "properties": {
+          "approvalId": {
+            "type": "string",
+            "pattern": "^approval-[0-9]{8}-[a-z0-9-]+$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "active",
+              "expired",
+              "revoked",
+              "cancelled"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "riskLevel": {
+            "type": "string",
+            "enum": [
+              "R0",
+              "R1",
+              "R2",
+              "R3",
+              "R4",
+              "R5",
+              "R6"
+            ]
+          },
+          "approvalRequiredFor": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activeApprovals",
+        "expiredApprovals",
+        "revokedApprovals",
+        "blockedActions"
+      ],
+      "properties": {
+        "activeApprovals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expiredApprovals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "revokedApprovals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blockedActions": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "createsRealApproval",
+        "authorizesLiveAction",
+        "authorizesDeployment",
+        "authorizesPaidAction"
+      ],
+      "properties": {
+        "createsRealApproval": {
+          "type": "boolean",
+          "const": false
+        },
+        "authorizesLiveAction": {
+          "type": "boolean",
+          "const": false
+        },
+        "authorizesDeployment": {
+          "type": "boolean",
+          "const": false
+        },
+        "authorizesPaidAction": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "approvalId": "approval-YYYYMMDD-required-slug",
+  "status": "draft",
+  "riskLevel": "R0",
+  "scope": "REQUIRED_APPROVAL_SCOPE",
+  "approvedBy": "REQUIRED_OWNER_OR_DELEGATE",
+  "approvedActions": [
+    "REQUIRED_APPROVED_ACTION"
+  ],
+  "notApprovedActions": [
+    "REQUIRED_EXCLUDED_ACTION"
+  ],
+  "evidence": [
+    {
+      "type": "REQUIRED_EVIDENCE_TYPE",
+      "reference": "REQUIRED_EVIDENCE_REFERENCE"
+    }
+  ],
+  "expiration": "REQUIRED_EXPIRATION",
+  "revocationPath": "REQUIRED_REVOCATION_PATH",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
