@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AG OS Dashboard</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Dashboard sections">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">AG</div>
+          <div>
+            <p class="brand-title">AG OS</p>
+            <p class="brand-subtitle">Dashboard v1</p>
+          </div>
+        </div>
+        <nav class="section-nav">
+          <a href="#overview">Overview</a>
+          <a href="#projects">Projects</a>
+          <a href="#registries">Registries</a>
+          <a href="#operating-systems">Operating Systems</a>
+          <a href="#safe-merge">Safe Merge</a>
+        </nav>
+      </aside>
+
+      <main class="dashboard">
+        <header class="topbar">
+          <div>
+            <h1>AG OS Dashboard</h1>
+            <p>Read-only operating view from source-controlled AG OS records.</p>
+          </div>
+          <div class="mode-lock" aria-label="Dashboard mode">Read-only</div>
+        </header>
+
+        <section id="overview" class="section-band">
+          <div class="section-heading">
+            <h2>Overview</h2>
+            <p>Current governance and registry posture.</p>
+          </div>
+          <div id="overview-grid" class="status-grid" aria-live="polite"></div>
+        </section>
+
+        <section id="projects" class="section-band">
+          <div class="section-heading">
+            <h2>Projects</h2>
+            <p>Registered product and operating projects.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Status</th>
+                  <th>Mode</th>
+                  <th>Risk</th>
+                  <th>Boundary</th>
+                </tr>
+              </thead>
+              <tbody id="projects-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="registries" class="section-band">
+          <div class="section-heading">
+            <h2>Registries</h2>
+            <p>Connector, command, and capability registry status.</p>
+          </div>
+          <div id="registry-grid" class="status-grid"></div>
+        </section>
+
+        <section id="operating-systems" class="section-band">
+          <div class="section-heading">
+            <h2>Operating Systems</h2>
+            <p>Cost, memory, and watchdog posture.</p>
+          </div>
+          <div id="os-grid" class="status-grid"></div>
+        </section>
+
+        <section id="safe-merge" class="section-band">
+          <div class="section-heading">
+            <h2>Safe Merge</h2>
+            <p>Merge posture from AG OS policy records.</p>
+          </div>
+          <div id="safe-merge-panel" class="policy-panel"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./dashboard-data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

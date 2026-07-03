@@ -5,7 +5,9 @@
   "description": "AG Digitalz OS foundation: docs, schemas, safety rules, and validation only.",
   "type": "module",
   "scripts": {
-    "validate": "node scripts/validate-foundation.mjs"
+    "dashboard:build": "node scripts/build-dashboard.mjs",
+    "dashboard:check": "node scripts/check-dashboard.mjs",
+    "validate": "node scripts/validate-foundation.mjs && node scripts/check-dashboard.mjs"
   },
   "engines": {
     "node": ">=20"
