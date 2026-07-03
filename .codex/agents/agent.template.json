@@ -1,0 +1,14 @@
+{
+  "template": true,
+  "id": "REQUIRED_AGENT_ID",
+  "name": "REQUIRED_AGENT_NAME",
+  "role": "REQUIRED_AGENT_ROLE",
+  "purpose": "REQUIRED_AGENT_PURPOSE",
+  "allowedInputs": ["REQUIRED_ALLOWED_INPUT"],
+  "prohibitedActions": ["REQUIRED_PROHIBITED_ACTION"],
+  "approvalRequiredFor": ["REQUIRED_APPROVAL_GATE"],
+  "outputs": ["REQUIRED_OUTPUT"],
+  "escalationRules": ["REQUIRED_ESCALATION_RULE"],
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

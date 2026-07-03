@@ -1,0 +1,13 @@
+{
+  "template": true,
+  "id": "REQUIRED_TASK_ID",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "title": "REQUIRED_TASK_TITLE",
+  "status": "REQUIRED_STATUS",
+  "riskLevel": "REQUIRED_RISK_LEVEL",
+  "acceptanceCriteria": ["REQUIRED_ACCEPTANCE_CRITERION"],
+  "evidence": ["REQUIRED_EVIDENCE"],
+  "rollback": "REQUIRED_ROLLBACK",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

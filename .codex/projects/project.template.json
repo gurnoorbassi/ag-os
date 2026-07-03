@@ -1,0 +1,25 @@
+{
+  "template": true,
+  "id": "REQUIRED_PROJECT_ID",
+  "name": "REQUIRED_PROJECT_NAME",
+  "status": "REQUIRED_STATUS",
+  "owner": "REQUIRED_OWNER",
+  "goal": "REQUIRED_PROJECT_GOAL",
+  "scope": ["REQUIRED_PROJECT_SCOPE"],
+  "outOfScope": ["REQUIRED_PROJECT_OUT_OF_SCOPE"],
+  "trustLevel": "REQUIRED_TRUST_LEVEL",
+  "stack": ["REQUIRED_STACK"],
+  "risks": [
+    {
+      "risk": "REQUIRED_RISK",
+      "mitigation": "REQUIRED_MITIGATION"
+    }
+  ],
+  "approvalRequiredFor": ["REQUIRED_APPROVAL_GATE"],
+  "qualityGates": ["REQUIRED_QUALITY_GATE"],
+  "securityReview": "REQUIRED_SECURITY_REVIEW",
+  "costTracking": "REQUIRED_COST_TRACKING",
+  "deploymentPlan": "REQUIRED_DEPLOYMENT_PLAN",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

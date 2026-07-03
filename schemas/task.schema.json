@@ -6,6 +6,7 @@
   "additionalProperties": false,
   "required": ["id", "projectId", "title", "status", "riskLevel", "acceptanceCriteria", "evidence", "createdAt", "updatedAt"],
   "properties": {
+    "template": { "type": "boolean", "const": true },
     "id": { "type": "string", "pattern": "^task-[a-z0-9-]+$" },
     "projectId": { "type": "string", "pattern": "^project-[a-z0-9-]+$" },
     "title": { "type": "string", "minLength": 3 },
