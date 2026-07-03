@@ -109,6 +109,73 @@
         }
       }
     },
+    "understanding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producedBy",
+        "inferredBusinessObjective",
+        "productArchetype",
+        "targetUser",
+        "successCriteria",
+        "criticalUnknowns",
+        "confidence",
+        "assumptions",
+        "ownerConstraints"
+      ],
+      "properties": {
+        "producedBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inferredBusinessObjective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "productArchetype": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetUser": {
+          "type": "string",
+          "minLength": 1
+        },
+        "successCriteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "criticalUnknowns": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ownerConstraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
     "plannedOutput": {
       "type": "string",
       "minLength": 1

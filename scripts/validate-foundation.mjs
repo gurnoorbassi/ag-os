@@ -187,6 +187,31 @@ const schemaValidatedRecordDirectories = [
     schemaPath: "schemas/owner.schema.json"
   }
 ];
+const knowledgeRecordDirectories = [
+  {
+    name: "product archetype",
+    recordDir: ".codex/archetypes",
+    schemaPath: "schemas/product-archetype.schema.json"
+  },
+  {
+    name: "accepted lesson",
+    recordDir: ".codex/memory/lessons",
+    schemaPath: "schemas/lesson.schema.json",
+    allowedStatuses: ["accepted", "archived"]
+  },
+  {
+    name: "lesson candidate",
+    recordDir: ".codex/memory/lessons/candidates",
+    schemaPath: "schemas/lesson.schema.json",
+    allowedStatuses: ["candidate", "rejected"]
+  },
+  {
+    name: "owner preference profile",
+    recordDir: ".codex/owners/preferences",
+    schemaPath: "schemas/owner-preferences.schema.json",
+    allowedStatuses: ["active", "archived"]
+  }
+];
 const engineRecordDirectories = [
   {
     name: "job",
@@ -1025,6 +1050,51 @@ for (const engineRecordDirectory of engineRecordDirectories) {
     }
   } catch (error) {
     fail(`${engineRecordDirectory.name} records could not be validated: ${error.message}`);
+  }
+}
+
+for (const knowledgeRecordDirectory of knowledgeRecordDirectories) {
+  try {
+    if (!existsSync(path.join(root, knowledgeRecordDirectory.recordDir))) {
+      pass(`no ${knowledgeRecordDirectory.name} directory present yet: ${knowledgeRecordDirectory.recordDir}`);
+      continue;
+    }
+
+    const schema = readJson(knowledgeRecordDirectory.schemaPath);
+    const recordPaths = listEngineJsonRecords(knowledgeRecordDirectory);
+    let activeRecordCount = 0;
+
+    for (const recordPath of recordPaths) {
+      const record = readJson(recordPath);
+      const failuresBeforeRecord = failures;
+
+      if (isTemplateRecordPath(recordPath)) {
+        validateTemplateObject(record, schema, recordPath);
+        if (failures === failuresBeforeRecord) {
+          pass(`${knowledgeRecordDirectory.name} template structurally valid: ${recordPath}`);
+        }
+        continue;
+      }
+
+      activeRecordCount += 1;
+      assertNoPlaceholders(record, recordPath);
+      assertNoFixtureMarkers(record, recordPath);
+      validateSchemaObject(record, schema, recordPath);
+
+      if (knowledgeRecordDirectory.allowedStatuses && !knowledgeRecordDirectory.allowedStatuses.includes(record.status)) {
+        fail(`${recordPath} status must be one of: ${knowledgeRecordDirectory.allowedStatuses.join(", ")}`);
+      }
+
+      if (failures === failuresBeforeRecord) {
+        pass(`${knowledgeRecordDirectory.name} active record structurally valid: ${recordPath}`);
+      }
+    }
+
+    if (activeRecordCount === 0) {
+      pass(`no active ${knowledgeRecordDirectory.name} records found in ${knowledgeRecordDirectory.recordDir}`);
+    }
+  } catch (error) {
+    fail(`${knowledgeRecordDirectory.name} records could not be validated: ${error.message}`);
   }
 }
 

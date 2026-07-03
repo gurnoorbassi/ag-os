@@ -4,6 +4,21 @@ The Planner turns owner commands into structured plans before execution is consi
 
 This foundation is planning metadata only. It does not execute steps, modify services, deploy code, connect credentials, or spend money.
 
+## Assembler Model
+
+The Planner is a validator and assembler, not an author. Plan content is authored by a model worker as a plan draft under `docs/worker-protocol.md`; the planner script deterministically verifies the draft, merges in mandatory approval gates and stop conditions that no draft can remove, enforces the `$5` per-task cost limit, and writes the plan record.
+
+A worker plan draft must provide `summary`, `tasks`, `tools`, and `expectedOutput`, and should provide a `basis` block that cites:
+
+- `productArchetype`: the archetype the plan follows, or a stated none.
+- `appliedLessons`: accepted lessons used, when any.
+- `ownerPreferencesUsed`: owner preferences applied, when any.
+- `stackChoice`: the Bootstrap Mode stack decision and why.
+- `qualityBar`: the quality bar inherited from the archetype.
+- `assumptions`: inferred decisions the owner can veto at plan review.
+
+When no draft is provided, the planner emits only a plan-only scaffold whose tasks are to produce the understanding block and the plan draft. Hardcoded per-category task lists are not allowed in planner code; category knowledge lives in archetypes.
+
 ## Plan Inputs
 
 Future plans must be built from:

@@ -1,0 +1,135 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-website",
+  "name": "Business Website",
+  "category": "website",
+  "status": "active",
+  "professionalExpectations": [
+    "Clear statement of what the business does, for whom, and where, visible without scrolling.",
+    "A visible primary contact path on every page: phone, form, or both.",
+    "Real service descriptions rather than filler copy.",
+    "Proof elements: past work, testimonials, certifications, or service-area credibility.",
+    "Fast load on mobile connections and correct rendering on phone-width screens.",
+    "Working links, working forms, no placeholder text in published output.",
+    "Consistent branding: one logo treatment, one palette, one type scale."
+  ],
+  "minimumQualityBar": [
+    "Every page passes mobile and desktop layout review.",
+    "Primary call to action is reachable within one click from any page.",
+    "No lorem ipsum, broken images, or empty sections at publish time.",
+    "Forms validate input and clearly confirm submission.",
+    "Page titles and descriptions are unique and descriptive.",
+    "Local validation passes before any PR merges."
+  ],
+  "commonPages": [
+    "Home",
+    "Services or Products",
+    "About",
+    "Proof (projects, gallery, or testimonials)",
+    "Contact",
+    "Service area or locations when the business is local"
+  ],
+  "uxExpectations": [
+    "Navigation stays under seven top-level items.",
+    "One primary call to action per page, visually dominant.",
+    "Readable type contrast and sizes on mobile without zooming.",
+    "Content ordered by visitor priority: what, proof, how to contact.",
+    "No autoplaying audio, intrusive popups, or scroll hijacking."
+  ],
+  "seoBasics": [
+    "Unique title and meta description per page.",
+    "One H1 per page matching search intent.",
+    "Descriptive URLs and alt text on meaningful images.",
+    "Local business schema markup when the business serves a local area.",
+    "Sitemap and robots configuration generated at build time."
+  ],
+  "conversionBasics": [
+    "Primary conversion action defined before design starts.",
+    "Contact options match how the audience actually reaches out.",
+    "Proof placed adjacent to calls to action.",
+    "Forms ask only for fields the business will actually use.",
+    "Thank-you or confirmation state defined for every conversion path."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Static or lightweight framework site kept in a GitHub repository.",
+      "GitHub as source of truth with CI validation before merge.",
+      "Netlify as the future hosting target, deploys only after owner approval.",
+      "Existing domain or subdomain, changed only with owner approval.",
+      "No database unless the site genuinely needs dynamic data.",
+      "Base44 optional for visual prototyping only, never source of truth."
+    ],
+    "notes": "Prefer the existing stack first. A static site meets the quality bar for most business websites at near-zero cost."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-scope",
+      "name": "Scope and information architecture",
+      "goals": [
+        "Define audience, offer, service area, and the primary conversion action.",
+        "Define the page list and content outline from owner-provided requirements.",
+        "Record assumptions and open questions, maximum three critical unknowns."
+      ]
+    },
+    {
+      "phaseId": "phase-build",
+      "name": "Build and content",
+      "goals": [
+        "Implement pages against the information architecture in a GitHub repository.",
+        "Write real copy grounded in owner-provided business facts.",
+        "Pass local validation and CI on every PR."
+      ]
+    },
+    {
+      "phaseId": "phase-quality",
+      "name": "Quality pass",
+      "goals": [
+        "Review against this archetype's quality checklist.",
+        "Fix mobile, performance, SEO, and conversion gaps.",
+        "Record a quality score and lesson candidates."
+      ]
+    },
+    {
+      "phaseId": "phase-launch",
+      "name": "Approval-gated launch",
+      "goals": [
+        "Prepare deployment plan and rollback notes.",
+        "Stop for owner approval before any hosting, deploy, or domain action."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Building pages before the conversion goal is defined.",
+    "Filler copy that describes no real service or area.",
+    "Desktop-only design reviewed on a wide monitor only.",
+    "Adding a CMS or database a brochure site does not need.",
+    "Treating deployment as part of the build instead of an owner-gated step.",
+    "Skipping the proof section because content is not ready."
+  ],
+  "approvalGates": [
+    "Repository creation is a live connector action and requires owner approval.",
+    "Any Netlify staging or production deploy requires owner approval.",
+    "Any domain or DNS change requires owner approval.",
+    "Any paid tool, stock asset purchase, or paid API requires owner approval."
+  ],
+  "qualityChecklist": [
+    "Value proposition is clear within five seconds on the home page.",
+    "All archetype common pages exist or were consciously excluded in the plan.",
+    "Primary call to action works and is one click away everywhere.",
+    "Mobile layout reviewed at phone width.",
+    "SEO basics applied: titles, descriptions, H1s, alt text, sitemap.",
+    "Forms validated and confirmation states present.",
+    "No placeholder content in the final output.",
+    "Local validation and CI pass.",
+    "Cost stayed within Cost OS limits."
+  ],
+  "sources": [
+    ".codex/plans/plan-construction-website-20260703.json",
+    ".codex/plans/plan-runtime-construction-website-automated-20260703.json",
+    "docs/bootstrap-mode.md"
+  ],
+  "notes": "Grounded in the construction website dry runs of 2026-07-03. This record is knowledge only; it authorizes nothing.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/lesson.schema.json",
+  "title": "AG OS Lesson",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "lessonId",
+    "title",
+    "lesson",
+    "sources",
+    "scope",
+    "confidence",
+    "status",
+    "owner",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "lessonId": { "type": "string", "pattern": "^lesson-[a-z0-9-]+$" },
+    "title": { "type": "string", "minLength": 1 },
+    "lesson": { "type": "string", "minLength": 1 },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["personal", "project", "company", "agent_shared"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "accepted", "rejected", "archived"]
+    },
+    "owner": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string" },
+    "appliesTo": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "promotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "approvedBy": { "type": "string" },
+        "approvedAt": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "notes": { "type": "string" },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string", "minLength": 1 }
+  }
+}

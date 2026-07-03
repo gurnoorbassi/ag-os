@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import process from "node:process";
 import { writeCommandIntakeRecord } from "./lib/runtime/command-intake-processor.mjs";
 
@@ -12,13 +13,18 @@ function readArg(name) {
 
 const command = readArg("--command");
 const runId = readArg("--run-id");
+const understandingPath = readArg("--understanding");
 
 if (!command) {
-  console.error("Usage: node scripts/process-command-intake.mjs --command \"make me a construction website\" --run-id construction-website");
+  console.error("Usage: node scripts/process-command-intake.mjs --command \"make me a construction website\" --run-id construction-website [--understanding path/to/understanding.json]");
   process.exit(1);
 }
 
-const result = writeCommandIntakeRecord({ command, runId });
+const understanding = understandingPath
+  ? JSON.parse(readFileSync(understandingPath, "utf8"))
+  : undefined;
+
+const result = writeCommandIntakeRecord({ command, runId, understanding });
 console.log(JSON.stringify({
   processor: "command-intake",
   recordPath: result.filePath,

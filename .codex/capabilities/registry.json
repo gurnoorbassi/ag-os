@@ -2,8 +2,33 @@
   "$schema": "../../schemas/capability-registry.schema.json",
   "registryVersion": 1,
   "registryType": "capability-registry",
-  "status": "foundation",
-  "capabilities": [],
+  "status": "active",
+  "capabilities": [
+    {
+      "id": "capability-live-github-private-repo-creation",
+      "name": "Live GitHub private repository creation",
+      "type": "connector_execution",
+      "provenBy": [
+        ".codex/approvals/approval-20260703-github-repo-create.json",
+        ".codex/boot/boot-runtime-github-construction-website-repo-20260703.json",
+        ".codex/audit/audit-20260703-github-repo-create-owner-approved.json",
+        ".codex/audit/audit-20260703-github-repo-create-executed.json",
+        ".codex/connectors/connector-exec-20260703-github-repo-create-live-result.json"
+      ],
+      "boundaries": [
+        "Requires a scoped, unexpired approval lock for the exact repository target.",
+        "Requires a passing boot check and foundation validation before execution.",
+        "Requires audit events for approval and execution.",
+        "Stops before any deploy, domain or DNS change, workflow activation, or paid action.",
+        "Netlify actions, n8n actions, live deploys, social posting, production changes, and domain changes are not proven capabilities."
+      ],
+      "owner": "owner-gurnoor-bassi",
+      "status": "active",
+      "safetyTier": "owner_approval_required",
+      "approvalRequired": true,
+      "notes": "Proven on 2026-07-03 through the full gate chain. This record describes a proven capability; it does not authorize any future execution without a new approval lock."
+    }
+  ],
   "allowedCapabilityTypes": [
     "discussion",
     "planning",

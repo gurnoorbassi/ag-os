@@ -18,9 +18,15 @@ Schema:
 schemas/capability-registry.schema.json
 ```
 
-## Foundation Status
+## Current Status
 
-The registry is in foundation mode and contains no capability records.
+The registry is active and records proven capabilities honestly.
+
+Registered proven capabilities:
+
+- `capability-live-github-private-repo-creation`: live GitHub private repository creation, proven 2026-07-03 through approval lock, boot check, validation, audit events, and a recorded connector result, with a hard stop before any deploy, domain, workflow, or paid action.
+
+Not proven and not registered: Netlify actions, n8n actions, live deploys, social posting, production changes, and domain changes. A capability record never authorizes execution; every gated action still requires its own approval lock.
 
 Future capability records must include:
 

@@ -93,8 +93,8 @@ window.AG_OS_DASHBOARD_DATA = {
     "paidTools": "Paid tools require owner approval"
   },
   "capabilityRegistry": {
-    "status": "foundation",
-    "count": 0,
+    "status": "active",
+    "count": 1,
     "allowedTypes": [
       "discussion: allowed foundation type",
       "planning: allowed foundation type",

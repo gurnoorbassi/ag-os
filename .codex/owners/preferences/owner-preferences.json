@@ -1,0 +1,87 @@
+{
+  "$schema": "../../../schemas/owner-preferences.schema.json",
+  "profileId": "owner-preferences-gurnoor-bassi",
+  "ownerId": "owner-gurnoor-bassi",
+  "status": "active",
+  "rules": {
+    "explicitStatementsOnly": true,
+    "privateContactDetailsAllowed": false,
+    "sensitivePersonalInfoAllowed": false,
+    "inferredSensitiveInfoAllowed": false
+  },
+  "preferences": [
+    {
+      "preferenceId": "pref-quality-over-quantity",
+      "statement": "Quality over quantity. One excellent implementation beats five weak ones.",
+      "category": "quality"
+    },
+    {
+      "preferenceId": "pref-bootstrap-mode-until-revenue",
+      "statement": "Bootstrap Mode stays active until AG OS-attributable revenue exists or the owner disables it.",
+      "category": "cost"
+    },
+    {
+      "preferenceId": "pref-monthly-budget-cap",
+      "statement": "Monthly spend maximum is $50.",
+      "category": "cost"
+    },
+    {
+      "preferenceId": "pref-daily-budget-cap",
+      "statement": "Daily spend maximum is $10.",
+      "category": "cost"
+    },
+    {
+      "preferenceId": "pref-per-task-budget-cap",
+      "statement": "Per-task spend maximum is $5.",
+      "category": "cost"
+    },
+    {
+      "preferenceId": "pref-production-clean-registries",
+      "statement": "No fabricated or fixture registry records. Registries stay production-clean.",
+      "category": "governance"
+    },
+    {
+      "preferenceId": "pref-required-placeholders",
+      "statement": "Unknown values use REQUIRED_ placeholders in templates only; active records must not carry placeholders.",
+      "category": "governance"
+    },
+    {
+      "preferenceId": "pref-existing-stack-first",
+      "statement": "Use the existing stack first: Hetzner VPS, Postgres, n8n, GitHub, Netlify, existing domain, and Claude credits.",
+      "category": "stack"
+    },
+    {
+      "preferenceId": "pref-github-source-of-truth",
+      "statement": "GitHub is the source of truth for all AG OS work.",
+      "category": "stack"
+    },
+    {
+      "preferenceId": "pref-base44-optional",
+      "statement": "Base44 is optional for prototypes only and is never source of truth.",
+      "category": "stack"
+    },
+    {
+      "preferenceId": "pref-lead-gen-protected",
+      "statement": "Lead Gen is a protected finished production project in observe/read-only mode.",
+      "category": "product"
+    },
+    {
+      "preferenceId": "pref-ai-receptionist-separate",
+      "statement": "AI Receptionist is a separate product project, not AG OS core.",
+      "category": "product"
+    },
+    {
+      "preferenceId": "pref-command-driven-execution",
+      "statement": "Command-driven execution: the owner states the outcome and AG OS handles safe execution steps.",
+      "category": "workflow"
+    },
+    {
+      "preferenceId": "pref-no-micromanagement",
+      "statement": "The owner does not want to micromanage routine safe steps; AG OS stops only at approval gates and stop conditions.",
+      "category": "workflow"
+    }
+  ],
+  "notes": "Only preferences explicitly stated by the owner. New preferences require an explicit owner statement and a reviewed PR.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}
