@@ -1,0 +1,24 @@
+{
+  "auditEventId": "audit-YYYYMMDD-required-slug",
+  "eventType": "REQUIRED_EVENT_TYPE",
+  "actor": "REQUIRED_ACTOR",
+  "projectId": "REQUIRED_PROJECT_ID_OR_NONE",
+  "relatedRecordId": "REQUIRED_RELATED_RECORD_ID",
+  "riskLevel": "R0",
+  "summary": "REQUIRED_EVENT_SUMMARY",
+  "evidence": [
+    {
+      "type": "REQUIRED_EVIDENCE_TYPE",
+      "reference": "REQUIRED_EVIDENCE_REFERENCE"
+    }
+  ],
+  "outcome": "recorded",
+  "tamperResistance": {
+    "appendOnly": true,
+    "redacted": true,
+    "containsCredentials": false,
+    "containsProductionData": false,
+    "containsCustomerData": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT"
+}
