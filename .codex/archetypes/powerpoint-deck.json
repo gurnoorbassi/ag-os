@@ -1,0 +1,111 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-presentation",
+  "name": "PowerPoint Deck",
+  "category": "presentation",
+  "status": "active",
+  "professionalExpectations": [
+    "A PowerPoint deck must communicate a clear argument, audience-specific story, and polished visual hierarchy.",
+    "The first version should prioritize narrative, slide structure, proof, and reviewability before advanced animation.",
+    "Sources, claims, and owner-provided facts must be traceable when the deck is used for business or schoolwork.",
+    "Export, sharing, and branding decisions must remain under owner control."
+  ],
+  "minimumQualityBar": [
+    "Purpose, audience, outcome, slide order, and key message are explicit.",
+    "Slides avoid crowded text, unsupported claims, inconsistent styling, and unclear calls to action.",
+    "Any citation or external source need is documented and must not be fabricated.",
+    "No private, customer, production, or restricted data is inserted without owner-approved handling."
+  ],
+  "commonModules": [
+    "Audience brief, objective, outline, slide inventory, and speaker-note plan.",
+    "Title, problem, solution, proof, process, offer, roadmap, financial, and next-step sections when relevant.",
+    "Visual system with typography, colors, charts, iconography, and image direction.",
+    "Review checklist for accuracy, narrative flow, accessibility, and export readiness."
+  ],
+  "uxExpectations": [
+    "Decks should be scannable from slide sorter view and readable in presentation mode.",
+    "Each slide should have one primary idea and an obvious visual focal point.",
+    "Charts and tables must be legible without relying on tiny labels.",
+    "Speaker notes should support delivery without hiding critical information."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Markdown or local outline first",
+      "PowerPoint or compatible deck generation only after outline approval",
+      "Canva or Base44 only as optional prototype tools when useful",
+      "Repository storage for source outline and review notes",
+      "No live sharing or publishing without owner approval"
+    ],
+    "notes": "Start with outline and slide plan. Use external design tools only when approved and useful."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-brief",
+      "name": "Brief And Story",
+      "goals": [
+        "Define audience, outcome, story arc, key messages, and evidence needs.",
+        "Identify any citation, confidentiality, or schoolwork constraints."
+      ]
+    },
+    {
+      "phaseId": "phase-draft",
+      "name": "Deck Draft",
+      "goals": [
+        "Create slide outline, content hierarchy, and visual direction.",
+        "Review for factual accuracy, pacing, and design consistency."
+      ]
+    },
+    {
+      "phaseId": "phase-export",
+      "name": "Export And Review",
+      "goals": [
+        "Produce final deck artifacts only after owner approval.",
+        "Record source, review, and distribution constraints."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Making slides visually busy before the story works.",
+    "Fabricating sources, metrics, testimonials, or case details.",
+    "Using private or production data in a deck without classification.",
+    "Overbuilding animation or branding before the audience and outcome are clear."
+  ],
+  "approvalGates": [
+    "Owner approval is required before using confidential, restricted, customer, or production data.",
+    "Owner approval is required before publishing, sharing externally, buying assets, or using paid design tools.",
+    "Owner approval is required before using branded client materials or private business facts.",
+    "Owner approval is required before claiming sources or citations that have not been verified."
+  ],
+  "qualityChecklist": [
+    "Audience, objective, story, and next action are clear.",
+    "Slides are readable, consistent, and not overcrowded.",
+    "Claims, sources, numbers, and citations are verified or marked for owner review.",
+    "Export and sharing constraints are documented."
+  ],
+  "whatToBuildFirst": [
+    "Audience brief and slide outline.",
+    "Narrative structure with one message per slide.",
+    "Source and claim checklist.",
+    "Low-risk visual system before final polish."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Animations, complex infographics, or detailed appendices before the story is approved.",
+    "Paid stock assets or design tools before approval.",
+    "Brand-heavy templates before content structure is clear.",
+    "External sharing or publishing workflow."
+  ],
+  "stopConditions": [
+    "Stop before using confidential, restricted, customer, production, or private source data without approval.",
+    "Stop before paid tools, external publishing, live collaboration sharing, or credential use.",
+    "Stop if citations are required but cannot be verified."
+  ],
+  "sources": [
+    "docs/bootstrap-mode.md",
+    "docs/data-classification.md",
+    "docs/ag-os-constitution-v1.md"
+  ],
+  "notes": "Archetype knowledge record only. It does not publish, share, or buy presentation assets.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}

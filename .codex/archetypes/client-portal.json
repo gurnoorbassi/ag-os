@@ -1,0 +1,111 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-client-portal",
+  "name": "Client Portal",
+  "category": "web_app",
+  "status": "active",
+  "professionalExpectations": [
+    "A client portal must provide secure, clear access to project status, documents, requests, messages, and approvals.",
+    "Client identity, permissions, file storage, messaging, and production data access are gated until approved.",
+    "The first version should prove the portal model with local records and non-live views.",
+    "Trust depends on privacy, auditability, clear status, and no accidental exposure."
+  ],
+  "minimumQualityBar": [
+    "Client, project, permission, document, request, and message concepts are modeled before live identity exists.",
+    "No client data, customer data, production data, credentials, live messaging, file upload, or deployment exists without approval.",
+    "Access assumptions, data classification, retention, and rollback are documented.",
+    "Read-only and write-capable surfaces are clearly separated."
+  ],
+  "commonModules": [
+    "Client dashboard, project status, milestones, documents, requests, approvals, messages, and notifications plan.",
+    "Permission model, role placeholders, data classification map, and audit trail.",
+    "File and document handling plan with retention, redaction, and backup requirements.",
+    "Future connector gates for identity, storage, email, billing, CRM, and support tools."
+  ],
+  "uxExpectations": [
+    "Portal views should be simple, trustworthy, and focused on the client's next action.",
+    "Status, due dates, approvals, and missing information should be visible immediately.",
+    "Documents and messages should be organized by project and topic.",
+    "Security and privacy states should be clear without overwhelming the client."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Static or local portal prototype from repository records",
+      "GitHub-governed source changes",
+      "Identity provider only after approved access model",
+      "Existing Postgres only after approved client-data handling",
+      "Netlify only after approved staging or production deployment"
+    ],
+    "notes": "Start with portal structure and read-only state. Do not collect or expose client data until access and data rules are approved."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-model",
+      "name": "Portal Model",
+      "goals": [
+        "Define client, project, document, request, approval, and message concepts.",
+        "Map access, data classification, and approval gates."
+      ]
+    },
+    {
+      "phaseId": "phase-read-only",
+      "name": "Read-Only Portal",
+      "goals": [
+        "Build local dashboard, project status, and document index views without live data.",
+        "Validate navigation, empty states, and privacy labels."
+      ]
+    },
+    {
+      "phaseId": "phase-approved-client-access",
+      "name": "Approved Client Access",
+      "goals": [
+        "Add identity, storage, messaging, and notifications only after approval and rollback planning.",
+        "Record audit evidence for access and data handling."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Adding login and file upload before permissions and data classification are settled.",
+    "Exposing internal project data that should not be client-visible.",
+    "Underbuilding audit and notification controls.",
+    "Overbuilding custom messaging before the portal's core status flow is useful."
+  ],
+  "approvalGates": [
+    "Owner approval is required before identity, client data, customer data, production data, file storage, email, messaging, deployment, domain or DNS changes.",
+    "Owner approval is required before credentials, paid tools, billing, CRM, support, or external notification integrations.",
+    "Owner approval is required before adding write access for clients.",
+    "Owner approval is required before migrating any protected project into a portal."
+  ],
+  "qualityChecklist": [
+    "Portal entities, visibility, permissions, and client-facing status are clear.",
+    "Read-only and write-capable features are separated.",
+    "Data classification, retention, backup, audit, and rollback are documented.",
+    "No live identity, messaging, file, deployment, or client-data path exists without approval."
+  ],
+  "whatToBuildFirst": [
+    "Portal information architecture and permission model.",
+    "Read-only project status and document index views.",
+    "Request and approval state model.",
+    "Data classification and future identity gate checklist."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Client login, file upload, live messaging, or notifications before approval.",
+    "Complex billing, support, or CRM integrations.",
+    "Granular permission matrix before roles are confirmed.",
+    "Production storage or deployment before protected data rules are ready."
+  ],
+  "stopConditions": [
+    "Stop before client data, customer data, production data, credentials, live identity, file storage, messaging, deployment, domain, DNS, or paid services.",
+    "Stop before granting write access or external notifications.",
+    "Stop before modifying Lead Gen production or AI Receptionist repo records."
+  ],
+  "sources": [
+    "docs/data-classification.md",
+    "docs/approval-workflow.md",
+    "docs/protected-project-migration-path.md"
+  ],
+  "notes": "Archetype knowledge record only. It does not create client access, file storage, messaging, or deployment.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}

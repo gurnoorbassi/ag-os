@@ -1,0 +1,111 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-lead-generation",
+  "name": "Lead Generation System",
+  "category": "lead_generation",
+  "status": "active",
+  "professionalExpectations": [
+    "A lead generation system must separate strategy, sourcing, qualification, outreach planning, handoff, and reporting.",
+    "It must preserve consent, compliance, data classification, and owner approval gates before live outreach.",
+    "It must keep the existing AG Digitalz Lead Generation System protected as an observe-only production project unless separately approved.",
+    "Early builds must prove workflow quality with local records and plans before any live connector action."
+  ],
+  "minimumQualityBar": [
+    "Lead definitions, qualification criteria, source assumptions, and handoff rules are explicit.",
+    "No scraping, live outreach, messaging, enrichment, email, SMS, domain, DNS, or automation activation happens from the archetype.",
+    "Every future live action has a gated approval path, audit event requirement, and rollback or disable plan.",
+    "Cost, compliance, data handling, and source reliability risks are visible in the plan."
+  ],
+  "commonModules": [
+    "Ideal customer profile, source strategy, qualification rules, and campaign plan records.",
+    "Lead intake, enrichment planning, score or fit review, and owner handoff queues.",
+    "Outreach copy drafts, approval states, blocked live-send gates, and audit trail planning.",
+    "Reporting model for pipeline movement, conversion, cost, and quality without live platform access by default."
+  ],
+  "uxExpectations": [
+    "Dashboards should emphasize status, next action, approval state, source, and risk.",
+    "Lists must make duplicate, unqualified, blocked, and ready-for-review leads easy to distinguish.",
+    "Draft outreach views must clearly show that no send action is available until approval exists.",
+    "Reporting should favor simple conversion and quality signals over decorative charts."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Local records for ICP, source plan, and qualification rules",
+      "GitHub-governed source changes",
+      "Existing n8n only after approved workflow plan and backup",
+      "Existing Postgres only after approved data handling plan",
+      "Netlify dashboard only after approved read-only deployment path"
+    ],
+    "notes": "Keep the first version offline and plan-only. The existing Lead Gen production project remains observe-only."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-strategy",
+      "name": "Strategy And Rules",
+      "goals": [
+        "Define ICP, lead qualification, source rules, handoff criteria, and blocked live actions.",
+        "Map approval gates for data, outreach, automation, and paid tools."
+      ]
+    },
+    {
+      "phaseId": "phase-local-workflow",
+      "name": "Local Workflow",
+      "goals": [
+        "Create local plan, queue, review, and reporting models without live sources.",
+        "Validate command intake, planner output, cost estimate, and audit records."
+      ]
+    },
+    {
+      "phaseId": "phase-approved-operations",
+      "name": "Approved Operations",
+      "goals": [
+        "Connect live tools only after owner approval, backup, rollback, and compliance review.",
+        "Keep production workflows modular, reversible, and observable."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Blurring lead planning with live outreach or live scraping.",
+    "Reusing production Lead Gen assumptions without read-only inventory and owner approval.",
+    "Over-automating before qualification quality is proven.",
+    "Underestimating compliance, sender reputation, consent, and data retention risks."
+  ],
+  "approvalGates": [
+    "Owner approval is required before live outreach, posting, sending messages, scraping, enrichment, or social account use.",
+    "Owner approval is required before touching the existing Lead Gen source, VPS, Postgres, n8n workflows, domain, DNS, or deployment path.",
+    "Owner approval is required before handling production data, customer data, credentials, or paid tools.",
+    "Owner approval is required before enabling or modifying automation workflows."
+  ],
+  "qualityChecklist": [
+    "ICP, sources, qualification, handoff, and reporting rules are clear.",
+    "The existing Lead Gen production project is protected from modification.",
+    "All live outreach, connector, paid, and production actions are blocked until approval.",
+    "Audit, cost, compliance, backup, and rollback expectations are documented."
+  ],
+  "whatToBuildFirst": [
+    "ICP and qualification rule document.",
+    "Local queue model for planned leads and blocked outreach states.",
+    "Owner-review workflow for copy, source assumptions, and handoff rules.",
+    "Approval-gate checklist for any future live source or send action."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Live scraping, enrichment, mailbox connection, SMS, social posting, or auto-send workflows.",
+    "Complex scoring models before lead quality and handoff rules are proven.",
+    "Production workflow edits before read-only inventory and rollback planning.",
+    "Paid data providers or sender tools before explicit approval."
+  ],
+  "stopConditions": [
+    "Stop before live outreach, social connection, posting, email, SMS, scraping, enrichment, paid tool use, or credential handling.",
+    "Stop before touching Lead Gen production source, VPS, Postgres, n8n workflows, domain, DNS, or deployment.",
+    "Stop before using production data or customer data without owner-approved classification and handling rules."
+  ],
+  "sources": [
+    "docs/product-project-policy.md",
+    "docs/protected-project-migration-path.md",
+    "docs/n8n-workflow-policy.md"
+  ],
+  "notes": "This is a product archetype only. It does not modify or authorize modification of the existing Lead Generation System.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}

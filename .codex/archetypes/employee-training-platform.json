@@ -1,0 +1,111 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-training-platform",
+  "name": "Employee Training Platform",
+  "category": "training_platform",
+  "status": "active",
+  "professionalExpectations": [
+    "A training platform must organize learning paths, modules, assessments, progress, and manager visibility.",
+    "The first version should make training content understandable and trackable without unnecessary learning-management complexity.",
+    "Access, identity, and employee data assumptions must be treated as gated until the owner approves live handling.",
+    "Quality depends on clear learning outcomes, not only polished screens."
+  ],
+  "minimumQualityBar": [
+    "Learning paths, modules, completion rules, and assessment expectations are explicit.",
+    "No employee, customer, production, HR, identity, email, or paid platform data is connected without approval.",
+    "Content structure supports review, versioning, and future updates.",
+    "Progress and reporting are modeled clearly before live account or database work."
+  ],
+  "commonModules": [
+    "Course catalog, learning path, module detail, lesson content, quiz or checklist, and completion tracking.",
+    "Learner progress, manager overview, content version history, and audit-ready update notes.",
+    "Role and access plan for owner, future managers, future learners, and future content editors.",
+    "Reporting model for completion, assessment, gaps, and overdue items."
+  ],
+  "uxExpectations": [
+    "Learning flows should be calm, readable, and easy to resume.",
+    "Progress, requirements, and completion status must be visible without confusion.",
+    "Manager views should be compact and focused on exceptions, overdue work, and training gaps.",
+    "Assessments should be simple first, with clear pass criteria and feedback states."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Static or local content records for the first curriculum model",
+      "GitHub for versioned content and app source",
+      "Existing Postgres only after approved learner-data handling",
+      "Netlify only after approved staging or production deployment",
+      "Identity provider only after owner-approved access plan"
+    ],
+    "notes": "Start with content architecture and local progress model. Live employee accounts and HR data are gated."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-curriculum",
+      "name": "Curriculum Model",
+      "goals": [
+        "Define learning paths, modules, outcomes, assessments, and completion rules.",
+        "Classify learner and manager data before runtime storage exists."
+      ]
+    },
+    {
+      "phaseId": "phase-read-only-platform",
+      "name": "Read-Only Platform",
+      "goals": [
+        "Build catalog, lesson, and progress-review views with local records.",
+        "Validate quality and accessibility of learning content."
+      ]
+    },
+    {
+      "phaseId": "phase-approved-tracking",
+      "name": "Approved Tracking",
+      "goals": [
+        "Add identity, storage, reporting, and notifications only after approval gates pass.",
+        "Document backup, retention, and rollback requirements."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Building a full LMS before content and learning outcomes are stable.",
+    "Collecting employee or HR-related data without classification and approval.",
+    "Making progress reporting too complex for the first operating version.",
+    "Ignoring content versioning and review cycles."
+  ],
+  "approvalGates": [
+    "Owner approval is required before identity, email, HR, employee, customer, production, or paid service integration.",
+    "Owner approval is required before storing learner progress outside local records.",
+    "Owner approval is required before deployment, domain or DNS changes, credentials, or notifications.",
+    "Owner approval is required before using live company training materials that contain confidential or restricted data."
+  ],
+  "qualityChecklist": [
+    "Learning outcomes, modules, completion, and assessments are clear.",
+    "Learner and manager views are accessible, responsive, and easy to scan.",
+    "Data classification, retention, backup, and rollback needs are documented.",
+    "No live identity, HR, notification, deployment, or paid action is present without approval."
+  ],
+  "whatToBuildFirst": [
+    "Course and module content model.",
+    "Read-only catalog and lesson views.",
+    "Completion and assessment state model using local records.",
+    "Manager reporting wireframe for completion and gaps."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Full identity and permissions before the learning model is validated.",
+    "Advanced certificates, gamification, or recommendation engines.",
+    "Complex analytics before basic completion and assessment quality are useful.",
+    "Live notifications or HR integrations before approval and data handling rules."
+  ],
+  "stopConditions": [
+    "Stop before handling employee, HR, customer, production, confidential, or restricted data.",
+    "Stop before connecting identity, email, notifications, database, deployment, domain, DNS, paid services, or credentials.",
+    "Stop before presenting training records as official compliance evidence without owner-approved requirements."
+  ],
+  "sources": [
+    "docs/bootstrap-mode.md",
+    "docs/data-classification.md",
+    "docs/approval-workflow.md"
+  ],
+  "notes": "Archetype knowledge record only. It does not authorize employee-data handling or live training deployment.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}

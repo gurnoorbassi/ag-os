@@ -1,0 +1,111 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-automation",
+  "name": "Automation Workflow System",
+  "category": "automation",
+  "status": "active",
+  "professionalExpectations": [
+    "An automation workflow system must be modular, observable, reversible, and explicit about every trigger and side effect.",
+    "Workflow activation, connector credentials, production data access, and external messaging are gated by default.",
+    "n8n workflows must be designed as small units with backup, rollback, and disabled-by-default behavior before activation.",
+    "The first version should prove the model with offline records and dry-run steps."
+  ],
+  "minimumQualityBar": [
+    "Triggers, inputs, transformations, outputs, retries, failure handling, and rollback are documented.",
+    "No workflow is activated and no connector action is called without approval.",
+    "Each side effect has an owner-approved gate, audit event requirement, and disable path.",
+    "The workflow can be understood from records without relying on hidden UI state."
+  ],
+  "commonModules": [
+    "Workflow inventory, trigger catalog, input/output schema, and side-effect map.",
+    "Dry-run executor, validation checks, audit trail, retry policy, and failure classification.",
+    "Connector gate records for GitHub, n8n, Netlify, Postgres, messaging, and future services.",
+    "Backup, rollback, disable, and incident-response instructions."
+  ],
+  "uxExpectations": [
+    "Workflow views should expose status, trigger, next run, last result, owner, and risk.",
+    "Side effects must be visible before any execution command is available.",
+    "Error states should explain what failed, what was skipped, and what requires approval.",
+    "Operators should be able to find a disable or rollback path quickly."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Local workflow records for first modeling",
+      "n8n only after approval, backup, and disabled-first design",
+      "GitHub for versioned workflow definitions and change review",
+      "Existing Postgres only after approved data handling",
+      "Netlify only for approved read-only visibility"
+    ],
+    "notes": "Do not activate workflows during archetype or dry-run phases. Design for backup and rollback before live execution."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-map",
+      "name": "Workflow Map",
+      "goals": [
+        "Define trigger, inputs, outputs, side effects, approvals, and rollback.",
+        "Classify connector, data, and cost risks."
+      ]
+    },
+    {
+      "phaseId": "phase-dry-run",
+      "name": "Dry-Run Records",
+      "goals": [
+        "Create local execution records and audit events without connector calls.",
+        "Validate failure states and blocked side effects."
+      ]
+    },
+    {
+      "phaseId": "phase-approved-activation",
+      "name": "Approved Activation",
+      "goals": [
+        "Activate one modular workflow only after approval, backup, rollback, and monitoring readiness.",
+        "Record audit events for activation, execution, and rollback readiness."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Activating workflows before dry-run behavior and rollback are proven.",
+    "Combining too many side effects in one workflow.",
+    "Relying on service UI configuration that is not backed up or documented.",
+    "Creating hidden costs or external messages through connector actions."
+  ],
+  "approvalGates": [
+    "Owner approval is required before workflow activation, connector credentials, live API calls, paid actions, or external messages.",
+    "Owner approval is required before production data, customer data, Postgres, n8n, Netlify, domain, DNS, or deployment changes.",
+    "Owner approval is required before destructive actions, scheduling recurring jobs, or enabling retries against live systems.",
+    "Owner approval and backup evidence are required before modifying production workflows."
+  ],
+  "qualityChecklist": [
+    "Trigger, input, output, side effects, retries, and failure states are documented.",
+    "Workflow records are modular and versionable.",
+    "Dry-run behavior creates audit evidence without live action.",
+    "Backup, disable, rollback, cost, and incident paths are documented."
+  ],
+  "whatToBuildFirst": [
+    "Workflow map and side-effect inventory.",
+    "Local dry-run record generator.",
+    "Approval-gate and connector-gate records.",
+    "Backup and rollback checklist."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Multi-step live automation before one workflow is safe and observable.",
+    "Complex scheduling, retries, or branching before failure handling is clear.",
+    "Connector credentials or live service calls during planning.",
+    "Production workflow edits without a restore point."
+  ],
+  "stopConditions": [
+    "Stop before n8n activation, connector execution, live API use, paid service use, external messaging, credentials, or production data handling.",
+    "Stop before deployment, domain or DNS change, destructive migration, or recurring job scheduling.",
+    "Stop before modifying existing Lead Gen workflows or AI Receptionist assets without separate approval."
+  ],
+  "sources": [
+    "docs/n8n-workflow-policy.md",
+    "docs/connector-registry.md",
+    "docs/rollback-policy.md"
+  ],
+  "notes": "Archetype knowledge record only. It does not activate workflows or authorize live connector use.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}
