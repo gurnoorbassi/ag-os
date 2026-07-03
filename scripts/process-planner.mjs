@@ -13,6 +13,7 @@ function readArg(name) {
 const routeRecordPath = readArg("--route-record");
 const jobRecordPath = readArg("--job-record");
 const commandRecordPath = readArg("--command-record");
+const planDraftPath = readArg("--plan-draft");
 const runId = readArg("--run-id");
 
 if (!routeRecordPath) {
@@ -24,6 +25,7 @@ const result = writePlanRecord({
   routeRecordPath,
   jobRecordPath,
   commandRecordPath,
+  planDraftPath,
   runId
 });
 

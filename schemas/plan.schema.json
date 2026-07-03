@@ -100,6 +100,51 @@
         }
       }
     },
+    "basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "productArchetype"
+      ],
+      "properties": {
+        "productArchetype": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appliedLessons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ownerPreferencesUsed": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "stackChoice": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualityBar": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
     "approvalGates": {
       "type": "array",
       "items": {
