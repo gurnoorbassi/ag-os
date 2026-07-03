@@ -15,6 +15,17 @@
     "requiresPaidAction": false,
     "requiresProductionData": false
   },
+  "understanding": {
+    "producedBy": "REQUIRED_WORKER_ID",
+    "inferredBusinessObjective": "REQUIRED_BUSINESS_OBJECTIVE",
+    "productArchetype": "REQUIRED_ARCHETYPE_ID_OR_NONE",
+    "targetUser": "REQUIRED_TARGET_USER",
+    "successCriteria": ["REQUIRED_SUCCESS_CRITERION"],
+    "criticalUnknowns": ["REQUIRED_UNKNOWN_OR_EMPTY"],
+    "confidence": "REQUIRED_CONFIDENCE",
+    "assumptions": ["REQUIRED_ASSUMPTION_OR_EMPTY"],
+    "ownerConstraints": ["REQUIRED_OWNER_CONSTRAINT_OR_EMPTY"]
+  },
   "plannedOutput": "REQUIRED_PLANNED_OUTPUT",
   "blockedReason": "REQUIRED_IF_BLOCKED",
   "nextRecord": {

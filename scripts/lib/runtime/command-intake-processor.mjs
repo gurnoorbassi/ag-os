@@ -38,9 +38,47 @@ function classifyCommand(command) {
   };
 }
 
-export function buildCommandIntakeRecord({ command, runId, now = new Date() }) {
+const UNDERSTANDING_REQUIRED_FIELDS = [
+  "producedBy",
+  "inferredBusinessObjective",
+  "productArchetype",
+  "targetUser",
+  "successCriteria",
+  "criticalUnknowns",
+  "confidence",
+  "assumptions",
+  "ownerConstraints"
+];
+
+// Phase B gate: deterministic shape check for a worker-authored understanding
+// block. Content quality is the worker's job; shape and limits are enforced here.
+export function assertUnderstandingShape(understanding) {
+  for (const field of UNDERSTANDING_REQUIRED_FIELDS) {
+    if (!Object.hasOwn(understanding, field)) {
+      throw new Error(`understanding block missing required field: ${field}`);
+    }
+  }
+
+  if (!Array.isArray(understanding.criticalUnknowns) || understanding.criticalUnknowns.length > 3) {
+    throw new Error("understanding.criticalUnknowns must be an array with at most 3 entries");
+  }
+
+  if (!["low", "medium", "high"].includes(understanding.confidence)) {
+    throw new Error("understanding.confidence must be low, medium, or high");
+  }
+
+  if (!Array.isArray(understanding.successCriteria) || understanding.successCriteria.length === 0) {
+    throw new Error("understanding.successCriteria must be a non-empty array");
+  }
+}
+
+export function buildCommandIntakeRecord({ command, runId, understanding, now = new Date() }) {
   if (!command || typeof command !== "string" || command.trim().length === 0) {
     throw new Error("command is required");
+  }
+
+  if (understanding) {
+    assertUnderstandingShape(understanding);
   }
 
   const normalizedRunId = normalizeRunId(runId || command);
@@ -48,6 +86,7 @@ export function buildCommandIntakeRecord({ command, runId, now = new Date() }) {
   const classification = classifyCommand(command.trim());
 
   return {
+    ...(understanding ? { understanding } : {}),
     commandIntakeId: `command-intake-${normalizedRunId}`,
     status: "classified",
     rawCommand: command.trim(),
@@ -72,8 +111,8 @@ export function buildCommandIntakeRecord({ command, runId, now = new Date() }) {
   };
 }
 
-export function writeCommandIntakeRecord({ command, runId, now, root = process.cwd() }) {
-  const record = buildCommandIntakeRecord({ command, runId, now });
+export function writeCommandIntakeRecord({ command, runId, understanding, now, root = process.cwd() }) {
+  const record = buildCommandIntakeRecord({ command, runId, understanding, now });
   const filePath = `.codex/commands/${record.commandIntakeId}.json`;
   writeJson(filePath, record, root);
   return { filePath, record };
