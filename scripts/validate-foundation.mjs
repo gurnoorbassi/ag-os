@@ -641,6 +641,96 @@ function validateCapabilityRegistry(record) {
   }
 }
 
+function validateProjectRegistry(record) {
+  if (record.status === "foundation" && record.projects?.length !== 0) {
+    fail("project registry foundation must not include project records yet");
+    return;
+  }
+
+  const projectSchema = readJson("schemas/project.schema.json");
+  const projectIds = new Set();
+
+  for (const entry of record.projects ?? []) {
+    if (projectIds.has(entry.projectId)) {
+      fail(`project registry contains duplicate project: ${entry.projectId}`);
+      continue;
+    }
+    projectIds.add(entry.projectId);
+
+    const recordPath = entry.recordPath;
+    if (!existsSync(path.join(root, recordPath))) {
+      fail(`project registry points to missing record: ${recordPath}`);
+      continue;
+    }
+
+    const project = readJson(recordPath);
+    const failuresBeforeProject = failures;
+    validateSchemaObject(project, projectSchema, recordPath);
+
+    if (project.template === true) {
+      fail(`project registry must not point to template record: ${recordPath}`);
+    }
+
+    if (project.id !== entry.projectId) {
+      fail(`${recordPath} id must match registry projectId`);
+    }
+
+    if (project.status !== entry.status) {
+      fail(`${recordPath} status must match registry status`);
+    }
+
+    validateKnownProjectPosture(project, recordPath);
+
+    if (failures === failuresBeforeProject) {
+      pass(`project record structurally valid: ${recordPath}`);
+    }
+  }
+}
+
+function validateKnownProjectPosture(project, recordPath) {
+  const projectText = JSON.stringify(project);
+
+  if (project.id === "project-lead-generation-system") {
+    if (project.status !== "complete") {
+      fail("Lead Generation System must be registered as complete");
+    }
+    if (project.projectType !== "product_project") {
+      fail("Lead Generation System must be registered as a product project");
+    }
+    if (!["observe_only", "read_only"].includes(project.managementMode)) {
+      fail("Lead Generation System management mode must be observe_only or read_only");
+    }
+    for (const requiredBoundary of [
+      "Do not touch source code.",
+      "Do not touch VPS.",
+      "Do not touch Postgres.",
+      "Do not touch n8n workflows.",
+      "Do not touch domain or DNS.",
+      "Do not deploy.",
+      "Do not connect credentials."
+    ]) {
+      if (!project.outOfScope?.includes(requiredBoundary)) {
+        fail(`Lead Generation System record missing boundary: ${requiredBoundary}`);
+      }
+    }
+  }
+
+  if (project.id === "project-ag-digitalz-ai-receptionist") {
+    if (project.status !== "active") {
+      fail("AG Digitalz AI Receptionist must be registered as active");
+    }
+    if (project.projectType !== "product_project") {
+      fail("AG Digitalz AI Receptionist must be registered as a product project");
+    }
+    if (project.managementMode !== "active_build") {
+      fail("AG Digitalz AI Receptionist management mode must be active_build");
+    }
+    if (!projectText.includes("https://github.com/gurnoorbassi/ag-digitalz-ai-receptionist")) {
+      fail("AG Digitalz AI Receptionist record must include the known GitHub repo URL");
+    }
+  }
+}
+
 function validateApprovalLockSchema(schema) {
   const requiredFields = [
     "approvalId",
@@ -770,10 +860,6 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     validateSchemaObject(record, schema, schemaValidatedRecord.recordPath);
 
-    if (schemaValidatedRecord.recordPath === ".codex/projects/registry.json" && record.projects?.length !== 0) {
-      fail("project registry foundation must not include project records yet");
-    }
-
     if (schemaValidatedRecord.recordPath === ".codex/connectors/registry.json") {
       validateConnectorRegistry(record);
     }
@@ -804,6 +890,10 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     if (schemaValidatedRecord.recordPath === ".codex/capabilities/registry.json") {
       validateCapabilityRegistry(record);
+    }
+
+    if (schemaValidatedRecord.recordPath === ".codex/projects/registry.json") {
+      validateProjectRegistry(record);
     }
 
     if (failures === failuresBeforeRecord) {

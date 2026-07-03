@@ -6,7 +6,7 @@ The Project Registry is the source-controlled index of AG Digitalz OS project re
 
 ## Current Status
 
-The registry is in foundation mode. It contains no project records.
+The registry is active. It contains production-clean project records approved through scoped PRs.
 
 Current registry file:
 
@@ -28,12 +28,25 @@ The registry must stay production-clean:
 - No fake project records
 - No demo project records
 - No customer records
-- No product records until explicitly approved
-- No lead generation records until explicitly approved
-- No AI receptionist records until explicitly approved
+- No product records until explicitly approved in a scoped PR
+- No lead generation records until explicitly approved in a scoped PR
+- No AI receptionist records until explicitly approved in a scoped PR
 - No credentials
 - No live service connection details
 - No deployment instructions
+
+## Registered Projects
+
+Current registered projects:
+
+| Project ID | Name | Status | Management Mode | Record |
+| --- | --- | --- | --- | --- |
+| `project-lead-generation-system` | Lead Generation System | `complete` | `observe_only` | `.codex/projects/lead-generation-system.json` |
+| `project-ag-digitalz-ai-receptionist` | AG Digitalz AI Receptionist | `active` | `active_build` | `.codex/projects/ag-digitalz-ai-receptionist.json` |
+
+The Lead Generation System record is observe-only. AG OS must not touch source code, VPS, Postgres, n8n workflows, domain or DNS, deployments, credentials, production data, or customer data.
+
+The AG Digitalz AI Receptionist record marks it as a separate product project, not AG OS core. AG OS must not infer live service status beyond known repository records.
 
 ## Adding A Future Project
 
@@ -51,4 +64,4 @@ Protected product projects such as Lead Gen and AI Receptionist must follow `doc
 
 ## Foundation Lock
 
-While `status` is `foundation`, validation requires `projects` to stay empty.
+While `status` is `foundation`, validation requires `projects` to stay empty. When `status` is `active`, validation requires each project entry to point to an existing project record that validates against `schemas/project.schema.json`.

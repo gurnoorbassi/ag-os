@@ -1,0 +1,70 @@
+{
+  "id": "project-lead-generation-system",
+  "name": "Lead Generation System",
+  "status": "complete",
+  "owner": "REQUIRED_OWNER",
+  "projectType": "product_project",
+  "managementMode": "observe_only",
+  "goal": "Register the existing finished production Lead Generation System in AG OS without modifying it.",
+  "knownFacts": [
+    "Status is finished production project.",
+    "Source currently lives on the owner's local computer.",
+    "Production runtime is Hetzner VPS.",
+    "Database is existing Postgres.",
+    "Automations use existing n8n.",
+    "Domain exists.",
+    "GitHub repo does not exist yet.",
+    "AG OS must not modify this project yet."
+  ],
+  "scope": [
+    "Register production-clean project metadata in AG OS.",
+    "Document observe-only management posture.",
+    "Prepare future migration rules without touching the project."
+  ],
+  "outOfScope": [
+    "Do not touch source code.",
+    "Do not touch VPS.",
+    "Do not touch Postgres.",
+    "Do not touch n8n workflows.",
+    "Do not touch domain or DNS.",
+    "Do not deploy.",
+    "Do not connect credentials.",
+    "Do not read, copy, or store production or customer data."
+  ],
+  "trustLevel": 0,
+  "stack": [
+    "local computer source",
+    "Hetzner VPS runtime",
+    "existing Postgres",
+    "existing n8n",
+    "existing domain"
+  ],
+  "risks": [
+    {
+      "risk": "Lead Gen is a finished production project with runtime, database, automation, and domain boundaries.",
+      "mitigation": "Keep AG OS in observe_only mode and limit this record to production-clean metadata."
+    }
+  ],
+  "approvalRequiredFor": [
+    "source code access",
+    "VPS access",
+    "Postgres access",
+    "n8n workflow access or mutation",
+    "domain or DNS changes",
+    "deployments",
+    "credential handling",
+    "production or customer data handling",
+    "management mode promotion"
+  ],
+  "qualityGates": [
+    "Project record remains production-clean.",
+    "No live service connection is added.",
+    "No credentials or production data are stored.",
+    "Future migration work uses a separate scoped PR."
+  ],
+  "securityReview": "Production-clean registry metadata only. No credentials, endpoints, database names, workflow names, local paths, production exports, or customer data are recorded.",
+  "costTracking": "No paid actions authorized. Future paid work requires Cost OS approval.",
+  "deploymentPlan": "No deployment. Any deployment requires a future owner-approved scope with backup and rollback planning.",
+  "createdAt": "2026-07-03T11:32:35Z",
+  "updatedAt": "2026-07-03T11:32:35Z"
+}

@@ -2,8 +2,25 @@
   "$schema": "../../schemas/project-registry.schema.json",
   "registryVersion": 1,
   "registryType": "project-registry",
-  "status": "foundation",
-  "projects": [],
+  "status": "active",
+  "projects": [
+    {
+      "projectId": "project-lead-generation-system",
+      "recordPath": ".codex/projects/lead-generation-system.json",
+      "status": "complete",
+      "owner": "REQUIRED_OWNER",
+      "riskLevel": "high",
+      "lastReviewedAt": "2026-07-03T11:32:35Z"
+    },
+    {
+      "projectId": "project-ag-digitalz-ai-receptionist",
+      "recordPath": ".codex/projects/ag-digitalz-ai-receptionist.json",
+      "status": "active",
+      "owner": "REQUIRED_OWNER",
+      "riskLevel": "medium",
+      "lastReviewedAt": "2026-07-03T11:32:35Z"
+    }
+  ],
   "rules": {
     "recordsMustBeProductionClean": true,
     "recordsMustBeExplicitlyApproved": true,
