@@ -276,9 +276,10 @@ Gated actions require approval lock records before execution.
 
 An approval lock must define:
 
+- `approvalId`, the canonical approval lock identifier.
 - Approval scope.
 - Expiration.
-- Revocation path.
+- Revocation path explaining how the approval gets revoked, expired, cancelled, or invalidated.
 - Evidence.
 - Who approved.
 - Exact action allowed.
@@ -705,6 +706,7 @@ Each amendment must identify:
 
 - Changed section.
 - Reason.
+- Hostile audit note.
 - Risk.
 - Expected operating effect.
 - Rollback path.
@@ -713,6 +715,8 @@ Each amendment must identify:
 Amendments that change authority, approval gates, data policy, deployments, live services, paid actions, production data, security controls, cost limits, protected product migration, trust levels, or Constitution activation require explicit owner approval.
 
 All Constitution amendments require owner approval. No automatic Constitution amendment is allowed.
+
+Any Constitution activation, Constitution amendment, authority-order change, approval-workflow change, or safe-merge rule change requires owner approval, approval lock, audit event, hostile audit note, PR, validation, and CI. Auto-merge is blocked unless the owner explicitly approves auto-merge for that exact governance PR.
 
 Constitution changes require an audit note and reason. Amendments must pass validation and CI before merge. After audit records become active, Constitution activation and amendments must create audit events.
 

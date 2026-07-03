@@ -23,6 +23,7 @@ Approval is required before:
 - Touching protected product systems such as Lead Gen before an approved migration scope exists.
 - Promoting AG OS trust level.
 - Activating or amending Constitution v1 when authority, safety, approvals, live systems, costs, or data rules change.
+- Changing Constitution activation status, Constitution text, authority order, approval workflow, or safe-merge rules.
 
 ## Approval Lock Format
 
@@ -38,7 +39,7 @@ Approval lock status must be `approved`, `expired`, or `revoked`. Only `approved
 
 Each approval lock must include:
 
-- Unique approval ID.
+- `approvalId`, the canonical approval lock identifier.
 - Status.
 - Owner ID.
 - Requester.
@@ -52,10 +53,13 @@ Each approval lock must include:
 - Approval gates covered.
 - Approved actions.
 - Prohibited actions.
+- Revocation path.
 - Evidence references.
 - Approval timestamp.
 - Expiration timestamp.
 - Created and updated timestamps.
+
+`approvalId` must use the clear `approval-YYYYMMDD-slug` format, such as `approval-20260703-constitution-activation`. Approval locks must not use ambiguous `id` fields.
 
 ## Scope And Expiration
 
@@ -74,6 +78,8 @@ Approval scope must identify:
 Default expiration should be the shortest practical window. A future policy may set exact defaults; until then, any approval without an expiration is invalid for live, paid, production, customer, credential, domain, deployment, or external-message work.
 
 ## Revocation
+
+Each approval lock must include `revocationPath`. The revocation path must explain how the approval gets revoked, expired, cancelled, or invalidated.
 
 Approval is invalid when:
 
@@ -123,6 +129,8 @@ If any check fails, stop for owner approval.
 - Approval does not bypass validation, CI, safe-merge policy, or Constitution rules.
 - Approval does not authorize actions outside the approval lock.
 - Approval must be rechecked immediately before execution.
+- Constitution activation, Constitution amendment, authority-order changes, approval-workflow changes, and safe-merge rule changes require owner approval, approval lock, audit event, hostile audit note, PR, validation, and CI.
+- Auto-merge for those governance PRs is blocked unless the owner explicitly approves auto-merge for that exact governance PR.
 
 ## Foundation Limitation
 
