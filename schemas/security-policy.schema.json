@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/security-policy.schema.json",
+  "title": "AG Digitalz OS Security Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "policyVersion",
+    "policyType",
+    "status",
+    "controls",
+    "rules",
+    "defaultReviewSignals",
+    "notes"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../schemas/security-policy.schema.json" },
+    "policyVersion": { "type": "integer", "minimum": 1 },
+    "policyType": { "type": "string", "const": "security-os-policy" },
+    "status": { "type": "string", "enum": ["foundation", "active", "archived"] },
+    "controls": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "required", "failureAction"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "secret_handling",
+              "data_sensitivity_review",
+              "access_change_review",
+              "connector_scope_review",
+              "production_data_block",
+              "safe_merge_security_review"
+            ]
+          },
+          "label": { "type": "string", "minLength": 1 },
+          "required": { "type": "boolean", "const": true },
+          "failureAction": { "type": "string", "enum": ["block_merge", "owner_review"] }
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "credentialsAllowed",
+        "productionCustomerDataAllowed",
+        "liveServiceChangesRequireOwnerApproval",
+        "accessChangesRequireOwnerApproval",
+        "secretsFindingBlocksMerge",
+        "domainDnsChangesRequireOwnerApproval",
+        "databaseMigrationsRequireOwnerApproval",
+        "paidActionsRequireOwnerApproval"
+      ],
+      "properties": {
+        "credentialsAllowed": { "type": "boolean", "const": false },
+        "productionCustomerDataAllowed": { "type": "boolean", "const": false },
+        "liveServiceChangesRequireOwnerApproval": { "type": "boolean", "const": true },
+        "accessChangesRequireOwnerApproval": { "type": "boolean", "const": true },
+        "secretsFindingBlocksMerge": { "type": "boolean", "const": true },
+        "domainDnsChangesRequireOwnerApproval": { "type": "boolean", "const": true },
+        "databaseMigrationsRequireOwnerApproval": { "type": "boolean", "const": true },
+        "paidActionsRequireOwnerApproval": { "type": "boolean", "const": true }
+      }
+    },
+    "defaultReviewSignals": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[a-z0-9_]+$" }
+    },
+    "notes": { "type": "string", "minLength": 1 }
+  }
+}

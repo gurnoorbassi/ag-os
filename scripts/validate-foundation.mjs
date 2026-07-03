@@ -22,6 +22,7 @@ const requiredPaths = [
   ".codex/quality/README.md",
   ".codex/quality/policy.json",
   ".codex/security/README.md",
+  ".codex/security/policy.json",
   ".codex/watchdog/README.md",
   ".codex/commands/registry.json",
   ".codex/connectors/registry.json",
@@ -34,12 +35,14 @@ const requiredPaths = [
   "docs/command-registry.md",
   "docs/cost-os.md",
   "docs/quality-os.md",
+  "docs/security-os.md",
   "docs/project-registry.md",
   "schemas/idea.schema.json",
   "schemas/command-registry.schema.json",
   "schemas/connector-registry.schema.json",
   "schemas/cost-budget.schema.json",
   "schemas/quality-policy.schema.json",
+  "schemas/security-policy.schema.json",
   "schemas/project.schema.json",
   "schemas/project-registry.schema.json",
   "schemas/agent.schema.json",
@@ -102,6 +105,11 @@ const schemaValidatedRecords = [
     name: "quality policy",
     recordPath: ".codex/quality/policy.json",
     schemaPath: "schemas/quality-policy.schema.json"
+  },
+  {
+    name: "security policy",
+    recordPath: ".codex/security/policy.json",
+    schemaPath: "schemas/security-policy.schema.json"
   },
   {
     name: "project registry",
@@ -424,6 +432,44 @@ function validateQualityPolicy(record) {
   }
 }
 
+function validateSecurityPolicy(record) {
+  const requiredControls = [
+    "secret_handling",
+    "data_sensitivity_review",
+    "access_change_review",
+    "connector_scope_review",
+    "production_data_block",
+    "safe_merge_security_review"
+  ];
+  const controlIds = new Set((record.controls ?? []).map((control) => control.id));
+
+  for (const requiredControl of requiredControls) {
+    if (!controlIds.has(requiredControl)) {
+      fail(`security policy missing required control: ${requiredControl}`);
+    }
+  }
+
+  if (record.rules?.credentialsAllowed !== false) {
+    fail("security policy must disallow credentials in the repo");
+  }
+
+  if (record.rules?.productionCustomerDataAllowed !== false) {
+    fail("security policy must disallow production/customer data");
+  }
+
+  if (record.rules?.liveServiceChangesRequireOwnerApproval !== true) {
+    fail("security policy must require owner approval for live service changes");
+  }
+
+  if (record.rules?.accessChangesRequireOwnerApproval !== true) {
+    fail("security policy must require owner approval for access changes");
+  }
+
+  if (record.rules?.secretsFindingBlocksMerge !== true) {
+    fail("security policy must block merge when secrets are found");
+  }
+}
+
 for (const templateRecord of templateRecords) {
   try {
     const record = readJson(templateRecord.recordPath);
@@ -469,6 +515,10 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     if (schemaValidatedRecord.recordPath === ".codex/quality/policy.json") {
       validateQualityPolicy(record);
+    }
+
+    if (schemaValidatedRecord.recordPath === ".codex/security/policy.json") {
+      validateSecurityPolicy(record);
     }
 
     if (failures === failuresBeforeRecord) {
