@@ -1,0 +1,29 @@
+{
+  "connectorExecutionId": "connector-exec-runtime-github-construction-website-repo-20260703-update-files",
+  "status": "waiting_approval",
+  "connectorId": "connector-github-mcp",
+  "requestedAction": "update_files",
+  "riskLevel": "R3",
+  "projectId": "project-unregistered-construction-website",
+  "approvalRequired": true,
+  "requiredPermissions": [
+    "approval-github-file-update",
+    "approval_lock_before_live_execution",
+    "audit_event_before_live_execution"
+  ],
+  "evidenceRequired": [
+    "owner_approval_lock",
+    "file_manifest",
+    "diff_review"
+  ],
+  "safety": {
+    "executesLiveAction": false,
+    "usesCredentials": false,
+    "triggersDeployment": false,
+    "changesDomain": false,
+    "usesPaidAction": false,
+    "accessesProductionData": false
+  },
+  "createdAt": "2026-07-03T20:45:00.000Z",
+  "updatedAt": "2026-07-03T20:45:00.000Z"
+}

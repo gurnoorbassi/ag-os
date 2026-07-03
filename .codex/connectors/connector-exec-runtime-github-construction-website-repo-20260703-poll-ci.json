@@ -1,0 +1,29 @@
+{
+  "connectorExecutionId": "connector-exec-runtime-github-construction-website-repo-20260703-poll-ci",
+  "status": "waiting_approval",
+  "connectorId": "connector-github-mcp",
+  "requestedAction": "poll_ci",
+  "riskLevel": "R3",
+  "projectId": "project-unregistered-construction-website",
+  "approvalRequired": true,
+  "requiredPermissions": [
+    "approval-github-ci-read",
+    "approval_lock_before_live_execution",
+    "audit_event_before_live_execution"
+  ],
+  "evidenceRequired": [
+    "pull_request_number",
+    "commit_sha",
+    "ci_check_names"
+  ],
+  "safety": {
+    "executesLiveAction": false,
+    "usesCredentials": false,
+    "triggersDeployment": false,
+    "changesDomain": false,
+    "usesPaidAction": false,
+    "accessesProductionData": false
+  },
+  "createdAt": "2026-07-03T20:45:00.000Z",
+  "updatedAt": "2026-07-03T20:45:00.000Z"
+}

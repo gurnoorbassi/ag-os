@@ -58,6 +58,55 @@ const PLANNING_ONLY_SAFETY = {
   usesPaidAction: false
 };
 
+const PLANNED_WORK = {
+  detectedProjectType: "website",
+  recommendedStack: "static HTML/CSS/JavaScript hosted on Netlify after owner approval",
+  starterFiles: [
+    {
+      path: "README.md",
+      purpose: "Document owner-provided website scope, local development, validation, and future approval gates."
+    },
+    {
+      path: "package.json",
+      purpose: "Define local-only build and validation commands for the website repository."
+    },
+    {
+      path: "index.html",
+      purpose: "Create the first static website entry point using owner-provided business details later."
+    },
+    {
+      path: "src/styles.css",
+      purpose: "Create the stylesheet for the approved website interface."
+    },
+    {
+      path: "src/main.js",
+      purpose: "Create optional local-only interaction hooks without live services."
+    }
+  ],
+  pullRequestFlow: [
+    "create owner-approved repository after approval lock exists",
+    "create owner-approved branch",
+    "create approved starter files",
+    "run local validation",
+    "open PR from approved branch to main"
+  ],
+  ciPolling: [
+    "poll Foundation CI status after PR exists",
+    "record check name, status, conclusion, commit SHA, PR number, checkedAt, and blocking reason",
+    "do not rerun jobs or change CI settings without approval"
+  ],
+  mergeRules: [
+    "merge only after CI, validation, approval gate, safe-merge gate, and audit event pass",
+    "block merge for credentials, production data, customer data, deployments, domain changes, paid actions, blocked files, or failed CI",
+    "never auto-merge GitHub execution unless the scoped action matrix allows it"
+  ],
+  stopConditions: [
+    "Stop before any GitHub MCP call without owner approval.",
+    "Stop before repository creation, branch creation, file write, PR creation, CI polling, or merge execution.",
+    "Stop before credentials, live services, deployments, domain changes, paid actions, production data, or customer data."
+  ]
+};
+
 export function buildGitHubExecutionPlan({
   runId,
   commandId,
@@ -88,6 +137,7 @@ export function buildGitHubExecutionPlan({
       rollbackRequired: action.rollbackRequired
     })),
     approvalGates: ACTIONS.map((action) => action.approvalGate),
+    plannedWork: PLANNED_WORK,
     safety: PLANNING_ONLY_SAFETY,
     createdAt: timestamp,
     updatedAt: timestamp
@@ -115,6 +165,10 @@ export function validateGitHubExecutionPlan(plan) {
 
   if (!Array.isArray(plan?.approvalGates) || plan.approvalGates.length === 0) {
     errors.push("approvalGates must not be empty");
+  }
+
+  if (!Array.isArray(plan?.plannedWork?.starterFiles) || plan.plannedWork.starterFiles.length === 0) {
+    errors.push("plannedWork starterFiles must not be empty");
   }
 
   if (!plan?.safety || Object.values(plan.safety).some((value) => value !== false)) {

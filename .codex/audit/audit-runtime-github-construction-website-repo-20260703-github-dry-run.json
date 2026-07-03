@@ -1,0 +1,48 @@
+{
+  "id": "audit-runtime-github-construction-website-repo-20260703-github-dry-run",
+  "occurredAt": "2026-07-03T20:45:00.000Z",
+  "actor": "ag-os-runtime",
+  "eventType": "validation_run",
+  "summary": "GitHub connector dry run produced 7 planned connector action record(s) without live GitHub calls.",
+  "scope": "github-plan-runtime-github-construction-website-repo-20260703",
+  "source": "local_validation",
+  "relatedArtifacts": [
+    {
+      "type": "other",
+      "reference": "github-plan-runtime-github-construction-website-repo-20260703"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-runtime-github-construction-website-repo-20260703-create-repo"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-runtime-github-construction-website-repo-20260703-create-branch"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-runtime-github-construction-website-repo-20260703-create-files"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-runtime-github-construction-website-repo-20260703-update-files"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-runtime-github-construction-website-repo-20260703-open-pr"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-runtime-github-construction-website-repo-20260703-poll-ci"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-runtime-github-construction-website-repo-20260703-merge-pr"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Dry-run only. No GitHub MCP call, repository creation, branch creation, file write, pull request, CI polling, or merge was executed.",
+  "createdAt": "2026-07-03T20:45:00.000Z"
+}
