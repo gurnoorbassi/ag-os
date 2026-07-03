@@ -2,11 +2,12 @@
 
 This folder contains JSON Schema contracts for future AG Digitalz OS records.
 
-Current validation only checks that each schema is valid JSON and has the expected schema metadata. It does not connect to databases or live services.
+Current validation checks schema metadata plus selected template and registry records. It does not connect to databases or live services.
 
 ## Records
 
 - `idea.schema.json`
+- `command-registry.schema.json`
 - `connector-registry.schema.json`
 - `project.schema.json`
 - `project-registry.schema.json`
