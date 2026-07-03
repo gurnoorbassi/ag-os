@@ -1,0 +1,42 @@
+{
+  "template": true,
+  "stateId": "REQUIRED_STATE_ID",
+  "stateType": "REQUIRED_STATE_TYPE",
+  "status": "REQUIRED_STATUS",
+  "generatedFrom": ["REQUIRED_SOURCE_RECORD"],
+  "projects": ["REQUIRED_PROJECT_STATE"],
+  "tasks": ["REQUIRED_TASK_STATE"],
+  "jobs": ["REQUIRED_JOB_STATE"],
+  "pullRequests": ["REQUIRED_PR_STATE"],
+  "approvals": ["REQUIRED_APPROVAL_STATE"],
+  "incidents": ["REQUIRED_INCIDENT_STATE"],
+  "costs": ["REQUIRED_COST_STATE"],
+  "connectors": ["REQUIRED_CONNECTOR_STATE"],
+  "capabilities": ["REQUIRED_CAPABILITY_STATE"],
+  "validation": {
+    "status": "REQUIRED_VALIDATION_STATUS",
+    "lastCheckedAt": "REQUIRED_LAST_CHECKED_AT"
+  },
+  "boot": {
+    "status": "REQUIRED_BOOT_STATUS",
+    "lastCheckedAt": "REQUIRED_LAST_CHECKED_AT"
+  },
+  "watchdog": {
+    "status": "REQUIRED_WATCHDOG_STATUS",
+    "lastCheckedAt": "REQUIRED_LAST_CHECKED_AT"
+  },
+  "engine": {
+    "status": "REQUIRED_ENGINE_STATUS",
+    "lastCheckedAt": "REQUIRED_LAST_CHECKED_AT"
+  },
+  "rules": {
+    "readOnly": true,
+    "sourceControlledOnly": true,
+    "liveServicesAllowed": false,
+    "credentialsAllowed": false,
+    "productionDataAllowed": false,
+    "customerDataAllowed": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
