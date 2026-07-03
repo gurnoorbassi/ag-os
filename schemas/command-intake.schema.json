@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/command-intake.schema.json",
+  "title": "AG OS Command Intake",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "commandIntakeId",
+    "status",
+    "rawCommand",
+    "normalizedCommand",
+    "commandCategory",
+    "riskLevel",
+    "classification",
+    "plannedOutput",
+    "nextRecord",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "commandIntakeId": {
+      "type": "string",
+      "pattern": "^command-intake-[a-z0-9-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "template",
+        "classified",
+        "planning",
+        "blocked",
+        "converted_to_job",
+        "cancelled"
+      ]
+    },
+    "rawCommand": {
+      "type": "string",
+      "minLength": 1
+    },
+    "normalizedCommand": {
+      "type": "string",
+      "minLength": 1
+    },
+    "commandCategory": {
+      "type": "string",
+      "enum": [
+        "discuss_only",
+        "plan_only",
+        "build",
+        "deploy_staging",
+        "deploy_production",
+        "connect_service",
+        "change_domain",
+        "send_message",
+        "stop_all",
+        "rollback",
+        "audit"
+      ]
+    },
+    "projectId": {
+      "type": "string"
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": [
+        "R0",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ]
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requiresPlan",
+        "requiresApproval",
+        "requiresLiveService",
+        "requiresDeployment",
+        "requiresDomainChange",
+        "requiresPaidAction",
+        "requiresProductionData"
+      ],
+      "properties": {
+        "requiresPlan": {
+          "type": "boolean"
+        },
+        "requiresApproval": {
+          "type": "boolean"
+        },
+        "requiresLiveService": {
+          "type": "boolean"
+        },
+        "requiresDeployment": {
+          "type": "boolean"
+        },
+        "requiresDomainChange": {
+          "type": "boolean"
+        },
+        "requiresPaidAction": {
+          "type": "boolean"
+        },
+        "requiresProductionData": {
+          "type": "boolean"
+        }
+      }
+    },
+    "plannedOutput": {
+      "type": "string",
+      "minLength": 1
+    },
+    "blockedReason": {
+      "type": "string"
+    },
+    "nextRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "jobId",
+        "planId"
+      ],
+      "properties": {
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "planId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executesCommand",
+        "createsLiveSideEffect",
+        "usesCredentials",
+        "callsConnector"
+      ],
+      "properties": {
+        "executesCommand": {
+          "type": "boolean",
+          "const": false
+        },
+        "createsLiveSideEffect": {
+          "type": "boolean",
+          "const": false
+        },
+        "usesCredentials": {
+          "type": "boolean",
+          "const": false
+        },
+        "callsConnector": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

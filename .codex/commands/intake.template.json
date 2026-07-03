@@ -1,0 +1,32 @@
+{
+  "commandIntakeId": "REQUIRED_COMMAND_INTAKE_ID",
+  "status": "template",
+  "rawCommand": "REQUIRED_OWNER_COMMAND",
+  "normalizedCommand": "REQUIRED_NORMALIZED_COMMAND",
+  "commandCategory": "plan_only",
+  "projectId": "REQUIRED_PROJECT_ID_OR_NONE",
+  "riskLevel": "R0",
+  "classification": {
+    "requiresPlan": true,
+    "requiresApproval": false,
+    "requiresLiveService": false,
+    "requiresDeployment": false,
+    "requiresDomainChange": false,
+    "requiresPaidAction": false,
+    "requiresProductionData": false
+  },
+  "plannedOutput": "REQUIRED_PLANNED_OUTPUT",
+  "blockedReason": "REQUIRED_IF_BLOCKED",
+  "nextRecord": {
+    "jobId": "REQUIRED_JOB_ID_OR_NOT_CREATED",
+    "planId": "REQUIRED_PLAN_ID_OR_NOT_CREATED"
+  },
+  "safety": {
+    "executesCommand": false,
+    "createsLiveSideEffect": false,
+    "usesCredentials": false,
+    "callsConnector": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
