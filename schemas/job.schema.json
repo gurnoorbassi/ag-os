@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/job.schema.json",
+  "title": "AG OS Job Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "jobId",
+    "commandId",
+    "projectId",
+    "status",
+    "priority",
+    "riskLevel",
+    "commandType",
+    "requestedBy",
+    "assignedDomain",
+    "assignedAgent",
+    "approvalRequired",
+    "expectedOutput",
+    "queueTimestamps",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "jobId": {
+      "type": "string",
+      "pattern": "^job-[a-z0-9-]+$"
+    },
+    "commandId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "planning",
+        "waiting_approval",
+        "running",
+        "blocked",
+        "failed",
+        "done",
+        "cancelled"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "urgent"
+      ]
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": [
+        "R0",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ]
+    },
+    "commandType": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requestedBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assignedDomain": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assignedAgent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approvalRequired": {
+      "type": "boolean"
+    },
+    "approvalId": {
+      "type": "string"
+    },
+    "blockedReason": {
+      "type": "string"
+    },
+    "expectedOutput": {
+      "type": "string",
+      "minLength": 1
+    },
+    "queueTimestamps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "queuedAt"
+      ],
+      "properties": {
+        "queuedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "planningStartedAt": {
+          "type": "string"
+        },
+        "runningStartedAt": {
+          "type": "string"
+        },
+        "completedAt": {
+          "type": "string"
+        },
+        "cancelledAt": {
+          "type": "string"
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "credentialsAllowed",
+        "liveServicesAllowed",
+        "deploymentAllowed",
+        "domainChangeAllowed",
+        "productionDataAllowed",
+        "paidActionAllowed"
+      ],
+      "properties": {
+        "credentialsAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "liveServicesAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "deploymentAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "domainChangeAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "productionDataAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "paidActionAllowed": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
