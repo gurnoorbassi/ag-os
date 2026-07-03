@@ -39,6 +39,7 @@ const requiredPaths = [
   "docs/command-registry.md",
   "docs/capability-registry.md",
   "docs/cost-os.md",
+  "docs/dashboard-os-plan.md",
   "docs/memory-os.md",
   "docs/quality-os.md",
   "docs/security-os.md",
