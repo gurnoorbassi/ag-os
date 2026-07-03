@@ -47,6 +47,9 @@ const requiredPaths = [
   ".codex/security/policy.json",
   ".codex/watchdog/README.md",
   ".codex/watchdog/policy.json",
+  ".codex/approvals/README.md",
+  ".codex/audit/README.md",
+  ".codex/owners/README.md",
   ".codex/capabilities/README.md",
   ".codex/capabilities/registry.json",
   ".codex/commands/registry.json",
@@ -167,6 +170,23 @@ const schemaValidatedRecords = [
     schemaPath: "schemas/project-registry.schema.json"
   }
 ];
+const schemaValidatedRecordDirectories = [
+  {
+    name: "approval lock",
+    recordDir: ".codex/approvals",
+    schemaPath: "schemas/approval-lock.schema.json"
+  },
+  {
+    name: "audit event",
+    recordDir: ".codex/audit",
+    schemaPath: "schemas/audit-event.schema.json"
+  },
+  {
+    name: "owner",
+    recordDir: ".codex/owners",
+    schemaPath: "schemas/owner.schema.json"
+  }
+];
 let failures = 0;
 
 function fail(message) {
@@ -224,6 +244,13 @@ for (const schemaName of readdirSync(path.join(root, "schemas")).filter((name) =
 
 function readJson(relativePath) {
   return JSON.parse(readFileSync(path.join(root, relativePath), "utf8"));
+}
+
+function listJsonRecords(relativeDir) {
+  const absoluteDir = path.join(root, relativeDir);
+  return readdirSync(absoluteDir)
+    .filter((name) => name.endsWith(".json"))
+    .map((name) => path.join(relativeDir, name).replaceAll("\\", "/"));
 }
 
 function isPlaceholder(value) {
@@ -612,6 +639,70 @@ function validateCapabilityRegistry(record) {
   }
 }
 
+function validateApprovalLockSchema(schema) {
+  const requiredFields = [
+    "approvedBy",
+    "target",
+    "dataClass",
+    "approvedAt",
+    "approvedActions",
+    "evidence"
+  ];
+  for (const requiredField of requiredFields) {
+    if (!schema.required?.includes(requiredField)) {
+      fail(`approval lock schema must require ${requiredField}`);
+    }
+  }
+
+  const expectedRiskLevels = ["R0", "R1", "R2", "R3", "R4", "R5", "R6"];
+  const actualRiskLevels = schema.properties?.riskLevel?.enum ?? [];
+  if (JSON.stringify(actualRiskLevels) !== JSON.stringify(expectedRiskLevels)) {
+    fail("approval lock schema riskLevel must use canonical R0-R6 values");
+  }
+
+  if ((schema.properties?.approvedActions?.minItems ?? 0) < 1) {
+    fail("approval lock schema must require at least one approved action");
+  }
+
+  if ((schema.properties?.evidence?.minItems ?? 0) < 1) {
+    fail("approval lock schema must require at least one evidence item");
+  }
+}
+
+function validateActivationBlockers() {
+  const approvalLockSchema = readJson("schemas/approval-lock.schema.json");
+  validateApprovalLockSchema(approvalLockSchema);
+
+  const actionMatrix = readFileSync(path.join(root, "docs/action-matrix.md"), "utf8");
+  if (!actionMatrix.includes("| Validation script changes | `R2` | Blocked for auto-merge | Yes | Approval lock after activation and PR |")) {
+    fail("action matrix must block validation script changes for auto-merge and require approval");
+  }
+  if (!actionMatrix.includes("| CI workflow changes | `R2` | Blocked for auto-merge | Yes | Approval lock after activation and PR |")) {
+    fail("action matrix must block CI workflow changes for auto-merge and require approval");
+  }
+  if (!actionMatrix.includes("| Authority, safe-merge, approval workflow, owner record, or Constitution change | `R2` | Blocked for auto-merge | Yes | Approval lock after activation, PR, and audit event after audit exists |")) {
+    fail("action matrix must require an approval lock for Constitution and governance changes after activation");
+  }
+
+  const constitution = readFileSync(path.join(root, "docs/ag-os-constitution-v1.md"), "utf8");
+  if (!constitution.includes("Before executing commands after Constitution activation, AG OS must:")) {
+    fail("Constitution boot sequence must be mandatory after activation");
+  }
+
+  const bootSequence = readFileSync(path.join(root, "docs/boot-sequence.md"), "utf8");
+  if (!bootSequence.includes("Before executing commands, AG OS must:")) {
+    fail("boot sequence must use mandatory language");
+  }
+
+  const approvalsReadme = readFileSync(path.join(root, ".codex/approvals/README.md"), "utf8");
+  const auditReadme = readFileSync(path.join(root, ".codex/audit/README.md"), "utf8");
+  if (/will live here/i.test(approvalsReadme) || /will live here/i.test(auditReadme)) {
+    fail("approval and audit folders must not describe records as future-only placeholders");
+  }
+}
+
+validateActivationBlockers();
+
 for (const templateRecord of templateRecords) {
   try {
     const record = readJson(templateRecord.recordPath);
@@ -680,6 +771,28 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
     }
   } catch (error) {
     fail(`${schemaValidatedRecord.name} could not be validated: ${error.message}`);
+  }
+}
+
+for (const schemaValidatedRecordDirectory of schemaValidatedRecordDirectories) {
+  try {
+    const schema = readJson(schemaValidatedRecordDirectory.schemaPath);
+    const recordPaths = listJsonRecords(schemaValidatedRecordDirectory.recordDir);
+    if (recordPaths.length === 0) {
+      pass(`no active ${schemaValidatedRecordDirectory.name} records found in ${schemaValidatedRecordDirectory.recordDir}`);
+      continue;
+    }
+
+    for (const recordPath of recordPaths) {
+      const record = readJson(recordPath);
+      const failuresBeforeRecord = failures;
+      validateSchemaObject(record, schema, recordPath);
+      if (failures === failuresBeforeRecord) {
+        pass(`${schemaValidatedRecordDirectory.name} record structurally valid: ${recordPath}`);
+      }
+    }
+  } catch (error) {
+    fail(`${schemaValidatedRecordDirectory.name} records could not be validated: ${error.message}`);
   }
 }
 

@@ -8,7 +8,7 @@ This boot sequence is documentation only. It does not run checks, call connector
 
 ## Boot Checks
 
-Before executing commands, AG OS should:
+Before executing commands, AG OS must:
 
 1. Confirm the active repository and branch.
 2. Check for uncommitted or unrelated local changes.
@@ -31,7 +31,7 @@ Before executing commands, AG OS should:
 
 ## Health Report
 
-The health report should include:
+The health report must include:
 
 - Current trust level.
 - Command category.
@@ -57,4 +57,4 @@ If boot checks fail:
 - Deployments must not run.
 - Paid actions must not run.
 - Production or customer data must not be accessed.
-- An owner approval packet should be prepared when appropriate.
+- An owner approval packet must be prepared when a gated execution request is blocked.
