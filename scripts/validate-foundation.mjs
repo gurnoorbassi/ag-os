@@ -210,18 +210,20 @@ for (const requiredPath of requiredPaths) {
 const constitutionPath = path.join(root, "docs/ag-os-constitution-v1.md");
 if (existsSync(constitutionPath)) {
   const constitution = readFileSync(constitutionPath, "utf8");
-  if (!constitution.includes("Status: Draft only. Not active.")) {
-    fail("Constitution v1 must remain marked as draft-only and not active");
+  if (!constitution.includes("Status: Active Constitution v1.0.")) {
+    fail("Constitution v1 must be marked active as v1.0");
   } else {
-    pass("Constitution v1 status is draft-only");
+    pass("Constitution v1 status is active v1.0");
   }
-  if (!constitution.includes("This file is a draft Constitution v1. It does not activate Constitution v1")) {
-    fail("Constitution v1 must include a non-activation statement");
+  if (!constitution.includes("Activation date: 2026-07-03.")) {
+    fail("Constitution v1 must include the activation date");
   } else {
-    pass("Constitution v1 non-activation statement present");
+    pass("Constitution v1 activation date present");
   }
-  if (/^Status:\s*Active\b/im.test(constitution)) {
-    fail("Constitution v1 must not be marked active in foundation validation");
+  if (!constitution.includes("This file activates Constitution v1.0 as the canonical operating contract.")) {
+    fail("Constitution v1 must include an activation statement");
+  } else {
+    pass("Constitution v1 activation statement present");
   }
 }
 

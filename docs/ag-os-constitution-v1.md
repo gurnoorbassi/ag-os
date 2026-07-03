@@ -1,10 +1,12 @@
 # AG Digitalz OS Constitution v1
 
-Status: Draft only. Not active.
+Status: Active Constitution v1.0.
 
-This document is the proposed canonical operating contract for AG Digitalz OS. It must not be treated as active until a future owner-approved activation PR explicitly changes its status and passes validation and CI.
+Activation date: 2026-07-03.
 
-This draft does not authorize live services, credentials, deployments, production data, customer data, domain changes, billing changes, paid actions, workflow activation, or changes to protected product systems.
+This document is the canonical operating contract for AG Digitalz OS.
+
+This activation does not authorize live services, credentials, deployments, production data, customer data, domain changes, billing changes, paid actions, workflow activation, or changes to protected product systems.
 
 ## 1. Purpose
 
@@ -16,11 +18,11 @@ Quality over quantity is a constitutional principle. One excellent implementatio
 
 AG OS is not the AI receptionist repo and is not the lead generation system. It may govern those systems later only through owner-approved, scoped migration work.
 
-## 2. Draft And Activation Rule
+## 2. Activation Rule
 
-This Constitution is a draft.
+This Constitution is active.
 
-Until activated, the governing order remains:
+Before activation, the governing order was:
 
 1. Explicit owner instruction for the current task, limited by non-negotiable safety rules.
 2. `docs/authority-order.md`, `docs/operating-rules.md`, and `docs/safe-merge-policy.md`.
@@ -30,7 +32,7 @@ Until activated, the governing order remains:
 6. Memory only when verified current, durable, or explicitly refreshed.
 7. Connector metadata and external service state only after the relevant access is approved.
 
-After owner-approved activation, this Constitution becomes the highest durable source of truth under explicit current owner instruction and non-negotiable safety rules.
+After owner-approved activation, this Constitution is the highest durable source of truth under explicit current owner instruction and non-negotiable safety rules.
 
 After activation, the full source-of-truth hierarchy is:
 
@@ -720,6 +722,6 @@ Any Constitution activation, Constitution amendment, authority-order change, app
 
 Constitution changes require an audit note and reason. Amendments must pass validation and CI before merge. After audit records become active, Constitution activation and amendments must create audit events.
 
-## 33. Non-Activation Statement
+## 33. Activation Statement
 
-This file is a draft Constitution v1. It does not activate Constitution v1, change trust level, add records, connect services, deploy, store credentials, use production data, migrate Lead Gen, trigger paid actions, or change domains.
+This file activates Constitution v1.0 as the canonical operating contract. It does not change trust level, add records, connect services, deploy, store credentials, use production data, migrate Lead Gen, trigger paid actions, or change domains.
