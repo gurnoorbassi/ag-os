@@ -1,0 +1,27 @@
+{
+  "jobId": "job-runtime-social-media-management-system-20260703",
+  "commandId": "command-intake-runtime-social-media-management-system-20260703",
+  "projectId": "project-unregistered-request",
+  "status": "queued",
+  "priority": "normal",
+  "riskLevel": "R1",
+  "commandType": "plan_only",
+  "requestedBy": "owner-gurnoor-bassi",
+  "assignedDomain": "command-os",
+  "assignedAgent": "agent-local-runtime",
+  "approvalRequired": false,
+  "expectedOutput": "Plan-only command intake record for request.",
+  "queueTimestamps": {
+    "queuedAt": "2026-07-03T22:29:20.674Z"
+  },
+  "safety": {
+    "credentialsAllowed": false,
+    "liveServicesAllowed": false,
+    "deploymentAllowed": false,
+    "domainChangeAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-03T22:29:20.674Z",
+  "updatedAt": "2026-07-03T22:29:20.674Z"
+}

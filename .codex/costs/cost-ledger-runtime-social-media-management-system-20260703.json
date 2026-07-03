@@ -1,0 +1,35 @@
+{
+  "costLedgerId": "cost-ledger-runtime-social-media-management-system-20260703",
+  "status": "active",
+  "budgetLimitsUsd": {
+    "perTaskMax": 5,
+    "dailyMax": 10,
+    "monthlyMax": 50
+  },
+  "entries": [
+    {
+      "costEntryId": "cost-entry-runtime-social-media-management-system-20260703-estimated",
+      "jobId": "job-runtime-social-media-management-system-20260703",
+      "projectId": "project-unregistered-request",
+      "costType": "estimated",
+      "amountUsd": 0,
+      "approvalRequired": false,
+      "status": "recorded"
+    }
+  ],
+  "summary": {
+    "estimatedTaskCostUsd": 0,
+    "actualTaskCostUsd": 0,
+    "dailyActualUsd": 0,
+    "monthlyActualUsd": 0,
+    "budgetStatus": "within_limit"
+  },
+  "safety": {
+    "createsBillingChange": false,
+    "usesPaidService": false,
+    "usesLiveApi": false,
+    "requiresOwnerApproval": false
+  },
+  "createdAt": "2026-07-03T22:31:26.733Z",
+  "updatedAt": "2026-07-03T22:31:26.733Z"
+}

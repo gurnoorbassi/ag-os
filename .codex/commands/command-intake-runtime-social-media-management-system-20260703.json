@@ -1,0 +1,70 @@
+{
+  "understanding": {
+    "producedBy": "worker-intelligence-layer-dry-run",
+    "inferredBusinessObjective": "Create a client-facing social media management system that turns a daily batch of up to five uploaded videos into platform-specific post drafts across multiple platforms and accounts, with owner/client approval before anything is published.",
+    "productArchetype": "missing_registered_archetype:social-media-content-operations-system",
+    "targetUser": "AG Digitalz operator or client social media manager responsible for turning video assets into approved multi-platform content.",
+    "successCriteria": [
+      "Accept up to five video uploads per client per day in a non-live planning scope.",
+      "Generate platform-specific post drafts, captions, hashtags, titles, and account assignments without publishing.",
+      "Require explicit approval before any post can go live.",
+      "Support multiple platforms and accounts as planned entities without connecting social accounts in this dry run.",
+      "Track status from uploaded asset to draft, review, approved, scheduled, or blocked."
+    ],
+    "criticalUnknowns": [
+      "Which platforms and account types are in the first supported set?",
+      "Who approves posts: AG Digitalz, the client, or both?",
+      "Should the first version include video editing/repurposing, or only post/caption/package generation around uploaded videos?"
+    ],
+    "confidence": "medium",
+    "assumptions": [
+      "This dry run is plan-only and must not connect social accounts, upload media to platforms, post content, use credentials, deploy, or use paid tools.",
+      "The initial system should be designed as an approval-gated workflow, not an autoposter.",
+      "Uploaded videos are treated as client content in future live scope, but no customer data or real media is used in this dry run.",
+      "The first implementation should use synthetic payloads and local/source-controlled records before any live integration."
+    ],
+    "ownerConstraints": [
+      "plan-only",
+      "no live services",
+      "no social account connections",
+      "no posting",
+      "no credentials",
+      "no paid tools",
+      "no deployments",
+      "no domain/DNS",
+      "no customer data",
+      "no Lead Gen production changes",
+      "no AI Receptionist changes",
+      "ask at most 3 critical questions only if required"
+    ]
+  },
+  "commandIntakeId": "command-intake-runtime-social-media-management-system-20260703",
+  "status": "classified",
+  "rawCommand": "Make me a social media management system for a client where I can upload 5 videos per day and the system creates different posts across multiple platforms and accounts, with approval before anything goes live.",
+  "normalizedCommand": "Create a plan-only request plan.",
+  "commandCategory": "plan_only",
+  "projectId": "project-unregistered-request",
+  "riskLevel": "R1",
+  "classification": {
+    "requiresPlan": true,
+    "requiresApproval": false,
+    "requiresLiveService": false,
+    "requiresDeployment": false,
+    "requiresDomainChange": false,
+    "requiresPaidAction": false,
+    "requiresProductionData": false
+  },
+  "plannedOutput": "Plan-only command intake record for request.",
+  "nextRecord": {
+    "jobId": "job-runtime-social-media-management-system-20260703",
+    "planId": "plan-runtime-social-media-management-system-20260703"
+  },
+  "safety": {
+    "executesCommand": false,
+    "createsLiveSideEffect": false,
+    "usesCredentials": false,
+    "callsConnector": false
+  },
+  "createdAt": "2026-07-03T22:31:12.279Z",
+  "updatedAt": "2026-07-03T22:31:12.279Z"
+}

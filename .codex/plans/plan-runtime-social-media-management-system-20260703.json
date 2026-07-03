@@ -1,0 +1,155 @@
+{
+  "planId": "plan-runtime-social-media-management-system-20260703",
+  "jobId": "job-runtime-social-media-management-system-20260703",
+  "commandId": "command-intake-runtime-social-media-management-system-20260703",
+  "projectId": "project-unregistered-request",
+  "summary": "Plan-only design for a social media management system that ingests up to five client videos per day, generates platform-specific post packages across multiple platforms and accounts, and blocks all publishing behind explicit approval gates. This dry run does not connect accounts, use credentials, post content, deploy, or touch protected systems.",
+  "riskLevel": "R1",
+  "estimatedCostUsd": 0,
+  "tools": [
+    "local-filesystem",
+    "AG OS command intake",
+    "AG OS planner",
+    "AG OS cost ledger",
+    "AG OS audit writer"
+  ],
+  "tasks": [
+    {
+      "taskId": "social-os-001-define-product-archetype",
+      "description": "Add a source-controlled archetype for a social-media-content-operations-system covering upload intake, variant generation, approval workflow, scheduling intent, platform/account models, and blocked live publishing.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "social-os-002-design-data-contracts",
+      "description": "Define local schemas for client workspace, uploaded video asset metadata, platform account placeholder, generated post package, approval decision, schedule intent, and audit trail. Use synthetic payloads only.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "social-os-003-plan-approval-workflow",
+      "description": "Design the approval workflow so generated posts cannot be scheduled, posted, or exported to a live connector until explicit owner/client approval exists.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "social-os-004-plan-generation-pipeline",
+      "description": "Plan an offline generation pipeline that creates platform-specific captions, titles, hashtags, descriptions, thumbnails/prompts, and account assignments from synthetic video metadata.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "social-os-005-plan-dashboard-surface",
+      "description": "Plan a read-only or local-only dashboard view for daily upload queue, generated drafts, approval state, blocked live actions, and quality checks.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "social-os-006-plan-validation",
+      "description": "Plan local validation for upload limits, no-credential records, no live connector markers, approval-required publishing paths, and synthetic-payload-only tests.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    }
+  ],
+  "basis": {
+    "productArchetype": "none_registered; candidate=social-media-content-operations-system",
+    "appliedLessons": [
+      "The request is a content operations product, not a construction website.",
+      "The core workflow is intake -> generate variants -> review -> approve -> schedule/publish in future gated scope."
+    ],
+    "ownerPreferencesUsed": [
+      "plan-only",
+      "no live services",
+      "no social account connections",
+      "no posting",
+      "no credentials",
+      "no paid tools",
+      "no deployments",
+      "no domain/DNS",
+      "no customer data",
+      "no Lead Gen production changes",
+      "no AI Receptionist changes"
+    ],
+    "stackChoice": "Local AG OS records first; future dashboard and workflow runtime only after approval.",
+    "assumptions": [
+      "Business objective is to turn daily video uploads into approved, platform-ready social post packages without live posting until owner/client approval exists.",
+      "Critical question 1: Which platforms and account types are in the first supported set?",
+      "Critical question 2: Who approves posts: AG Digitalz, the client, or both?",
+      "Critical question 3: Should the first version include video editing/repurposing, or only post/caption/package generation around uploaded videos?",
+      "First version should be local/offline with synthetic video metadata and placeholder platform accounts.",
+      "Publishing, scheduling, and account connection features are future R4/R5 work requiring approval locks.",
+      "The approval workflow is a hard product requirement, not an optional admin feature."
+    ],
+    "qualityBar": [
+      "No hardcoded construction website terminology in command understanding or plan content.",
+      "Every generated post package must be traceable to an uploaded video and target account/platform.",
+      "Every live path must be blocked unless an approval lock exists.",
+      "Validation must pass locally before any PR or future runtime promotion.",
+      "Future UI must make pending approvals, blocked posts, and publish-disabled state obvious."
+    ]
+  },
+  "approvalGates": [
+    {
+      "gateId": "approval-live-connector-action",
+      "approvalRequired": true,
+      "reason": "Any live connector action, including repository creation, requires owner approval."
+    },
+    {
+      "gateId": "approval-preview-or-production-deploy",
+      "approvalRequired": true,
+      "reason": "Any staging or production deploy requires owner approval before live connector use."
+    },
+    {
+      "gateId": "approval-domain-or-dns-change",
+      "approvalRequired": true,
+      "reason": "Any domain or DNS change is blocked until explicit owner approval."
+    },
+    {
+      "gateId": "approval-paid-tool-use",
+      "approvalRequired": true,
+      "reason": "Paid tools or paid API usage are blocked unless owner approved and within Cost OS limits."
+    },
+    {
+      "gateId": "approval-social-account-connection",
+      "approvalRequired": true,
+      "reason": "Connecting TikTok, Instagram, YouTube, Facebook, LinkedIn, X, or any client social account requires explicit scoped owner approval and credential handling outside the repo."
+    },
+    {
+      "gateId": "approval-social-post-publish",
+      "approvalRequired": true,
+      "reason": "Publishing, scheduling, or sending posts to any external platform is an external message/live action and is blocked until approved."
+    },
+    {
+      "gateId": "approval-client-content-handling",
+      "approvalRequired": true,
+      "reason": "Using real client videos, captions, accounts, customer information, or brand assets requires data classification and owner-approved handling."
+    },
+    {
+      "gateId": "approval-ai-generation-provider",
+      "approvalRequired": true,
+      "reason": "Using paid or live AI/media tooling requires Cost OS review, vendor cap review, and owner approval."
+    }
+  ],
+  "expectedOutput": "A source-controlled plan record for a social media management system archetype and MVP path. No social posting, credentials, live connectors, paid tools, deployment, customer data, Lead Gen changes, or AI Receptionist changes.",
+  "stopConditions": [
+    "Stop before any live connector action without a valid approval lock.",
+    "Stop before any deployment, preview deployment, domain change, or DNS change.",
+    "Stop before using credentials, private endpoints, paid services, customer data, or production data.",
+    "Stop when scope, risk tier, or approval requirements become unclear.",
+    "Stop before connecting any social media account or requesting credentials.",
+    "Stop before uploading, storing, or processing real client videos or customer data.",
+    "Stop before publishing, scheduling, or exporting content to a live platform.",
+    "Stop before using paid AI, media processing, storage, hosting, or automation tools.",
+    "Stop before changing Lead Gen, AI Receptionist, domains, DNS, deployments, or production systems.",
+    "Stop if the product archetype remains missing and implementation scope depends on archetype-specific rules."
+  ],
+  "safety": {
+    "executionAuthorized": false,
+    "liveServiceUseAllowed": false,
+    "deploymentAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-03T22:31:19.344Z",
+  "updatedAt": "2026-07-03T22:31:19.344Z"
+}
