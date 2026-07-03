@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/execution-step.schema.json",
+  "title": "AG OS Execution Step",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "executionStepId",
+    "planId",
+    "jobId",
+    "projectId",
+    "stepType",
+    "status",
+    "riskLevel",
+    "command",
+    "expectedResult",
+    "evidenceRequired",
+    "rollbackRequired",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "executionStepId": {
+      "type": "string",
+      "pattern": "^exec-[a-z0-9-]+$"
+    },
+    "planId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "jobId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stepType": {
+      "type": "string",
+      "enum": [
+        "create_branch",
+        "update_files",
+        "run_validation",
+        "open_pr",
+        "check_ci",
+        "safe_merge",
+        "pull_main",
+        "report_result"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "waiting_approval",
+        "ready",
+        "running",
+        "blocked",
+        "failed",
+        "done",
+        "cancelled"
+      ]
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": [
+        "R0",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ]
+    },
+    "approvalId": {
+      "type": "string"
+    },
+    "command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expectedResult": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidenceRequired": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rollbackRequired": {
+      "type": "boolean"
+    },
+    "rollbackPlan": {
+      "type": "string"
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "credentialsAllowed",
+        "liveServiceUseAllowed",
+        "deploymentAllowed",
+        "domainChangeAllowed",
+        "productionDataAllowed",
+        "paidActionAllowed"
+      ],
+      "properties": {
+        "credentialsAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "liveServiceUseAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "deploymentAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "domainChangeAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "productionDataAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "paidActionAllowed": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
