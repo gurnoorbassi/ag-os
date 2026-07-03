@@ -32,9 +32,28 @@ Rollback involving live services, deployments, domains, databases, workflows, cr
 
 Foundation mode may prepare rollback plans, but must not execute live rollback actions.
 
+## Production Rollback Procedure
+
+Before production rollback:
+
+1. Confirm owner approval.
+2. Confirm incident level or rollback reason.
+3. Identify current state and previous known-good state.
+4. Confirm backup or recovery point when data may be affected.
+5. Confirm RTO and RPO targets when defined.
+6. Confirm customer, production, credential, billing, and domain impact.
+7. Execute only the approved rollback action.
+8. Validate the restored state.
+9. Document residual risk.
+10. Record an audit event when audit records are active.
+
+If any required item is missing, stop and request owner approval.
+
 ## Emergency Stop
 
 If a task appears to risk credentials, production data, customer data, domain settings, billing, live workflows, or deployments, Codex must stop and request owner approval before continuing.
+
+Emergency stop may prepare a plan, preserve local evidence, and identify targets. It must not mutate live systems without owner approval or a future explicitly delegated incident scope.
 
 ## Evidence
 

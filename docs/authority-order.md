@@ -12,7 +12,7 @@ Codex may execute allowed local work, validation, PR creation, and safe merge on
 
 ## Source Of Truth Order
 
-When records conflict, use this order:
+Before Constitution activation, use this order:
 
 1. Explicit owner instruction for the current task, limited by non-negotiable safety rules.
 2. Constitution v1 after it is active.
@@ -24,6 +24,41 @@ When records conflict, use this order:
 8. Memory records only when verified current, durable, or explicitly refreshed.
 9. Connector metadata and external service state only after the relevant access is approved.
 
+After Constitution activation, use this order:
+
+1. Explicit owner instruction for the current task, limited by law, platform safety, and repository non-secret rules.
+2. Active Constitution.
+3. Approval locks that are current, scoped, unrevoked, and tied to the exact action.
+4. Security OS.
+5. Governance OS.
+6. Quality OS.
+7. Cost OS.
+8. Command OS.
+9. Connector Registry.
+10. Project rules.
+11. Agent rules.
+12. Other source-controlled registries, schemas, docs, and folder READMEs.
+13. Memory only when verified current, durable, or explicitly refreshed.
+14. External connector or service state only after approved verification.
+
+## Canonical Precedence
+
+When systems disagree, the exact precedence is:
+
+1. Owner.
+2. Constitution.
+3. Approval locks.
+4. Security OS.
+5. Governance OS.
+6. Quality OS.
+7. Cost OS.
+8. Command OS.
+9. Connector Registry.
+10. Project rules.
+11. Agent rules.
+
+Owner approval must be explicit, scoped, current, and recorded when records are active. Owner approval does not permit credentials, secrets, customer data, or production exports to be committed to the repository.
+
 ## Conflict Rules
 
 - The more restrictive safety rule wins when two rules conflict.
@@ -32,6 +67,8 @@ When records conflict, use this order:
 - A merged PR does not override explicit stop conditions unless the PR itself was scoped to change those conditions.
 - Memory cannot override current repo state, owner instruction, or validation output.
 - External service state must be treated as untrusted until verified under an approved scope.
+- If precedence is unclear, stop and request owner approval.
+- If the higher-priority source is stale, missing, revoked, or out of scope, fall back to the next valid source and document the gap.
 
 ## Ownership Boundaries
 

@@ -28,6 +28,8 @@ Approval is required before:
 
 Approval locks are future records stored under `.codex/approvals/` and validated by `schemas/approval-lock.schema.json`.
 
+Before any gated action executes, a current approval lock must exist unless the action remains plan-only. Current owner instruction may authorize foundation work, but live services, deployments, domains, paid actions, credentials, production data, customer data, external messages, destructive migrations, and protected product changes require a lock once approval records are active.
+
 Each approval lock must include:
 
 - Unique approval ID.
@@ -43,7 +45,55 @@ Each approval lock must include:
 - Prohibited actions.
 - Evidence references.
 - Expiration timestamp.
+- Approved-by owner or delegate reference.
 - Created and updated timestamps.
+
+## Scope And Expiration
+
+Approval scope must identify:
+
+- Exact action.
+- Exact target.
+- Allowed command category.
+- Risk tier.
+- Data class.
+- Connector or service if relevant.
+- Budget if relevant.
+- Expiration.
+- Actions still prohibited.
+
+Default expiration should be the shortest practical window. A future policy may set exact defaults; until then, any approval without an expiration is invalid for live, paid, production, customer, credential, domain, deployment, or external-message work.
+
+## Revocation
+
+Approval is invalid when:
+
+- The owner revokes it.
+- The expiration passes.
+- The target changes.
+- The action expands beyond scope.
+- The risk tier increases.
+- CI or validation fails after approval.
+- An incident affects the target.
+- A required rollback or evidence artifact is missing.
+
+Revoked or expired approvals must not be reused.
+
+## Already Approved Verification
+
+Before treating work as already approved, AG OS must verify:
+
+- The approval lock exists.
+- Status is approved.
+- Approval is unexpired and unrevoked.
+- Approved action matches the requested action.
+- Approved target matches the requested target.
+- Approved risk tier covers the requested risk tier.
+- Evidence references are present.
+- Prohibited actions do not include the requested action.
+- Budget and data-class rules still pass.
+
+If any check fails, stop for owner approval.
 
 ## Workflow
 
@@ -53,6 +103,7 @@ Each approval lock must include:
 4. Approved work may execute only inside the recorded scope.
 5. Any scope expansion requires a new approval lock.
 6. Completion, failure, rollback, or incident follow-up should be recorded as an audit event when audit records become active.
+7. High-risk overrides must include who approved, reason, risk accepted, and rollback path.
 
 ## Approval Rules
 
@@ -61,6 +112,8 @@ Each approval lock must include:
 - Approval does not carry across unrelated projects, services, domains, workflows, or time windows.
 - Approval does not permit credentials or customer data to be committed.
 - Approval does not bypass validation, CI, safe-merge policy, or Constitution rules.
+- Approval does not authorize actions outside the approval lock.
+- Approval must be rechecked immediately before execution.
 
 ## Foundation Limitation
 

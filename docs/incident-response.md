@@ -26,6 +26,61 @@ Foundation mode allows documentation, local review, validation, and approval-pac
 6. Request owner approval for any live, production, customer, credential, billing, deployment, or domain action.
 7. Document resolution and follow-up.
 
+## Incident Commander
+
+The incident commander is the person or role coordinating the response.
+
+Foundation default:
+
+- Owner is incident commander for I3 and I4.
+- `INCIDENT_COMMANDER_PLACEHOLDER` may be added later by owner-approved record.
+- Codex may prepare notes, timelines, and options, but must not execute live containment without approval.
+
+## Recovery Targets
+
+RTO and RPO targets are placeholders until each production project defines them:
+
+- `RTO_PLACEHOLDER`: maximum acceptable time to restore service.
+- `RPO_PLACEHOLDER`: maximum acceptable data loss window.
+
+No production project should reach Trust Level 4 without explicit RTO and RPO values.
+
+## Credential-Compromise Procedure
+
+If credentials may be exposed:
+
+1. Stop work.
+2. Do not print, copy, commit, summarize, or store the secret.
+3. Preserve non-secret evidence.
+4. Notify the owner.
+5. Prepare rotation and revocation steps.
+6. Execute rotation or revocation only with owner approval.
+7. Record an audit event when audit records are active.
+
+## CI Outage Procedure
+
+If CI is missing, failed, unavailable, or inconclusive:
+
+1. Stop safe merge.
+2. Run local validation if available.
+3. Preserve CI status evidence.
+4. Do not merge automatically.
+5. Request owner review or wait for CI recovery.
+
+## Connector Outage Procedure
+
+If a connector is unavailable, inconsistent, or returns unexpected state:
+
+1. Stop connector-dependent work.
+2. Treat connector state as untrusted.
+3. Use local source-controlled metadata only.
+4. Do not retry with broader permissions.
+5. Request owner approval before changing connector scope.
+
+## Communication Rules
+
+AG OS may draft incident communications, but must not send email, SMS, chat, client notifications, public posts, or support updates without explicit owner approval.
+
 ## Authority
 
 The owner has final authority for I3 and I4 decisions. Codex may not perform live containment or customer communication without explicit approval.
@@ -40,4 +95,7 @@ After an incident is resolved, the follow-up should include:
 - Rollback or recovery notes.
 - Remaining risk.
 - Preventive follow-up.
+- Postmortem for I2 or higher incidents.
 - Audit event when audit records become active.
+
+Postmortems must include timeline, root cause, impact, corrective actions, owner decisions, and remaining risk.
