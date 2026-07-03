@@ -210,12 +210,68 @@ checkActiveIncidents();
 checkActiveApprovals();
 checkStaleLocks();
 
+// Worker briefing: offline context assembled from source-controlled records
+// only. This is intelligence delivery, not authorization. No live calls.
+function buildWorkerBriefing() {
+  const budget = readJson(".codex/costs/budget.json");
+
+  const preferencesPath = ".codex/owners/preferences/owner-preferences.json";
+  const ownerPreferences = existsSync(path.join(root, preferencesPath))
+    ? readJson(preferencesPath)
+    : null;
+
+  const archetypes = listDirectJson(".codex/archetypes").map((archetypePath) => {
+    const archetype = readJson(archetypePath);
+    return { archetypeId: archetype.archetypeId, name: archetype.name, category: archetype.category, status: archetype.status };
+  });
+
+  const acceptedLessons = listDirectJson(".codex/memory/lessons").map((lessonPath) => {
+    const lesson = readJson(lessonPath);
+    return { lessonId: lesson.lessonId, title: lesson.title, scope: lesson.scope, status: lesson.status };
+  });
+
+  const activeApprovals = listDirectJson(".codex/approvals").map((approvalPath) => {
+    const approval = readJson(approvalPath);
+    return { approvalId: approval.approvalId, status: approval.status, expiresAt: approval.expiresAt ?? null };
+  });
+
+  const connectorRegistry = readJson(".codex/connectors/registry.json");
+  const connectorStatus = (connectorRegistry.connectors ?? []).map((connector) => ({
+    id: connector.id,
+    connectionStatus: connector.connectionStatus
+  }));
+
+  const countActive = (relativeDir) => listDirectJson(relativeDir).length;
+  const engineStatus = {
+    activeCommandIntakes: listDirectJson(".codex/commands", { exclude: ["registry.json"] }).length,
+    activeJobs: countActive(".codex/jobs"),
+    activePlans: countActive(".codex/plans"),
+    activeRoutes: countActive(".codex/router"),
+    activeExecutionSteps: countActive(".codex/execution"),
+    bootRuns: countActive(".codex/boot")
+  };
+
+  return {
+    constitutionStatus: checks.find((check) => check.checkId === "constitution-status")?.status ?? "unknown",
+    repoHealth: checks.every((check) => !check.required || check.status === "pass") ? "healthy" : "blocked",
+    budget: budget.limits ?? null,
+    ownerPreferences,
+    archetypes,
+    acceptedLessons,
+    activeApprovals,
+    connectorStatus,
+    blockers: checks.filter((check) => check.required && check.status !== "pass").map((check) => check.checkId),
+    engineStatus
+  };
+}
+
 const failedRequiredChecks = checks.filter((check) => check.required && check.status !== "pass");
 const report = {
   bootCheck: "offline",
   status: failedRequiredChecks.length === 0 ? "ready" : "blocked",
   generatedAt: now.toISOString(),
   checks,
+  briefing: buildWorkerBriefing(),
   safety: {
     liveCalls: false,
     credentialAccess: false,

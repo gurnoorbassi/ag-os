@@ -51,6 +51,12 @@ The Boot Sequence Runner must not perform:
 
 Live health checks can be added only after the relevant connector permissions, approval workflow, audit trail, and storage rules are active.
 
+## Worker Briefing
+
+Boot output includes an offline `briefing` block that delivers accumulated context to workers at session start: Constitution status, repo health, current budget limits, owner preferences when present, known archetypes, accepted lessons, active approval locks, connector status from source-controlled metadata, current blockers, and engine record counts.
+
+The briefing is assembled only from source-controlled records. It makes no live calls and grants no permissions. Workers must read the briefing before planning work, per `docs/worker-protocol.md`.
+
 ## Output
 
 Each future boot run must produce:
