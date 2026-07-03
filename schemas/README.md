@@ -19,6 +19,7 @@ Current validation checks schema metadata plus selected template and registry re
 - `cost.schema.json`
 - `quality-check.schema.json`
 - `security-review.schema.json`
+- `security-policy.schema.json`
 - `deployment.schema.json`
 
 ## Rule

@@ -1,0 +1,65 @@
+{
+  "$schema": "../../schemas/security-policy.schema.json",
+  "policyVersion": 1,
+  "policyType": "security-os-policy",
+  "status": "foundation",
+  "controls": [
+    {
+      "id": "secret_handling",
+      "label": "Secret handling",
+      "required": true,
+      "failureAction": "block_merge"
+    },
+    {
+      "id": "data_sensitivity_review",
+      "label": "Data sensitivity review",
+      "required": true,
+      "failureAction": "block_merge"
+    },
+    {
+      "id": "access_change_review",
+      "label": "Access change review",
+      "required": true,
+      "failureAction": "owner_review"
+    },
+    {
+      "id": "connector_scope_review",
+      "label": "Connector scope review",
+      "required": true,
+      "failureAction": "owner_review"
+    },
+    {
+      "id": "production_data_block",
+      "label": "Production data block",
+      "required": true,
+      "failureAction": "block_merge"
+    },
+    {
+      "id": "safe_merge_security_review",
+      "label": "Safe merge security review",
+      "required": true,
+      "failureAction": "block_merge"
+    }
+  ],
+  "rules": {
+    "credentialsAllowed": false,
+    "productionCustomerDataAllowed": false,
+    "liveServiceChangesRequireOwnerApproval": true,
+    "accessChangesRequireOwnerApproval": true,
+    "secretsFindingBlocksMerge": true,
+    "domainDnsChangesRequireOwnerApproval": true,
+    "databaseMigrationsRequireOwnerApproval": true,
+    "paidActionsRequireOwnerApproval": true
+  },
+  "defaultReviewSignals": [
+    "credentials",
+    "customer_data",
+    "production_data",
+    "access_changes",
+    "live_service_changes",
+    "domain_dns_changes",
+    "database_migrations",
+    "paid_actions"
+  ],
+  "notes": "Foundation policy only. This file defines security controls and stop conditions; it does not store credentials, inspect live systems, or change access."
+}
