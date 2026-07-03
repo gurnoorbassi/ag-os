@@ -1,0 +1,30 @@
+{
+  "connectorExecutionId": "connector-exec-runtime-construction-website-automated-20260703-netlify",
+  "status": "waiting_approval",
+  "connectorId": "connector-netlify-mcp",
+  "requestedAction": "future_preview_or_production_deploy",
+  "riskLevel": "R4",
+  "projectId": "project-unregistered-construction-website",
+  "approvalRequired": true,
+  "requiredPermissions": [
+    "owner approval lock",
+    "audit event",
+    "deployment scope and rollback plan"
+  ],
+  "evidenceRequired": [
+    "owner approval for Netlify connector action",
+    "deployment target",
+    "rollback plan",
+    "validation result before deploy"
+  ],
+  "safety": {
+    "executesLiveAction": false,
+    "usesCredentials": false,
+    "triggersDeployment": false,
+    "changesDomain": false,
+    "usesPaidAction": false,
+    "accessesProductionData": false
+  },
+  "createdAt": "2026-07-03T20:20:00.000Z",
+  "updatedAt": "2026-07-03T20:20:00.000Z"
+}

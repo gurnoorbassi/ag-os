@@ -3,8 +3,9 @@ import process from "node:process";
 import { isoTimestamp, normalizeRunId, readJson, writeJson } from "./common.mjs";
 
 export function runLocalValidation({ root = process.cwd() } = {}) {
-  const npmExecutable = process.platform === "win32" ? "npm.cmd" : "npm";
-  const result = spawnSync(npmExecutable, ["run", "validate"], {
+  const command = process.platform === "win32" ? "cmd.exe" : "npm";
+  const args = process.platform === "win32" ? ["/c", "npm.cmd", "run", "validate"] : ["run", "validate"];
+  const result = spawnSync(command, args, {
     cwd: root,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"]
@@ -13,8 +14,8 @@ export function runLocalValidation({ root = process.cwd() } = {}) {
   return {
     passed: result.status === 0,
     status: result.status,
-    stdout: result.stdout,
-    stderr: result.stderr
+    stdout: result.stdout ?? "",
+    stderr: result.stderr ?? (result.error ? result.error.message : "")
   };
 }
 

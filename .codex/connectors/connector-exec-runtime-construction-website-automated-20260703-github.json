@@ -1,0 +1,29 @@
+{
+  "connectorExecutionId": "connector-exec-runtime-construction-website-automated-20260703-github",
+  "status": "waiting_approval",
+  "connectorId": "connector-github-mcp",
+  "requestedAction": "future_repository_creation_or_pull_request_work",
+  "riskLevel": "R3",
+  "projectId": "project-unregistered-construction-website",
+  "approvalRequired": true,
+  "requiredPermissions": [
+    "owner approval lock",
+    "audit event",
+    "safe merge checks before repository writes"
+  ],
+  "evidenceRequired": [
+    "owner approval for GitHub connector action",
+    "target repository or repository creation scope",
+    "validation result before merge"
+  ],
+  "safety": {
+    "executesLiveAction": false,
+    "usesCredentials": false,
+    "triggersDeployment": false,
+    "changesDomain": false,
+    "usesPaidAction": false,
+    "accessesProductionData": false
+  },
+  "createdAt": "2026-07-03T20:20:00.000Z",
+  "updatedAt": "2026-07-03T20:20:00.000Z"
+}
