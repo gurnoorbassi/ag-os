@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/task-route.schema.json",
+  "title": "AG OS Task Route",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "routeId",
+    "jobId",
+    "commandType",
+    "projectId",
+    "riskLevel",
+    "connectorNeeds",
+    "targetDomain",
+    "targetAgent",
+    "approvalGates",
+    "routingReason",
+    "blockedBy",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "routeId": {
+      "type": "string",
+      "pattern": "^route-[a-z0-9-]+$"
+    },
+    "jobId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "commandType": {
+      "type": "string",
+      "minLength": 1
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": [
+        "R0",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ]
+    },
+    "connectorNeeds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "targetDomain": {
+      "type": "string",
+      "minLength": 1
+    },
+    "targetAgent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approvalGates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "routingReason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "blockedBy": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executionAuthorized",
+        "liveConnectorUseAllowed",
+        "deploymentAllowed",
+        "productionDataAllowed",
+        "paidActionAllowed"
+      ],
+      "properties": {
+        "executionAuthorized": {
+          "type": "boolean",
+          "const": false
+        },
+        "liveConnectorUseAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "deploymentAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "productionDataAllowed": {
+          "type": "boolean",
+          "const": false
+        },
+        "paidActionAllowed": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
