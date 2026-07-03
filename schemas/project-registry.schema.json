@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/project-registry.schema.json",
+  "title": "AG Digitalz OS Project Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "registryVersion", "registryType", "status", "projects", "rules"],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../schemas/project-registry.schema.json" },
+    "registryVersion": { "type": "integer", "minimum": 1 },
+    "registryType": { "type": "string", "const": "project-registry" },
+    "status": { "type": "string", "enum": ["foundation", "active", "archived"] },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["projectId", "recordPath", "status"],
+        "properties": {
+          "projectId": { "type": "string", "pattern": "^project-[a-z0-9-]+$" },
+          "recordPath": { "type": "string", "pattern": "^\\.codex/projects/[a-z0-9-]+\\.json$" },
+          "status": { "type": "string", "enum": ["planned", "active", "blocked", "paused", "complete", "archived"] },
+          "owner": { "type": "string", "minLength": 1 },
+          "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] },
+          "lastReviewedAt": { "type": ["string", "null"], "format": "date-time" }
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordsMustBeProductionClean",
+        "recordsMustBeExplicitlyApproved",
+        "disallowExampleRecords",
+        "disallowLiveServiceConnections"
+      ],
+      "properties": {
+        "recordsMustBeProductionClean": { "type": "boolean", "const": true },
+        "recordsMustBeExplicitlyApproved": { "type": "boolean", "const": true },
+        "disallowExampleRecords": { "type": "boolean", "const": true },
+        "disallowLiveServiceConnections": { "type": "boolean", "const": true }
+      }
+    }
+  }
+}
