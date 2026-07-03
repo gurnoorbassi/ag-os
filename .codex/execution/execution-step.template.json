@@ -1,0 +1,27 @@
+{
+  "executionStepId": "REQUIRED_EXECUTION_STEP_ID",
+  "planId": "REQUIRED_PLAN_ID",
+  "jobId": "REQUIRED_JOB_ID",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "stepType": "run_validation",
+  "status": "planned",
+  "riskLevel": "R0",
+  "approvalId": "REQUIRED_APPROVAL_ID_OR_NOT_REQUIRED",
+  "command": "REQUIRED_SAFE_COMMAND_OR_DESCRIPTION",
+  "expectedResult": "REQUIRED_EXPECTED_RESULT",
+  "evidenceRequired": [
+    "REQUIRED_EVIDENCE_OR_NONE"
+  ],
+  "rollbackRequired": false,
+  "rollbackPlan": "REQUIRED_IF_ROLLBACK_REQUIRED",
+  "safety": {
+    "credentialsAllowed": false,
+    "liveServiceUseAllowed": false,
+    "deploymentAllowed": false,
+    "domainChangeAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
