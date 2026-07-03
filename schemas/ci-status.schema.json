@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/ci-status.schema.json",
+  "title": "AG OS CI Status Runtime Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ciStatusId",
+    "checkName",
+    "status",
+    "conclusion",
+    "commitSha",
+    "prNumber",
+    "checkedAt",
+    "blockingReason",
+    "source",
+    "liveServiceTouched",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "ciStatusId": {
+      "type": "string",
+      "pattern": "^ci-status-[a-z0-9-]+$"
+    },
+    "checkName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": ["queued", "in_progress", "completed", "missing", "blocked"]
+    },
+    "conclusion": {
+      "type": "string",
+      "enum": ["none", "success", "failure", "cancelled", "skipped", "timed_out", "action_required", "neutral"]
+    },
+    "commitSha": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{7,40}$"
+    },
+    "prNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "checkedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "blockingReason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "enum": ["offline_record", "manual_review", "future_github_mcp_poll"]
+    },
+    "liveServiceTouched": {
+      "type": "boolean",
+      "const": false
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
