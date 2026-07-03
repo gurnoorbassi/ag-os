@@ -16,7 +16,7 @@ function buildPlan() {
     runId: "construction-website-repo",
     commandId: "command-intake-runtime-construction-website-repo",
     projectId: "project-unregistered-construction-website",
-    requestedRepositoryName: "REQUIRED_OWNER_APPROVED_REPO_NAME",
+    requestedRepositoryName: "owner-approval-required-repository-name",
     now: fixedNow
   });
 }
@@ -41,6 +41,18 @@ test("builds a planning-only GitHub execution plan with all safe action types", 
   assert.equal(plan.plannedActions.every((action) => action.approvalRequired === true), true);
   assert.equal(plan.plannedActions.find((action) => action.actionType === "merge_pr").requiredEvidence.includes("ci_passed"), true);
   assert.equal(plan.approvalGates.includes("approval-github-repo-create"), true);
+  assert.equal(plan.plannedWork.detectedProjectType, "website");
+  assert.equal(plan.plannedWork.recommendedStack, "static HTML/CSS/JavaScript hosted on Netlify after owner approval");
+  assert.deepEqual(plan.plannedWork.starterFiles.map((file) => file.path), [
+    "README.md",
+    "package.json",
+    "index.html",
+    "src/styles.css",
+    "src/main.js"
+  ]);
+  assert.equal(plan.plannedWork.pullRequestFlow.includes("open PR from approved branch to main"), true);
+  assert.equal(plan.plannedWork.ciPolling.includes("poll Foundation CI status after PR exists"), true);
+  assert.equal(plan.plannedWork.mergeRules.includes("merge only after CI, validation, approval gate, safe-merge gate, and audit event pass"), true);
   assert.deepEqual(plan.safety, {
     executesGitHubAction: false,
     createsRepository: false,
@@ -52,7 +64,7 @@ test("builds a planning-only GitHub execution plan with all safe action types", 
     touchesProductionData: false,
     usesPaidAction: false
   });
-  assert.equal(JSON.stringify(plan).includes("REQUIRED_"), true);
+  assert.equal(JSON.stringify(plan).includes("REQUIRED_"), false);
 });
 
 test("validates required GitHub execution plan fields and safety defaults", () => {
@@ -62,6 +74,10 @@ test("validates required GitHub execution plan fields and safety defaults", () =
     ...buildPlan(),
     plannedActions: [],
     approvalGates: [],
+    plannedWork: {
+      ...buildPlan().plannedWork,
+      starterFiles: []
+    },
     safety: {
       ...buildPlan().safety,
       executesGitHubAction: true
@@ -72,6 +88,7 @@ test("validates required GitHub execution plan fields and safety defaults", () =
   assert.equal(result.valid, false);
   assert.equal(result.errors.includes("plannedActions must not be empty"), true);
   assert.equal(result.errors.includes("approvalGates must not be empty"), true);
+  assert.equal(result.errors.includes("plannedWork starterFiles must not be empty"), true);
   assert.equal(result.errors.includes("safety flags must all be false for planning_only"), true);
 });
 

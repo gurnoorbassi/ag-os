@@ -15,6 +15,7 @@
     "riskLevel",
     "plannedActions",
     "approvalGates",
+    "plannedWork",
     "safety",
     "createdAt",
     "updatedAt"
@@ -91,6 +92,62 @@
       "type": "array",
       "minItems": 1,
       "items": { "type": "string", "minLength": 1 }
+    },
+    "plannedWork": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "detectedProjectType",
+        "recommendedStack",
+        "starterFiles",
+        "pullRequestFlow",
+        "ciPolling",
+        "mergeRules",
+        "stopConditions"
+      ],
+      "properties": {
+        "detectedProjectType": {
+          "type": "string",
+          "const": "website"
+        },
+        "recommendedStack": {
+          "type": "string",
+          "minLength": 1
+        },
+        "starterFiles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "purpose"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "purpose": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "pullRequestFlow": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "ciPolling": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "mergeRules": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "stopConditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
     },
     "safety": {
       "type": "object",

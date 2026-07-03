@@ -1,0 +1,183 @@
+{
+  "githubMcpExecutionGateId": "github-mcp-gate-runtime-github-construction-website-repo-20260703",
+  "status": "blocked",
+  "mode": "execution_gate_only",
+  "connectorId": "connector-github-mcp",
+  "githubExecutionPlanId": "github-plan-runtime-github-construction-website-repo-20260703",
+  "projectId": "project-unregistered-construction-website",
+  "riskLevel": "R3",
+  "validationPassed": true,
+  "actions": [
+    {
+      "actionType": "create_repo",
+      "approvalGate": "approval-github-repo-create",
+      "executionState": "blocked",
+      "ownerApprovalRequired": true,
+      "requiresApprovalLock": true,
+      "requiresAuditEvent": true,
+      "requiresCiPassed": false,
+      "requiresValidationPassed": true,
+      "allowedAfterApproval": true,
+      "permittedWhen": [
+        "active owner approval lock explicitly scopes repository creation",
+        "repository name and visibility are approved",
+        "no credentials, production data, paid action, deployment, or domain change is included"
+      ],
+      "blockedWhen": [
+        "approval lock is missing, expired, revoked, or out of scope",
+        "repository scope is unclear",
+        "action would add credentials, production data, paid service, deployment, or domain change"
+      ]
+    },
+    {
+      "actionType": "create_branch",
+      "approvalGate": "approval-github-branch-create",
+      "executionState": "blocked",
+      "ownerApprovalRequired": true,
+      "requiresApprovalLock": true,
+      "requiresAuditEvent": true,
+      "requiresCiPassed": false,
+      "requiresValidationPassed": true,
+      "allowedAfterApproval": true,
+      "permittedWhen": [
+        "active owner approval lock scopes the target repository and branch",
+        "branch name is recorded before execution",
+        "source branch is current with the approved target"
+      ],
+      "blockedWhen": [
+        "approval lock is missing, expired, revoked, or out of scope",
+        "target repository or branch name is unclear",
+        "branch action would touch production data or deployment settings"
+      ]
+    },
+    {
+      "actionType": "create_files",
+      "approvalGate": "approval-github-file-create",
+      "executionState": "blocked",
+      "ownerApprovalRequired": true,
+      "requiresApprovalLock": true,
+      "requiresAuditEvent": true,
+      "requiresCiPassed": false,
+      "requiresValidationPassed": true,
+      "allowedAfterApproval": true,
+      "permittedWhen": [
+        "active owner approval lock scopes file creation",
+        "file manifest and validation plan are recorded",
+        "created files avoid credentials, production data, live connector actions, and paid paths"
+      ],
+      "blockedWhen": [
+        "approval lock is missing, expired, revoked, or out of scope",
+        "file manifest is missing",
+        "planned content contains credentials, production data, customer data, deployment, or paid action"
+      ]
+    },
+    {
+      "actionType": "update_files",
+      "approvalGate": "approval-github-file-update",
+      "executionState": "blocked",
+      "ownerApprovalRequired": true,
+      "requiresApprovalLock": true,
+      "requiresAuditEvent": true,
+      "requiresCiPassed": false,
+      "requiresValidationPassed": true,
+      "allowedAfterApproval": true,
+      "permittedWhen": [
+        "active owner approval lock scopes file updates",
+        "diff review and rollback path are recorded",
+        "updates avoid credentials, production data, live connector actions, and paid paths"
+      ],
+      "blockedWhen": [
+        "approval lock is missing, expired, revoked, or out of scope",
+        "diff review or rollback path is missing",
+        "planned update changes credentials, production data, customer data, deployment, or domain settings"
+      ]
+    },
+    {
+      "actionType": "open_pr",
+      "approvalGate": "approval-github-open-pr",
+      "executionState": "blocked",
+      "ownerApprovalRequired": true,
+      "requiresApprovalLock": true,
+      "requiresAuditEvent": true,
+      "requiresCiPassed": false,
+      "requiresValidationPassed": true,
+      "allowedAfterApproval": true,
+      "permittedWhen": [
+        "active owner approval lock scopes opening a pull request",
+        "branch reference and pull request body are recorded",
+        "pull request does not request deployment, domain, paid, or production-data action"
+      ],
+      "blockedWhen": [
+        "approval lock is missing, expired, revoked, or out of scope",
+        "branch reference or pull request body is missing",
+        "pull request would trigger an unapproved live, paid, domain, or production-data path"
+      ]
+    },
+    {
+      "actionType": "poll_ci",
+      "approvalGate": "approval-github-ci-read",
+      "executionState": "blocked",
+      "ownerApprovalRequired": true,
+      "requiresApprovalLock": true,
+      "requiresAuditEvent": true,
+      "requiresCiPassed": false,
+      "requiresValidationPassed": true,
+      "allowedAfterApproval": true,
+      "permittedWhen": [
+        "active owner approval lock scopes CI status reads",
+        "pull request number and commit SHA are recorded",
+        "CI polling reads status only and does not rerun jobs"
+      ],
+      "blockedWhen": [
+        "approval lock is missing, expired, revoked, or out of scope",
+        "pull request number or commit SHA is missing",
+        "CI action would rerun jobs, change workflow settings, deploy, or access secrets"
+      ]
+    },
+    {
+      "actionType": "merge_pr",
+      "approvalGate": "approval-github-safe-merge",
+      "executionState": "blocked",
+      "ownerApprovalRequired": true,
+      "requiresApprovalLock": true,
+      "requiresAuditEvent": true,
+      "requiresCiPassed": true,
+      "requiresValidationPassed": true,
+      "allowedAfterApproval": true,
+      "permittedWhen": [
+        "active owner approval lock scopes the merge",
+        "GitHub CI has passed for the exact head SHA",
+        "local validation passed and safe-merge rules have no blockers",
+        "audit event is written before merge execution"
+      ],
+      "blockedWhen": [
+        "approval lock is missing, expired, revoked, or out of scope",
+        "CI is missing, pending, failed, or for a different commit SHA",
+        "validation failed or safe-merge rules are blocked",
+        "merge includes credentials, production data, paid action, deployment, domain change, or customer data"
+      ]
+    }
+  ],
+  "mergeGuard": {
+    "requiresApprovalGate": true,
+    "requiresCiPassed": true,
+    "requiresValidationPassed": true,
+    "requiresSafeMergeRulesPassed": true,
+    "requiresNoBlockedFiles": true,
+    "requiresNoLiveProductionPaidDomainOrCustomerDataAction": true,
+    "requiresAuditEvent": true
+  },
+  "safety": {
+    "executesGitHubAction": false,
+    "createsRepository": false,
+    "writesRepositoryContent": false,
+    "opensPullRequest": false,
+    "pollsCi": false,
+    "mergesPullRequest": false,
+    "usesCredentials": false,
+    "touchesProductionData": false,
+    "usesPaidAction": false
+  },
+  "createdAt": "2026-07-03T20:45:00.000Z",
+  "updatedAt": "2026-07-03T20:45:00.000Z"
+}

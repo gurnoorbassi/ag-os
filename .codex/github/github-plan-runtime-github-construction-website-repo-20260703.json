@@ -1,0 +1,174 @@
+{
+  "githubExecutionPlanId": "github-plan-runtime-github-construction-website-repo-20260703",
+  "status": "planned",
+  "mode": "planning_only",
+  "connectorId": "connector-github-mcp",
+  "commandId": "command-intake-runtime-github-construction-website-repo-20260703",
+  "projectId": "project-unregistered-construction-website",
+  "requestedRepositoryName": "owner-approval-required-construction-website-repo",
+  "riskLevel": "R3",
+  "plannedActions": [
+    {
+      "actionId": "github-action-runtime-github-construction-website-repo-20260703-create-repo",
+      "actionType": "create_repo",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-repo-create",
+      "requiredEvidence": [
+        "owner_approval_lock",
+        "repository_scope",
+        "audit_event"
+      ],
+      "rollbackRequired": true
+    },
+    {
+      "actionId": "github-action-runtime-github-construction-website-repo-20260703-create-branch",
+      "actionType": "create_branch",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-branch-create",
+      "requiredEvidence": [
+        "owner_approval_lock",
+        "target_repository",
+        "branch_name"
+      ],
+      "rollbackRequired": true
+    },
+    {
+      "actionId": "github-action-runtime-github-construction-website-repo-20260703-create-files",
+      "actionType": "create_files",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-file-create",
+      "requiredEvidence": [
+        "owner_approval_lock",
+        "file_manifest",
+        "validation_plan"
+      ],
+      "rollbackRequired": true
+    },
+    {
+      "actionId": "github-action-runtime-github-construction-website-repo-20260703-update-files",
+      "actionType": "update_files",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-file-update",
+      "requiredEvidence": [
+        "owner_approval_lock",
+        "file_manifest",
+        "diff_review"
+      ],
+      "rollbackRequired": true
+    },
+    {
+      "actionId": "github-action-runtime-github-construction-website-repo-20260703-open-pr",
+      "actionType": "open_pr",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-open-pr",
+      "requiredEvidence": [
+        "owner_approval_lock",
+        "branch_ref",
+        "pr_body"
+      ],
+      "rollbackRequired": false
+    },
+    {
+      "actionId": "github-action-runtime-github-construction-website-repo-20260703-poll-ci",
+      "actionType": "poll_ci",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-ci-read",
+      "requiredEvidence": [
+        "pull_request_number",
+        "commit_sha",
+        "ci_check_names"
+      ],
+      "rollbackRequired": false
+    },
+    {
+      "actionId": "github-action-runtime-github-construction-website-repo-20260703-merge-pr",
+      "actionType": "merge_pr",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-safe-merge",
+      "requiredEvidence": [
+        "owner_approval_lock",
+        "ci_passed",
+        "validation_passed",
+        "safe_merge_rules_passed"
+      ],
+      "rollbackRequired": true
+    }
+  ],
+  "approvalGates": [
+    "approval-github-repo-create",
+    "approval-github-branch-create",
+    "approval-github-file-create",
+    "approval-github-file-update",
+    "approval-github-open-pr",
+    "approval-github-ci-read",
+    "approval-github-safe-merge"
+  ],
+  "plannedWork": {
+    "detectedProjectType": "website",
+    "recommendedStack": "static HTML/CSS/JavaScript hosted on Netlify after owner approval",
+    "starterFiles": [
+      {
+        "path": "README.md",
+        "purpose": "Document owner-provided website scope, local development, validation, and future approval gates."
+      },
+      {
+        "path": "package.json",
+        "purpose": "Define local-only build and validation commands for the website repository."
+      },
+      {
+        "path": "index.html",
+        "purpose": "Create the first static website entry point using owner-provided business details later."
+      },
+      {
+        "path": "src/styles.css",
+        "purpose": "Create the stylesheet for the approved website interface."
+      },
+      {
+        "path": "src/main.js",
+        "purpose": "Create optional local-only interaction hooks without live services."
+      }
+    ],
+    "pullRequestFlow": [
+      "create owner-approved repository after approval lock exists",
+      "create owner-approved branch",
+      "create approved starter files",
+      "run local validation",
+      "open PR from approved branch to main"
+    ],
+    "ciPolling": [
+      "poll Foundation CI status after PR exists",
+      "record check name, status, conclusion, commit SHA, PR number, checkedAt, and blocking reason",
+      "do not rerun jobs or change CI settings without approval"
+    ],
+    "mergeRules": [
+      "merge only after CI, validation, approval gate, safe-merge gate, and audit event pass",
+      "block merge for credentials, production data, customer data, deployments, domain changes, paid actions, blocked files, or failed CI",
+      "never auto-merge GitHub execution unless the scoped action matrix allows it"
+    ],
+    "stopConditions": [
+      "Stop before any GitHub MCP call without owner approval.",
+      "Stop before repository creation, branch creation, file write, PR creation, CI polling, or merge execution.",
+      "Stop before credentials, live services, deployments, domain changes, paid actions, production data, or customer data."
+    ]
+  },
+  "safety": {
+    "executesGitHubAction": false,
+    "createsRepository": false,
+    "writesRepositoryContent": false,
+    "opensPullRequest": false,
+    "pollsCi": false,
+    "mergesPullRequest": false,
+    "usesCredentials": false,
+    "touchesProductionData": false,
+    "usesPaidAction": false
+  },
+  "createdAt": "2026-07-03T20:45:00.000Z",
+  "updatedAt": "2026-07-03T20:45:00.000Z"
+}
