@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/command-registry.schema.json",
+  "title": "AG Digitalz OS Command Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "registryVersion",
+    "registryType",
+    "status",
+    "categories",
+    "rules"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../schemas/command-registry.schema.json" },
+    "registryVersion": { "type": "integer", "minimum": 1 },
+    "registryType": { "type": "string", "const": "command-registry" },
+    "status": { "type": "string", "enum": ["foundation", "active", "archived"] },
+    "categories": {
+      "type": "array",
+      "minItems": 11,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "description",
+          "approvalLevel",
+          "executionMode",
+          "allowedByDefault",
+          "requiresOwnerApproval",
+          "allowedActions",
+          "blockedActions",
+          "executionRule"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "discuss_only",
+              "plan_only",
+              "build",
+              "deploy_staging",
+              "deploy_production",
+              "connect_service",
+              "change_domain",
+              "send_message",
+              "stop_all",
+              "rollback",
+              "audit"
+            ]
+          },
+          "description": { "type": "string", "minLength": 1 },
+          "approvalLevel": {
+            "type": "string",
+            "enum": [
+              "none",
+              "plan_required",
+              "owner_approval_required",
+              "hard_stop"
+            ]
+          },
+          "executionMode": {
+            "type": "string",
+            "enum": [
+              "discussion",
+              "planning",
+              "local_safe",
+              "approval_gated",
+              "blocked"
+            ]
+          },
+          "allowedByDefault": { "type": "boolean" },
+          "requiresOwnerApproval": { "type": "boolean" },
+          "allowedActions": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^[a-z0-9_]+$" }
+          },
+          "blockedActions": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^[a-z0-9_]+$" }
+          },
+          "executionRule": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "credentialsAllowed",
+        "liveCallsAllowedByDefault",
+        "deploymentsAllowedByDefault",
+        "workflowActivationAllowedByDefault",
+        "domainChangesAllowedByDefault",
+        "messagesAllowedByDefault",
+        "smsEmailAllowedByDefault",
+        "paidActionsAllowedByDefault",
+        "productionDataAllowedByDefault"
+      ],
+      "properties": {
+        "credentialsAllowed": { "type": "boolean", "const": false },
+        "liveCallsAllowedByDefault": { "type": "boolean", "const": false },
+        "deploymentsAllowedByDefault": { "type": "boolean", "const": false },
+        "workflowActivationAllowedByDefault": { "type": "boolean", "const": false },
+        "domainChangesAllowedByDefault": { "type": "boolean", "const": false },
+        "messagesAllowedByDefault": { "type": "boolean", "const": false },
+        "smsEmailAllowedByDefault": { "type": "boolean", "const": false },
+        "paidActionsAllowedByDefault": { "type": "boolean", "const": false },
+        "productionDataAllowedByDefault": { "type": "boolean", "const": false }
+      }
+    }
+  }
+}

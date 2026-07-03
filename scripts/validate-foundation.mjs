@@ -21,6 +21,7 @@ const requiredPaths = [
   ".codex/quality/README.md",
   ".codex/security/README.md",
   ".codex/watchdog/README.md",
+  ".codex/commands/registry.json",
   ".codex/connectors/registry.json",
   ".codex/projects/README.md",
   ".codex/projects/registry.json",
@@ -28,8 +29,10 @@ const requiredPaths = [
   ".codex/tasks/task.template.json",
   ".codex/agents/agent.template.json",
   "docs/connector-registry.md",
+  "docs/command-registry.md",
   "docs/project-registry.md",
   "schemas/idea.schema.json",
+  "schemas/command-registry.schema.json",
   "schemas/connector-registry.schema.json",
   "schemas/project.schema.json",
   "schemas/project-registry.schema.json",
@@ -78,6 +81,11 @@ const schemaValidatedRecords = [
     name: "connector registry",
     recordPath: ".codex/connectors/registry.json",
     schemaPath: "schemas/connector-registry.schema.json"
+  },
+  {
+    name: "command registry",
+    recordPath: ".codex/commands/registry.json",
+    schemaPath: "schemas/command-registry.schema.json"
   },
   {
     name: "project registry",
@@ -275,6 +283,59 @@ function validateConnectorRegistry(record) {
   }
 }
 
+function validateCommandRegistry(record) {
+  const requiredCategories = [
+    "discuss_only",
+    "plan_only",
+    "build",
+    "deploy_staging",
+    "deploy_production",
+    "connect_service",
+    "change_domain",
+    "send_message",
+    "stop_all",
+    "rollback",
+    "audit"
+  ];
+  const approvalGatedCategories = [
+    "deploy_staging",
+    "deploy_production",
+    "connect_service",
+    "change_domain",
+    "send_message",
+    "stop_all",
+    "rollback"
+  ];
+  const neverDefaultExecutableCategories = [
+    "deploy_production",
+    "connect_service",
+    "change_domain",
+    "send_message"
+  ];
+
+  const categoryIds = new Set();
+  for (const category of record.categories ?? []) {
+    if (categoryIds.has(category.id)) {
+      fail(`command registry contains duplicate category: ${category.id}`);
+    }
+    categoryIds.add(category.id);
+
+    if (approvalGatedCategories.includes(category.id) && category.requiresOwnerApproval !== true) {
+      fail(`command category ${category.id} must require owner approval`);
+    }
+
+    if (neverDefaultExecutableCategories.includes(category.id) && category.allowedByDefault !== false) {
+      fail(`command category ${category.id} must not be allowed by default`);
+    }
+  }
+
+  for (const requiredCategory of requiredCategories) {
+    if (!categoryIds.has(requiredCategory)) {
+      fail(`command registry missing required category: ${requiredCategory}`);
+    }
+  }
+}
+
 for (const templateRecord of templateRecords) {
   try {
     const record = readJson(templateRecord.recordPath);
@@ -308,6 +369,10 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     if (schemaValidatedRecord.recordPath === ".codex/connectors/registry.json") {
       validateConnectorRegistry(record);
+    }
+
+    if (schemaValidatedRecord.recordPath === ".codex/commands/registry.json") {
+      validateCommandRegistry(record);
     }
 
     if (failures === failuresBeforeRecord) {

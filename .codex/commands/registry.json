@@ -1,0 +1,240 @@
+{
+  "$schema": "../../schemas/command-registry.schema.json",
+  "registryVersion": 1,
+  "registryType": "command-registry",
+  "status": "foundation",
+  "categories": [
+    {
+      "id": "discuss_only",
+      "description": "Owner command category for analysis, explanation, comparison, and discussion without making changes.",
+      "approvalLevel": "none",
+      "executionMode": "discussion",
+      "allowedByDefault": true,
+      "requiresOwnerApproval": false,
+      "allowedActions": [
+        "answer_questions",
+        "explain_tradeoffs",
+        "summarize_context"
+      ],
+      "blockedActions": [
+        "file_changes",
+        "live_service_calls",
+        "deployments",
+        "external_messages",
+        "domain_changes"
+      ],
+      "executionRule": "Do not change files, call live services, deploy, send messages, or change domains."
+    },
+    {
+      "id": "plan_only",
+      "description": "Owner command category for planning work and defining implementation steps without changing files.",
+      "approvalLevel": "none",
+      "executionMode": "planning",
+      "allowedByDefault": true,
+      "requiresOwnerApproval": false,
+      "allowedActions": [
+        "create_plan",
+        "sequence_tasks",
+        "identify_risks"
+      ],
+      "blockedActions": [
+        "file_changes",
+        "live_service_calls",
+        "deployments",
+        "external_messages",
+        "domain_changes"
+      ],
+      "executionRule": "Produce plans only. Do not edit files or touch external systems."
+    },
+    {
+      "id": "build",
+      "description": "Owner command category for local source-controlled changes, offline validation, and pull-request preparation.",
+      "approvalLevel": "plan_required",
+      "executionMode": "local_safe",
+      "allowedByDefault": true,
+      "requiresOwnerApproval": false,
+      "allowedActions": [
+        "edit_repo_files",
+        "run_local_validation",
+        "create_pull_request"
+      ],
+      "blockedActions": [
+        "credentials",
+        "live_service_calls",
+        "deployments",
+        "workflow_activation",
+        "external_messages",
+        "domain_changes"
+      ],
+      "executionRule": "Keep changes local and source-controlled. Do not connect services, deploy, activate workflows, or send messages."
+    },
+    {
+      "id": "deploy_staging",
+      "description": "Owner command category for staging deployment requests.",
+      "approvalLevel": "owner_approval_required",
+      "executionMode": "approval_gated",
+      "allowedByDefault": false,
+      "requiresOwnerApproval": true,
+      "allowedActions": [
+        "prepare_staging_deployment_plan"
+      ],
+      "blockedActions": [
+        "credentials",
+        "unapproved_live_service_calls",
+        "unapproved_deployments",
+        "production_deployments",
+        "domain_changes"
+      ],
+      "executionRule": "Do not deploy from foundation mode. Staging deployment execution requires explicit owner approval in a future scoped task."
+    },
+    {
+      "id": "deploy_production",
+      "description": "Owner command category for production deployment requests.",
+      "approvalLevel": "owner_approval_required",
+      "executionMode": "approval_gated",
+      "allowedByDefault": false,
+      "requiresOwnerApproval": true,
+      "allowedActions": [
+        "prepare_production_deployment_plan"
+      ],
+      "blockedActions": [
+        "credentials",
+        "unapproved_live_service_calls",
+        "unapproved_deployments",
+        "domain_changes",
+        "production_data_changes"
+      ],
+      "executionRule": "Do not deploy to production without explicit owner approval and a scoped deployment task."
+    },
+    {
+      "id": "connect_service",
+      "description": "Owner command category for connecting external services, connectors, credentials, or integrations.",
+      "approvalLevel": "owner_approval_required",
+      "executionMode": "approval_gated",
+      "allowedByDefault": false,
+      "requiresOwnerApproval": true,
+      "allowedActions": [
+        "draft_connection_plan",
+        "document_required_permissions"
+      ],
+      "blockedActions": [
+        "credentials",
+        "live_service_calls",
+        "service_mutations",
+        "workflow_activation",
+        "paid_actions"
+      ],
+      "executionRule": "Document connection plans only unless the owner explicitly approves a specific connector or service task."
+    },
+    {
+      "id": "change_domain",
+      "description": "Owner command category for domain, DNS, routing, or public URL changes.",
+      "approvalLevel": "owner_approval_required",
+      "executionMode": "approval_gated",
+      "allowedByDefault": false,
+      "requiresOwnerApproval": true,
+      "allowedActions": [
+        "draft_domain_change_plan"
+      ],
+      "blockedActions": [
+        "dns_mutation",
+        "domain_purchase",
+        "domain_transfer",
+        "routing_changes",
+        "live_service_calls"
+      ],
+      "executionRule": "Do not change domains, DNS, routing, or public URLs without explicit owner approval."
+    },
+    {
+      "id": "send_message",
+      "description": "Owner command category for sending external messages such as email, SMS, chat, or client-facing notifications.",
+      "approvalLevel": "owner_approval_required",
+      "executionMode": "approval_gated",
+      "allowedByDefault": false,
+      "requiresOwnerApproval": true,
+      "allowedActions": [
+        "draft_message",
+        "prepare_send_approval_packet"
+      ],
+      "blockedActions": [
+        "email_send",
+        "sms_send",
+        "chat_send",
+        "client_notification_send",
+        "unapproved_live_service_calls"
+      ],
+      "executionRule": "Draft only. Do not send SMS, email, chat, or other external messages without explicit owner approval."
+    },
+    {
+      "id": "stop_all",
+      "description": "Owner command category for stopping active automation, live workflows, or running operations.",
+      "approvalLevel": "owner_approval_required",
+      "executionMode": "approval_gated",
+      "allowedByDefault": false,
+      "requiresOwnerApproval": true,
+      "allowedActions": [
+        "document_stop_scope",
+        "prepare_stop_plan"
+      ],
+      "blockedActions": [
+        "unapproved_live_service_calls",
+        "unapproved_workflow_changes",
+        "destructive_changes",
+        "domain_changes"
+      ],
+      "executionRule": "Do not stop live systems from foundation mode. Stop actions require explicit owner approval and scoped target identification."
+    },
+    {
+      "id": "rollback",
+      "description": "Owner command category for reverting a change, restoring a previous state, or preparing rollback work.",
+      "approvalLevel": "owner_approval_required",
+      "executionMode": "approval_gated",
+      "allowedByDefault": false,
+      "requiresOwnerApproval": true,
+      "allowedActions": [
+        "prepare_rollback_plan",
+        "identify_revert_targets"
+      ],
+      "blockedActions": [
+        "unapproved_deployments",
+        "unapproved_live_service_calls",
+        "database_migrations",
+        "production_data_changes",
+        "domain_changes"
+      ],
+      "executionRule": "Plan rollback work only unless the owner explicitly approves the target, method, and expected effect."
+    },
+    {
+      "id": "audit",
+      "description": "Owner command category for offline review, safety checks, validation, and source-controlled inspection.",
+      "approvalLevel": "none",
+      "executionMode": "local_safe",
+      "allowedByDefault": true,
+      "requiresOwnerApproval": false,
+      "allowedActions": [
+        "inspect_files",
+        "run_local_validation",
+        "summarize_findings"
+      ],
+      "blockedActions": [
+        "credentials",
+        "live_service_calls",
+        "deployments",
+        "external_messages",
+        "domain_changes"
+      ],
+      "executionRule": "Run offline inspection and local validation only. Do not mutate live services or production data."
+    }
+  ],
+  "rules": {
+    "credentialsAllowed": false,
+    "liveCallsAllowedByDefault": false,
+    "deploymentsAllowedByDefault": false,
+    "workflowActivationAllowedByDefault": false,
+    "domainChangesAllowedByDefault": false,
+    "messagesAllowedByDefault": false,
+    "smsEmailAllowedByDefault": false,
+    "paidActionsAllowedByDefault": false,
+    "productionDataAllowedByDefault": false
+  }
+}
