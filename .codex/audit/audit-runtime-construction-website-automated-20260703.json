@@ -1,0 +1,51 @@
+{
+  "id": "audit-runtime-construction-website-automated-20260703",
+  "occurredAt": "2026-07-03T20:20:00.000Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "validation_run",
+  "summary": "Automated local dry run generated command intake, boot, job, route, plan, cost, connector gate, audit, and execution records for a construction website request.",
+  "scope": "automated_first_dry_run",
+  "source": "local_validation",
+  "relatedArtifacts": [
+    {
+      "type": "other",
+      "reference": "command-intake-runtime-construction-website-automated-20260703"
+    },
+    {
+      "type": "other",
+      "reference": "boot-runtime-construction-website-automated-20260703"
+    },
+    {
+      "type": "other",
+      "reference": "job-runtime-construction-website-automated-20260703"
+    },
+    {
+      "type": "other",
+      "reference": "route-runtime-construction-website-automated-20260703"
+    },
+    {
+      "type": "other",
+      "reference": "plan-runtime-construction-website-automated-20260703"
+    },
+    {
+      "type": "other",
+      "reference": "cost-ledger-runtime-construction-website-automated-20260703"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-runtime-construction-website-automated-20260703-github"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-runtime-construction-website-automated-20260703-netlify"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-runtime-construction-website-automated-20260703-n8n"
+    }
+  ],
+  "riskLevel": "low",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "createdAt": "2026-07-03T20:20:00.000Z"
+}

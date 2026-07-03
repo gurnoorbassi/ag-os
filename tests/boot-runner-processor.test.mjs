@@ -45,6 +45,10 @@ test("builds a ready boot-run record from the offline boot report", () => {
   assert.equal(record.bootRunId, "boot-runtime-construction-website-dry-run");
   assert.equal(record.status, "ready");
   assert.equal(record.checks.length, 3);
+  assert.deepEqual(record.summary, {
+    readyForCommandExecution: true,
+    blockedReasons: []
+  });
   assert.equal(record.checks[0].checkType, "constitution");
   assert.equal(record.checks[1].checkType, "validation");
   assert.equal(record.checks[2].checkType, "approval");
@@ -77,6 +81,8 @@ test("marks the boot-run blocked when a required check fails", () => {
   });
 
   assert.equal(record.status, "blocked");
+  assert.equal(record.summary.readyForCommandExecution, false);
+  assert.equal(record.summary.blockedReasons.length, 1);
   assert.equal(record.checks.at(-1).checkType, "cost");
   assert.equal(record.checks.at(-1).status, "failed");
 });

@@ -1,0 +1,30 @@
+{
+  "connectorExecutionId": "connector-exec-runtime-construction-website-automated-20260703-n8n",
+  "status": "waiting_approval",
+  "connectorId": "connector-n8n-mcp",
+  "requestedAction": "future_workflow_creation_or_activation_if_needed",
+  "riskLevel": "R4",
+  "projectId": "project-unregistered-construction-website",
+  "approvalRequired": true,
+  "requiredPermissions": [
+    "owner approval lock",
+    "audit event",
+    "workflow backup before changes"
+  ],
+  "evidenceRequired": [
+    "owner approval for n8n connector action",
+    "workflow scope",
+    "workflow backup plan",
+    "activation approval if activation is requested"
+  ],
+  "safety": {
+    "executesLiveAction": false,
+    "usesCredentials": false,
+    "triggersDeployment": false,
+    "changesDomain": false,
+    "usesPaidAction": false,
+    "accessesProductionData": false
+  },
+  "createdAt": "2026-07-03T20:20:00.000Z",
+  "updatedAt": "2026-07-03T20:20:00.000Z"
+}

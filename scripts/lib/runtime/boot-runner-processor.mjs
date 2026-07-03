@@ -47,11 +47,11 @@ export function runOfflineBootCheck({ root = process.cwd() } = {}) {
     stdio: ["ignore", "pipe", "pipe"]
   });
 
-  if (result.status !== 0) {
-    throw new Error(`boot-check failed: ${result.stderr || result.stdout}`);
+  try {
+    return JSON.parse(result.stdout);
+  } catch (error) {
+    throw new Error(`boot-check did not return parseable JSON: ${result.stderr || result.stdout}`);
   }
-
-  return JSON.parse(result.stdout);
 }
 
 export function buildBootRunRecord({ bootReport, runId, now = new Date() }) {
@@ -74,7 +74,10 @@ export function buildBootRunRecord({ bootReport, runId, now = new Date() }) {
     bootRunId: `boot-${normalizedRunId}`,
     status: blockingChecks.length === 0 ? "ready" : "blocked",
     checks,
-    summary: `Offline boot runner completed with ${checks.length - blockingChecks.length} passing required check(s) and ${blockingChecks.length} blocking check(s).`,
+    summary: {
+      readyForCommandExecution: blockingChecks.length === 0,
+      blockedReasons: blockingChecks.map((check) => `${check.checkId}: ${check.evidence}`)
+    },
     safety: {
       usesLiveService: false,
       usesCredentials: false,

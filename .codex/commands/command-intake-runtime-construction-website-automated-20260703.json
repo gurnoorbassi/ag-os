@@ -1,0 +1,31 @@
+{
+  "commandIntakeId": "command-intake-runtime-construction-website-automated-20260703",
+  "status": "classified",
+  "rawCommand": "make me a construction website",
+  "normalizedCommand": "Create a plan-only construction website build plan.",
+  "commandCategory": "plan_only",
+  "projectId": "project-unregistered-construction-website",
+  "riskLevel": "R1",
+  "classification": {
+    "requiresPlan": true,
+    "requiresApproval": false,
+    "requiresLiveService": false,
+    "requiresDeployment": false,
+    "requiresDomainChange": false,
+    "requiresPaidAction": false,
+    "requiresProductionData": false
+  },
+  "plannedOutput": "Plan-only command intake record for a construction website.",
+  "nextRecord": {
+    "jobId": "job-runtime-construction-website-automated-20260703",
+    "planId": "plan-runtime-construction-website-automated-20260703"
+  },
+  "safety": {
+    "executesCommand": false,
+    "createsLiveSideEffect": false,
+    "usesCredentials": false,
+    "callsConnector": false
+  },
+  "createdAt": "2026-07-03T20:20:00.000Z",
+  "updatedAt": "2026-07-03T20:20:00.000Z"
+}

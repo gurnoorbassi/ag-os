@@ -1,0 +1,96 @@
+{
+  "bootRunId": "boot-runtime-construction-website-automated-20260703",
+  "status": "ready",
+  "checks": [
+    {
+      "checkId": "constitution-status",
+      "checkType": "constitution",
+      "status": "pass",
+      "required": true,
+      "evidence": "Constitution v1.0 is active."
+    },
+    {
+      "checkId": "project-registry",
+      "checkType": "registry",
+      "status": "pass",
+      "required": true,
+      "evidence": "2 project registry entries checked."
+    },
+    {
+      "checkId": "connector-registry",
+      "checkType": "connector",
+      "status": "pass",
+      "required": true,
+      "evidence": "Required connected connector records are present."
+    },
+    {
+      "checkId": "command-registry",
+      "checkType": "registry",
+      "status": "pass",
+      "required": true,
+      "evidence": "11 command categories checked."
+    },
+    {
+      "checkId": "capability-registry",
+      "checkType": "registry",
+      "status": "pass",
+      "required": true,
+      "evidence": "Capability registry safety rules are present."
+    },
+    {
+      "checkId": "owner-record",
+      "checkType": "registry",
+      "status": "pass",
+      "required": true,
+      "evidence": "1 active final owner record(s) found."
+    },
+    {
+      "checkId": "validation-status",
+      "checkType": "validation",
+      "status": "pass",
+      "required": true,
+      "evidence": "Local foundation and dashboard checks passed."
+    },
+    {
+      "checkId": "cost-budget",
+      "checkType": "cost",
+      "status": "pass",
+      "required": true,
+      "evidence": "Cost budget limits and default restrictions checked."
+    },
+    {
+      "checkId": "active-incidents",
+      "checkType": "incident",
+      "status": "pass",
+      "required": true,
+      "evidence": "No active incident records found."
+    },
+    {
+      "checkId": "active-approvals",
+      "checkType": "approval",
+      "status": "pass",
+      "required": true,
+      "evidence": "No active approval lock records found."
+    },
+    {
+      "checkId": "stale-locks",
+      "checkType": "approval",
+      "status": "pass",
+      "required": true,
+      "evidence": "0 stale lock record(s) found."
+    }
+  ],
+  "summary": {
+    "readyForCommandExecution": true,
+    "blockedReasons": []
+  },
+  "safety": {
+    "usesLiveService": false,
+    "usesCredentials": false,
+    "changesFiles": false,
+    "triggersDeployment": false,
+    "usesPaidAction": false
+  },
+  "createdAt": "2026-07-03T20:20:00.000Z",
+  "updatedAt": "2026-07-03T20:20:00.000Z"
+}
