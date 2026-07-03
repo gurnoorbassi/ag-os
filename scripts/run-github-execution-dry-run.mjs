@@ -39,6 +39,7 @@ const job = writeJobRecord({
 
 const route = writeTaskRouteRecord({
   job: job.record,
+  commandIntake: command.record,
   runId: RUN_ID,
   now: RUN_TIMESTAMP
 });
