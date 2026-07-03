@@ -1,0 +1,29 @@
+{
+  "ledgerId": "REQUIRED_APPROVAL_LEDGER_ID",
+  "status": "template",
+  "approvalLocks": [
+    {
+      "approvalId": "REQUIRED_APPROVAL_ID",
+      "status": "draft",
+      "scope": "REQUIRED_APPROVAL_SCOPE",
+      "riskLevel": "R0",
+      "approvalRequiredFor": [
+        "REQUIRED_GATED_ACTION"
+      ]
+    }
+  ],
+  "summary": {
+    "activeApprovals": 0,
+    "expiredApprovals": 0,
+    "revokedApprovals": 0,
+    "blockedActions": 0
+  },
+  "safety": {
+    "createsRealApproval": false,
+    "authorizesLiveAction": false,
+    "authorizesDeployment": false,
+    "authorizesPaidAction": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
