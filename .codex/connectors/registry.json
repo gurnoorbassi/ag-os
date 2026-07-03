@@ -1,0 +1,106 @@
+{
+  "$schema": "../../schemas/connector-registry.schema.json",
+  "registryVersion": 1,
+  "registryType": "connector-registry",
+  "status": "foundation",
+  "connectors": [
+    {
+      "id": "connector-github-mcp",
+      "name": "GitHub MCP",
+      "provider": "GitHub",
+      "mcpNamespace": "mcp__codex_apps__github",
+      "connectionStatus": "connected",
+      "verificationSource": "Codex tool metadata exposed GitHub MCP tools.",
+      "allowedCapabilities": [
+        "repository_metadata_read",
+        "pull_request_create",
+        "pull_request_status_read",
+        "pull_request_safe_merge"
+      ],
+      "approvalRequiredFor": [
+        "branch_deletion",
+        "repository_settings_changes",
+        "secret_management",
+        "destructive_repository_changes"
+      ],
+      "prohibitedActions": [
+        "credential_extraction",
+        "unreviewed_production_changes",
+        "bypassing_safe_merge_policy"
+      ],
+      "notes": "Use for source control, pull requests, CI status checks, and safe merges under docs/safe-merge-policy.md."
+    },
+    {
+      "id": "connector-n8n-mcp",
+      "name": "n8n MCP",
+      "provider": "n8n",
+      "mcpNamespace": "mcp__n8n",
+      "connectionStatus": "connected",
+      "verificationSource": "Codex tool metadata exposed n8n MCP tools.",
+      "allowedCapabilities": [
+        "workflow_sdk_reference_read",
+        "node_metadata_discovery",
+        "workflow_code_validation"
+      ],
+      "approvalRequiredFor": [
+        "workflow_create",
+        "workflow_update",
+        "workflow_archive",
+        "workflow_unpublish",
+        "workflow_activation"
+      ],
+      "prohibitedActions": [
+        "credential_extraction",
+        "production_workflow_execution",
+        "unapproved_workflow_activation"
+      ],
+      "notes": "Default use is design and validation only. Do not create, update, archive, unpublish, or activate workflows without explicit approval."
+    },
+    {
+      "id": "connector-netlify-mcp",
+      "name": "Netlify MCP",
+      "provider": "Netlify",
+      "mcpNamespace": "mcp__codex_apps__netlify",
+      "connectionStatus": "connected",
+      "verificationSource": "Codex tool metadata exposed Netlify MCP tools.",
+      "allowedCapabilities": [
+        "coding_context_read",
+        "project_metadata_read",
+        "team_metadata_read",
+        "deploy_metadata_read"
+      ],
+      "approvalRequiredFor": [
+        "site_deploy",
+        "project_create",
+        "environment_variable_changes",
+        "form_settings_changes",
+        "access_control_changes",
+        "extension_installation"
+      ],
+      "prohibitedActions": [
+        "credential_extraction",
+        "unapproved_deployment",
+        "unapproved_domain_changes"
+      ],
+      "notes": "Default use is read-only context and metadata. Do not deploy, change project settings, change environment variables, or touch domains without explicit approval."
+    }
+  ],
+  "availableButNotConnected": [
+    {
+      "name": "Base44",
+      "provider": "Base44",
+      "connectionStatus": "available_not_connected",
+      "intendedUse": "UI prototypes only when useful.",
+      "notes": "No Base44 MCP namespace was exposed in Codex tool metadata during registry creation. Do not treat Base44 as connected until a Base44 MCP is available."
+    }
+  ],
+  "rules": {
+    "credentialsAllowed": false,
+    "liveCallsAllowedByDefault": false,
+    "deploymentsAllowedByDefault": false,
+    "workflowActivationAllowedByDefault": false,
+    "domainChangesAllowedByDefault": false,
+    "paidActionsAllowedByDefault": false,
+    "productionDataAllowedByDefault": false
+  }
+}
