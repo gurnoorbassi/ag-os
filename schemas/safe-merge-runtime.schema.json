@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/safe-merge-runtime.schema.json",
+  "title": "AG OS Safe Merge Runtime Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "safeMergeRuntimeId",
+    "status",
+    "mode",
+    "prNumber",
+    "commitSha",
+    "riskLevel",
+    "conditions",
+    "blockedFiles",
+    "blockingReasons",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "safeMergeRuntimeId": {
+      "type": "string",
+      "pattern": "^safe-merge-[a-z0-9-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["blocked", "ready"]
+    },
+    "mode": {
+      "type": "string",
+      "const": "merge_gate_only"
+    },
+    "prNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "commitSha": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{7,40}$"
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": ["R0", "R1", "R2", "R3", "R4", "R5", "R6"]
+    },
+    "conditions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approvalGateAllows",
+        "ciPassed",
+        "validationPassed",
+        "riskTierAllowed",
+        "noBlockedFiles",
+        "noLiveProdPaidDomainCustomerDataAction",
+        "auditEventCreated"
+      ],
+      "properties": {
+        "approvalGateAllows": { "type": "boolean" },
+        "ciPassed": { "type": "boolean" },
+        "validationPassed": { "type": "boolean" },
+        "riskTierAllowed": { "type": "boolean" },
+        "noBlockedFiles": { "type": "boolean" },
+        "noLiveProdPaidDomainCustomerDataAction": { "type": "boolean" },
+        "auditEventCreated": { "type": "boolean" }
+      }
+    },
+    "blockedFiles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "blockingReasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executesMerge",
+        "liveServiceTouched",
+        "deploys",
+        "changesDomain",
+        "usesPaidAction",
+        "touchesProductionData",
+        "touchesCustomerData"
+      ],
+      "properties": {
+        "executesMerge": { "type": "boolean", "const": false },
+        "liveServiceTouched": { "type": "boolean", "const": false },
+        "deploys": { "type": "boolean", "const": false },
+        "changesDomain": { "type": "boolean", "const": false },
+        "usesPaidAction": { "type": "boolean", "const": false },
+        "touchesProductionData": { "type": "boolean", "const": false },
+        "touchesCustomerData": { "type": "boolean", "const": false }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
