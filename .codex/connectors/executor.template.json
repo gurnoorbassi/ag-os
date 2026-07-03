@@ -1,0 +1,26 @@
+{
+  "connectorExecutionId": "REQUIRED_CONNECTOR_EXECUTION_ID",
+  "status": "template",
+  "connectorId": "REQUIRED_CONNECTOR_ID",
+  "requestedAction": "REQUIRED_CONNECTOR_ACTION",
+  "riskLevel": "R0",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "approvalRequired": true,
+  "approvalId": "REQUIRED_APPROVAL_ID_OR_NOT_REQUIRED",
+  "requiredPermissions": [
+    "REQUIRED_PERMISSION"
+  ],
+  "evidenceRequired": [
+    "REQUIRED_EVIDENCE_OR_NONE"
+  ],
+  "safety": {
+    "executesLiveAction": false,
+    "usesCredentials": false,
+    "triggersDeployment": false,
+    "changesDomain": false,
+    "usesPaidAction": false,
+    "accessesProductionData": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

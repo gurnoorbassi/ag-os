@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/connector-execution.schema.json",
+  "title": "AG OS Connector Execution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "connectorExecutionId",
+    "status",
+    "connectorId",
+    "requestedAction",
+    "riskLevel",
+    "projectId",
+    "approvalRequired",
+    "requiredPermissions",
+    "evidenceRequired",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "connectorExecutionId": {
+      "type": "string",
+      "pattern": "^connector-exec-[a-z0-9-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "template",
+        "planned",
+        "waiting_approval",
+        "blocked",
+        "ready",
+        "running",
+        "failed",
+        "done",
+        "cancelled"
+      ]
+    },
+    "connectorId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requestedAction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": [
+        "R0",
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ]
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approvalRequired": {
+      "type": "boolean"
+    },
+    "approvalId": {
+      "type": "string"
+    },
+    "requiredPermissions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "evidenceRequired": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executesLiveAction",
+        "usesCredentials",
+        "triggersDeployment",
+        "changesDomain",
+        "usesPaidAction",
+        "accessesProductionData"
+      ],
+      "properties": {
+        "executesLiveAction": {
+          "type": "boolean",
+          "const": false
+        },
+        "usesCredentials": {
+          "type": "boolean",
+          "const": false
+        },
+        "triggersDeployment": {
+          "type": "boolean",
+          "const": false
+        },
+        "changesDomain": {
+          "type": "boolean",
+          "const": false
+        },
+        "usesPaidAction": {
+          "type": "boolean",
+          "const": false
+        },
+        "accessesProductionData": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
