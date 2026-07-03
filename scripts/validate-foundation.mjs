@@ -192,6 +192,18 @@ const knowledgeRecordDirectories = [
     name: "product archetype",
     recordDir: ".codex/archetypes",
     schemaPath: "schemas/product-archetype.schema.json"
+  },
+  {
+    name: "accepted lesson",
+    recordDir: ".codex/memory/lessons",
+    schemaPath: "schemas/lesson.schema.json",
+    allowedStatuses: ["accepted", "archived"]
+  },
+  {
+    name: "lesson candidate",
+    recordDir: ".codex/memory/lessons/candidates",
+    schemaPath: "schemas/lesson.schema.json",
+    allowedStatuses: ["candidate", "rejected"]
   }
 ];
 const engineRecordDirectories = [
@@ -1062,6 +1074,10 @@ for (const knowledgeRecordDirectory of knowledgeRecordDirectories) {
       assertNoPlaceholders(record, recordPath);
       assertNoFixtureMarkers(record, recordPath);
       validateSchemaObject(record, schema, recordPath);
+
+      if (knowledgeRecordDirectory.allowedStatuses && !knowledgeRecordDirectory.allowedStatuses.includes(record.status)) {
+        fail(`${recordPath} status must be one of: ${knowledgeRecordDirectory.allowedStatuses.join(", ")}`);
+      }
 
       if (failures === failuresBeforeRecord) {
         pass(`${knowledgeRecordDirectory.name} active record structurally valid: ${recordPath}`);

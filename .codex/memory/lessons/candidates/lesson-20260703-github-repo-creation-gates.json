@@ -1,0 +1,24 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260703-github-repo-creation-gates",
+  "title": "Live GitHub repo creation succeeded only through the full gate chain",
+  "lesson": "The first live GitHub repository creation on 2026-07-03 worked only after every gate passed in order: a scoped approval lock (approval-20260703-github-repo-create), a passing boot check, passing local foundation validation, audit events for approval and execution, and a recorded connector execution result. The execution stopped before any deploy, domain, or workflow action. Future live connector actions should reuse this exact gate chain rather than inventing a new path.",
+  "sources": [
+    ".codex/approvals/approval-20260703-github-repo-create.json",
+    ".codex/audit/audit-20260703-github-repo-create-owner-approved.json",
+    ".codex/audit/audit-20260703-github-repo-create-executed.json",
+    ".codex/connectors/connector-exec-20260703-github-repo-create-live-result.json",
+    "docs/live-github-repo-creation-approval-package.md"
+  ],
+  "scope": "agent_shared",
+  "confidence": "high",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "appliesTo": [
+    "connector-github-mcp",
+    "live connector actions"
+  ],
+  "notes": "Candidate only. Not accepted permanent truth until reviewed and promoted per docs/memory-learning-policy.md.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}
