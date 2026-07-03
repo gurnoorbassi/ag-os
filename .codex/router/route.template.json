@@ -1,0 +1,28 @@
+{
+  "routeId": "REQUIRED_ROUTE_ID",
+  "jobId": "REQUIRED_JOB_ID",
+  "commandType": "REQUIRED_COMMAND_TYPE",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "riskLevel": "R0",
+  "connectorNeeds": [
+    "REQUIRED_CONNECTOR_OR_NONE"
+  ],
+  "targetDomain": "REQUIRED_OS_DOMAIN",
+  "targetAgent": "REQUIRED_AGENT_OR_SYSTEM",
+  "approvalGates": [
+    "REQUIRED_APPROVAL_GATE_OR_NONE"
+  ],
+  "routingReason": "REQUIRED_ROUTING_REASON",
+  "blockedBy": [
+    "REQUIRED_BLOCKER_OR_NONE"
+  ],
+  "safety": {
+    "executionAuthorized": false,
+    "liveConnectorUseAllowed": false,
+    "deploymentAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
