@@ -1,0 +1,27 @@
+{
+  "auditTrailId": "REQUIRED_AUDIT_TRAIL_ID",
+  "status": "template",
+  "eventTypesTracked": [
+    "command",
+    "pull_request",
+    "merge",
+    "approval",
+    "incident",
+    "validation_change",
+    "blocked_action"
+  ],
+  "summary": {
+    "eventsRecorded": 0,
+    "blockedActions": 0,
+    "incidents": 0,
+    "redactionRequired": false
+  },
+  "safety": {
+    "createsRealAuditEvent": false,
+    "containsCredentials": false,
+    "containsProductionData": false,
+    "containsCustomerData": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

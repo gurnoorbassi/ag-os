@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/audit-trail.schema.json",
+  "title": "AG OS Audit Trail",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "auditTrailId",
+    "status",
+    "eventTypesTracked",
+    "summary",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "auditTrailId": {
+      "type": "string",
+      "pattern": "^audit-trail-[a-z0-9-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "template",
+        "draft",
+        "active",
+        "blocked",
+        "archived"
+      ]
+    },
+    "eventTypesTracked": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "command",
+          "pull_request",
+          "merge",
+          "approval",
+          "incident",
+          "validation_change",
+          "blocked_action",
+          "rollback",
+          "cost_event",
+          "connector_event"
+        ]
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eventsRecorded",
+        "blockedActions",
+        "incidents",
+        "redactionRequired"
+      ],
+      "properties": {
+        "eventsRecorded": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blockedActions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "incidents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "redactionRequired": {
+          "type": "boolean"
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "createsRealAuditEvent",
+        "containsCredentials",
+        "containsProductionData",
+        "containsCustomerData"
+      ],
+      "properties": {
+        "createsRealAuditEvent": {
+          "type": "boolean",
+          "const": false
+        },
+        "containsCredentials": {
+          "type": "boolean",
+          "const": false
+        },
+        "containsProductionData": {
+          "type": "boolean",
+          "const": false
+        },
+        "containsCustomerData": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
