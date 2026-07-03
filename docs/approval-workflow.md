@@ -4,7 +4,7 @@
 
 This document defines how AG Digitalz OS records and uses owner approval for actions that are blocked by default.
 
-This foundation does not create approval records. It defines the workflow and schema shape for future approval locks.
+This foundation does not create real approval records. It defines the active record location, workflow, and schema shape for approval locks.
 
 ## Actions Requiring Approval
 
@@ -32,22 +32,29 @@ Approval locks and audit events must be active before any gated action after Con
 
 Before any gated action executes, a current approval lock must exist unless the action remains plan-only. Current owner instruction may authorize foundation work, but live services, deployments, domains, paid actions, credentials, production data, customer data, external messages, destructive migrations, and protected product changes require a lock after Constitution activation.
 
+Approval locks are authorization records, not casual approval requests. Draft requests, rejected requests, and discussion notes belong in PR text or audit events, not as executable approval locks.
+
+Approval lock status must be `approved`, `expired`, or `revoked`. Only `approved` locks can authorize gated execution, and they still must be unexpired, unrevoked, scoped to the exact action, and rechecked immediately before execution.
+
 Each approval lock must include:
 
 - Unique approval ID.
 - Status.
 - Owner ID.
 - Requester.
+- Approved-by owner or delegated approver reference.
 - Command category.
 - Requested action.
+- Exact target.
 - Exact scope.
 - Risk level.
+- Data class.
 - Approval gates covered.
 - Approved actions.
 - Prohibited actions.
 - Evidence references.
+- Approval timestamp.
 - Expiration timestamp.
-- Approved-by owner or delegate reference.
 - Created and updated timestamps.
 
 ## Scope And Expiration

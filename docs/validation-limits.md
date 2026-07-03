@@ -18,6 +18,9 @@ Passing validation is required for safe merge, but it is not the same as product
 - Forbidden credential and live-connection marker patterns in source-controlled text files.
 - Required governance docs added for Constitution readiness.
 - Draft-only Constitution status.
+- Approval-lock schema activation readiness.
+- Future approval, audit, and owner JSON records if records are added.
+- Mandatory boot-sequence language and action-matrix governance gates.
 
 ## Current Validation Does Not Prove
 

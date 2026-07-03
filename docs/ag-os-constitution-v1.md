@@ -626,7 +626,7 @@ Early schemas may still contain legacy labels. Legacy labels must be mapped unde
 
 Passing validation is required, but it does not prove production readiness, security approval, owner approval, live-service approval, domain safety, billing safety, database migration safety, or absence of all secrets.
 
-Current validation checks required foundation paths, JSON schema metadata, selected templates, selected registries and policies, empty foundation Project Registry, and obvious forbidden credential or live-connection marker patterns.
+Current validation checks required foundation paths, JSON schema metadata, selected templates, selected registries and policies, empty foundation Project Registry, approval-lock schema readiness, future approval/audit/owner records when present, mandatory boot language, action-matrix governance gates, and obvious forbidden credential or live-connection marker patterns.
 
 Validation does not authorize live services, deployments, credentials, production data, customer data, paid actions, domain changes, database migrations, connector permission changes, or Constitution activation.
 
@@ -634,7 +634,7 @@ Validation may be expanded through safe PRs. Any validation that calls live serv
 
 ## 30. Boot Sequence
 
-Before executing commands after Constitution activation, AG OS should:
+Before executing commands after Constitution activation, AG OS must:
 
 1. Validate registries.
 2. Validate schemas.
