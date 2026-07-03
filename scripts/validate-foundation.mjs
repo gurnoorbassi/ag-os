@@ -20,6 +20,7 @@ const requiredPaths = [
   ".codex/costs/README.md",
   ".codex/costs/budget.json",
   ".codex/quality/README.md",
+  ".codex/quality/policy.json",
   ".codex/security/README.md",
   ".codex/watchdog/README.md",
   ".codex/commands/registry.json",
@@ -32,11 +33,13 @@ const requiredPaths = [
   "docs/connector-registry.md",
   "docs/command-registry.md",
   "docs/cost-os.md",
+  "docs/quality-os.md",
   "docs/project-registry.md",
   "schemas/idea.schema.json",
   "schemas/command-registry.schema.json",
   "schemas/connector-registry.schema.json",
   "schemas/cost-budget.schema.json",
+  "schemas/quality-policy.schema.json",
   "schemas/project.schema.json",
   "schemas/project-registry.schema.json",
   "schemas/agent.schema.json",
@@ -94,6 +97,11 @@ const schemaValidatedRecords = [
     name: "cost budget",
     recordPath: ".codex/costs/budget.json",
     schemaPath: "schemas/cost-budget.schema.json"
+  },
+  {
+    name: "quality policy",
+    recordPath: ".codex/quality/policy.json",
+    schemaPath: "schemas/quality-policy.schema.json"
   },
   {
     name: "project registry",
@@ -378,6 +386,44 @@ function validateCostBudget(record) {
   }
 }
 
+function validateQualityPolicy(record) {
+  const requiredGates = [
+    "foundation_validation",
+    "schema_validation",
+    "safety_review",
+    "documentation_review",
+    "rollback_readiness",
+    "residual_risk_review"
+  ];
+  const gateIds = new Set((record.gates ?? []).map((gate) => gate.id));
+
+  for (const requiredGate of requiredGates) {
+    if (!gateIds.has(requiredGate)) {
+      fail(`quality policy missing required gate: ${requiredGate}`);
+    }
+  }
+
+  if (record.rules?.validationRequiredBeforeMerge !== true) {
+    fail("quality policy must require validation before merge");
+  }
+
+  if (record.rules?.evidenceRequiredForPassingStatus !== true) {
+    fail("quality policy must require evidence for passing status");
+  }
+
+  if (record.rules?.ownerApprovalRequiredForWaivers !== true) {
+    fail("quality policy must require owner approval for waivers");
+  }
+
+  if (record.rules?.noMergeOnFailedRequiredGate !== true) {
+    fail("quality policy must block merge on failed required gates");
+  }
+
+  if (record.rules?.rollbackNotesRequiredForRiskyChanges !== true) {
+    fail("quality policy must require rollback notes for risky changes");
+  }
+}
+
 for (const templateRecord of templateRecords) {
   try {
     const record = readJson(templateRecord.recordPath);
@@ -419,6 +465,10 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     if (schemaValidatedRecord.recordPath === ".codex/costs/budget.json") {
       validateCostBudget(record);
+    }
+
+    if (schemaValidatedRecord.recordPath === ".codex/quality/policy.json") {
+      validateQualityPolicy(record);
     }
 
     if (failures === failuresBeforeRecord) {

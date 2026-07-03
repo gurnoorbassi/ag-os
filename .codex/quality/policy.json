@@ -1,0 +1,67 @@
+{
+  "$schema": "../../schemas/quality-policy.schema.json",
+  "policyVersion": 1,
+  "policyType": "quality-os-policy",
+  "status": "foundation",
+  "gates": [
+    {
+      "id": "foundation_validation",
+      "label": "Foundation validation",
+      "required": true,
+      "evidenceRequired": true,
+      "failureAction": "block_merge"
+    },
+    {
+      "id": "schema_validation",
+      "label": "Schema validation",
+      "required": true,
+      "evidenceRequired": true,
+      "failureAction": "block_merge"
+    },
+    {
+      "id": "safety_review",
+      "label": "Safety review",
+      "required": true,
+      "evidenceRequired": true,
+      "failureAction": "block_merge"
+    },
+    {
+      "id": "documentation_review",
+      "label": "Documentation review",
+      "required": true,
+      "evidenceRequired": true,
+      "failureAction": "block_merge"
+    },
+    {
+      "id": "rollback_readiness",
+      "label": "Rollback readiness",
+      "required": true,
+      "evidenceRequired": true,
+      "failureAction": "owner_review"
+    },
+    {
+      "id": "residual_risk_review",
+      "label": "Residual risk review",
+      "required": true,
+      "evidenceRequired": true,
+      "failureAction": "owner_review"
+    }
+  ],
+  "rules": {
+    "validationRequiredBeforeMerge": true,
+    "evidenceRequiredForPassingStatus": true,
+    "ownerApprovalRequiredForWaivers": true,
+    "noMergeOnFailedRequiredGate": true,
+    "rollbackNotesRequiredForRiskyChanges": true,
+    "knownResidualRisksMustBeDocumented": true
+  },
+  "defaultEvidenceTypes": [
+    "validation_output",
+    "ci_status",
+    "diff_review",
+    "safety_checklist",
+    "rollback_notes",
+    "residual_risk_notes"
+  ],
+  "notes": "Foundation policy only. This file defines quality gates and evidence rules; it does not create project records, run live checks, or change external systems."
+}
