@@ -1,0 +1,35 @@
+{
+  "$schema": "../../schemas/cost-budget.schema.json",
+  "budgetVersion": 1,
+  "budgetType": "cost-os-budget",
+  "status": "foundation",
+  "currency": "USD",
+  "limits": {
+    "monthlyMaxUsd": 50,
+    "dailyMaxUsd": 10,
+    "perTaskMaxUsd": 5
+  },
+  "approvalRules": {
+    "paidToolsRequireOwnerApproval": true,
+    "liveApiUsageRequiresOwnerApprovalUnlessApproved": true,
+    "billingChangesRequireOwnerApproval": true,
+    "newRecurringSpendRequiresOwnerApproval": true
+  },
+  "sourcingRules": {
+    "preferExistingToolsAndInfrastructure": true,
+    "useCheapestOptionThatMeetsQuality": true,
+    "neverSacrificeQualityForTinyCostSavings": true
+  },
+  "defaultRestrictions": {
+    "liveApiCallsAllowedByDefault": false,
+    "billingChangesAllowedByDefault": false,
+    "credentialsAllowed": false,
+    "deploymentsAllowedByDefault": false,
+    "paidActionsAllowedByDefault": false
+  },
+  "reviewCadence": {
+    "budgetReview": "monthly",
+    "taskCostReview": "before_paid_or_live_usage"
+  },
+  "notes": "Foundation budget metadata only. This file does not authorize billing changes, paid actions, live API usage, deployments, or credential storage."
+}

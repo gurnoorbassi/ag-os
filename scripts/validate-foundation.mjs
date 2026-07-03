@@ -18,6 +18,7 @@ const requiredPaths = [
   ".codex/ideas/README.md",
   ".codex/memory/README.md",
   ".codex/costs/README.md",
+  ".codex/costs/budget.json",
   ".codex/quality/README.md",
   ".codex/security/README.md",
   ".codex/watchdog/README.md",
@@ -30,10 +31,12 @@ const requiredPaths = [
   ".codex/agents/agent.template.json",
   "docs/connector-registry.md",
   "docs/command-registry.md",
+  "docs/cost-os.md",
   "docs/project-registry.md",
   "schemas/idea.schema.json",
   "schemas/command-registry.schema.json",
   "schemas/connector-registry.schema.json",
+  "schemas/cost-budget.schema.json",
   "schemas/project.schema.json",
   "schemas/project-registry.schema.json",
   "schemas/agent.schema.json",
@@ -86,6 +89,11 @@ const schemaValidatedRecords = [
     name: "command registry",
     recordPath: ".codex/commands/registry.json",
     schemaPath: "schemas/command-registry.schema.json"
+  },
+  {
+    name: "cost budget",
+    recordPath: ".codex/costs/budget.json",
+    schemaPath: "schemas/cost-budget.schema.json"
   },
   {
     name: "project registry",
@@ -336,6 +344,40 @@ function validateCommandRegistry(record) {
   }
 }
 
+function validateCostBudget(record) {
+  if (record.limits?.monthlyMaxUsd !== 50) {
+    fail("cost budget monthly max must be 50 USD");
+  }
+
+  if (record.limits?.dailyMaxUsd !== 10) {
+    fail("cost budget daily max must be 10 USD");
+  }
+
+  if (record.limits?.perTaskMaxUsd !== 5) {
+    fail("cost budget per-task max must be 5 USD");
+  }
+
+  if (record.approvalRules?.paidToolsRequireOwnerApproval !== true) {
+    fail("cost budget must require owner approval for paid tools");
+  }
+
+  if (record.approvalRules?.liveApiUsageRequiresOwnerApprovalUnlessApproved !== true) {
+    fail("cost budget must require owner approval for live API usage unless already approved");
+  }
+
+  if (record.sourcingRules?.preferExistingToolsAndInfrastructure !== true) {
+    fail("cost budget must prefer existing tools and infrastructure");
+  }
+
+  if (record.sourcingRules?.useCheapestOptionThatMeetsQuality !== true) {
+    fail("cost budget must prefer the cheapest option that still meets quality");
+  }
+
+  if (record.sourcingRules?.neverSacrificeQualityForTinyCostSavings !== true) {
+    fail("cost budget must never sacrifice quality for tiny cost savings");
+  }
+}
+
 for (const templateRecord of templateRecords) {
   try {
     const record = readJson(templateRecord.recordPath);
@@ -373,6 +415,10 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     if (schemaValidatedRecord.recordPath === ".codex/commands/registry.json") {
       validateCommandRegistry(record);
+    }
+
+    if (schemaValidatedRecord.recordPath === ".codex/costs/budget.json") {
+      validateCostBudget(record);
     }
 
     if (failures === failuresBeforeRecord) {
