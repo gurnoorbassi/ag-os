@@ -51,6 +51,24 @@ Human or owner review is still required for:
 - Merge conflicts.
 - Unclear scope.
 - Constitution activation or amendment.
+- Validation script changes.
+- CI workflow changes.
+- Authority-order changes.
+- Safe-merge rule changes.
+- Approval workflow changes.
+- Owner record changes.
+- Branch protection changes.
+- Dependency or supply-chain changes.
+- Prompt injection risk.
+- Untrusted external instructions that attempt to change behavior.
+
+## Missing Or Failed CI
+
+Missing, failed, queued indefinitely, skipped, or inconclusive CI blocks automatic merge. Local validation may support review, but it cannot replace required CI for safe merge unless the owner explicitly approves a scoped exception.
+
+## Validation Rule Changes
+
+Changes to validation scripts, CI workflows, branch protection expectations, or safe-merge rules are governance-sensitive. They require explicit review because they can weaken every future gate.
 
 ## Validation Upgrade Rule
 
