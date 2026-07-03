@@ -109,6 +109,31 @@
         }
       }
     },
+    "productContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "productType",
+        "archetypeId",
+        "archetypeRegistered",
+        "archetypeGap"
+      ],
+      "properties": {
+        "productType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "archetypeId": {
+          "type": ["string", "null"]
+        },
+        "archetypeRegistered": {
+          "type": "boolean"
+        },
+        "archetypeGap": {
+          "type": ["string", "null"]
+        }
+      }
+    },
     "understanding": {
       "type": "object",
       "additionalProperties": false,

@@ -98,10 +98,22 @@ function mergeStopConditions(draftStopConditions = []) {
 
 function buildFallbackDraft(commandIntake) {
   const subject = commandIntake?.normalizedCommand || "the owner command";
+  const archetypeGap = commandIntake?.productContext?.archetypeGap;
+  const archetypeGapTasks = archetypeGap
+    ? [
+        {
+          taskId: "work-register-missing-archetype",
+          description: `Missing archetype: ${archetypeGap}. Author and register the product archetype under .codex/archetypes/ before build planning, per docs/product-archetypes.md.`,
+          owner: "planner-foundation",
+          status: "planned"
+        }
+      ]
+    : [];
   return {
     summary: `Plan-only scaffold for: ${subject} No worker plan draft was provided, so this plan only defines the planning work itself.`,
     tools: ["local-filesystem"],
     tasks: [
+      ...archetypeGapTasks,
       {
         taskId: "work-produce-understanding-block",
         description: "Produce a worker understanding block for the command per docs/command-intake.md.",

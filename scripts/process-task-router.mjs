@@ -11,14 +11,15 @@ function readArg(name) {
 }
 
 const jobRecordPath = readArg("--job-record");
+const commandRecordPath = readArg("--command-record");
 const runId = readArg("--run-id");
 
 if (!jobRecordPath) {
-  console.error("Usage: node scripts/process-task-router.mjs --job-record .codex/jobs/job-runtime-example.json");
+  console.error("Usage: node scripts/process-task-router.mjs --job-record .codex/jobs/job-runtime-example.json [--command-record .codex/commands/command-intake-runtime-example.json]");
   process.exit(1);
 }
 
-const result = writeTaskRouteRecord({ jobRecordPath, runId });
+const result = writeTaskRouteRecord({ jobRecordPath, commandRecordPath, runId });
 console.log(JSON.stringify({
   processor: "task-router",
   recordPath: result.filePath,

@@ -1,6 +1,111 @@
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
 import { DEFAULT_PROJECT_ID, isoTimestamp, normalizeRunId, slugify, writeJson } from "./common.mjs";
 
-function classifyCommand(command) {
+// Product type detection is a deterministic hint, not understanding. Real
+// understanding comes from the worker block; these matchers only pick a
+// product-aware label and the archetype to look up. Order matters: first
+// match wins, so more specific product types come first.
+const PRODUCT_TYPE_MATCHERS = [
+  {
+    productType: "social media content operations",
+    slug: "social-media-content-operations",
+    archetypeId: "archetype-social-media-content-operations-system",
+    pattern: /social\s*media|content\s+operations|posts?\s+across|multi[-\s]?platform|multiple\s+platforms/
+  },
+  {
+    productType: "website",
+    slug: "website",
+    archetypeId: "archetype-website",
+    pattern: /\b(web\s*site|website|landing\s+page)\b/
+  },
+  {
+    productType: "crm",
+    slug: "crm",
+    archetypeId: "archetype-crm",
+    pattern: /\bcrm\b|customer\s+relationship/
+  },
+  {
+    productType: "lead generation system",
+    slug: "lead-generation-system",
+    archetypeId: "archetype-lead-generation",
+    pattern: /\blead\s+gen(?:eration)?\b/
+  },
+  {
+    productType: "dashboard",
+    slug: "dashboard",
+    archetypeId: "archetype-dashboard",
+    pattern: /\bdashboard\b/
+  },
+  {
+    productType: "presentation",
+    slug: "presentation",
+    archetypeId: "archetype-presentation",
+    pattern: /\bpower\s*point\b|\bpresentation\b|\bslide\s*deck\b|\bpptx\b/
+  },
+  {
+    productType: "training platform",
+    slug: "training-platform",
+    archetypeId: "archetype-training-platform",
+    pattern: /\btraining\s+platform\b|\bemployee\s+training\b|\bcourse\s+platform\b/
+  },
+  {
+    productType: "ai tool",
+    slug: "ai-tool",
+    archetypeId: "archetype-ai-tool",
+    pattern: /\bai\s+(tool|app|assistant|agent)\b/
+  },
+  {
+    productType: "automation",
+    slug: "automation",
+    archetypeId: "archetype-automation",
+    pattern: /\bautomation\b|\bworkflow\b/
+  }
+];
+
+const COMMAND_SLUG_STOP_WORDS = new Set([
+  "make", "me", "a", "an", "the", "for", "of", "to", "and", "with", "that",
+  "this", "my", "i", "can", "it", "in", "on", "where", "build", "create",
+  "system", "please", "want", "need"
+]);
+
+// Unknown product types keep a slug derived from the command's own words
+// instead of collapsing into a weak generic name like "request".
+function deriveCommandSlug(command) {
+  const words = command
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((word) => word.length > 0 && !COMMAND_SLUG_STOP_WORDS.has(word));
+
+  return slugify(words.slice(0, 4).join(" ")) === "unspecified"
+    ? "unclassified-product"
+    : slugify(words.slice(0, 4).join(" "));
+}
+
+function findRegisteredArchetype(archetypeId, root = process.cwd()) {
+  if (!archetypeId) {
+    return false;
+  }
+
+  const archetypeDir = path.join(root, ".codex/archetypes");
+  if (!existsSync(archetypeDir)) {
+    return false;
+  }
+
+  return readdirSync(archetypeDir)
+    .filter((name) => name.endsWith(".json") && !name.endsWith(".template.json"))
+    .some((name) => {
+      try {
+        const record = JSON.parse(readFileSync(path.join(archetypeDir, name), "utf8"));
+        return record.archetypeId === archetypeId;
+      } catch {
+        return false;
+      }
+    });
+}
+
+function classifyCommand(command, root = process.cwd()) {
   const lowerCommand = command.toLowerCase();
   const isWebsite = /\b(web\s*site|website|site)\b/.test(lowerCommand);
   const isConstruction = /\bconstruction\b/.test(lowerCommand);
@@ -9,22 +114,32 @@ function classifyCommand(command) {
   const mentionsPaid = /\bpaid|buy|purchase|subscribe|billing\b/.test(lowerCommand);
   const mentionsCredentials = /\bcredential|secret|api key|password|token\b/.test(lowerCommand);
 
-  const targetSlug = slugify([
-    isConstruction ? "construction" : null,
-    isWebsite ? "website" : "request"
-  ].filter(Boolean).join(" "));
+  const matched = PRODUCT_TYPE_MATCHERS.find((matcher) => matcher.pattern.test(lowerCommand));
+  const targetSlug = matched ? matched.slug : deriveCommandSlug(command);
+  const productType = matched ? matched.productType : "unclassified product";
+  const archetypeRegistered = matched ? findRegisteredArchetype(matched.archetypeId, root) : false;
+  const productContext = {
+    productType,
+    archetypeId: matched?.archetypeId ?? null,
+    archetypeRegistered,
+    archetypeGap: matched
+      ? (archetypeRegistered ? null : `missing_registered_archetype:${matched.archetypeId}`)
+      : "no_product_type_match"
+  };
 
   const requiresApproval = mentionsDeployment || mentionsDomain || mentionsPaid || mentionsCredentials;
+  const productLabel = matched ? productType : targetSlug.replace(/-/g, " ");
 
   return {
     targetSlug,
+    productContext,
     projectId: isConstruction && isWebsite ? DEFAULT_PROJECT_ID : `project-unregistered-${targetSlug}`,
     normalizedCommand: isConstruction && isWebsite
       ? "Create a plan-only construction website build plan."
-      : `Create a plan-only ${targetSlug} plan.`,
+      : `Create a plan-only ${productLabel} plan.`,
     plannedOutput: isConstruction && isWebsite
       ? "Plan-only command intake record for a construction website."
-      : `Plan-only command intake record for ${targetSlug}.`,
+      : `Plan-only command intake record for ${productLabel}.`,
     riskLevel: requiresApproval ? "R3" : "R1",
     classification: {
       requiresPlan: true,
@@ -72,7 +187,7 @@ export function assertUnderstandingShape(understanding) {
   }
 }
 
-export function buildCommandIntakeRecord({ command, runId, understanding, now = new Date() }) {
+export function buildCommandIntakeRecord({ command, runId, understanding, now = new Date(), root = process.cwd() }) {
   if (!command || typeof command !== "string" || command.trim().length === 0) {
     throw new Error("command is required");
   }
@@ -83,7 +198,7 @@ export function buildCommandIntakeRecord({ command, runId, understanding, now = 
 
   const normalizedRunId = normalizeRunId(runId || command);
   const timestamp = isoTimestamp(now);
-  const classification = classifyCommand(command.trim());
+  const classification = classifyCommand(command.trim(), root);
 
   return {
     ...(understanding ? { understanding } : {}),
@@ -95,6 +210,7 @@ export function buildCommandIntakeRecord({ command, runId, understanding, now = 
     projectId: classification.projectId,
     riskLevel: classification.riskLevel,
     classification: classification.classification,
+    productContext: classification.productContext,
     plannedOutput: classification.plannedOutput,
     nextRecord: {
       jobId: `job-${normalizedRunId}`,
@@ -112,7 +228,7 @@ export function buildCommandIntakeRecord({ command, runId, understanding, now = 
 }
 
 export function writeCommandIntakeRecord({ command, runId, understanding, now, root = process.cwd() }) {
-  const record = buildCommandIntakeRecord({ command, runId, understanding, now });
+  const record = buildCommandIntakeRecord({ command, runId, understanding, now, root });
   const filePath = `.codex/commands/${record.commandIntakeId}.json`;
   writeJson(filePath, record, root);
   return { filePath, record };
