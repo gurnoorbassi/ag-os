@@ -7,6 +7,7 @@ Current validation checks schema metadata plus selected template and registry re
 ## Records
 
 - `idea.schema.json`
+- `capability-registry.schema.json`
 - `command-registry.schema.json`
 - `connector-registry.schema.json`
 - `cost-budget.schema.json`

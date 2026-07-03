@@ -1,0 +1,26 @@
+{
+  "$schema": "../../schemas/capability-registry.schema.json",
+  "registryVersion": 1,
+  "registryType": "capability-registry",
+  "status": "foundation",
+  "capabilities": [],
+  "allowedCapabilityTypes": [
+    "discussion",
+    "planning",
+    "local_build",
+    "validation",
+    "registry_management",
+    "documentation",
+    "approval_packet"
+  ],
+  "rules": {
+    "credentialsAllowed": false,
+    "liveActionsAllowedByDefault": false,
+    "ownerApprovalRequiredForLiveActions": true,
+    "ownerApprovalRequiredForPaidActions": true,
+    "productionDataAllowed": false,
+    "customerDataAllowed": false,
+    "deploymentAllowedByDefault": false
+  },
+  "notes": "Foundation registry only. No capability records are registered yet; future records require explicit scope, owner, safety tier, and validation."
+}
