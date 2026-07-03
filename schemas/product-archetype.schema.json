@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/product-archetype.schema.json",
+  "title": "AG OS Product Archetype",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "archetypeId",
+    "name",
+    "category",
+    "status",
+    "professionalExpectations",
+    "minimumQualityBar",
+    "uxExpectations",
+    "recommendedStack",
+    "phases",
+    "knownPitfalls",
+    "approvalGates",
+    "qualityChecklist",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "archetypeId": { "type": "string", "pattern": "^archetype-[a-z0-9-]+$" },
+    "name": { "type": "string", "minLength": 1 },
+    "category": {
+      "type": "string",
+      "enum": [
+        "website",
+        "web_app",
+        "crm",
+        "lead_generation",
+        "social_media_system",
+        "ai_tool",
+        "presentation",
+        "dashboard",
+        "automation",
+        "training_platform",
+        "document",
+        "other"
+      ]
+    },
+    "status": { "type": "string", "enum": ["draft", "active", "archived"] },
+    "professionalExpectations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "minimumQualityBar": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "commonPages": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "uxExpectations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "seoBasics": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "conversionBasics": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "recommendedStack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bootstrapMode", "components"],
+      "properties": {
+        "bootstrapMode": { "type": "boolean", "const": true },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "phases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["phaseId", "name", "goals"],
+        "properties": {
+          "phaseId": { "type": "string", "pattern": "^phase-[a-z0-9-]+$" },
+          "name": { "type": "string", "minLength": 1 },
+          "goals": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "knownPitfalls": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "approvalGates": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "qualityChecklist": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "sources": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "notes": { "type": "string" },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string", "minLength": 1 }
+  }
+}
