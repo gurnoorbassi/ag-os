@@ -641,9 +641,11 @@ function validateCapabilityRegistry(record) {
 
 function validateApprovalLockSchema(schema) {
   const requiredFields = [
+    "approvalId",
     "approvedBy",
     "target",
     "dataClass",
+    "revocationPath",
     "approvedAt",
     "approvedActions",
     "evidence"
@@ -660,12 +662,25 @@ function validateApprovalLockSchema(schema) {
     fail("approval lock schema riskLevel must use canonical R0-R6 values");
   }
 
+  if (schema.required?.includes("id") || schema.properties?.id) {
+    fail("approval lock schema must use approvalId instead of ambiguous id");
+  }
+
+  const expectedApprovalIdPattern = "^approval-[0-9]{8}-[a-z0-9]+(?:-[a-z0-9]+)*$";
+  if (schema.properties?.approvalId?.pattern !== expectedApprovalIdPattern) {
+    fail("approval lock schema approvalId must use approval-YYYYMMDD-slug pattern");
+  }
+
   if ((schema.properties?.approvedActions?.minItems ?? 0) < 1) {
     fail("approval lock schema must require at least one approved action");
   }
 
   if ((schema.properties?.evidence?.minItems ?? 0) < 1) {
     fail("approval lock schema must require at least one evidence item");
+  }
+
+  if ((schema.properties?.revocationPath?.minLength ?? 0) < 1) {
+    fail("approval lock schema must require a non-empty revocationPath");
   }
 }
 
@@ -680,18 +695,41 @@ function validateActivationBlockers() {
   if (!actionMatrix.includes("| CI workflow changes | `R2` | Blocked for auto-merge | Yes | Approval lock after activation and PR |")) {
     fail("action matrix must block CI workflow changes for auto-merge and require approval");
   }
-  if (!actionMatrix.includes("| Authority, safe-merge, approval workflow, owner record, or Constitution change | `R2` | Blocked for auto-merge | Yes | Approval lock after activation, PR, and audit event after audit exists |")) {
-    fail("action matrix must require an approval lock for Constitution and governance changes after activation");
+  if (!actionMatrix.includes("| Authority, safe-merge, approval workflow, owner record, or Constitution change | `R2` | Blocked for auto-merge | Yes | Owner approval, approval lock, hostile audit note, PR, and audit event |")) {
+    fail("action matrix must require owner approval, approval lock, hostile audit note, PR, and audit event for Constitution and governance changes");
+  }
+  if (!actionMatrix.includes("Blocked unless explicitly owner-approved for that governance PR")) {
+    fail("action matrix must block auto-merge for governance changes unless owner-approved for that exact governance PR");
   }
 
   const constitution = readFileSync(path.join(root, "docs/ag-os-constitution-v1.md"), "utf8");
   if (!constitution.includes("Before executing commands after Constitution activation, AG OS must:")) {
     fail("Constitution boot sequence must be mandatory after activation");
   }
+  if (!constitution.includes("hostile audit note")) {
+    fail("Constitution must require a hostile audit note for activation and amendments");
+  }
+  if (!constitution.includes("`approvalId`, the canonical approval lock identifier")) {
+    fail("Constitution must define approvalId as the canonical approval lock identifier");
+  }
+  if (!constitution.includes("Revocation path explaining how the approval gets revoked, expired, cancelled, or invalidated")) {
+    fail("Constitution must define approval lock revocation path requirements");
+  }
 
   const bootSequence = readFileSync(path.join(root, "docs/boot-sequence.md"), "utf8");
   if (!bootSequence.includes("Before executing commands, AG OS must:")) {
     fail("boot sequence must use mandatory language");
+  }
+
+  const approvalWorkflow = readFileSync(path.join(root, "docs/approval-workflow.md"), "utf8");
+  if (!approvalWorkflow.includes("`approvalId` must use the clear `approval-YYYYMMDD-slug` format")) {
+    fail("approval workflow must define approvalId naming");
+  }
+  if (!approvalWorkflow.includes("revoked, expired, cancelled, or invalidated")) {
+    fail("approval workflow must define revocationPath meaning");
+  }
+  if (!approvalWorkflow.includes("hostile audit note")) {
+    fail("approval workflow must require hostile audit notes for governance changes");
   }
 
   const approvalsReadme = readFileSync(path.join(root, ".codex/approvals/README.md"), "utf8");
