@@ -1,0 +1,13 @@
+{
+  "$schema": "../../schemas/project-registry.schema.json",
+  "registryVersion": 1,
+  "registryType": "project-registry",
+  "status": "foundation",
+  "projects": [],
+  "rules": {
+    "recordsMustBeProductionClean": true,
+    "recordsMustBeExplicitlyApproved": true,
+    "disallowExampleRecords": true,
+    "disallowLiveServiceConnections": true
+  }
+}

@@ -21,11 +21,14 @@ const requiredPaths = [
   ".codex/security/README.md",
   ".codex/watchdog/README.md",
   ".codex/projects/README.md",
+  ".codex/projects/registry.json",
   ".codex/projects/project.template.json",
   ".codex/tasks/task.template.json",
   ".codex/agents/agent.template.json",
+  "docs/project-registry.md",
   "schemas/idea.schema.json",
   "schemas/project.schema.json",
+  "schemas/project-registry.schema.json",
   "schemas/agent.schema.json",
   "schemas/task.schema.json",
   "schemas/memory.schema.json",
@@ -64,6 +67,13 @@ const templateRecords = [
     name: "agent template",
     recordPath: ".codex/agents/agent.template.json",
     schemaPath: "schemas/agent.schema.json"
+  }
+];
+const schemaValidatedRecords = [
+  {
+    name: "project registry",
+    recordPath: ".codex/projects/registry.json",
+    schemaPath: "schemas/project-registry.schema.json"
   }
 ];
 let failures = 0;
@@ -111,8 +121,8 @@ function isPlaceholder(value) {
   return typeof value === "string" && placeholderPattern.test(value);
 }
 
-function validateTemplateValue(value, schema, location) {
-  if (isPlaceholder(value)) {
+function validateSchemaValue(value, schema, location, options = {}) {
+  if (options.allowPlaceholders && isPlaceholder(value)) {
     return;
   }
 
@@ -153,12 +163,16 @@ function validateTemplateValue(value, schema, location) {
   }
 
   if (schema.type === "array") {
-    validateTemplateArray(value, schema, location);
+    validateSchemaArray(value, schema, location, options);
   }
 
   if (schema.type === "object") {
-    validateTemplateObject(value, schema, location);
+    validateSchemaObject(value, schema, location, options);
   }
+}
+
+function validateTemplateValue(value, schema, location) {
+  validateSchemaValue(value, schema, location, { allowPlaceholders: true });
 }
 
 function matchesType(value, type) {
@@ -174,7 +188,7 @@ function matchesType(value, type) {
   return typeof value === type;
 }
 
-function validateTemplateArray(value, schema, location) {
+function validateSchemaArray(value, schema, location, options = {}) {
   if (!Array.isArray(value)) {
     return;
   }
@@ -183,12 +197,20 @@ function validateTemplateArray(value, schema, location) {
     fail(`${location} must include at least ${schema.minItems} item(s) or use a REQUIRED_* placeholder`);
   }
 
+  if (schema.maxItems !== undefined && value.length > schema.maxItems) {
+    fail(`${location} must include at most ${schema.maxItems} item(s)`);
+  }
+
   if (schema.items) {
-    value.forEach((item, index) => validateTemplateValue(item, schema.items, `${location}[${index}]`));
+    value.forEach((item, index) => validateSchemaValue(item, schema.items, `${location}[${index}]`, options));
   }
 }
 
-function validateTemplateObject(record, schema, location) {
+function validateTemplateArray(value, schema, location) {
+  validateSchemaArray(value, schema, location, { allowPlaceholders: true });
+}
+
+function validateSchemaObject(record, schema, location, options = {}) {
   if (!record || typeof record !== "object" || Array.isArray(record)) {
     return;
   }
@@ -210,9 +232,13 @@ function validateTemplateObject(record, schema, location) {
   for (const [key, value] of Object.entries(record)) {
     const propertySchema = schema.properties?.[key];
     if (propertySchema) {
-      validateTemplateValue(value, propertySchema, `${location}.${key}`);
+      validateSchemaValue(value, propertySchema, `${location}.${key}`, options);
     }
   }
+}
+
+function validateTemplateObject(record, schema, location) {
+  validateSchemaObject(record, schema, location, { allowPlaceholders: true });
 }
 
 for (const templateRecord of templateRecords) {
@@ -231,6 +257,26 @@ for (const templateRecord of templateRecords) {
     }
   } catch (error) {
     fail(`${templateRecord.name} could not be validated: ${error.message}`);
+  }
+}
+
+for (const schemaValidatedRecord of schemaValidatedRecords) {
+  try {
+    const record = readJson(schemaValidatedRecord.recordPath);
+    const schema = readJson(schemaValidatedRecord.schemaPath);
+    const failuresBeforeRecord = failures;
+
+    validateSchemaObject(record, schema, schemaValidatedRecord.recordPath);
+
+    if (schemaValidatedRecord.recordPath === ".codex/projects/registry.json" && record.projects?.length !== 0) {
+      fail("project registry foundation must not include project records yet");
+    }
+
+    if (failures === failuresBeforeRecord) {
+      pass(`record structurally valid: ${schemaValidatedRecord.recordPath}`);
+    }
+  } catch (error) {
+    fail(`${schemaValidatedRecord.name} could not be validated: ${error.message}`);
   }
 }
 

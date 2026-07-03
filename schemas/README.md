@@ -8,6 +8,7 @@ Current validation only checks that each schema is valid JSON and has the expect
 
 - `idea.schema.json`
 - `project.schema.json`
+- `project-registry.schema.json`
 - `agent.schema.json`
 - `task.schema.json`
 - `memory.schema.json`
