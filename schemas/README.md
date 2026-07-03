@@ -21,6 +21,7 @@ Current validation checks schema metadata plus selected template and registry re
 - `security-review.schema.json`
 - `security-policy.schema.json`
 - `deployment.schema.json`
+- `watchdog-policy.schema.json`
 
 ## Rule
 
