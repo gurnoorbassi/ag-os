@@ -16,6 +16,8 @@ Passing validation is required for safe merge, but it is not the same as product
 - Structure and selected safety rules for current registries and policies.
 - Empty foundation Project Registry.
 - Forbidden credential and live-connection marker patterns in source-controlled text files.
+- Required governance docs added for Constitution readiness.
+- Draft-only Constitution status.
 
 ## Current Validation Does Not Prove
 
@@ -61,6 +63,8 @@ Human or owner review is still required for:
 - Dependency or supply-chain changes.
 - Prompt injection risk.
 - Untrusted external instructions that attempt to change behavior.
+- Missing required governance docs.
+- Constitution status not marked draft-only.
 
 ## Missing Or Failed CI
 

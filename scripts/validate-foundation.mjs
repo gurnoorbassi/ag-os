@@ -13,6 +13,26 @@ const requiredPaths = [
   "docs/lead-gen-migration-plan.md",
   "docs/lead-gen-project-migration-rules.md",
   "docs/safe-merge-policy.md",
+  "docs/ag-os-constitution-v1.md",
+  "docs/action-matrix.md",
+  "docs/authority-order.md",
+  "docs/approval-workflow.md",
+  "docs/owner-role-model.md",
+  "docs/usage-ledger-policy.md",
+  "docs/supply-chain-policy.md",
+  "docs/prompt-injection-policy.md",
+  "docs/boot-sequence.md",
+  "docs/data-classification.md",
+  "docs/incident-response.md",
+  "docs/rollback-policy.md",
+  "docs/validation-limits.md",
+  "docs/bootstrap-mode.md",
+  "docs/memory-learning-policy.md",
+  "docs/runtime-direction.md",
+  "docs/storage-manager-policy.md",
+  "docs/n8n-workflow-policy.md",
+  "docs/watchdog-alert-policy.md",
+  "docs/product-project-policy.md",
   ".codex/agents/README.md",
   ".codex/tasks/README.md",
   ".codex/locks/README.md",
@@ -47,6 +67,9 @@ const requiredPaths = [
   "docs/watchdog-os.md",
   "docs/project-registry.md",
   "schemas/idea.schema.json",
+  "schemas/approval-lock.schema.json",
+  "schemas/audit-event.schema.json",
+  "schemas/owner.schema.json",
   "schemas/capability-registry.schema.json",
   "schemas/command-registry.schema.json",
   "schemas/connector-registry.schema.json",
@@ -161,6 +184,24 @@ for (const requiredPath of requiredPaths) {
     fail(`missing required path: ${requiredPath}`);
   } else {
     pass(`found ${requiredPath}`);
+  }
+}
+
+const constitutionPath = path.join(root, "docs/ag-os-constitution-v1.md");
+if (existsSync(constitutionPath)) {
+  const constitution = readFileSync(constitutionPath, "utf8");
+  if (!constitution.includes("Status: Draft only. Not active.")) {
+    fail("Constitution v1 must remain marked as draft-only and not active");
+  } else {
+    pass("Constitution v1 status is draft-only");
+  }
+  if (!constitution.includes("This file is a draft Constitution v1. It does not activate Constitution v1")) {
+    fail("Constitution v1 must include a non-activation statement");
+  } else {
+    pass("Constitution v1 non-activation statement present");
+  }
+  if (/^Status:\s*Active\b/im.test(constitution)) {
+    fail("Constitution v1 must not be marked active in foundation validation");
   }
 }
 

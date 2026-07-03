@@ -39,6 +39,12 @@ These limits are hard foundation defaults. Raising them requires a future scoped
 - Use the cheapest option that still meets the required quality.
 - Never sacrifice quality for tiny cost savings.
 
+Bootstrap Mode adds these defaults until disabled by the owner or AG OS revenue exists:
+
+- Use existing Hetzner VPS, Postgres, n8n, GitHub, Netlify, domain, and Claude credits where practical.
+- Do not add new paid tools without owner approval.
+- Prefer high-quality low-cost options.
+
 ## Default Restrictions
 
 By default, AG OS may not:
@@ -63,3 +69,5 @@ By default, AG OS may not:
 - Quality is not sacrificed for tiny cost savings.
 
 This validation is local and offline.
+
+See also `docs/bootstrap-mode.md` and `docs/usage-ledger-policy.md`.

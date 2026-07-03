@@ -25,6 +25,8 @@ schemas/project-registry.schema.json
 The registry must stay production-clean:
 
 - No example project records
+- No fake project records
+- No demo project records
 - No customer records
 - No product records until explicitly approved
 - No lead generation records until explicitly approved
@@ -44,6 +46,8 @@ Before a project can be added:
 3. Add the project to `.codex/projects/registry.json`.
 4. Run `npm run validate`.
 5. Include approval context in the PR body when the project touches production-sensitive systems.
+
+Protected product projects such as Lead Gen and AI Receptionist must follow `docs/product-project-policy.md`.
 
 ## Foundation Lock
 
