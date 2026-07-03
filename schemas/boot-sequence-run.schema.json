@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/boot-sequence-run.schema.json",
+  "title": "AG OS Boot Sequence Run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "bootRunId",
+    "status",
+    "checks",
+    "summary",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "bootRunId": {
+      "type": "string",
+      "pattern": "^boot-[a-z0-9-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "template",
+        "ready",
+        "warning",
+        "blocked",
+        "failed"
+      ]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "checkId",
+          "checkType",
+          "status",
+          "required",
+          "evidence"
+        ],
+        "properties": {
+          "checkId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "checkType": {
+            "type": "string",
+            "enum": [
+              "constitution",
+              "registry",
+              "schema",
+              "validation",
+              "ci",
+              "cost",
+              "approval",
+              "incident",
+              "connector",
+              "watchdog",
+              "storage",
+              "engine"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "pass",
+              "warn",
+              "blocked",
+              "failed",
+              "not_applicable"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "readyForCommandExecution",
+        "blockedReasons"
+      ],
+      "properties": {
+        "readyForCommandExecution": {
+          "type": "boolean"
+        },
+        "blockedReasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "usesLiveService",
+        "usesCredentials",
+        "changesFiles",
+        "triggersDeployment",
+        "usesPaidAction"
+      ],
+      "properties": {
+        "usesLiveService": {
+          "type": "boolean",
+          "const": false
+        },
+        "usesCredentials": {
+          "type": "boolean",
+          "const": false
+        },
+        "changesFiles": {
+          "type": "boolean",
+          "const": false
+        },
+        "triggersDeployment": {
+          "type": "boolean",
+          "const": false
+        },
+        "usesPaidAction": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

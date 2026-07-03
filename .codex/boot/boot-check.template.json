@@ -1,0 +1,28 @@
+{
+  "bootRunId": "REQUIRED_BOOT_RUN_ID",
+  "status": "template",
+  "checks": [
+    {
+      "checkId": "REQUIRED_CHECK_ID",
+      "checkType": "validation",
+      "status": "pending",
+      "required": true,
+      "evidence": "REQUIRED_EVIDENCE_OR_NOT_RUN"
+    }
+  ],
+  "summary": {
+    "readyForCommandExecution": false,
+    "blockedReasons": [
+      "REQUIRED_BLOCKER_OR_NONE"
+    ]
+  },
+  "safety": {
+    "usesLiveService": false,
+    "usesCredentials": false,
+    "changesFiles": false,
+    "triggersDeployment": false,
+    "usesPaidAction": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
