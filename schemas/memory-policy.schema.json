@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/memory-policy.schema.json",
+  "title": "AG Digitalz OS Memory Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "policyVersion",
+    "policyType",
+    "status",
+    "windows",
+    "rules",
+    "memoryStates",
+    "allowedRecordTypes",
+    "blockedContentTypes",
+    "notes"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../schemas/memory-policy.schema.json" },
+    "policyVersion": { "type": "integer", "minimum": 1 },
+    "policyType": { "type": "string", "const": "memory-os-policy" },
+    "status": { "type": "string", "enum": ["foundation", "active", "archived"] },
+    "windows": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shortTermDays",
+        "mediumTermReviewDays",
+        "longTermReviewRequired"
+      ],
+      "properties": {
+        "shortTermDays": { "type": "integer", "const": 30 },
+        "mediumTermReviewDays": { "type": "integer", "minimum": 31 },
+        "longTermReviewRequired": { "type": "boolean", "const": true }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "secretsAllowed",
+        "customerDataAllowed",
+        "productionDataAllowed",
+        "sourceRequired",
+        "verifiedCurrentFactsRequireVerifiedAt",
+        "staleMemoryRequiresRefreshTrigger",
+        "ownerApprovalRequiredForSensitiveMemory"
+      ],
+      "properties": {
+        "secretsAllowed": { "type": "boolean", "const": false },
+        "customerDataAllowed": { "type": "boolean", "const": false },
+        "productionDataAllowed": { "type": "boolean", "const": false },
+        "sourceRequired": { "type": "boolean", "const": true },
+        "verifiedCurrentFactsRequireVerifiedAt": { "type": "boolean", "const": true },
+        "staleMemoryRequiresRefreshTrigger": { "type": "boolean", "const": true },
+        "ownerApprovalRequiredForSensitiveMemory": { "type": "boolean", "const": true }
+      }
+    },
+    "memoryStates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["verified_current", "short_term", "stale_needs_review", "archived"]
+      }
+    },
+    "allowedRecordTypes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["decision", "fact", "preference", "rule", "state", "runbook"]
+      }
+    },
+    "blockedContentTypes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[a-z0-9_]+$" }
+    },
+    "notes": { "type": "string", "minLength": 1 }
+  }
+}
