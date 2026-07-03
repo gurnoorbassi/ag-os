@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/github-execution-plan.schema.json",
+  "title": "AG OS GitHub Execution Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "githubExecutionPlanId",
+    "status",
+    "mode",
+    "connectorId",
+    "commandId",
+    "projectId",
+    "requestedRepositoryName",
+    "riskLevel",
+    "plannedActions",
+    "approvalGates",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "githubExecutionPlanId": {
+      "type": "string",
+      "pattern": "^github-plan-[a-z0-9-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planned", "blocked", "ready", "done", "cancelled"]
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["planning_only", "dry_run", "approved_execution"]
+    },
+    "connectorId": {
+      "type": "string",
+      "const": "connector-github-mcp"
+    },
+    "commandId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requestedRepositoryName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": ["R0", "R1", "R2", "R3", "R4", "R5", "R6"]
+    },
+    "plannedActions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "actionId",
+          "actionType",
+          "status",
+          "approvalRequired",
+          "approvalGate",
+          "requiredEvidence",
+          "rollbackRequired"
+        ],
+        "properties": {
+          "actionId": { "type": "string", "minLength": 1 },
+          "actionType": {
+            "type": "string",
+            "enum": ["create_repo", "create_branch", "create_files", "update_files", "open_pr", "poll_ci", "merge_pr"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["planned", "blocked", "ready", "done", "cancelled"]
+          },
+          "approvalRequired": { "type": "boolean" },
+          "approvalGate": { "type": "string", "minLength": 1 },
+          "requiredEvidence": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "rollbackRequired": { "type": "boolean" }
+        }
+      }
+    },
+    "approvalGates": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executesGitHubAction",
+        "createsRepository",
+        "writesRepositoryContent",
+        "opensPullRequest",
+        "pollsCi",
+        "mergesPullRequest",
+        "usesCredentials",
+        "touchesProductionData",
+        "usesPaidAction"
+      ],
+      "properties": {
+        "executesGitHubAction": { "type": "boolean", "const": false },
+        "createsRepository": { "type": "boolean", "const": false },
+        "writesRepositoryContent": { "type": "boolean", "const": false },
+        "opensPullRequest": { "type": "boolean", "const": false },
+        "pollsCi": { "type": "boolean", "const": false },
+        "mergesPullRequest": { "type": "boolean", "const": false },
+        "usesCredentials": { "type": "boolean", "const": false },
+        "touchesProductionData": { "type": "boolean", "const": false },
+        "usesPaidAction": { "type": "boolean", "const": false }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
