@@ -26,6 +26,8 @@ Approval is required before:
 - Deleting, overwriting, or bulk-moving business data
 - Touching the existing lead generation system
 
+Approval workflow details live in `docs/approval-workflow.md`. Source-of-truth and conflict rules live in `docs/authority-order.md`.
+
 ## Safe Merge Policy
 
 Codex-controlled merging is governed by `docs/safe-merge-policy.md`.

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/audit-event.schema.json",
+  "title": "AG Digitalz OS Audit Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "occurredAt",
+    "actor",
+    "eventType",
+    "summary",
+    "scope",
+    "source",
+    "relatedArtifacts",
+    "riskLevel",
+    "dataClassification",
+    "liveServiceTouched",
+    "createdAt"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^audit-[a-z0-9-]+$" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "actor": { "type": "string", "minLength": 1 },
+    "eventType": {
+      "type": "string",
+      "enum": [
+        "approval_requested",
+        "approval_granted",
+        "approval_rejected",
+        "safe_merge",
+        "constitution_change",
+        "policy_change",
+        "incident_reported",
+        "rollback_planned",
+        "rollback_completed",
+        "validation_run",
+        "registry_change",
+        "owner_change"
+      ]
+    },
+    "summary": { "type": "string", "minLength": 1 },
+    "scope": { "type": "string", "minLength": 1 },
+    "source": {
+      "type": "string",
+      "enum": ["owner_instruction", "git_commit", "pull_request", "ci", "local_validation", "connector_metadata", "manual_review"]
+    },
+    "relatedArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "reference"],
+        "properties": {
+          "type": { "type": "string", "enum": ["commit", "pull_request", "document", "schema", "approval", "issue", "other"] },
+          "reference": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "riskLevel": { "type": "string", "enum": ["none", "low", "medium", "high", "critical"] },
+    "dataClassification": { "type": "string", "enum": ["none", "internal", "customer", "secret", "regulated"] },
+    "liveServiceTouched": { "type": "boolean" },
+    "notes": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}

@@ -9,7 +9,7 @@ This repository starts as a control plane, not a live application. The current f
 Included now:
 
 - Operating architecture and safety rules
-- Project, agent, task, memory, cost, quality, security, and deployment schemas
+- Project, agent, task, memory, cost, quality, security, governance, and deployment schemas
 - `.codex/` operating folders for planning and state artifacts
 - Local validation placeholders
 - GitHub CI that runs local validation only
@@ -44,10 +44,16 @@ None of those services are connected by this scaffold.
 .
 |-- .codex/
 |   |-- agents/
+|   |-- approvals/
+|   |-- audit/
+|   |-- capabilities/
+|   |-- commands/
+|   |-- connectors/
 |   |-- costs/
 |   |-- ideas/
 |   |-- locks/
 |   |-- memory/
+|   |-- owners/
 |   |-- projects/
 |   |-- quality/
 |   |-- security/

@@ -2,11 +2,13 @@
 
 This folder contains JSON Schema contracts for future AG Digitalz OS records.
 
-Current validation checks schema metadata plus selected template and registry records. It does not connect to databases or live services.
+Current validation checks schema metadata plus selected template, registry, policy, and budget records. It does not connect to databases or live services.
 
 ## Records
 
 - `idea.schema.json`
+- `approval-lock.schema.json`
+- `audit-event.schema.json`
 - `capability-registry.schema.json`
 - `command-registry.schema.json`
 - `connector-registry.schema.json`
@@ -22,6 +24,7 @@ Current validation checks schema metadata plus selected template and registry re
 - `quality-check.schema.json`
 - `security-review.schema.json`
 - `security-policy.schema.json`
+- `owner.schema.json`
 - `deployment.schema.json`
 - `watchdog-policy.schema.json`
 
