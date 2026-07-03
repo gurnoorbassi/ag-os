@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/quality-policy.schema.json",
+  "title": "AG Digitalz OS Quality Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "policyVersion",
+    "policyType",
+    "status",
+    "gates",
+    "rules",
+    "defaultEvidenceTypes",
+    "notes"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../schemas/quality-policy.schema.json" },
+    "policyVersion": { "type": "integer", "minimum": 1 },
+    "policyType": { "type": "string", "const": "quality-os-policy" },
+    "status": { "type": "string", "enum": ["foundation", "active", "archived"] },
+    "gates": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "required",
+          "evidenceRequired",
+          "failureAction"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "foundation_validation",
+              "schema_validation",
+              "safety_review",
+              "documentation_review",
+              "rollback_readiness",
+              "residual_risk_review"
+            ]
+          },
+          "label": { "type": "string", "minLength": 1 },
+          "required": { "type": "boolean", "const": true },
+          "evidenceRequired": { "type": "boolean", "const": true },
+          "failureAction": { "type": "string", "enum": ["block_merge", "owner_review"] }
+        }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validationRequiredBeforeMerge",
+        "evidenceRequiredForPassingStatus",
+        "ownerApprovalRequiredForWaivers",
+        "noMergeOnFailedRequiredGate",
+        "rollbackNotesRequiredForRiskyChanges",
+        "knownResidualRisksMustBeDocumented"
+      ],
+      "properties": {
+        "validationRequiredBeforeMerge": { "type": "boolean", "const": true },
+        "evidenceRequiredForPassingStatus": { "type": "boolean", "const": true },
+        "ownerApprovalRequiredForWaivers": { "type": "boolean", "const": true },
+        "noMergeOnFailedRequiredGate": { "type": "boolean", "const": true },
+        "rollbackNotesRequiredForRiskyChanges": { "type": "boolean", "const": true },
+        "knownResidualRisksMustBeDocumented": { "type": "boolean", "const": true }
+      }
+    },
+    "defaultEvidenceTypes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[a-z0-9_]+$" }
+    },
+    "notes": { "type": "string", "minLength": 1 }
+  }
+}

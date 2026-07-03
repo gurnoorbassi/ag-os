@@ -12,6 +12,7 @@ Current validation checks schema metadata plus selected template and registry re
 - `cost-budget.schema.json`
 - `project.schema.json`
 - `project-registry.schema.json`
+- `quality-policy.schema.json`
 - `agent.schema.json`
 - `task.schema.json`
 - `memory.schema.json`
