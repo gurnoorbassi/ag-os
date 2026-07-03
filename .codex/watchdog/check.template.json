@@ -1,0 +1,22 @@
+{
+  "watchdogCheckId": "REQUIRED_WATCHDOG_CHECK_ID",
+  "status": "template",
+  "checkType": "validation",
+  "scope": "REQUIRED_CHECK_SCOPE",
+  "severity": "info",
+  "finding": "REQUIRED_FINDING_OR_NONE",
+  "evidence": [
+    "REQUIRED_EVIDENCE_OR_NONE"
+  ],
+  "blockedAction": false,
+  "recommendedAction": "REQUIRED_RECOMMENDED_ACTION_OR_NONE",
+  "safety": {
+    "usesLiveMonitoring": false,
+    "usesCredentials": false,
+    "callsConnector": false,
+    "sendsAlert": false,
+    "triggersDeployment": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

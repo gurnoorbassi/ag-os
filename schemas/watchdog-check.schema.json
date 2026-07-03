@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/watchdog-check.schema.json",
+  "title": "AG OS Watchdog Check",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "watchdogCheckId",
+    "status",
+    "checkType",
+    "scope",
+    "severity",
+    "finding",
+    "evidence",
+    "blockedAction",
+    "recommendedAction",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "watchdogCheckId": {
+      "type": "string",
+      "pattern": "^watchdog-[a-z0-9-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "template",
+        "pending",
+        "pass",
+        "warning",
+        "blocked",
+        "critical",
+        "resolved"
+      ]
+    },
+    "checkType": {
+      "type": "string",
+      "enum": [
+        "repo_health",
+        "validation",
+        "ci",
+        "stale_lock",
+        "cost",
+        "incident",
+        "connector",
+        "capability",
+        "storage",
+        "dashboard",
+        "engine"
+      ]
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "blocked",
+        "critical"
+      ]
+    },
+    "finding": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "blockedAction": {
+      "type": "boolean"
+    },
+    "recommendedAction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "usesLiveMonitoring",
+        "usesCredentials",
+        "callsConnector",
+        "sendsAlert",
+        "triggersDeployment"
+      ],
+      "properties": {
+        "usesLiveMonitoring": {
+          "type": "boolean",
+          "const": false
+        },
+        "usesCredentials": {
+          "type": "boolean",
+          "const": false
+        },
+        "callsConnector": {
+          "type": "boolean",
+          "const": false
+        },
+        "sendsAlert": {
+          "type": "boolean",
+          "const": false
+        },
+        "triggersDeployment": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
