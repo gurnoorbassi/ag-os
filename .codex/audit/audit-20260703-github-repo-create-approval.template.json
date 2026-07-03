@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260703-github-repo-create-approval",
+  "occurredAt": "REQUIRED_OCCURRED_AT",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for AG OS to create exactly one private GitHub repository with the owner-approved name. This audit event does not execute the action.",
+  "scope": "approval-20260703-github-repo-create",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260703-github-repo-create"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/github/github-plan-runtime-github-construction-website-repo-20260703.json"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/github/github-mcp-gate-runtime-github-construction-website-repo-20260703.json"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/audit/audit-runtime-github-construction-website-repo-20260703-github-dry-run.json"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Future live execution remains blocked until the approval lock is converted from template to active approved record with owner-approved repository name, approval text, approval timestamp, expiration, and current validation evidence.",
+  "createdAt": "REQUIRED_CREATED_AT"
+}

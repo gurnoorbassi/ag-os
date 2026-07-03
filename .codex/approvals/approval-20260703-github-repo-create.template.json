@@ -1,0 +1,70 @@
+{
+  "approvalId": "approval-20260703-github-repo-create",
+  "status": "revoked",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "commandCategory": "connect_service",
+  "requestedAction": "Create one private GitHub repository only.",
+  "target": "REQUIRED_OWNER_APPROVED_REPOSITORY_NAME",
+  "scope": "Allow AG OS to create exactly one private GitHub repository with the owner-approved name for the construction website project. No deployment, Netlify, n8n, domain or DNS change, paid service, credential, production data, customer data, branch creation, pull request, CI polling, merge, or file write is allowed by this approval package. Starter README creation requires explicit owner approval in this lock or a separate lock before execution.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-runtime-github-construction-website-repo-20260703.json"
+  },
+  "approvalRequiredFor": [
+    "create_repo"
+  ],
+  "approvedActions": [
+    "create_repo"
+  ],
+  "prohibitedActions": [
+    "create_branch",
+    "create_files",
+    "update_files",
+    "open_pr",
+    "poll_ci",
+    "merge_pr",
+    "deploy_staging",
+    "deploy_production",
+    "connect_netlify",
+    "connect_n8n",
+    "change_domain",
+    "change_dns",
+    "use_credentials",
+    "access_production_data",
+    "access_customer_data",
+    "paid_action"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the repository name changes, the repository visibility changes from private, README creation is requested without explicit approval, any prohibited action is needed, validation or CI evidence fails, an incident is opened for this scope, or the action expands beyond creating one private GitHub repository.",
+  "evidence": [
+    {
+      "type": "other",
+      "reference": ".codex/github/github-plan-runtime-github-construction-website-repo-20260703.json",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/github/github-mcp-gate-runtime-github-construction-website-repo-20260703.json",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/audit/audit-runtime-github-construction-website-repo-20260703-github-dry-run.json",
+      "verified": true
+    },
+    {
+      "type": "owner_instruction",
+      "reference": "REQUIRED_OWNER_APPROVAL_TEXT_REFERENCE",
+      "verified": false
+    }
+  ],
+  "approvalText": "REQUIRED_EXACT_OWNER_APPROVAL_TEXT",
+  "approvedAt": "REQUIRED_APPROVED_AT",
+  "expiresAt": "REQUIRED_EXPIRES_AT",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
