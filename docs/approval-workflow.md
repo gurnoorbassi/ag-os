@@ -26,9 +26,11 @@ Approval is required before:
 
 ## Approval Lock Format
 
-Approval locks are future records stored under `.codex/approvals/` and validated by `schemas/approval-lock.schema.json`.
+Approval locks are records stored under `.codex/approvals/` and validated by `schemas/approval-lock.schema.json`.
 
-Before any gated action executes, a current approval lock must exist unless the action remains plan-only. Current owner instruction may authorize foundation work, but live services, deployments, domains, paid actions, credentials, production data, customer data, external messages, destructive migrations, and protected product changes require a lock once approval records are active.
+Approval locks and audit events must be active before any gated action after Constitution activation.
+
+Before any gated action executes, a current approval lock must exist unless the action remains plan-only. Current owner instruction may authorize foundation work, but live services, deployments, domains, paid actions, credentials, production data, customer data, external messages, destructive migrations, and protected product changes require a lock after Constitution activation.
 
 Each approval lock must include:
 
@@ -118,3 +120,5 @@ If any check fails, stop for owner approval.
 ## Foundation Limitation
 
 Until approval records are active, owner approval is represented by the current task instruction and PR history. Live services, deployments, credentials, paid actions, production data, and domain changes remain blocked unless the owner gives explicit scoped approval.
+
+Constitution activation must not happen until approval locks and audit events are ready for gated actions.

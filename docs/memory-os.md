@@ -24,6 +24,17 @@ schemas/memory-policy.schema.json
 - Medium-term review window: `90` days
 - Long-term memory requires review before it is treated as current
 
+Short-term casual memory is deleted after `30` days if unused. If referenced again, it may be refreshed. It must not become permanent memory without owner approval or a valid source.
+
+## Memory Scopes
+
+- `personal`
+- `project`
+- `company`
+- `agent_shared`
+
+Agents may learn from each other only through source-backed `agent_shared` lessons.
+
 ## Memory States
 
 - `verified_current`
@@ -61,5 +72,10 @@ schemas/memory-policy.schema.json
 - Sources are required.
 - Verified current facts require `verifiedAt`.
 - Stale memory requires a refresh trigger.
+- Short-term casual memory must be deleted after `30` days if unused.
+- Random brainstorming must not become permanent memory.
+- Casual ideas must not create work without a commitment signal.
+
+See `docs/memory-learning-policy.md`.
 
 This validation is local and offline.

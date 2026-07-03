@@ -34,6 +34,8 @@ Base44 is available as a possible UI prototyping tool, but it is not listed as a
 
 Base44 must stay in `availableButNotConnected` until a Base44 MCP is actually available and explicitly approved for registry promotion.
 
+Base44 is not source of truth. GitHub remains source of truth. Base44 output must be exported or documented where possible before it can influence source-controlled implementation.
+
 ## Default Rules
 
 By default, connectors may not:

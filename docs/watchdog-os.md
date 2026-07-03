@@ -49,6 +49,16 @@ Owner approval is required before any:
 - Mutation
 - Production target check
 
+## Alert Policy
+
+Dashboard alerts come first.
+
+WhatsApp or other external alerts are future-only and require explicit owner approval before any real message is sent.
+
+Urgent alerts are limited to CI failure, security risk, live-service risk, production issue, cost limit reached, or storage over `90%`.
+
+Watchdog must avoid alert spam by grouping repeated alerts and making owner action clear.
+
 ## Validation
 
 `npm run validate` checks that:
@@ -62,3 +72,5 @@ Owner approval is required before any:
 - Live monitoring and external notifications require owner approval.
 
 This validation is local and offline.
+
+See also `docs/watchdog-alert-policy.md`.

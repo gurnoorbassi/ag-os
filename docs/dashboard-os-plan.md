@@ -10,6 +10,8 @@ This plan is documentation only. It does not build a UI, connect live services, 
 
 The first dashboard must be source-controlled and local-first. It should read only validated repository metadata until live connectors are explicitly approved.
 
+Dashboard v1 runtime direction is Netlify. Staging deploys require owner approval or an approved staging capability. Production deploys, domain changes, and DNS changes require owner approval.
+
 Allowed foundation inputs:
 
 - Project registry

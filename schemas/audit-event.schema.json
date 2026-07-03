@@ -58,7 +58,18 @@
       }
     },
     "riskLevel": { "type": "string", "enum": ["none", "low", "medium", "high", "critical"] },
-    "dataClassification": { "type": "string", "enum": ["none", "internal", "customer", "secret", "regulated"] },
+    "dataClassification": {
+      "type": "string",
+      "enum": [
+        "public",
+        "internal",
+        "confidential",
+        "restricted",
+        "customer_data",
+        "production_data",
+        "secrets"
+      ]
+    },
     "liveServiceTouched": { "type": "boolean" },
     "notes": { "type": "string" },
     "createdAt": { "type": "string", "format": "date-time" }

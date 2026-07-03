@@ -6,6 +6,8 @@ This document defines rollback requirements for AG Digitalz OS changes.
 
 Rollback planning is required before risky changes and before any future live, deployment, database, domain, workflow, production-data, customer-data, or paid action.
 
+Backup is required before changing working workflows, deployments, database schemas, production configs, or Lead Gen.
+
 ## Rollback Requirements
 
 Every rollback plan must identify:
@@ -19,6 +21,16 @@ Every rollback plan must identify:
 - Required approval.
 - Validation after rollback.
 - Residual risk.
+
+Every backup must identify:
+
+- Target.
+- Known-good version.
+- Backup location or source-controlled artifact.
+- Restore steps.
+- Verification method.
+
+Backup is not valid until the restore path is documented. Test restore when possible.
 
 ## Foundation Rollbacks
 

@@ -9,7 +9,18 @@
     "id": { "type": "string", "pattern": "^security-[a-z0-9-]+$" },
     "projectId": { "type": "string", "pattern": "^project-[a-z0-9-]+$" },
     "status": { "type": "string", "enum": ["planned", "in_review", "approved", "blocked", "waived"] },
-    "dataSensitivity": { "type": "string", "enum": ["none", "internal", "customer", "secret", "regulated"] },
+    "dataSensitivity": {
+      "type": "string",
+      "enum": [
+        "public",
+        "internal",
+        "confidential",
+        "restricted",
+        "customer_data",
+        "production_data",
+        "secrets"
+      ]
+    },
     "accessChanges": { "type": "array", "items": { "type": "string" } },
     "findings": {
       "type": "array",

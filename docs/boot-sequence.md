@@ -23,9 +23,11 @@ Before executing commands, AG OS should:
 11. Check whether live connector verification is approved before making live calls.
 12. Check stale memory and refresh requirements.
 13. Check storage risk when runtime storage exists.
-14. Check dependency and supply-chain risk for planned work.
-15. Check prompt-injection and untrusted-instruction risk.
-16. Report health before executing commands.
+14. Check Bootstrap Mode status.
+15. Check product project posture before touching protected products.
+16. Check dependency and supply-chain risk for planned work.
+17. Check prompt-injection and untrusted-instruction risk.
+18. Report health before executing commands.
 
 ## Health Report
 
@@ -40,6 +42,8 @@ The health report should include:
 - Quality status.
 - Connector status.
 - Open incidents.
+- Bootstrap Mode status.
+- Product posture if relevant.
 - Rollback requirement.
 - Whether execution may proceed.
 

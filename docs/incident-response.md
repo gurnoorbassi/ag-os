@@ -81,6 +81,8 @@ If a connector is unavailable, inconsistent, or returns unexpected state:
 
 AG OS may draft incident communications, but must not send email, SMS, chat, client notifications, public posts, or support updates without explicit owner approval.
 
+Watchdog alerting starts with dashboard alerts. WhatsApp or any other external alert channel requires explicit owner approval before real messages are sent.
+
 ## Authority
 
 The owner has final authority for I3 and I4 decisions. Codex may not perform live containment or customer communication without explicit approval.

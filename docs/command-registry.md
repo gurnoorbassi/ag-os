@@ -6,6 +6,12 @@ The Command Registry defines owner command categories, approval levels, executio
 
 It is a policy registry only. It does not execute commands, connect services, store credentials, deploy, send messages, activate workflows, or change domains.
 
+## Command-Driven Execution
+
+The owner gives outcomes. AG OS handles safe execution steps such as branch creation, local validation, PR creation, CI review, safe merge, and next-task selection when the command category and action matrix allow it.
+
+The owner should not need to micromanage routine safe execution. AG OS must still stop when approval gates, stop conditions, or the action matrix require owner approval.
+
 ## Current Registry
 
 ```text
@@ -63,6 +69,8 @@ By default, commands may not:
 - Read or write production data
 
 Any exception requires a future scoped request, explicit owner approval, validation, and a reviewed PR when source-controlled files change.
+
+The canonical execution decision table is `docs/action-matrix.md`.
 
 ## Validation
 
