@@ -90,4 +90,4 @@ Start every new project at the lowest trust level that can produce evidence:
 
 ## First Safe Project After This Scaffold
 
-The next safe PR should add example records for one fake internal project, one fake task, and one fake agent. That PR should prove the schemas are usable without connecting any live services.
+The next safe PR should add placeholder-only templates for project, task, and agent records. That PR should prove the schemas are usable without adding example records or connecting any live services.

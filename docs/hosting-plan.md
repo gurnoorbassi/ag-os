@@ -85,7 +85,7 @@ Base44 may be used for UI prototypes when useful, but it is not the system of re
 ## Hosting Sequence
 
 1. Keep AG Digitalz OS file-based and validated in GitHub.
-2. Add local fake data examples for schemas.
+2. Add placeholder-only templates for schemas.
 3. Add read-only dashboard prototype if useful.
 4. Add Postgres schema plan with migration review.
 5. Add read-only database integration in a separate PR.

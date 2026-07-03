@@ -24,6 +24,7 @@
     "updatedAt"
   ],
   "properties": {
+    "template": { "type": "boolean", "const": true },
     "id": { "type": "string", "pattern": "^project-[a-z0-9-]+$" },
     "name": { "type": "string", "minLength": 3 },
     "status": { "type": "string", "enum": ["idea", "planned", "active", "blocked", "paused", "complete", "archived"] },

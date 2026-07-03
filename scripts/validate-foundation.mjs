@@ -21,6 +21,9 @@ const requiredPaths = [
   ".codex/security/README.md",
   ".codex/watchdog/README.md",
   ".codex/projects/README.md",
+  ".codex/projects/project.template.json",
+  ".codex/tasks/task.template.json",
+  ".codex/agents/agent.template.json",
   "schemas/idea.schema.json",
   "schemas/project.schema.json",
   "schemas/agent.schema.json",
@@ -45,6 +48,24 @@ const forbiddenPatterns = [
 ];
 
 const ignoreDirs = new Set([".git", "node_modules"]);
+const placeholderPattern = /^REQUIRED_[A-Z0-9_]+$/;
+const templateRecords = [
+  {
+    name: "project template",
+    recordPath: ".codex/projects/project.template.json",
+    schemaPath: "schemas/project.schema.json"
+  },
+  {
+    name: "task template",
+    recordPath: ".codex/tasks/task.template.json",
+    schemaPath: "schemas/task.schema.json"
+  },
+  {
+    name: "agent template",
+    recordPath: ".codex/agents/agent.template.json",
+    schemaPath: "schemas/agent.schema.json"
+  }
+];
 let failures = 0;
 
 function fail(message) {
@@ -79,6 +100,137 @@ for (const schemaName of readdirSync(path.join(root, "schemas")).filter((name) =
     }
   } catch (error) {
     fail(`${schemaName} is not valid JSON: ${error.message}`);
+  }
+}
+
+function readJson(relativePath) {
+  return JSON.parse(readFileSync(path.join(root, relativePath), "utf8"));
+}
+
+function isPlaceholder(value) {
+  return typeof value === "string" && placeholderPattern.test(value);
+}
+
+function validateTemplateValue(value, schema, location) {
+  if (isPlaceholder(value)) {
+    return;
+  }
+
+  if (Array.isArray(schema.type)) {
+    if (!schema.type.some((type) => matchesType(value, type))) {
+      fail(`${location} must match one of these types or use a REQUIRED_* placeholder: ${schema.type.join(", ")}`);
+    }
+    return;
+  }
+
+  if (schema.type && !matchesType(value, schema.type)) {
+    fail(`${location} must be ${schema.type} or use a REQUIRED_* placeholder`);
+    return;
+  }
+
+  if (schema.enum && !schema.enum.includes(value)) {
+    fail(`${location} must use a schema enum value or a REQUIRED_* placeholder`);
+  }
+
+  if (schema.pattern && typeof value === "string" && !new RegExp(schema.pattern).test(value)) {
+    fail(`${location} must match schema pattern ${schema.pattern} or use a REQUIRED_* placeholder`);
+  }
+
+  if (schema.minLength && typeof value === "string" && value.length < schema.minLength) {
+    fail(`${location} must be at least ${schema.minLength} character(s) or use a REQUIRED_* placeholder`);
+  }
+
+  if (schema.minimum !== undefined && typeof value === "number" && value < schema.minimum) {
+    fail(`${location} must be at least ${schema.minimum} or use a REQUIRED_* placeholder`);
+  }
+
+  if (schema.maximum !== undefined && typeof value === "number" && value > schema.maximum) {
+    fail(`${location} must be at most ${schema.maximum} or use a REQUIRED_* placeholder`);
+  }
+
+  if (schema.const !== undefined && value !== schema.const) {
+    fail(`${location} must be ${JSON.stringify(schema.const)}`);
+  }
+
+  if (schema.type === "array") {
+    validateTemplateArray(value, schema, location);
+  }
+
+  if (schema.type === "object") {
+    validateTemplateObject(value, schema, location);
+  }
+}
+
+function matchesType(value, type) {
+  if (type === "array") {
+    return Array.isArray(value);
+  }
+  if (type === "integer") {
+    return Number.isInteger(value);
+  }
+  if (type === "null") {
+    return value === null;
+  }
+  return typeof value === type;
+}
+
+function validateTemplateArray(value, schema, location) {
+  if (!Array.isArray(value)) {
+    return;
+  }
+
+  if (schema.minItems && value.length < schema.minItems) {
+    fail(`${location} must include at least ${schema.minItems} item(s) or use a REQUIRED_* placeholder`);
+  }
+
+  if (schema.items) {
+    value.forEach((item, index) => validateTemplateValue(item, schema.items, `${location}[${index}]`));
+  }
+}
+
+function validateTemplateObject(record, schema, location) {
+  if (!record || typeof record !== "object" || Array.isArray(record)) {
+    return;
+  }
+
+  for (const requiredKey of schema.required ?? []) {
+    if (!Object.hasOwn(record, requiredKey)) {
+      fail(`${location} missing required field: ${requiredKey}`);
+    }
+  }
+
+  if (schema.additionalProperties === false) {
+    for (const key of Object.keys(record)) {
+      if (!schema.properties?.[key]) {
+        fail(`${location} includes field not allowed by schema: ${key}`);
+      }
+    }
+  }
+
+  for (const [key, value] of Object.entries(record)) {
+    const propertySchema = schema.properties?.[key];
+    if (propertySchema) {
+      validateTemplateValue(value, propertySchema, `${location}.${key}`);
+    }
+  }
+}
+
+for (const templateRecord of templateRecords) {
+  try {
+    const record = readJson(templateRecord.recordPath);
+    const schema = readJson(templateRecord.schemaPath);
+    const failuresBeforeTemplate = failures;
+
+    if (record.template !== true) {
+      fail(`${templateRecord.name} must be clearly marked with template: true`);
+    }
+
+    validateTemplateObject(record, schema, templateRecord.recordPath);
+    if (failures === failuresBeforeTemplate) {
+      pass(`template structurally valid: ${templateRecord.recordPath}`);
+    }
+  } catch (error) {
+    fail(`${templateRecord.name} could not be validated: ${error.message}`);
   }
 }
 

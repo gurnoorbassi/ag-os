@@ -6,6 +6,7 @@
   "additionalProperties": false,
   "required": ["id", "name", "role", "purpose", "allowedInputs", "prohibitedActions", "approvalRequiredFor", "outputs", "createdAt", "updatedAt"],
   "properties": {
+    "template": { "type": "boolean", "const": true },
     "id": { "type": "string", "pattern": "^agent-[a-z0-9-]+$" },
     "name": { "type": "string", "minLength": 3 },
     "role": { "type": "string", "minLength": 1 },
