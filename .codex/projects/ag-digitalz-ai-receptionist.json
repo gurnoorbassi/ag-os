@@ -2,7 +2,7 @@
   "id": "project-ag-digitalz-ai-receptionist",
   "name": "AG Digitalz AI Receptionist",
   "status": "active",
-  "owner": "REQUIRED_OWNER",
+  "owner": "owner-gurnoor-bassi",
   "projectType": "product_project",
   "managementMode": "active_build",
   "goal": "Track AG Digitalz AI Receptionist as a separate product build project, not AG OS core.",

@@ -1,0 +1,32 @@
+{
+  "id": "owner-gurnoor-bassi",
+  "name": "Gurnoor Bassi",
+  "role": "business_owner",
+  "authorityLevel": "final",
+  "status": "active",
+  "responsibilities": [
+    "Final authority for AG Digitalz OS business direction, approvals, spending, protected systems, and scoped governance decisions."
+  ],
+  "approvalScopes": [
+    "constitution",
+    "projects",
+    "tasks",
+    "agents",
+    "connectors",
+    "capabilities",
+    "live_services",
+    "deployments",
+    "domains",
+    "credentials",
+    "data",
+    "costs",
+    "security",
+    "quality",
+    "watchdog",
+    "memory",
+    "messages",
+    "rollback"
+  ],
+  "createdAt": "2026-07-03T13:20:00Z",
+  "updatedAt": "2026-07-03T13:20:00Z"
+}

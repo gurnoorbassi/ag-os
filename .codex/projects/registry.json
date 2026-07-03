@@ -8,7 +8,7 @@
       "projectId": "project-lead-generation-system",
       "recordPath": ".codex/projects/lead-generation-system.json",
       "status": "complete",
-      "owner": "REQUIRED_OWNER",
+      "owner": "owner-gurnoor-bassi",
       "riskLevel": "high",
       "lastReviewedAt": "2026-07-03T11:32:35Z"
     },
@@ -16,7 +16,7 @@
       "projectId": "project-ag-digitalz-ai-receptionist",
       "recordPath": ".codex/projects/ag-digitalz-ai-receptionist.json",
       "status": "active",
-      "owner": "REQUIRED_OWNER",
+      "owner": "owner-gurnoor-bassi",
       "riskLevel": "medium",
       "lastReviewedAt": "2026-07-03T11:32:35Z"
     }

@@ -24,7 +24,7 @@ window.AG_OS_DASHBOARD_DATA = {
         "managementMode": "observe_only",
         "projectType": "product_project",
         "riskLevel": "high",
-        "owner": "REQUIRED_OWNER",
+        "owner": "owner-gurnoor-bassi",
         "recordPath": ".codex/projects/lead-generation-system.json",
         "boundary": "No source, VPS, Postgres, n8n, domain, DNS, deployment, credential, production data, or customer data changes."
       },
@@ -35,7 +35,7 @@ window.AG_OS_DASHBOARD_DATA = {
         "managementMode": "active_build",
         "projectType": "product_project",
         "riskLevel": "medium",
-        "owner": "REQUIRED_OWNER",
+        "owner": "owner-gurnoor-bassi",
         "recordPath": ".codex/projects/ag-digitalz-ai-receptionist.json",
         "boundary": "Separate product project; no live service status inferred beyond repository records."
       }
@@ -48,7 +48,7 @@ window.AG_OS_DASHBOARD_DATA = {
     "managementMode": "observe_only",
     "projectType": "product_project",
     "riskLevel": "high",
-    "owner": "REQUIRED_OWNER",
+    "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/lead-generation-system.json",
     "boundary": "No source, VPS, Postgres, n8n, domain, DNS, deployment, credential, production data, or customer data changes."
   },
@@ -59,7 +59,7 @@ window.AG_OS_DASHBOARD_DATA = {
     "managementMode": "active_build",
     "projectType": "product_project",
     "riskLevel": "medium",
-    "owner": "REQUIRED_OWNER",
+    "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/ag-digitalz-ai-receptionist.json",
     "boundary": "Separate product project; no live service status inferred beyond repository records."
   },
