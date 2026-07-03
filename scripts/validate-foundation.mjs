@@ -204,6 +204,12 @@ const knowledgeRecordDirectories = [
     recordDir: ".codex/memory/lessons/candidates",
     schemaPath: "schemas/lesson.schema.json",
     allowedStatuses: ["candidate", "rejected"]
+  },
+  {
+    name: "owner preference profile",
+    recordDir: ".codex/owners/preferences",
+    schemaPath: "schemas/owner-preferences.schema.json",
+    allowedStatuses: ["active", "archived"]
   }
 ];
 const engineRecordDirectories = [
