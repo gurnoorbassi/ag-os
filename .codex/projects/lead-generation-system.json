@@ -2,7 +2,7 @@
   "id": "project-lead-generation-system",
   "name": "Lead Generation System",
   "status": "complete",
-  "owner": "REQUIRED_OWNER",
+  "owner": "owner-gurnoor-bassi",
   "projectType": "product_project",
   "managementMode": "observe_only",
   "goal": "Register the existing finished production Lead Generation System in AG OS without modifying it.",
