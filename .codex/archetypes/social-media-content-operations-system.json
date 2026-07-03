@@ -1,0 +1,140 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-social-media-content-operations-system",
+  "name": "Social Media Content Operations System",
+  "category": "social_media_system",
+  "status": "active",
+  "professionalExpectations": [
+    "Daily video intake: accept a defined batch of source videos per client per day, with clear intake status per asset.",
+    "Content repurposing: each source video fans out into platform-specific post drafts, short-form clips, carousels, and stories as configured.",
+    "Platform-specific post creation: captions, hooks, hashtags, titles, and formats tailored per platform, never one generic post copied everywhere.",
+    "Multiple accounts per platform, with every draft explicitly assigned to an account.",
+    "Approval workflow: every post moves through draft, review, approved or rejected states, with a named approver.",
+    "Scheduling workflow: approved posts can be queued to a schedule; scheduling activation itself stays approval-gated.",
+    "Analytics and reporting: content output volume, approval status, scheduled posts, and post performance once platforms are connected.",
+    "Weekly report generation per client covering output, approvals, schedule, and performance.",
+    "Client onboarding path: client profile, brand rules, platforms, accounts, approvers, and posting cadence captured before content work starts.",
+    "Credential checklist: the system documents which platform credentials will eventually be needed, without storing any of them."
+  ],
+  "minimumQualityBar": [
+    "Every post traces back to its source video, target account, target platform, and approval state.",
+    "An approval gate exists before any live posting, with no bypass path.",
+    "Drafts are structurally separated from published or live actions; a draft can never leak into a live state without approval.",
+    "Analytics show content output, approval status, scheduled posts, and performance once platforms are connected.",
+    "The system degrades safely when credentials or platform connections are missing: drafts and reports keep working, publishing stays blocked.",
+    "Local validation passes before any PR merges."
+  ],
+  "uxExpectations": [
+    "The operator sees a single pipeline view from uploaded video to draft, review, approved, scheduled, and posted.",
+    "Approvers see exactly what will go live: final caption, media, account, platform, and time.",
+    "Rejections require a reason so the next draft improves.",
+    "Blocked publish state is visually unmistakable and explains what approval is missing.",
+    "Bulk actions exist for daily-volume work: approve, reject, and reschedule in batches."
+  ],
+  "conversionBasics": [
+    "Hooks are written per platform in the first seconds or first line, not appended as an afterthought.",
+    "Calls to action match each platform's mechanics: link placement, comments, or profile routing.",
+    "Posting cadence follows the client's approved schedule, not the tool's convenience."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Source-controlled system design and records in a GitHub repository; GitHub remains source of truth.",
+      "Existing Postgres for content pipeline state when runtime storage is approved.",
+      "n8n for intake, repurposing, and scheduling workflows: drafts and sanitized exports only, no activation without owner approval.",
+      "Existing Hetzner VPS as the future runtime target.",
+      "Netlify for any client-facing dashboard, deploys only after owner approval.",
+      "No paid AI, media, or storage services without owner approval and Cost OS review."
+    ],
+    "notes": "Validate the workflow with synthetic payloads end to end before any platform connection, credential handling, or paid service is even proposed."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-onboarding-model",
+      "name": "Client and content model",
+      "goals": [
+        "Define client profile, brand rules, platforms, accounts, approvers, and cadence.",
+        "Define the content pipeline states from intake to posted, including blocked and rejected.",
+        "Define the credential checklist as documentation only; no credentials are collected or stored."
+      ]
+    },
+    {
+      "phaseId": "phase-draft-pipeline",
+      "name": "Draft-first pipeline",
+      "goals": [
+        "Build video intake and repurposing into platform-specific drafts using synthetic payloads.",
+        "Generate captions, hooks, clips, carousels, and stories as drafts assigned to accounts.",
+        "Enforce draft-first mode: publishing paths exist only as blocked states."
+      ]
+    },
+    {
+      "phaseId": "phase-approval-scheduling",
+      "name": "Approval and scheduling",
+      "goals": [
+        "Implement the approval workflow with named approvers and rejection reasons.",
+        "Implement scheduling of approved posts as queue records; live scheduling activation stays owner-gated.",
+        "Prove that nothing can post without an approval trail."
+      ]
+    },
+    {
+      "phaseId": "phase-reporting",
+      "name": "Analytics and reporting",
+      "goals": [
+        "Report content output, approval status, and scheduled posts from pipeline records.",
+        "Add per-client weekly report generation.",
+        "Reserve performance metrics for after platform connections are approved."
+      ]
+    },
+    {
+      "phaseId": "phase-gated-connection",
+      "name": "Approval-gated platform connection",
+      "goals": [
+        "Prepare the connection plan, credential handling design, rollback notes, and audit requirements.",
+        "Stop for owner approval before any social account connection, credential use, or live posting."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Connecting social accounts too early, before the draft pipeline is proven with synthetic payloads.",
+    "Posting or scheduling without an enforced approval gate.",
+    "Using real client content before the client and owner approve its use.",
+    "Overbuilding video editing and rendering before the core workflow is validated.",
+    "Ignoring platform API rate limits and content rules until publishing fails in production.",
+    "Unreviewed paid AI, media, or storage costs accumulating per video.",
+    "Unclear ownership of approvals between AG Digitalz and the client.",
+    "Duplicate posts across accounts from missing idempotency in the fan-out step.",
+    "Weak audit trail that cannot answer who approved which post and when."
+  ],
+  "approvalGates": [
+    "Social account connection requires owner approval.",
+    "Any credential handling requires owner approval and stays outside the repository.",
+    "Real client content handling requires owner approval.",
+    "Live posting requires owner approval.",
+    "Scheduling activation requires owner approval.",
+    "Paid AI, media, or storage services require owner approval.",
+    "Deployment requires owner approval.",
+    "Domain or DNS changes require owner approval.",
+    "Client-facing access requires owner approval."
+  ],
+  "qualityChecklist": [
+    "Every post record traces to source video, account, platform, and approval state.",
+    "No publish path exists without an approval gate.",
+    "Drafts and live actions are separated in data model and UI.",
+    "Blocked publish state works and explains itself.",
+    "Analytics cover output, approval status, schedule, and performance when connected.",
+    "System keeps working in draft mode when credentials or platforms are missing.",
+    "Duplicate-post protection is tested across accounts.",
+    "Audit trail answers who approved what and when.",
+    "Costs stayed within Cost OS limits with no unapproved paid services.",
+    "Local validation and CI pass."
+  ],
+  "sources": [
+    ".codex/commands/command-intake-runtime-social-media-management-system-20260703.json",
+    ".codex/plans/plan-runtime-social-media-management-system-20260703.json",
+    "docs/bootstrap-mode.md",
+    "docs/n8n-workflow-policy.md"
+  ],
+  "notes": "Grounded in the plan-only social media management dry run of 2026-07-03. Knowledge record only; it authorizes no connections, posting, credentials, or spending.",
+  "createdAt": "2026-07-03T00:00:00Z",
+  "updatedAt": "2026-07-03T00:00:00Z"
+}
