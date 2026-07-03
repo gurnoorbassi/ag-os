@@ -1,0 +1,54 @@
+{
+  "bootRunId": "boot-construction-website-plan-20260703",
+  "status": "ready",
+  "checks": [
+    {
+      "checkId": "check-constitution-active",
+      "checkType": "constitution",
+      "status": "pass",
+      "required": true,
+      "evidence": "Constitution v1.0 active in docs/ag-os-constitution-v1.md."
+    },
+    {
+      "checkId": "check-registries-present",
+      "checkType": "registry",
+      "status": "pass",
+      "required": true,
+      "evidence": "Project, connector, command, and capability registries validated locally."
+    },
+    {
+      "checkId": "check-cost-zero",
+      "checkType": "cost",
+      "status": "pass",
+      "required": true,
+      "evidence": "Plan-only local dry-run cost estimate is 0 USD."
+    },
+    {
+      "checkId": "check-no-approval-required",
+      "checkType": "approval",
+      "status": "pass",
+      "required": true,
+      "evidence": "Plan-only classification requires no live-action approval."
+    },
+    {
+      "checkId": "check-validation-local",
+      "checkType": "validation",
+      "status": "pass",
+      "required": true,
+      "evidence": "npm.cmd run validate is required before PR merge."
+    }
+  ],
+  "summary": {
+    "readyForCommandExecution": true,
+    "blockedReasons": []
+  },
+  "safety": {
+    "usesLiveService": false,
+    "usesCredentials": false,
+    "changesFiles": false,
+    "triggersDeployment": false,
+    "usesPaidAction": false
+  },
+  "createdAt": "2026-07-03T19:45:00Z",
+  "updatedAt": "2026-07-03T19:45:00Z"
+}

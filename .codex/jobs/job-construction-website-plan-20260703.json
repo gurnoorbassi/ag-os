@@ -1,0 +1,29 @@
+{
+  "jobId": "job-construction-website-plan-20260703",
+  "commandId": "command-intake-construction-website-20260703",
+  "projectId": "project-unregistered-construction-website",
+  "status": "done",
+  "priority": "normal",
+  "riskLevel": "R1",
+  "commandType": "plan_only",
+  "requestedBy": "owner-gurnoor-bassi",
+  "assignedDomain": "planner",
+  "assignedAgent": "planner-foundation",
+  "approvalRequired": false,
+  "expectedOutput": "Create an offline plan-only record chain for a construction website request.",
+  "queueTimestamps": {
+    "queuedAt": "2026-07-03T19:45:00Z",
+    "planningStartedAt": "2026-07-03T19:45:00Z",
+    "completedAt": "2026-07-03T19:45:00Z"
+  },
+  "safety": {
+    "credentialsAllowed": false,
+    "liveServicesAllowed": false,
+    "deploymentAllowed": false,
+    "domainChangeAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-03T19:45:00Z",
+  "updatedAt": "2026-07-03T19:45:00Z"
+}
