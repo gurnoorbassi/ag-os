@@ -1,0 +1,36 @@
+{
+  "costLedgerId": "REQUIRED_COST_LEDGER_ID",
+  "status": "template",
+  "budgetLimitsUsd": {
+    "perTaskMax": 5,
+    "dailyMax": 10,
+    "monthlyMax": 50
+  },
+  "entries": [
+    {
+      "costEntryId": "REQUIRED_COST_ENTRY_ID",
+      "jobId": "REQUIRED_JOB_ID",
+      "projectId": "REQUIRED_PROJECT_ID",
+      "costType": "estimated",
+      "amountUsd": 0,
+      "approvalRequired": false,
+      "approvalId": "REQUIRED_APPROVAL_ID_OR_NOT_REQUIRED",
+      "status": "planned"
+    }
+  ],
+  "summary": {
+    "estimatedTaskCostUsd": 0,
+    "actualTaskCostUsd": 0,
+    "dailyActualUsd": 0,
+    "monthlyActualUsd": 0,
+    "budgetStatus": "within_limit"
+  },
+  "safety": {
+    "createsBillingChange": false,
+    "usesPaidService": false,
+    "usesLiveApi": false,
+    "requiresOwnerApproval": false
+  },
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

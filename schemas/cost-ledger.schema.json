@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/cost-ledger.schema.json",
+  "title": "AG OS Cost Ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "costLedgerId",
+    "status",
+    "budgetLimitsUsd",
+    "entries",
+    "summary",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "costLedgerId": {
+      "type": "string",
+      "pattern": "^cost-ledger-[a-z0-9-]+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "template",
+        "draft",
+        "active",
+        "blocked",
+        "archived"
+      ]
+    },
+    "budgetLimitsUsd": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "perTaskMax",
+        "dailyMax",
+        "monthlyMax"
+      ],
+      "properties": {
+        "perTaskMax": {
+          "type": "number",
+          "const": 5
+        },
+        "dailyMax": {
+          "type": "number",
+          "const": 10
+        },
+        "monthlyMax": {
+          "type": "number",
+          "const": 50
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "costEntryId",
+          "jobId",
+          "projectId",
+          "costType",
+          "amountUsd",
+          "approvalRequired",
+          "status"
+        ],
+        "properties": {
+          "costEntryId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "jobId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "projectId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "costType": {
+            "type": "string",
+            "enum": [
+              "estimated",
+              "actual",
+              "reserved",
+              "reversed"
+            ]
+          },
+          "amountUsd": {
+            "type": "number",
+            "minimum": 0
+          },
+          "approvalRequired": {
+            "type": "boolean"
+          },
+          "approvalId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "approved",
+              "blocked",
+              "recorded",
+              "reversed"
+            ]
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "estimatedTaskCostUsd",
+        "actualTaskCostUsd",
+        "dailyActualUsd",
+        "monthlyActualUsd",
+        "budgetStatus"
+      ],
+      "properties": {
+        "estimatedTaskCostUsd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "actualTaskCostUsd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dailyActualUsd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "monthlyActualUsd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "budgetStatus": {
+          "type": "string",
+          "enum": [
+            "within_limit",
+            "near_limit",
+            "over_limit",
+            "blocked"
+          ]
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "createsBillingChange",
+        "usesPaidService",
+        "usesLiveApi",
+        "requiresOwnerApproval"
+      ],
+      "properties": {
+        "createsBillingChange": {
+          "type": "boolean",
+          "const": false
+        },
+        "usesPaidService": {
+          "type": "boolean",
+          "const": false
+        },
+        "usesLiveApi": {
+          "type": "boolean",
+          "const": false
+        },
+        "requiresOwnerApproval": {
+          "type": "boolean"
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
