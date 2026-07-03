@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/deployment.schema.json",
+  "title": "AG Digitalz OS Deployment Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "projectId", "target", "status", "requiresSecrets", "rollbackPlan", "approvalStatus", "createdAt", "updatedAt"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^deployment-[a-z0-9-]+$" },
+    "projectId": { "type": "string", "pattern": "^project-[a-z0-9-]+$" },
+    "target": { "type": "string", "enum": ["none", "netlify", "hetzner", "github_actions", "n8n", "domain", "other"] },
+    "status": { "type": "string", "enum": ["none", "planned", "preview", "production", "paused", "rolled_back"] },
+    "requiresSecrets": { "type": "boolean" },
+    "secretNamesOnly": { "type": "array", "items": { "type": "string" } },
+    "rollbackPlan": { "type": "string", "minLength": 1 },
+    "approvalStatus": { "type": "string", "enum": ["not_required", "required", "approved", "rejected"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

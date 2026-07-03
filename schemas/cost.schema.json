@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/cost.schema.json",
+  "title": "AG Digitalz OS Cost Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "service", "type", "status", "owner", "monthlyEstimateUsd", "approvalStatus", "createdAt", "updatedAt"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^cost-[a-z0-9-]+$" },
+    "service": { "type": "string", "minLength": 1 },
+    "type": { "type": "string", "enum": ["hosting", "api", "model", "tool", "contractor", "domain", "other"] },
+    "status": { "type": "string", "enum": ["estimated", "approved", "active", "paused", "cancelled"] },
+    "owner": { "type": "string", "minLength": 1 },
+    "monthlyEstimateUsd": { "type": "number", "minimum": 0 },
+    "approvalStatus": { "type": "string", "enum": ["not_required", "required", "approved", "rejected"] },
+    "killSwitch": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

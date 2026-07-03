@@ -1,0 +1,13 @@
+{
+  "name": "ag-os",
+  "version": "0.0.0",
+  "private": true,
+  "description": "AG Digitalz OS foundation: docs, schemas, safety rules, and validation only.",
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate-foundation.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

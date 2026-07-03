@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/idea.schema.json",
+  "title": "AG Digitalz OS Idea",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "source", "status", "valueHypothesis", "riskLevel", "createdAt", "updatedAt"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^idea-[a-z0-9-]+$" },
+    "title": { "type": "string", "minLength": 3 },
+    "source": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["captured", "triaged", "promoted", "rejected", "archived"] },
+    "valueHypothesis": { "type": "string", "minLength": 1 },
+    "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] },
+    "tags": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "notes": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

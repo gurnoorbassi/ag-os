@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/memory.schema.json",
+  "title": "AG Digitalz OS Memory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "summary", "source", "confidence", "verifiedAt", "createdAt", "updatedAt"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^memory-[a-z0-9-]+$" },
+    "type": { "type": "string", "enum": ["decision", "fact", "preference", "rule", "state", "runbook"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "source": { "type": "string", "minLength": 1 },
+    "confidence": { "type": "string", "enum": ["low", "medium", "high"] },
+    "verifiedAt": { "type": ["string", "null"], "format": "date-time" },
+    "refreshTrigger": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

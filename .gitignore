@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
+.DS_Store
+Thumbs.db
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+local/
+.codex/**/local-*

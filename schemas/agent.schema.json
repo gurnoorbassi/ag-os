@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/agent.schema.json",
+  "title": "AG Digitalz OS Agent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "role", "purpose", "allowedInputs", "prohibitedActions", "approvalRequiredFor", "outputs", "createdAt", "updatedAt"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^agent-[a-z0-9-]+$" },
+    "name": { "type": "string", "minLength": 3 },
+    "role": { "type": "string", "minLength": 1 },
+    "purpose": { "type": "string", "minLength": 1 },
+    "allowedInputs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "prohibitedActions": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "approvalRequiredFor": { "type": "array", "items": { "type": "string" } },
+    "outputs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "escalationRules": { "type": "array", "items": { "type": "string" }, "default": [] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

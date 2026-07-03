@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/task.schema.json",
+  "title": "AG Digitalz OS Task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "projectId", "title", "status", "riskLevel", "acceptanceCriteria", "evidence", "createdAt", "updatedAt"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^task-[a-z0-9-]+$" },
+    "projectId": { "type": "string", "pattern": "^project-[a-z0-9-]+$" },
+    "title": { "type": "string", "minLength": 3 },
+    "status": { "type": "string", "enum": ["planned", "active", "blocked", "complete", "cancelled"] },
+    "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] },
+    "acceptanceCriteria": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "evidence": { "type": "array", "items": { "type": "string" } },
+    "rollback": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}
