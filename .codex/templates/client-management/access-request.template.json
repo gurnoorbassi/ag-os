@@ -1,0 +1,15 @@
+{
+  "template": true,
+  "accessRequestId": "REQUIRED_ACCESS_REQUEST_ID",
+  "clientId": "REQUIRED_CLIENT_ID",
+  "engagementId": "REQUIRED_ENGAGEMENT_ID",
+  "platform": "REQUIRED_PLATFORM",
+  "accessType": "social_oauth",
+  "status": "not_requested",
+  "reason": "REQUIRED_ACCESS_REASON",
+  "requestedBy": "REQUIRED_REQUESTED_BY",
+  "approvedBy": "REQUIRED_APPROVED_BY",
+  "credentialStoragePolicy": "Credentials and secret values must never be stored in AG OS records. Future credentials must live only in an owner-approved secure connector or secret system.",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

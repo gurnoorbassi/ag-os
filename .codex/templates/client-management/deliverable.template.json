@@ -1,0 +1,18 @@
+{
+  "template": true,
+  "deliverableId": "REQUIRED_DELIVERABLE_ID",
+  "engagementId": "REQUIRED_ENGAGEMENT_ID",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "deliverableType": "client_config",
+  "status": "planned",
+  "location": {
+    "path": "REQUIRED_DELIVERABLE_PATH",
+    "link": "REQUIRED_DELIVERABLE_LINK"
+  },
+  "reviewStatus": "not_reviewed",
+  "qualityScoreRef": "REQUIRED_QUALITY_SCORE_REF",
+  "approvalRequired": true,
+  "ownerDecisionNeeded": true,
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

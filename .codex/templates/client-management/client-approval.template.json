@@ -1,0 +1,16 @@
+{
+  "template": true,
+  "approvalId": "REQUIRED_CLIENT_APPROVAL_ID",
+  "clientId": "REQUIRED_CLIENT_ID",
+  "engagementId": "REQUIRED_ENGAGEMENT_ID",
+  "itemType": "deliverable",
+  "itemRef": "REQUIRED_ITEM_REF",
+  "decisionNeeded": "REQUIRED_DECISION_NEEDED",
+  "status": "pending",
+  "requestedAt": "REQUIRED_REQUESTED_AT",
+  "decidedAt": "REQUIRED_DECIDED_AT",
+  "notes": [
+    "REQUIRED_APPROVAL_NOTES"
+  ],
+  "blockerLevel": "none"
+}

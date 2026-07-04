@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/access-request.schema.json",
+  "title": "AG Digitalz OS Access Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "accessRequestId",
+    "clientId",
+    "engagementId",
+    "platform",
+    "accessType",
+    "status",
+    "reason",
+    "requestedBy",
+    "approvedBy",
+    "credentialStoragePolicy",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "template": { "type": "boolean", "const": true },
+    "accessRequestId": { "type": "string", "pattern": "^access-request-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "clientId": { "type": "string", "pattern": "^client-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "engagementId": { "type": "string", "pattern": "^engagement-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "platform": { "type": "string", "minLength": 1 },
+    "accessType": {
+      "type": "string",
+      "enum": ["social_oauth", "analytics_api", "n8n", "netlify", "github", "domain_dns", "content_asset", "other"]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_requested",
+        "requested",
+        "provided_to_secure_store",
+        "connected_draft_only",
+        "approved_for_live_later",
+        "revoked",
+        "blocked"
+      ]
+    },
+    "reason": { "type": "string", "minLength": 1 },
+    "requestedBy": { "type": "string", "minLength": 1 },
+    "approvedBy": { "type": "string", "minLength": 1 },
+    "credentialStoragePolicy": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

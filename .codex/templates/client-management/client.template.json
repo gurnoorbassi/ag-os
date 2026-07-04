@@ -1,0 +1,20 @@
+{
+  "template": true,
+  "clientId": "REQUIRED_CLIENT_ID",
+  "clientName": "REQUIRED_CLIENT_NAME",
+  "status": "prospect",
+  "contactOwner": "REQUIRED_CONTACT_OWNER",
+  "brandNames": [
+    "REQUIRED_BRAND_NAME"
+  ],
+  "industry": "REQUIRED_INDUSTRY",
+  "systemsPurchased": [
+    "REQUIRED_SYSTEM_PURCHASED"
+  ],
+  "notes": [
+    "REQUIRED_CLIENT_NOTES"
+  ],
+  "privacyLevel": "confidential",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

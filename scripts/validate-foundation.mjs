@@ -53,6 +53,7 @@ const requiredPaths = [
   ".codex/approvals/README.md",
   ".codex/audit/README.md",
   ".codex/owners/README.md",
+  ".codex/client-management/README.md",
   ".codex/capabilities/README.md",
   ".codex/capabilities/registry.json",
   ".codex/commands/registry.json",
@@ -62,6 +63,11 @@ const requiredPaths = [
   ".codex/projects/project.template.json",
   ".codex/tasks/task.template.json",
   ".codex/agents/agent.template.json",
+  ".codex/templates/client-management/client.template.json",
+  ".codex/templates/client-management/engagement.template.json",
+  ".codex/templates/client-management/deliverable.template.json",
+  ".codex/templates/client-management/access-request.template.json",
+  ".codex/templates/client-management/client-approval.template.json",
   "docs/connector-registry.md",
   "docs/command-registry.md",
   "docs/capability-registry.md",
@@ -72,6 +78,9 @@ const requiredPaths = [
   "docs/security-os.md",
   "docs/watchdog-os.md",
   "docs/project-registry.md",
+  "docs/client-engagement-records-v1.md",
+  "docs/client-management-safety-policy.md",
+  "docs/client-engagement-workflow.md",
   "schemas/idea.schema.json",
   "schemas/approval-lock.schema.json",
   "schemas/audit-event.schema.json",
@@ -93,7 +102,12 @@ const requiredPaths = [
   "schemas/quality-check.schema.json",
   "schemas/plan-critique.schema.json",
   "schemas/security-review.schema.json",
-  "schemas/deployment.schema.json"
+  "schemas/deployment.schema.json",
+  "schemas/client.schema.json",
+  "schemas/engagement.schema.json",
+  "schemas/deliverable.schema.json",
+  "schemas/access-request.schema.json",
+  "schemas/client-approval.schema.json"
 ];
 
 const forbiddenPatterns = [
@@ -125,6 +139,31 @@ const templateRecords = [
     name: "agent template",
     recordPath: ".codex/agents/agent.template.json",
     schemaPath: "schemas/agent.schema.json"
+  },
+  {
+    name: "client template",
+    recordPath: ".codex/templates/client-management/client.template.json",
+    schemaPath: "schemas/client.schema.json"
+  },
+  {
+    name: "engagement template",
+    recordPath: ".codex/templates/client-management/engagement.template.json",
+    schemaPath: "schemas/engagement.schema.json"
+  },
+  {
+    name: "deliverable template",
+    recordPath: ".codex/templates/client-management/deliverable.template.json",
+    schemaPath: "schemas/deliverable.schema.json"
+  },
+  {
+    name: "access request template",
+    recordPath: ".codex/templates/client-management/access-request.template.json",
+    schemaPath: "schemas/access-request.schema.json"
+  },
+  {
+    name: "client approval template",
+    recordPath: ".codex/templates/client-management/client-approval.template.json",
+    schemaPath: "schemas/client-approval.schema.json"
   }
 ];
 const schemaValidatedRecords = [
