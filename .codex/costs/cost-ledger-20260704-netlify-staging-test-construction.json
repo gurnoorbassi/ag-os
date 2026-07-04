@@ -1,0 +1,46 @@
+{
+  "costLedgerId": "cost-ledger-20260704-netlify-staging-test-construction",
+  "status": "active",
+  "budgetLimitsUsd": {
+    "perTaskMax": 5,
+    "dailyMax": 10,
+    "monthlyMax": 50
+  },
+  "entries": [
+    {
+      "costEntryId": "cost-entry-20260704-netlify-staging-test-construction-estimated",
+      "jobId": "job-20260704-netlify-staging-test-construction",
+      "projectId": "project-unregistered-construction-website",
+      "costType": "estimated",
+      "amountUsd": 0,
+      "approvalRequired": true,
+      "approvalId": "approval-20260704-netlify-staging-test-construction",
+      "status": "approved"
+    },
+    {
+      "costEntryId": "cost-entry-20260704-netlify-staging-test-construction-actual",
+      "jobId": "job-20260704-netlify-staging-test-construction",
+      "projectId": "project-unregistered-construction-website",
+      "costType": "actual",
+      "amountUsd": 0,
+      "approvalRequired": true,
+      "approvalId": "approval-20260704-netlify-staging-test-construction",
+      "status": "recorded"
+    }
+  ],
+  "summary": {
+    "estimatedTaskCostUsd": 0,
+    "actualTaskCostUsd": 0,
+    "dailyActualUsd": 0,
+    "monthlyActualUsd": 0,
+    "budgetStatus": "within_limit"
+  },
+  "safety": {
+    "createsBillingChange": false,
+    "usesPaidService": false,
+    "usesLiveApi": false,
+    "requiresOwnerApproval": true
+  },
+  "createdAt": "2026-07-04T10:55:00.383Z",
+  "updatedAt": "2026-07-04T10:55:00.383Z"
+}

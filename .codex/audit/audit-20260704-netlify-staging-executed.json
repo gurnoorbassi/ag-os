@@ -1,0 +1,36 @@
+{
+  "id": "audit-20260704-netlify-staging-executed",
+  "occurredAt": "2026-07-04T10:55:00.383Z",
+  "actor": "ag-os-runtime",
+  "eventType": "registry_change",
+  "summary": "Executed the approved Netlify staging milestone by creating a staging-only Netlify site and deploying gurnoorbassi/ag-test-construction-website from main.",
+  "scope": "live_netlify_staging_ag_test_construction_website",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-netlify-staging-test-construction"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-20260704-netlify-staging-live-result"
+    },
+    {
+      "type": "other",
+      "reference": "cost-ledger-20260704-netlify-staging-test-construction"
+    },
+    {
+      "type": "document",
+      "reference": ".codex/netlify/netlify-plan-20260704-test-construction-staging.json"
+    },
+    {
+      "type": "commit",
+      "reference": "8c635538d7d5b7bb9918d2ea900c8f934ee98d49"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Executed exactly the owner-approved Netlify staging action for gurnoorbassi/ag-test-construction-website from main at 8c635538d7d5b7bb9918d2ea900c8f934ee98d49. Created Netlify site ag-test-construction-website-staging with site id e592fa55-9630-4b3b-b807-0fca5415f13a and deploy id 6a48e6777c5c2f79b36d8c40. The Netlify deploy reached ready state. No target repository files were edited. No target repo PR was merged. No custom domain, DNS change, paid feature, repository credential, exposed secret, n8n change, Lead Gen change, AI Receptionist change, Constitution change, extra repository, live form, live API, tracking script, Netlify function, or Netlify edge function was added.",
+  "createdAt": "2026-07-04T10:55:00.383Z"
+}
