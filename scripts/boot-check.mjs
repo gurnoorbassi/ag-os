@@ -142,6 +142,25 @@ function checkCostBudget() {
   );
 }
 
+function listQualityScorePaths() {
+  return listDirectJson(".codex/quality-scores")
+    .filter((scorePath) => path.basename(scorePath).startsWith("quality-score-"));
+}
+
+function checkQualityScores() {
+  const qualityScoreDir = ".codex/quality-scores";
+  const directoryExists = existsSync(path.join(root, qualityScoreDir));
+  const scoreCount = directoryExists ? listQualityScorePaths().length : 0;
+
+  addCheck(
+    "quality-scores",
+    directoryExists ? "pass" : "failed",
+    directoryExists
+      ? `Quality score directory exists with ${scoreCount} source-controlled score record(s).`
+      : "Quality score directory is missing."
+  );
+}
+
 function checkActiveIncidents() {
   const incidents = listDirectJson(".codex/incidents");
   if (incidents.length === 0) {
@@ -206,6 +225,7 @@ checkCapabilityRegistry();
 checkOwnerRecord();
 checkValidationStatus();
 checkCostBudget();
+checkQualityScores();
 checkActiveIncidents();
 checkActiveApprovals();
 checkStaleLocks();
@@ -241,6 +261,26 @@ function buildWorkerBriefing() {
     connectionStatus: connector.connectionStatus
   }));
 
+  const qualityScorePaths = listQualityScorePaths();
+  const qualityScoreSummaries = qualityScorePaths
+    .map((scorePath) => ({ scorePath, score: readJson(scorePath) }))
+    .map(({ scorePath, score }) => ({
+      scoreId: score.scoreId,
+      projectId: score.projectId,
+      archetypeId: score.archetypeId,
+      outputType: score.outputType,
+      overallScore: score.overallScore,
+      meetsBar: score.meetsBar,
+      updatedAt: score.updatedAt,
+      scorePath
+    }))
+    .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
+  const qualityScores = {
+    directoryExists: existsSync(path.join(root, ".codex/quality-scores")),
+    acceptedActiveCount: qualityScoreSummaries.length,
+    latest: qualityScoreSummaries[0] ?? null
+  };
+
   const countActive = (relativeDir) => listDirectJson(relativeDir).length;
   const engineStatus = {
     activeCommandIntakes: listDirectJson(".codex/commands", { exclude: ["registry.json"] }).length,
@@ -260,6 +300,7 @@ function buildWorkerBriefing() {
     acceptedLessons,
     activeApprovals,
     connectorStatus,
+    qualityScores,
     blockers: checks.filter((check) => check.required && check.status !== "pass").map((check) => check.checkId),
     engineStatus
   };

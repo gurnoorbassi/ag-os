@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -10,6 +10,17 @@ const fixedNodeArgs = ["scripts/validate-foundation.mjs"];
 
 function runValidator(cwd) {
   const result = spawnSync(process.execPath, fixedNodeArgs, {
+    cwd,
+    encoding: "utf8"
+  });
+  return {
+    status: result.status,
+    output: `${result.stdout || ""}${result.stderr || ""}`
+  };
+}
+
+function runBootCheck(cwd) {
+  const result = spawnSync(process.execPath, ["scripts/boot-check.mjs"], {
     cwd,
     encoding: "utf8"
   });
@@ -42,6 +53,15 @@ function readJson(root, relativePath) {
 
 function writeJson(root, relativePath, value) {
   writeFileSync(path.join(root, relativePath), `${JSON.stringify(value, null, 2)}\n`);
+}
+
+function ensureQualityScoresFoundation(root) {
+  const directory = path.join(root, ".codex/quality-scores");
+  mkdirSync(directory, { recursive: true });
+  const readmePath = path.join(directory, "README.md");
+  if (!existsSync(readmePath)) {
+    writeFileSync(readmePath, "# Quality Scores\n");
+  }
 }
 
 function withTempRepo(assertion) {
@@ -194,6 +214,41 @@ test("validator fails on an invalid GitHub MCP execution gate runtime record", (
 
   assert.notEqual(result.status, 0);
   assert.match(result.output, /github-mcp-gate-runtime-github-construction-website-repo-20260703\.json\.mode must be "execution_gate_only"/);
+}));
+
+test("validator allows an empty quality-score directory", () => withTempRepo((root) => {
+  ensureQualityScoresFoundation(root);
+
+  const result = runValidator(root);
+
+  assert.equal(result.status, 0, result.output);
+  assert.match(result.output, /no active quality score records found in \.codex\/quality-scores/);
+}));
+
+test("validator fails on an invalid quality-score record", () => withTempRepo((root) => {
+  ensureQualityScoresFoundation(root);
+  writeJson(root, ".codex/quality-scores/quality-score-invalid.json", {
+    "$schema": "../../schemas/quality-score.schema.json",
+    "scoreId": "quality-score-invalid"
+  });
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /quality-score-invalid\.json missing required field: projectId/);
+}));
+
+test("boot check remains ready when no quality-score records exist", () => withTempRepo((root) => {
+  ensureQualityScoresFoundation(root);
+
+  const result = runBootCheck(root);
+
+  assert.equal(result.status, 0, result.output);
+  const report = JSON.parse(result.output);
+  assert.equal(report.status, "ready");
+  assert.equal(report.briefing.qualityScores.directoryExists, true);
+  assert.equal(report.briefing.qualityScores.acceptedActiveCount, 0);
+  assert.equal(report.briefing.qualityScores.latest, null);
 }));
 
 test("validator fails when an enforced schema uses an unsupported structural keyword", () => withTempRepo((root) => {

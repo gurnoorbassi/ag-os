@@ -43,6 +43,7 @@ const requiredPaths = [
   ".codex/costs/budget.json",
   ".codex/quality/README.md",
   ".codex/quality/policy.json",
+  ".codex/quality-scores/README.md",
   ".codex/security/README.md",
   ".codex/security/policy.json",
   ".codex/watchdog/README.md",
@@ -279,6 +280,12 @@ const runtimeRecordDirectories = [
     recordDir: ".codex/github",
     schemaPath: "schemas/github-mcp-execution-gate.schema.json",
     includePrefixes: ["github-mcp-gate-"]
+  },
+  {
+    name: "quality score",
+    recordDir: ".codex/quality-scores",
+    schemaPath: "schemas/quality-score.schema.json",
+    includePrefixes: ["quality-score-"]
   }
 ];
 let failures = 0;

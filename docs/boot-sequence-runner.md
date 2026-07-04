@@ -53,9 +53,9 @@ Live health checks can be added only after the relevant connector permissions, a
 
 ## Worker Briefing
 
-Boot output includes an offline `briefing` block that delivers accumulated context to workers at session start: Constitution status, repo health, current budget limits, owner preferences when present, known archetypes, accepted lessons, active approval locks, connector status from source-controlled metadata, current blockers, and engine record counts.
+Boot output includes an offline `briefing` block that delivers accumulated context to workers at session start: Constitution status, repo health, current budget limits, owner preferences when present, known archetypes, accepted lessons, active approval locks, connector status from source-controlled metadata, quality score record count and latest summary when present, current blockers, and engine record counts.
 
-The briefing is assembled only from source-controlled records. It makes no live calls and grants no permissions. Workers must read the briefing before planning work, per `docs/worker-protocol.md`.
+The briefing is assembled only from source-controlled records. It makes no live calls and grants no permissions. An empty quality-score directory is valid and reports a count of `0`; AG OS must not invent a quality score. Workers must read the briefing before planning work, per `docs/worker-protocol.md`.
 
 ## Output
 
