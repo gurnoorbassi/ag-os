@@ -1,0 +1,29 @@
+{
+  "template": true,
+  "templateId": "social-media-platform-account-template-v1",
+  "recordType": "social_media_platform_account",
+  "status": "template",
+  "clientName": "REQUIRED_CLIENT_NAME",
+  "brandName": "REQUIRED_BRAND_NAME",
+  "platforms": "REQUIRED_PLATFORMS",
+  "handles": "REQUIRED_HANDLES",
+  "accountStatus": "not_connected",
+  "allowedStatuses": [
+    "not_connected",
+    "access_requested",
+    "connected_draft_only",
+    "approved_for_scheduling",
+    "approved_for_live_posting"
+  ],
+  "postingMode": "draft_only",
+  "approvalRequired": true,
+  "livePostingBlocked": true,
+  "credentialsStored": false,
+  "futureConnectorReadiness": {
+    "socialOAuthApproved": false,
+    "schedulingApproved": false,
+    "postingApproved": false,
+    "analyticsApproved": false
+  }
+}
+

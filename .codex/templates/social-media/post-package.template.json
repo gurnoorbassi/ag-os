@@ -1,0 +1,30 @@
+{
+  "template": true,
+  "templateId": "social-media-post-package-template-v1",
+  "recordType": "social_media_post_package",
+  "status": "template",
+  "clientName": "REQUIRED_CLIENT_NAME",
+  "brandName": "REQUIRED_BRAND_NAME",
+  "platforms": "REQUIRED_PLATFORMS",
+  "handles": "REQUIRED_HANDLES",
+  "contentPillars": "REQUIRED_CONTENT_PILLARS",
+  "brandVoice": "REQUIRED_BRAND_VOICE",
+  "approvalOwner": "REQUIRED_APPROVAL_OWNER",
+  "postingMode": "draft_only",
+  "approvalRequired": true,
+  "livePostingBlocked": true,
+  "credentialsStored": false,
+  "packageStatus": "draft",
+  "sourceContent": {
+    "intakeStatus": "required",
+    "privateClientAssetApproved": false
+  },
+  "variants": {
+    "shortFormVideo": [],
+    "carousel": [],
+    "story": [],
+    "captionHooks": [],
+    "platformSpecificVariants": []
+  }
+}
+

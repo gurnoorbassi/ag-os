@@ -1,0 +1,35 @@
+{
+  "template": true,
+  "templateId": "social-media-client-config-template-v1",
+  "recordType": "social_media_client_config",
+  "status": "template",
+  "clientName": "REQUIRED_CLIENT_NAME",
+  "brands": [
+    {
+      "brandName": "REQUIRED_BRAND_NAME",
+      "contentPillars": "REQUIRED_CONTENT_PILLARS",
+      "brandVoice": "REQUIRED_BRAND_VOICE",
+      "platforms": "REQUIRED_PLATFORMS",
+      "handles": "REQUIRED_HANDLES",
+      "postingVolume": "REQUIRED_POSTING_VOLUME",
+      "approvalOwner": "REQUIRED_APPROVAL_OWNER",
+      "reportingCadence": "REQUIRED_REPORTING_CADENCE"
+    }
+  ],
+  "defaults": {
+    "accountStatus": "not_connected",
+    "postingMode": "draft_only",
+    "approvalRequired": true,
+    "livePostingBlocked": true,
+    "credentialsStored": false
+  },
+  "blockedLiveActions": {
+    "socialOAuth": true,
+    "posting": true,
+    "scheduling": true,
+    "analyticsApi": true,
+    "n8nActivation": true,
+    "paidTools": true
+  }
+}
+
