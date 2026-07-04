@@ -1,0 +1,36 @@
+{
+  "id": "audit-20260704-n8n-draft-workflow-executed",
+  "occurredAt": "2026-07-04T11:56:19.923Z",
+  "actor": "ag-os-runtime",
+  "eventType": "registry_change",
+  "summary": "Executed the approved n8n draft workflow proof by creating one inactive construction website lead intake follow-up draft workflow.",
+  "scope": "approval-20260704-n8n-draft-workflow-proof",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-n8n-draft-workflow-proof"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-20260704-n8n-draft-workflow-live-result"
+    },
+    {
+      "type": "other",
+      "reference": "cost-ledger-20260704-n8n-draft-workflow-proof-success"
+    },
+    {
+      "type": "document",
+      "reference": ".codex/n8n/n8n-plan-20260704-construction-lead-draft-proof.json"
+    },
+    {
+      "type": "document",
+      "reference": ".codex/n8n/exports/n8n-export-20260704-construction-lead-draft-proof-success.json"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Created exactly one inactive n8n draft workflow named Construction Website Lead Intake Follow-up Draft with workflow id WaD4uysb8ic0rfsH. The workflow uses placeholder/test payload handling only, has active false, activeVersionId null, triggerCount 0, no auto-assigned credentials, no outbound email, SMS, WhatsApp, posting, live outreach, phone, voice, real external API, production workflow, Lead Gen workflow, AI Receptionist workflow, deployment, domain/DNS, paid action, customer data, production data, or Constitution change.",
+  "createdAt": "2026-07-04T11:56:19.923Z"
+}
