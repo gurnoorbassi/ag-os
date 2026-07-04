@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260704-runtime-closed-loop-crm-proof-20260704-01",
+  "title": "Improve low quality dimensions for archetype-crm",
+  "lesson": "When a plan_quality_score has below-bar dimensions, keep the work in plan-only review and strengthen the weak dimensions before build mode. Current weak dimensions: performance (7/10).",
+  "sources": [
+    ".codex/quality-scores/quality-score-20260704-runtime-closed-loop-crm-proof-20260704.json",
+    ".codex/plans/plan-runtime-closed-loop-crm-proof-20260704.json",
+    ".codex/audit/audit-runtime-closed-loop-crm-proof-20260704.json",
+    ".codex/costs/cost-ledger-runtime-closed-loop-crm-proof-20260704.json",
+    ".codex/execution/exec-runtime-closed-loop-crm-proof-20260704-run-validation.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "medium",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-unregistered-crm",
+  "appliesTo": [
+    "archetype-crm",
+    "plan_quality_score",
+    "quality-score-lesson-loop"
+  ],
+  "sourceScoreId": "quality-score-20260704-runtime-closed-loop-crm-proof-20260704",
+  "generatedBy": "scripts/process-lesson-candidates.mjs",
+  "whyThisMatters": "Quality OS should turn weak score evidence into specific planning work instead of treating a score as a pass.",
+  "whenToUse": "Use when a quality score has one or more dimensions below 8/10.",
+  "whenNotToUse": "Do not use as authority to approve execution, deployment, live connectors, or paid work.",
+  "notes": "Candidate only. Not accepted truth until owner-reviewed and promoted through the memory learning policy.",
+  "createdAt": "2026-07-04T09:32:00.000Z",
+  "updatedAt": "2026-07-04T09:32:00.000Z"
+}

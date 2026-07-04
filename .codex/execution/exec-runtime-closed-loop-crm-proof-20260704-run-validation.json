@@ -1,0 +1,28 @@
+{
+  "executionStepId": "exec-runtime-closed-loop-crm-proof-20260704-run-validation",
+  "planId": "plan-runtime-closed-loop-crm-proof-20260704",
+  "jobId": "job-runtime-closed-loop-crm-proof-20260704",
+  "projectId": "project-unregistered-crm",
+  "stepType": "run_validation",
+  "status": "done",
+  "riskLevel": "R1",
+  "command": "npm.cmd run validate",
+  "expectedResult": "Local AG OS validation completes without live service calls, deployments, credentials, paid usage, or production data.",
+  "evidenceRequired": [
+    "local validation command output",
+    "no live service calls",
+    "no credentials used"
+  ],
+  "rollbackRequired": false,
+  "rollbackPlan": "Remove the generated dry-run record chain if validation fails before merge.",
+  "safety": {
+    "credentialsAllowed": false,
+    "liveServiceUseAllowed": false,
+    "deploymentAllowed": false,
+    "domainChangeAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-04T08:15:24.354Z",
+  "updatedAt": "2026-07-04T08:15:24.354Z"
+}

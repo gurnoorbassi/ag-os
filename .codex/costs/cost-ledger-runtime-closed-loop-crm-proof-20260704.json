@@ -1,0 +1,35 @@
+{
+  "costLedgerId": "cost-ledger-runtime-closed-loop-crm-proof-20260704",
+  "status": "active",
+  "budgetLimitsUsd": {
+    "perTaskMax": 5,
+    "dailyMax": 10,
+    "monthlyMax": 50
+  },
+  "entries": [
+    {
+      "costEntryId": "cost-entry-runtime-closed-loop-crm-proof-20260704-estimated",
+      "jobId": "job-runtime-closed-loop-crm-proof-20260704",
+      "projectId": "project-unregistered-crm",
+      "costType": "estimated",
+      "amountUsd": 0,
+      "approvalRequired": false,
+      "status": "recorded"
+    }
+  ],
+  "summary": {
+    "estimatedTaskCostUsd": 0,
+    "actualTaskCostUsd": 0,
+    "dailyActualUsd": 0,
+    "monthlyActualUsd": 0,
+    "budgetStatus": "within_limit"
+  },
+  "safety": {
+    "createsBillingChange": false,
+    "usesPaidService": false,
+    "usesLiveApi": false,
+    "requiresOwnerApproval": false
+  },
+  "createdAt": "2026-07-04T08:15:23.852Z",
+  "updatedAt": "2026-07-04T08:15:23.852Z"
+}

@@ -1,0 +1,51 @@
+{
+  "$schema": "../../schemas/quality-score.schema.json",
+  "scoreId": "quality-score-20260704-runtime-closed-loop-crm-proof-20260704",
+  "status": "candidate",
+  "scoreType": "plan_quality_score",
+  "projectId": "project-unregistered-crm",
+  "planId": "plan-runtime-closed-loop-crm-proof-20260704",
+  "sourcePlanPath": ".codex/plans/plan-runtime-closed-loop-crm-proof-20260704.json",
+  "outputType": "crm",
+  "archetypeId": "archetype-crm",
+  "archetypeFile": ".codex/archetypes/crm-system.json",
+  "checklistItemsEvaluated": [
+    "Core entities and status transitions are explicit and validated.",
+    "No live imports, exports, email sync, SMS, payment, or production data connection exists without approval.",
+    "Read and write paths are separated so future approval gates can control risky operations.",
+    "Role assumptions and data classification are documented before customer data is handled.",
+    "Core entities, statuses, required fields, and transitions are validated.",
+    "Operator workflows can be completed without live services.",
+    "Tables, filters, and detail views are responsive and accessible.",
+    "Audit, ownership, data classification, backup, and rollback expectations are documented."
+  ],
+  "dimensions": {
+    "completeness": 10,
+    "craft": 9,
+    "maintainability": 9,
+    "ux": 9,
+    "security": 10,
+    "performance": 7,
+    "ownerAcceptance": 8,
+    "archetypeFit": 10,
+    "costDiscipline": 10
+  },
+  "overallScore": 9.1,
+  "meetsBar": true,
+  "reviewStatus": "pass",
+  "improvementRecommendations": [
+    "Improve performance evidence before promotion beyond plan-only work."
+  ],
+  "lessonCandidates": [],
+  "evidence": [
+    ".codex/plans/plan-runtime-closed-loop-crm-proof-20260704.json",
+    ".codex/commands/command-intake-runtime-closed-loop-crm-proof-20260704.json"
+  ],
+  "generatedBy": "scripts/process-quality-score.mjs",
+  "limitations": [
+    "No product output was provided; this is a plan quality only score and does not represent owner acceptance or product quality."
+  ],
+  "notes": "Candidate score only. It does not authorize execution, deployment, live connector use, or accepted lessons.",
+  "createdAt": "2026-07-04T09:31:00.000Z",
+  "updatedAt": "2026-07-04T09:31:00.000Z"
+}

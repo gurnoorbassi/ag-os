@@ -1,0 +1,28 @@
+{
+  "jobId": "job-runtime-closed-loop-crm-proof-20260704",
+  "commandId": "command-intake-runtime-closed-loop-crm-proof-20260704",
+  "projectId": "project-unregistered-crm",
+  "status": "done",
+  "priority": "normal",
+  "riskLevel": "R1",
+  "commandType": "plan_only",
+  "requestedBy": "owner-gurnoor-bassi",
+  "assignedDomain": "command-os",
+  "assignedAgent": "agent-local-runtime",
+  "approvalRequired": false,
+  "expectedOutput": "Plan-only command intake record for crm.",
+  "queueTimestamps": {
+    "queuedAt": "2026-07-04T08:15:23.724Z",
+    "completedAt": "2026-07-04T08:15:24.355Z"
+  },
+  "safety": {
+    "credentialsAllowed": false,
+    "liveServicesAllowed": false,
+    "deploymentAllowed": false,
+    "domainChangeAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-04T08:15:23.724Z",
+  "updatedAt": "2026-07-04T08:15:24.355Z"
+}

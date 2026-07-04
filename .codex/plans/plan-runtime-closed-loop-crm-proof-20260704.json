@@ -1,0 +1,228 @@
+{
+  "planId": "plan-runtime-closed-loop-crm-proof-20260704",
+  "jobId": "job-runtime-closed-loop-crm-proof-20260704",
+  "commandId": "command-intake-runtime-closed-loop-crm-proof-20260704",
+  "projectId": "project-unregistered-crm",
+  "summary": "Plan-only CRM foundation for a local service business, assembled from the active CRM archetype and AG OS safety rules.",
+  "riskLevel": "R1",
+  "estimatedCostUsd": 0,
+  "tools": [
+    "local-filesystem"
+  ],
+  "tasks": [
+    {
+      "taskId": "work-archetype-first-entity-schema-and-status-model",
+      "description": "Archetype first build item for CRM System: Entity schema and status model.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-first-read-only-list-detail-interface-for-representati",
+      "description": "Archetype first build item for CRM System: Read-only list/detail interface for representative record shapes without production data.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-first-tas-k-and-next-action-model",
+      "description": "Archetype first build item for CRM System: Task and next-action model.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-first-audit-and-approval-gate-map-for-future-live-acti",
+      "description": "Archetype first build item for CRM System: Audit and approval-gate map for future live actions.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-model",
+      "description": "CRM System phase - Data Model And Workflow: Define core entities, statuses, ownership, and audit needs. Map read, write, import, and export surfaces with approval gates.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-interface",
+      "description": "CRM System phase - Operator Interface: Build list, detail, filters, task queue, and status review views. Keep the first interface local or repository-backed until live storage is approved.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-runtime",
+      "description": "CRM System phase - Controlled Runtime: Add approved storage, connector, and audit behavior only after validation and rollback planning. Introduce production data handling only after data classification and backup rules pass.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-common-modules",
+      "description": "Plan common CRM System modules/features: Account and contact records with ownership, status, notes, and activity history. Pipeline or opportunity tracking with stages, next actions, and close probability only when useful. Task queue, reminders, filters, saved views, and audit events for operator activity. Import/export planning, connector gates, and data retention rules for future live use.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-risk-review",
+      "description": "Review CRM System known pitfalls before build mode: Overbuilding custom automation before the core operator workflow is stable. Treating CRM data as low-risk when it may become customer or production data. Adding imports without deduplication, validation, backup, or rollback rules. Hiding ownership and audit fields from the people who must maintain the system.",
+      "owner": "quality-os",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-closed-loop-crm-understanding",
+      "description": "Preserve the worker understanding, assumptions, and owner constraints for a local-service CRM plan.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-closed-loop-crm-model",
+      "description": "Use the CRM archetype to define accounts, contacts, statuses, ownership, task queue, notes, activity history, and audit expectations without production or customer data.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-closed-loop-crm-quality-review",
+      "description": "Review CRM quality checklist coverage, known pitfalls, approval gates, stop conditions, cost discipline, and Bootstrap Mode stack before any build-mode promotion.",
+      "owner": "quality-os",
+      "status": "planned"
+    }
+  ],
+  "basis": {
+    "productArchetype": "archetype-crm",
+    "assumptions": [
+      "The CRM proof is local and source-controlled only.",
+      "The first build direction is schema and operator workflow planning, not live CRM integration.",
+      "Any live action requires a future scoped owner approval lock."
+    ],
+    "ownerPreferencesUsed": [
+      "pref-quality-over-quantity",
+      "pref-bootstrap-mode-until-revenue",
+      "pref-existing-stack-first",
+      "pref-lead-gen-protected",
+      "pref-ai-receptionist-separate"
+    ],
+    "archetypeFile": ".codex/archetypes/crm-system.json",
+    "archetypeVersion": null,
+    "qualityChecklistSource": "archetype:archetype-crm",
+    "appliedPhases": [
+      "phase-model: Data Model And Workflow - Define core entities, statuses, ownership, and audit needs. Map read, write, import, and export surfaces with approval gates.",
+      "phase-interface: Operator Interface - Build list, detail, filters, task queue, and status review views. Keep the first interface local or repository-backed until live storage is approved.",
+      "phase-runtime: Controlled Runtime - Add approved storage, connector, and audit behavior only after validation and rollback planning. Introduce production data handling only after data classification and backup rules pass."
+    ],
+    "appliedWhatToBuildFirst": [
+      "Entity schema and status model.",
+      "Read-only list/detail interface for representative record shapes without production data.",
+      "Task and next-action model.",
+      "Audit and approval-gate map for future live actions."
+    ],
+    "appliedApprovalGates": [
+      "Owner approval is required before connecting live email, SMS, CRM, payment, database, or automation services.",
+      "Owner approval is required before importing, exporting, or transforming production or customer data.",
+      "Owner approval is required before deployment, domain or DNS change, paid tool use, or credential handling.",
+      "Owner approval and rollback planning are required before destructive bulk edits or migrations."
+    ],
+    "appliedStopConditions": [
+      "Stop before handling credentials, production data, customer data, live imports, live exports, or paid enrichment.",
+      "Stop before connecting email, SMS, CRM, database, n8n, Netlify, domain, DNS, or deployment services.",
+      "Stop before touching the existing Lead Gen production system or AI Receptionist repo without separate approval."
+    ],
+    "appliedKnownPitfalls": [
+      "Overbuilding custom automation before the core operator workflow is stable.",
+      "Treating CRM data as low-risk when it may become customer or production data.",
+      "Adding imports without deduplication, validation, backup, or rollback rules.",
+      "Hiding ownership and audit fields from the people who must maintain the system."
+    ],
+    "appliedCommonModules": [
+      "Account and contact records with ownership, status, notes, and activity history.",
+      "Pipeline or opportunity tracking with stages, next actions, and close probability only when useful.",
+      "Task queue, reminders, filters, saved views, and audit events for operator activity.",
+      "Import/export planning, connector gates, and data retention rules for future live use."
+    ],
+    "appliedWhatNotToOverbuildEarly": [
+      "Custom sales forecasting, AI scoring, or complex automation before core data quality is proven.",
+      "Live imports from email, spreadsheets, or existing CRMs before approval and backup planning.",
+      "Permission matrix beyond the owner and documented future roles.",
+      "Paid CRM connectors or enrichment services before budget approval."
+    ],
+    "stackChoice": "Bootstrap Mode stack: Repository records or local JSON for first model validation; Static or lightweight app shell for read-only review; Existing Postgres only after approved runtime phase; GitHub for source and PR governance; Netlify only after approved staging or production deployment. Notes: Start offline and schema-first. Do not connect email, SMS, billing, third-party CRM tools, or production databases until owner-approved.",
+    "qualityBar": [
+      "Core entities and status transitions are explicit and validated.",
+      "No live imports, exports, email sync, SMS, payment, or production data connection exists without approval.",
+      "Read and write paths are separated so future approval gates can control risky operations.",
+      "Role assumptions and data classification are documented before customer data is handled.",
+      "Core entities, statuses, required fields, and transitions are validated.",
+      "Operator workflows can be completed without live services.",
+      "Tables, filters, and detail views are responsive and accessible.",
+      "Audit, ownership, data classification, backup, and rollback expectations are documented."
+    ]
+  },
+  "approvalGates": [
+    {
+      "gateId": "approval-live-connector-action",
+      "approvalRequired": true,
+      "reason": "Any live connector action, including repository creation, requires owner approval."
+    },
+    {
+      "gateId": "approval-preview-or-production-deploy",
+      "approvalRequired": true,
+      "reason": "Any staging or production deploy requires owner approval before live connector use."
+    },
+    {
+      "gateId": "approval-domain-or-dns-change",
+      "approvalRequired": true,
+      "reason": "Any domain or DNS change is blocked until explicit owner approval."
+    },
+    {
+      "gateId": "approval-paid-tool-use",
+      "approvalRequired": true,
+      "reason": "Paid tools or paid API usage are blocked unless owner approved and within Cost OS limits."
+    },
+    {
+      "gateId": "approval-closed-loop-universal-live-risk",
+      "approvalRequired": true,
+      "reason": "Owner approval is required before any live service, live connector, n8n, Netlify, database, email, SMS, CRM API, credential, deployment, domain, DNS, paid action, production data, customer data, posting, live outreach, phone action, voice action, Lead Gen change, AI Receptionist change, or Constitution change."
+    },
+    {
+      "gateId": "approval-archetype-owner-approval-is-required-before-connecting-liv",
+      "approvalRequired": true,
+      "reason": "Owner approval is required before connecting live email, SMS, CRM, payment, database, or automation services."
+    },
+    {
+      "gateId": "approval-archetype-owner-approval-is-required-before-importing-expo",
+      "approvalRequired": true,
+      "reason": "Owner approval is required before importing, exporting, or transforming production or customer data."
+    },
+    {
+      "gateId": "approval-archetype-owner-approval-is-required-before-deployment-dom",
+      "approvalRequired": true,
+      "reason": "Owner approval is required before deployment, domain or DNS change, paid tool use, or credential handling."
+    },
+    {
+      "gateId": "approval-archetype-owner-approval-and-rollback-planning-are-require",
+      "approvalRequired": true,
+      "reason": "Owner approval and rollback planning are required before destructive bulk edits or migrations."
+    }
+  ],
+  "expectedOutput": "Plan-only CRM proof chain records. No live services, credentials, deployments, domain/DNS, paid tools, production/customer data, posting, outreach, phone/voice actions, n8n activation, Netlify activation, Lead Gen changes, AI Receptionist changes, Constitution changes, accepted lessons, permanent memory, or approval bypass.",
+  "stopConditions": [
+    "Stop before any live connector action without a valid approval lock.",
+    "Stop before any deployment, preview deployment, domain change, or DNS change.",
+    "Stop before using credentials, private endpoints, paid services, customer data, or production data.",
+    "Stop when scope, risk tier, or approval requirements become unclear.",
+    "Stop before any live service, live connector, n8n, Netlify, database, email, SMS, CRM API, credential, deployment, domain, DNS, paid action, production data, customer data, posting, live outreach, phone action, voice action, Lead Gen change, AI Receptionist change, or Constitution change.",
+    "Stop before owner approval bypass or any attempt to treat critique, quality score, or lesson candidate as approval.",
+    "Stop before creating accepted lessons or permanent memory from this proof run.",
+    "Stop before handling credentials, production data, customer data, live imports, live exports, or paid enrichment.",
+    "Stop before connecting email, SMS, CRM, database, n8n, Netlify, domain, DNS, or deployment services.",
+    "Stop before touching the existing Lead Gen production system or AI Receptionist repo without separate approval.",
+    "Do not overbuild early: Custom sales forecasting, AI scoring, or complex automation before core data quality is proven.",
+    "Do not overbuild early: Live imports from email, spreadsheets, or existing CRMs before approval and backup planning.",
+    "Do not overbuild early: Permission matrix beyond the owner and documented future roles.",
+    "Do not overbuild early: Paid CRM connectors or enrichment services before budget approval."
+  ],
+  "safety": {
+    "executionAuthorized": false,
+    "liveServiceUseAllowed": false,
+    "deploymentAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-04T08:15:23.809Z",
+  "updatedAt": "2026-07-04T08:15:23.809Z"
+}
