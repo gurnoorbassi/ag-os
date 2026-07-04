@@ -129,6 +129,65 @@
           "type": "string",
           "minLength": 1
         },
+        "archetypeFile": {
+          "type": ["string", "null"]
+        },
+        "archetypeVersion": {
+          "type": ["string", "null"]
+        },
+        "qualityChecklistSource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "appliedPhases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "appliedWhatToBuildFirst": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "appliedApprovalGates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "appliedStopConditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "appliedKnownPitfalls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "appliedCommonModules": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "appliedWhatNotToOverbuildEarly": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "qualityBar": {
           "type": "array",
           "items": {
