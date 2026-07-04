@@ -147,6 +147,11 @@ function listQualityScorePaths() {
     .filter((scorePath) => path.basename(scorePath).startsWith("quality-score-"));
 }
 
+function listLessonCandidatePaths() {
+  return listDirectJson(".codex/memory/lessons/candidates")
+    .filter((lessonPath) => path.basename(lessonPath).startsWith("lesson-"));
+}
+
 function checkQualityScores() {
   const qualityScoreDir = ".codex/quality-scores";
   const directoryExists = existsSync(path.join(root, qualityScoreDir));
@@ -250,6 +255,18 @@ function buildWorkerBriefing() {
     return { lessonId: lesson.lessonId, title: lesson.title, scope: lesson.scope, status: lesson.status };
   });
 
+  const lessonCandidateSummaries = listLessonCandidatePaths()
+    .map((lessonPath) => ({ lessonPath, lesson: readJson(lessonPath) }))
+    .map(({ lessonPath, lesson }) => ({
+      lessonId: lesson.lessonId,
+      title: lesson.title,
+      scope: lesson.scope,
+      status: lesson.status,
+      updatedAt: lesson.updatedAt,
+      lessonPath
+    }))
+    .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
+
   const activeApprovals = listDirectJson(".codex/approvals").map((approvalPath) => {
     const approval = readJson(approvalPath);
     return { approvalId: approval.approvalId, status: approval.status, expiresAt: approval.expiresAt ?? null };
@@ -266,19 +283,30 @@ function buildWorkerBriefing() {
     .map((scorePath) => ({ scorePath, score: readJson(scorePath) }))
     .map(({ scorePath, score }) => ({
       scoreId: score.scoreId,
+      scoreType: score.scoreType ?? null,
+      status: score.status ?? null,
       projectId: score.projectId,
       archetypeId: score.archetypeId,
       outputType: score.outputType,
       overallScore: score.overallScore,
       meetsBar: score.meetsBar,
+      reviewStatus: score.reviewStatus ?? null,
       updatedAt: score.updatedAt,
       scorePath
     }))
     .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
   const qualityScores = {
     directoryExists: existsSync(path.join(root, ".codex/quality-scores")),
+    count: qualityScoreSummaries.length,
     acceptedActiveCount: qualityScoreSummaries.length,
     latest: qualityScoreSummaries[0] ?? null
+  };
+
+  const lessonMemory = {
+    acceptedCount: acceptedLessons.length,
+    candidateCount: lessonCandidateSummaries.length,
+    latestCandidate: lessonCandidateSummaries[0] ?? null,
+    candidatesLoadedAsTruth: false
   };
 
   const countActive = (relativeDir) => listDirectJson(relativeDir).length;
@@ -298,6 +326,7 @@ function buildWorkerBriefing() {
     ownerPreferences,
     archetypes,
     acceptedLessons,
+    lessonMemory,
     activeApprovals,
     connectorStatus,
     qualityScores,

@@ -335,7 +335,95 @@ test("boot check remains ready when no quality-score records exist", () => withT
   assert.equal(report.status, "ready");
   assert.equal(report.briefing.qualityScores.directoryExists, true);
   assert.equal(report.briefing.qualityScores.acceptedActiveCount, 0);
+  assert.equal(report.briefing.qualityScores.count, 0);
   assert.equal(report.briefing.qualityScores.latest, null);
+}));
+
+test("boot check surfaces quality scores and keeps candidate lessons out of accepted truth", () => withTempRepo((root) => {
+  ensureQualityScoresFoundation(root);
+  writeJson(root, ".codex/quality-scores/quality-score-20260704-crm-plan-quality.json", {
+    "$schema": "../../schemas/quality-score.schema.json",
+    scoreId: "quality-score-20260704-crm-plan-quality",
+    status: "candidate",
+    scoreType: "plan_quality_score",
+    projectId: "project-unregistered-crm",
+    planId: "plan-crm-quality-test",
+    sourcePlanPath: ".codex/plans/plan-crm-quality-test.json",
+    outputType: "crm",
+    archetypeId: "archetype-crm",
+    archetypeFile: ".codex/archetypes/crm-system.json",
+    checklistItemsEvaluated: [
+      "Core entities, statuses, required fields, and transitions are validated."
+    ],
+    dimensions: {
+      completeness: 9,
+      craft: 9,
+      maintainability: 9,
+      ux: 7,
+      security: 10,
+      performance: 7,
+      ownerAcceptance: 8,
+      archetypeFit: 10,
+      costDiscipline: 10
+    },
+    overallScore: 8.8,
+    meetsBar: true,
+    reviewStatus: "review",
+    evidence: [
+      ".codex/plans/plan-crm-quality-test.json"
+    ],
+    generatedBy: "scripts/process-quality-score.mjs",
+    limitations: [
+      "No product output was provided; this is a plan quality only score."
+    ],
+    createdAt: "2026-07-04T08:00:00.000Z",
+    updatedAt: "2026-07-04T08:00:00.000Z"
+  });
+  writeJson(root, ".codex/memory/lessons/lesson-20260704-accepted-quality-loop.json", {
+    "$schema": "../../../schemas/lesson.schema.json",
+    lessonId: "lesson-20260704-accepted-quality-loop",
+    title: "Accepted quality loop example",
+    lesson: "Accepted lessons are loaded from the accepted lesson folder only.",
+    sources: [
+      ".codex/quality-scores/quality-score-20260704-crm-plan-quality.json"
+    ],
+    scope: "agent_shared",
+    confidence: "high",
+    status: "accepted",
+    owner: "owner-gurnoor-bassi",
+    createdAt: "2026-07-04T08:10:00.000Z",
+    updatedAt: "2026-07-04T08:10:00.000Z"
+  });
+  writeJson(root, ".codex/memory/lessons/candidates/lesson-20260704-crm-plan-quality-01.json", {
+    "$schema": "../../../../schemas/lesson.schema.json",
+    lessonId: "lesson-20260704-crm-plan-quality-01",
+    title: "Candidate quality loop reminder",
+    lesson: "Candidate lessons stay out of accepted truth until owner promotion.",
+    sources: [
+      ".codex/quality-scores/quality-score-20260704-crm-plan-quality.json"
+    ],
+    scope: "agent_shared",
+    confidence: "medium",
+    status: "candidate",
+    owner: "owner-gurnoor-bassi",
+    whyThisMatters: "Candidate records are useful for review but not authority.",
+    whenToUse: "Use as review input during future owner promotion.",
+    whenNotToUse: "Do not load as accepted planning truth.",
+    createdAt: "2026-07-04T08:05:00.000Z",
+    updatedAt: "2026-07-04T08:05:00.000Z"
+  });
+
+  const result = runBootCheck(root);
+
+  assert.equal(result.status, 0, result.output);
+  const report = JSON.parse(result.output);
+  assert.equal(report.briefing.qualityScores.count, 1);
+  assert.equal(report.briefing.qualityScores.latest.scoreId, "quality-score-20260704-crm-plan-quality");
+  assert.equal(report.briefing.lessonMemory.acceptedCount, 1);
+  assert.equal(report.briefing.lessonMemory.candidateCount, 2);
+  assert.equal(report.briefing.lessonMemory.candidatesLoadedAsTruth, false);
+  assert.equal(report.briefing.acceptedLessons.length, 1);
+  assert.equal(report.briefing.acceptedLessons[0].lessonId, "lesson-20260704-accepted-quality-loop");
 }));
 
 test("validator fails when an enforced schema uses an unsupported structural keyword", () => withTempRepo((root) => {
