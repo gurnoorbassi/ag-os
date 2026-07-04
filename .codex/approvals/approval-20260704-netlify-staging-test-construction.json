@@ -1,0 +1,76 @@
+{
+  "approvalId": "approval-20260704-netlify-staging-test-construction",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "commandCategory": "deploy_staging",
+  "requestedAction": "Create or connect one Netlify staging site for gurnoorbassi/ag-test-construction-website and deploy staging from main.",
+  "target": "netlify:gurnoorbassi/ag-test-construction-website:staging",
+  "scope": "This approval allows AG OS to use Netlify for exactly one live staging-only deployment milestone for gurnoorbassi/ag-test-construction-website. The allowed live actions are limited to creating or connecting one Netlify staging site for the target repository, deploying staging from main at commit 8c635538d7d5b7bb9918d2ea900c8f934ee98d49, recording the Netlify deployment result, and stopping before production, custom domain, DNS, paid features, credentials in source control, n8n, Lead Gen, AI Receptionist, or Constitution changes.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260704-netlify-staging-test-construction.json"
+  },
+  "approvalRequiredFor": [
+    "connect_netlify",
+    "deploy_staging"
+  ],
+  "approvedActions": [
+    "connect_netlify",
+    "deploy_staging"
+  ],
+  "prohibitedActions": [
+    "deploy_production",
+    "create_production_deploy",
+    "change_domain",
+    "change_dns",
+    "connect_n8n",
+    "use_paid_service",
+    "use_credentials",
+    "add_secrets",
+    "add_tracking_scripts",
+    "wire_forms_to_live_services",
+    "access_production_data",
+    "access_customer_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target branch changes, the target main SHA changes without renewed approval, a custom domain or DNS change is needed, a paid Netlify feature is required, credentials would need to be stored in the repository, validation or boot check fails, target repo checks fail, Netlify reports a configuration or billing blocker, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond one staging-only Netlify deployment.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner approval granted for approval-20260704-netlify-staging-test-construction. Allowed live action: create or connect Netlify staging site for gurnoorbassi/ag-test-construction-website, deploy staging from main only, record result, and stop.",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/73",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/netlify/netlify-plan-20260704-test-construction-staging.json",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "docs/netlify-staging-approval-package.md",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs must pass immediately before execution.",
+      "verified": false
+    }
+  ],
+  "approvalText": "Owner approval granted for approval-20260704-netlify-staging-test-construction. AG OS may execute the approved Netlify staging milestone by creating or connecting a Netlify staging site for gurnoorbassi/ag-test-construction-website and deploying staging from main only using .codex/netlify/netlify-plan-20260704-test-construction-staging.json. Do not create production deployment, touch domain/DNS, add custom domain, use paid Netlify features, add credentials to repo, expose secrets, touch n8n, touch Lead Gen, touch AI Receptionist, change Constitution, edit target repo files, merge any target repo PR, create extra repos, or connect forms/live APIs/tracking.",
+  "approvedAt": "2026-07-04T10:50:47.910Z",
+  "expiresAt": "2026-07-05T10:50:47.913Z",
+  "createdAt": "2026-07-04T10:50:47.910Z",
+  "updatedAt": "2026-07-04T10:50:47.910Z"
+}

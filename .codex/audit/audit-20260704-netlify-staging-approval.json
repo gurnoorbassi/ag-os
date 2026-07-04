@@ -1,0 +1,36 @@
+{
+  "id": "audit-20260704-netlify-staging-approval",
+  "occurredAt": "2026-07-04T10:50:47.910Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for AG OS to create or connect one Netlify staging site and deploy gurnoorbassi/ag-test-construction-website from main.",
+  "scope": "approval-20260704-netlify-staging-test-construction",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-netlify-staging-test-construction"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/73"
+    },
+    {
+      "type": "document",
+      "reference": "docs/netlify-staging-approval-package.md"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/netlify/netlify-plan-20260704-test-construction-staging.json"
+    },
+    {
+      "type": "commit",
+      "reference": "8c635538d7d5b7bb9918d2ea900c8f934ee98d49"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "This audit records owner approval only. The approved future live action is limited to one Netlify staging deployment for gurnoorbassi/ag-test-construction-website from main at 8c635538d7d5b7bb9918d2ea900c8f934ee98d49. No production deploy, custom domain, DNS, paid feature, credential storage, n8n, Lead Gen, AI Receptionist, Constitution change, target repo edit, target PR merge, extra repo, live form, API connection, or tracking action is approved.",
+  "createdAt": "2026-07-04T10:50:47.910Z"
+}
