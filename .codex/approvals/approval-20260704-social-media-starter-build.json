@@ -1,0 +1,92 @@
+{
+  "approvalId": "approval-20260704-social-media-starter-build",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "build",
+  "requestedAction": "Create one branch, scaffold approved Social Media Management System v1 starter files, and open one pull request in gurnoorbassi/ag-social-media-management-system.",
+  "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/social-media-system-v1-starter",
+  "scope": "This approval allows AG OS to use GitHub MCP for exactly one live builder milestone in the existing private repository gurnoorbassi/ag-social-media-management-system. The allowed live actions are limited to verifying the repository exists with main branch, creating branch ag-os/social-media-system-v1-starter, adding or updating README.md, package.json, index.html, src/main.js, src/styles.css, src/data/templates.js, src/lib/safety.js, and src/lib/status.js, and opening exactly one pull request to main. This approval does not allow repository creation, merging, deployments, Netlify, n8n activation, domain or DNS changes, paid actions, credentials, social account connections, posting, scheduling, DMs, comments, analytics API usage, production data, customer data, real client private data, Lead Gen changes, AI Receptionist changes, Constitution changes, additional repositories, additional branches, or additional pull requests.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260704-social-media-starter-build.json"
+  },
+  "approvalRequiredFor": [
+    "create_branch",
+    "create_files",
+    "update_files",
+    "open_pr"
+  ],
+  "approvedActions": [
+    "create_branch",
+    "create_files",
+    "update_files",
+    "open_pr"
+  ],
+  "prohibitedActions": [
+    "create_repo",
+    "create_more_than_one_branch",
+    "open_more_than_one_pr",
+    "merge_pr",
+    "deploy_staging",
+    "deploy_production",
+    "connect_netlify",
+    "connect_n8n",
+    "activate_n8n",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "use_credentials",
+    "add_secrets",
+    "connect_social_account",
+    "post_content",
+    "schedule_content",
+    "send_dm",
+    "send_comment",
+    "use_analytics_api",
+    "access_production_data",
+    "access_customer_data",
+    "use_real_client_private_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target branch changes, more than one pull request is needed, merge or deployment is requested, validation or boot check fails, GitHub reports a conflict, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond creating one branch, writing the approved starter files, and opening one pull request.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner approval granted to resume the Social Media Management System v1 starter build in existing repository gurnoorbassi/ag-social-media-management-system.",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/79",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "docs/social-media-management-system-v1-approval-package.md",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/projects/social-media-management-system-v1.json",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs passed immediately before execution.",
+      "verified": true
+    }
+  ],
+  "approvalText": "Owner approval granted to execute the Social Media Management System v1 starter build in existing private repository gurnoorbassi/ag-social-media-management-system. Allowed live GitHub actions: verify repo exists, verify main exists, create branch ag-os/social-media-system-v1-starter, scaffold approved starter app files, and open one PR to main. Do not merge PR, deploy, connect Netlify, connect social accounts, use credentials, post, schedule, use DMs/comments, use analytics APIs, activate n8n, use paid tools, use real client private data, touch Lead Gen, touch AI Receptionist, or change Constitution.",
+  "approvedAt": "2026-07-04T21:35:09Z",
+  "expiresAt": "2026-07-05T21:35:09Z",
+  "createdAt": "2026-07-04T21:35:09Z",
+  "updatedAt": "2026-07-04T21:35:09Z"
+}
