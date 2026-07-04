@@ -94,8 +94,7 @@
       ],
       "properties": {
         "executesLiveAction": {
-          "type": "boolean",
-          "const": false
+          "type": "boolean"
         },
         "usesCredentials": {
           "type": "boolean",
@@ -118,6 +117,20 @@
           "const": false
         }
       }
+    },
+    "result": {
+      "type": "object"
+    },
+    "prohibitedActionsConfirmedFalse": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "notes": {
+      "type": "string",
+      "minLength": 1
     },
     "createdAt": {
       "type": "string",

@@ -43,6 +43,7 @@ const requiredPaths = [
   ".codex/costs/budget.json",
   ".codex/quality/README.md",
   ".codex/quality/policy.json",
+  ".codex/quality-scores/README.md",
   ".codex/security/README.md",
   ".codex/security/policy.json",
   ".codex/watchdog/README.md",
@@ -255,15 +256,102 @@ const engineRecordDirectories = [
     schemaPath: "schemas/approval-lock.schema.json"
   }
 ];
+const runtimeRecordDirectories = [
+  {
+    name: "cost ledger",
+    recordDir: ".codex/costs",
+    schemaPath: "schemas/cost-ledger.schema.json",
+    includePrefixes: ["cost-ledger-"]
+  },
+  {
+    name: "connector execution",
+    recordDir: ".codex/connectors",
+    schemaPath: "schemas/connector-execution.schema.json",
+    includePrefixes: ["connector-exec-"]
+  },
+  {
+    name: "GitHub execution plan",
+    recordDir: ".codex/github",
+    schemaPath: "schemas/github-execution-plan.schema.json",
+    includePrefixes: ["github-plan-"]
+  },
+  {
+    name: "GitHub MCP execution gate",
+    recordDir: ".codex/github",
+    schemaPath: "schemas/github-mcp-execution-gate.schema.json",
+    includePrefixes: ["github-mcp-gate-"]
+  },
+  {
+    name: "quality score",
+    recordDir: ".codex/quality-scores",
+    schemaPath: "schemas/quality-score.schema.json",
+    includePrefixes: ["quality-score-"]
+  }
+];
 let failures = 0;
+let warnings = 0;
 
 function fail(message) {
   failures += 1;
   console.error(`FAIL ${message}`);
 }
 
+function warn(message) {
+  warnings += 1;
+  console.warn(`WARN ${message}`);
+}
+
 function pass(message) {
   console.log(`PASS ${message}`);
+}
+
+const unsupportedStructuralKeywords = new Set([
+  "$ref",
+  "oneOf",
+  "anyOf",
+  "allOf",
+  "if",
+  "then",
+  "else",
+  "patternProperties",
+  "dependentRequired"
+]);
+
+const enforcedSchemaPaths = new Set([
+  ...templateRecords.map((record) => record.schemaPath),
+  ...schemaValidatedRecords.map((record) => record.schemaPath),
+  ...schemaValidatedRecordDirectories.map((directory) => directory.schemaPath),
+  ...knowledgeRecordDirectories.map((directory) => directory.schemaPath),
+  ...engineRecordDirectories.map((directory) => directory.schemaPath),
+  ...runtimeRecordDirectories.map((directory) => directory.schemaPath)
+]);
+
+function inspectSchemaKeywordSupport(schema, schemaPath, enforced, location = "$") {
+  if (!schema || typeof schema !== "object") {
+    return;
+  }
+
+  if (Array.isArray(schema)) {
+    schema.forEach((item, index) => inspectSchemaKeywordSupport(item, schemaPath, enforced, `${location}[${index}]`));
+    return;
+  }
+
+  for (const [key, value] of Object.entries(schema)) {
+    if (key === "format") {
+      warn(`schema format keyword is present but not enforced: ${schemaPath} at ${location}.format`);
+    }
+
+    if (unsupportedStructuralKeywords.has(key)) {
+      const message = `unsupported schema keyword ${key} in ${enforced ? "enforced" : "orphan"} schema ${schemaPath} at ${location}.${key}`;
+      if (enforced) {
+        fail(message);
+      } else {
+        warn(message);
+      }
+    }
+
+    inspectSchemaKeywordSupport(value, schemaPath, enforced, `${location}.${key}`);
+  }
 }
 
 for (const requiredPath of requiredPaths) {
@@ -297,8 +385,10 @@ if (existsSync(constitutionPath)) {
 
 for (const schemaName of readdirSync(path.join(root, "schemas")).filter((name) => name.endsWith(".json"))) {
   const schemaPath = path.join(root, "schemas", schemaName);
+  const relativeSchemaPath = `schemas/${schemaName}`;
   try {
     const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
+    inspectSchemaKeywordSupport(schema, relativeSchemaPath, enforcedSchemaPaths.has(relativeSchemaPath));
     if (schema.$schema !== "https://json-schema.org/draft/2020-12/schema") {
       fail(`${schemaName} must use JSON Schema draft 2020-12`);
     }
@@ -333,7 +423,18 @@ function isTemplateRecordPath(recordPath) {
 
 function listEngineJsonRecords(recordDirectory) {
   const excludedFiles = new Set(recordDirectory.excludeFiles ?? []);
-  return listJsonRecords(recordDirectory.recordDir).filter((recordPath) => !excludedFiles.has(path.basename(recordPath)));
+  return listJsonRecords(recordDirectory.recordDir).filter((recordPath) => {
+    const name = path.basename(recordPath);
+    if (excludedFiles.has(name)) {
+      return false;
+    }
+
+    if (recordDirectory.includePrefixes?.length > 0) {
+      return recordDirectory.includePrefixes.some((prefix) => name.startsWith(prefix));
+    }
+
+    return true;
+  });
 }
 
 function assertNoPlaceholders(value, location) {
@@ -1050,6 +1151,47 @@ for (const engineRecordDirectory of engineRecordDirectories) {
     }
   } catch (error) {
     fail(`${engineRecordDirectory.name} records could not be validated: ${error.message}`);
+  }
+}
+
+for (const runtimeRecordDirectory of runtimeRecordDirectories) {
+  try {
+    if (!existsSync(path.join(root, runtimeRecordDirectory.recordDir))) {
+      pass(`no ${runtimeRecordDirectory.name} directory present yet: ${runtimeRecordDirectory.recordDir}`);
+      continue;
+    }
+
+    const schema = readJson(runtimeRecordDirectory.schemaPath);
+    const recordPaths = listEngineJsonRecords(runtimeRecordDirectory);
+    let activeRecordCount = 0;
+
+    for (const recordPath of recordPaths) {
+      const record = readJson(recordPath);
+      const failuresBeforeRecord = failures;
+
+      if (isTemplateRecordPath(recordPath)) {
+        validateTemplateObject(record, schema, recordPath);
+        if (failures === failuresBeforeRecord) {
+          pass(`${runtimeRecordDirectory.name} template structurally valid: ${recordPath}`);
+        }
+        continue;
+      }
+
+      activeRecordCount += 1;
+      assertNoPlaceholders(record, recordPath);
+      assertNoFixtureMarkers(record, recordPath);
+      validateSchemaObject(record, schema, recordPath);
+
+      if (failures === failuresBeforeRecord) {
+        pass(`${runtimeRecordDirectory.name} active record structurally valid: ${recordPath}`);
+      }
+    }
+
+    if (activeRecordCount === 0) {
+      pass(`no active ${runtimeRecordDirectory.name} records found in ${runtimeRecordDirectory.recordDir}`);
+    }
+  } catch (error) {
+    fail(`${runtimeRecordDirectory.name} records could not be validated: ${error.message}`);
   }
 }
 
