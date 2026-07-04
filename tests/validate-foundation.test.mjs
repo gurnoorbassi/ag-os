@@ -64,6 +64,15 @@ function ensureQualityScoresFoundation(root) {
   }
 }
 
+function ensureCritiquesFoundation(root) {
+  const directory = path.join(root, ".codex/critiques");
+  mkdirSync(directory, { recursive: true });
+  const readmePath = path.join(directory, "README.md");
+  if (!existsSync(readmePath)) {
+    writeFileSync(readmePath, "# Critiques\n");
+  }
+}
+
 function clearJsonRecords(root, relativeDir, prefix) {
   const directory = path.join(root, relativeDir);
   if (!existsSync(directory)) {
@@ -83,6 +92,10 @@ function clearJsonRecords(root, relativeDir, prefix) {
 
 function clearQualityScoreRecords(root) {
   clearJsonRecords(root, ".codex/quality-scores", "quality-score-");
+}
+
+function clearCritiqueRecords(root) {
+  clearJsonRecords(root, ".codex/critiques", "critique-");
 }
 
 function clearLessonCandidateRecords(root) {
@@ -316,6 +329,76 @@ test("validator accepts a generated plan quality-score record", () => withTempRe
   assert.match(result.output, /quality score active record structurally valid: \.codex\/quality-scores\/quality-score-20260704-crm-plan-quality\.json/);
 }));
 
+test("validator allows an empty critique directory", () => withTempRepo((root) => {
+  ensureCritiquesFoundation(root);
+  clearCritiqueRecords(root);
+
+  const result = runValidator(root);
+
+  assert.equal(result.status, 0, result.output);
+  assert.match(result.output, /no active plan critique records found in \.codex\/critiques/);
+}));
+
+test("validator fails on an invalid plan critique record", () => withTempRepo((root) => {
+  ensureCritiquesFoundation(root);
+  writeJson(root, ".codex/critiques/critique-invalid.json", {
+    "$schema": "../../schemas/plan-critique.schema.json",
+    critiqueId: "critique-invalid"
+  });
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /critique-invalid\.json missing required field: sourcePlanId/);
+}));
+
+test("validator accepts a generated plan critique record", () => withTempRepo((root) => {
+  ensureCritiquesFoundation(root);
+  writeJson(root, ".codex/critiques/critique-20260704-crm-plan-quality.json", {
+    "$schema": "../../schemas/plan-critique.schema.json",
+    critiqueId: "critique-20260704-crm-plan-quality",
+    sourcePlanId: "plan-crm-quality-test",
+    sourcePlanPath: ".codex/plans/plan-crm-quality-test.json",
+    archetypeId: "archetype-crm",
+    archetypeFile: ".codex/archetypes/crm-system.json",
+    reviewerType: "critic_worker",
+    authority: "advisory_only",
+    reviewStatus: "review",
+    blocksBuildMode: true,
+    findings: [
+      {
+        findingId: "finding-assumptions-missing",
+        severity: "medium",
+        category: "assumptions",
+        message: "Plan assumptions are not explicit.",
+        evidence: [
+          ".codex/plans/plan-crm-quality-test.json"
+        ],
+        requiredFix: "Add explicit assumptions before build mode."
+      }
+    ],
+    requiredFixes: [
+      "Add explicit assumptions before build mode."
+    ],
+    optionalImprovements: [
+      "Keep critique as advisory input until owner review."
+    ],
+    evidence: [
+      ".codex/plans/plan-crm-quality-test.json"
+    ],
+    generatedBy: "scripts/process-plan-critique.mjs",
+    limitations: [
+      "Critic output is advisory and cannot approve live actions."
+    ],
+    createdAt: "2026-07-04T09:00:00.000Z"
+  });
+
+  const result = runValidator(root);
+
+  assert.equal(result.status, 0, result.output);
+  assert.match(result.output, /plan critique active record structurally valid: \.codex\/critiques\/critique-20260704-crm-plan-quality\.json/);
+}));
+
 test("validator accepts a generated lesson candidate with candidate-only metadata", () => withTempRepo((root) => {
   writeJson(root, ".codex/memory/lessons/candidates/lesson-20260704-crm-plan-quality-01.json", {
     "$schema": "../../../../schemas/lesson.schema.json",
@@ -453,6 +536,59 @@ test("boot check surfaces quality scores and keeps candidate lessons out of acce
   assert.equal(report.briefing.lessonMemory.candidatesLoadedAsTruth, false);
   assert.equal(report.briefing.acceptedLessons.length, 1);
   assert.equal(report.briefing.acceptedLessons[0].lessonId, "lesson-20260704-accepted-quality-loop");
+}));
+
+test("boot check surfaces critique summaries without treating them as approval", () => withTempRepo((root) => {
+  ensureCritiquesFoundation(root);
+  clearCritiqueRecords(root);
+  writeJson(root, ".codex/critiques/critique-20260704-crm-plan-quality.json", {
+    "$schema": "../../schemas/plan-critique.schema.json",
+    critiqueId: "critique-20260704-crm-plan-quality",
+    sourcePlanId: "plan-crm-quality-test",
+    sourcePlanPath: ".codex/plans/plan-crm-quality-test.json",
+    archetypeId: "archetype-crm",
+    archetypeFile: ".codex/archetypes/crm-system.json",
+    reviewerType: "critic_worker",
+    authority: "advisory_only",
+    reviewStatus: "fail",
+    blocksBuildMode: true,
+    findings: [
+      {
+        findingId: "finding-gates-missing",
+        severity: "high",
+        category: "approval_gates",
+        message: "Plan is missing mandatory approval gates.",
+        evidence: [
+          ".codex/plans/plan-crm-quality-test.json"
+        ],
+        requiredFix: "Add mandatory approval gates."
+      }
+    ],
+    requiredFixes: [
+      "Add mandatory approval gates."
+    ],
+    optionalImprovements: [
+      "Re-run the critic after planner revision."
+    ],
+    evidence: [
+      ".codex/plans/plan-crm-quality-test.json"
+    ],
+    generatedBy: "scripts/process-plan-critique.mjs",
+    limitations: [
+      "Critic output is advisory and cannot approve live actions."
+    ],
+    createdAt: "2026-07-04T09:00:00.000Z"
+  });
+
+  const result = runBootCheck(root);
+
+  assert.equal(result.status, 0, result.output);
+  const report = JSON.parse(result.output);
+  assert.equal(report.briefing.critiques.count, 1);
+  assert.equal(report.briefing.critiques.latest.critiqueId, "critique-20260704-crm-plan-quality");
+  assert.equal(report.briefing.critiques.reviewRequiredCount, 1);
+  assert.equal(report.briefing.critiques.failedCount, 1);
+  assert.equal(report.briefing.critiques.critiqueIsApproval, false);
 }));
 
 test("validator fails when an enforced schema uses an unsupported structural keyword", () => withTempRepo((root) => {

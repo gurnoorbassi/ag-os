@@ -147,6 +147,11 @@ function listQualityScorePaths() {
     .filter((scorePath) => path.basename(scorePath).startsWith("quality-score-"));
 }
 
+function listCritiquePaths() {
+  return listDirectJson(".codex/critiques")
+    .filter((critiquePath) => path.basename(critiquePath).startsWith("critique-"));
+}
+
 function listLessonCandidatePaths() {
   return listDirectJson(".codex/memory/lessons/candidates")
     .filter((lessonPath) => path.basename(lessonPath).startsWith("lesson-"));
@@ -163,6 +168,20 @@ function checkQualityScores() {
     directoryExists
       ? `Quality score directory exists with ${scoreCount} source-controlled score record(s).`
       : "Quality score directory is missing."
+  );
+}
+
+function checkCritiques() {
+  const critiqueDir = ".codex/critiques";
+  const directoryExists = existsSync(path.join(root, critiqueDir));
+  const critiqueCount = directoryExists ? listCritiquePaths().length : 0;
+
+  addCheck(
+    "plan-critiques",
+    directoryExists ? "pass" : "failed",
+    directoryExists
+      ? `Critique directory exists with ${critiqueCount} source-controlled critique record(s).`
+      : "Critique directory is missing."
   );
 }
 
@@ -231,6 +250,7 @@ checkOwnerRecord();
 checkValidationStatus();
 checkCostBudget();
 checkQualityScores();
+checkCritiques();
 checkActiveIncidents();
 checkActiveApprovals();
 checkStaleLocks();
@@ -302,6 +322,33 @@ function buildWorkerBriefing() {
     latest: qualityScoreSummaries[0] ?? null
   };
 
+  const critiqueSummaries = listCritiquePaths()
+    .map((critiquePath) => ({ critiquePath, critique: readJson(critiquePath) }))
+    .map(({ critiquePath, critique }) => ({
+      critiqueId: critique.critiqueId,
+      sourcePlanId: critique.sourcePlanId,
+      archetypeId: critique.archetypeId,
+      reviewStatus: critique.reviewStatus,
+      blocksBuildMode: critique.blocksBuildMode,
+      findingCount: critique.findings?.length ?? 0,
+      requiredFixCount: critique.requiredFixes?.length ?? 0,
+      createdAt: critique.createdAt,
+      critiquePath
+    }))
+    .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
+  const reviewRequiredCritiques = critiqueSummaries.filter((critique) => critique.blocksBuildMode || critique.reviewStatus === "review" || critique.reviewStatus === "fail");
+  const failedCritiques = critiqueSummaries.filter((critique) => critique.reviewStatus === "fail");
+  const critiques = {
+    directoryExists: existsSync(path.join(root, ".codex/critiques")),
+    count: critiqueSummaries.length,
+    latest: critiqueSummaries[0] ?? null,
+    reviewRequiredCount: reviewRequiredCritiques.length,
+    failedCount: failedCritiques.length,
+    reviewRequired: reviewRequiredCritiques,
+    failed: failedCritiques,
+    critiqueIsApproval: false
+  };
+
   const lessonMemory = {
     acceptedCount: acceptedLessons.length,
     candidateCount: lessonCandidateSummaries.length,
@@ -330,6 +377,7 @@ function buildWorkerBriefing() {
     activeApprovals,
     connectorStatus,
     qualityScores,
+    critiques,
     blockers: checks.filter((check) => check.required && check.status !== "pass").map((check) => check.checkId),
     engineStatus
   };
