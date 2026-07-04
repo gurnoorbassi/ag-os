@@ -1,0 +1,28 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260704-runtime-quality-loop-crm-20260704-02",
+  "title": "Preserve recommendations from quality-score-20260704-runtime-quality-loop-crm-20260704",
+  "lesson": "Quality score recommendations should become candidate planning reminders, not automatic memory truth. First recommendation: Improve performance evidence before promotion beyond plan-only work.",
+  "sources": [
+    ".codex/quality-scores/quality-score-20260704-runtime-quality-loop-crm-20260704.json",
+    ".codex/plans/plan-runtime-quality-loop-crm-20260704.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "medium",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-unregistered-crm",
+  "appliesTo": [
+    "archetype-crm",
+    "plan_quality_score",
+    "quality-score-lesson-loop"
+  ],
+  "sourceScoreId": "quality-score-20260704-runtime-quality-loop-crm-20260704",
+  "generatedBy": "scripts/process-lesson-candidates.mjs",
+  "whyThisMatters": "Recommendations are useful only when source-linked and owner-reviewable.",
+  "whenToUse": "Use when a source-controlled quality score includes concrete improvement recommendations.",
+  "whenNotToUse": "Do not use when the recommendation is vague, unsourced, sensitive, or conflicts with AG OS safety gates.",
+  "notes": "Candidate only. Not accepted truth until owner-reviewed and promoted through the memory learning policy.",
+  "createdAt": "2026-07-04T08:26:00.000Z",
+  "updatedAt": "2026-07-04T08:26:00.000Z"
+}
