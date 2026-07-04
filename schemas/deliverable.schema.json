@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/deliverable.schema.json",
+  "title": "AG Digitalz OS Deliverable",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "deliverableId",
+    "engagementId",
+    "projectId",
+    "deliverableType",
+    "status",
+    "location",
+    "reviewStatus",
+    "qualityScoreRef",
+    "approvalRequired",
+    "ownerDecisionNeeded",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "template": { "type": "boolean", "const": true },
+    "deliverableId": { "type": "string", "pattern": "^deliverable-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "engagementId": { "type": "string", "pattern": "^engagement-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "projectId": { "type": "string", "pattern": "^project-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "deliverableType": {
+      "type": "string",
+      "enum": [
+        "repo",
+        "PR",
+        "staging_site",
+        "n8n_draft",
+        "dashboard",
+        "content_calendar",
+        "post_package",
+        "weekly_report",
+        "client_config",
+        "approval_record"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planned", "draft", "ready_for_review", "changes_requested", "approved", "delivered", "blocked", "archived"]
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "link"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "link": { "type": "string", "minLength": 1 }
+      }
+    },
+    "reviewStatus": {
+      "type": "string",
+      "enum": ["not_reviewed", "review", "pass", "fail", "blocked"]
+    },
+    "qualityScoreRef": { "type": "string", "minLength": 1 },
+    "approvalRequired": { "type": "boolean" },
+    "ownerDecisionNeeded": { "type": "boolean" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

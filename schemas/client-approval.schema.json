@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/client-approval.schema.json",
+  "title": "AG Digitalz OS Client Approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "approvalId",
+    "clientId",
+    "engagementId",
+    "itemType",
+    "itemRef",
+    "decisionNeeded",
+    "status",
+    "requestedAt",
+    "decidedAt",
+    "notes",
+    "blockerLevel"
+  ],
+  "properties": {
+    "template": { "type": "boolean", "const": true },
+    "approvalId": { "type": "string", "pattern": "^client-approval-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "clientId": { "type": "string", "pattern": "^client-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "engagementId": { "type": "string", "pattern": "^engagement-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "itemType": {
+      "type": "string",
+      "enum": ["deliverable", "access_request", "content_calendar", "post_package", "weekly_report", "client_config", "other"]
+    },
+    "itemRef": { "type": "string", "minLength": 1 },
+    "decisionNeeded": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "approved", "rejected", "changes_requested", "expired", "revoked"]
+    },
+    "requestedAt": { "type": "string", "format": "date-time" },
+    "decidedAt": { "type": "string", "minLength": 1 },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "blockerLevel": { "type": "string", "enum": ["none", "low", "medium", "high", "critical"] }
+  }
+}

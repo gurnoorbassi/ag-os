@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/engagement.schema.json",
+  "title": "AG Digitalz OS Engagement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "engagementId",
+    "clientId",
+    "projectId",
+    "systemType",
+    "serviceScope",
+    "currentPhase",
+    "paymentStatus",
+    "startDate",
+    "targetMilestones",
+    "approvalOwner",
+    "accessNeeded",
+    "blockers",
+    "risks",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "template": { "type": "boolean", "const": true },
+    "engagementId": { "type": "string", "pattern": "^engagement-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "clientId": { "type": "string", "pattern": "^client-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "projectId": { "type": "string", "pattern": "^project-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "systemType": { "type": "string", "minLength": 1 },
+    "serviceScope": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "currentPhase": {
+      "type": "string",
+      "enum": [
+        "discovery",
+        "package_prepared",
+        "draft_build",
+        "staging",
+        "client_review",
+        "approved_live_later",
+        "paused",
+        "completed"
+      ]
+    },
+    "paymentStatus": { "type": "string", "minLength": 1 },
+    "startDate": { "type": "string", "minLength": 1 },
+    "targetMilestones": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "approvalOwner": { "type": "string", "minLength": 1 },
+    "accessNeeded": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "blockers": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "risks": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

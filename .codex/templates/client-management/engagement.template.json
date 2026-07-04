@@ -1,0 +1,28 @@
+{
+  "template": true,
+  "engagementId": "REQUIRED_ENGAGEMENT_ID",
+  "clientId": "REQUIRED_CLIENT_ID",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "systemType": "REQUIRED_SYSTEM_TYPE",
+  "serviceScope": [
+    "REQUIRED_SERVICE_SCOPE"
+  ],
+  "currentPhase": "discovery",
+  "paymentStatus": "REQUIRED_PAYMENT_STATUS",
+  "startDate": "REQUIRED_START_DATE",
+  "targetMilestones": [
+    "REQUIRED_TARGET_MILESTONE"
+  ],
+  "approvalOwner": "REQUIRED_APPROVAL_OWNER",
+  "accessNeeded": [
+    "REQUIRED_ACCESS_NEEDED"
+  ],
+  "blockers": [
+    "REQUIRED_BLOCKER"
+  ],
+  "risks": [
+    "REQUIRED_RISK"
+  ],
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

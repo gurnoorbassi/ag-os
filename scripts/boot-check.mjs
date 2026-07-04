@@ -380,6 +380,17 @@ function buildWorkerBriefing() {
     bootRuns: countActive(".codex/boot")
   };
 
+  const clientApprovalRecords = listDirectJson(".codex/client-management/approvals")
+    .map((approvalPath) => readJson(approvalPath));
+  const clientManagement = {
+    directoryExists: existsSync(path.join(root, ".codex/client-management")),
+    clientCount: countActive(".codex/client-management/clients"),
+    engagementCount: countActive(".codex/client-management/engagements"),
+    deliverableCount: countActive(".codex/client-management/deliverables"),
+    accessRequestCount: countActive(".codex/client-management/access-requests"),
+    pendingApprovalCount: clientApprovalRecords.filter((approval) => approval.status === "pending").length
+  };
+
   return {
     constitutionStatus: checks.find((check) => check.checkId === "constitution-status")?.status ?? "unknown",
     repoHealth: checks.every((check) => !check.required || check.status === "pass") ? "healthy" : "blocked",
@@ -394,6 +405,7 @@ function buildWorkerBriefing() {
     connectorStatus,
     qualityScores,
     critiques,
+    clientManagement,
     blockers: checks.filter((check) => check.required && check.status !== "pass").map((check) => check.checkId),
     engineStatus
   };

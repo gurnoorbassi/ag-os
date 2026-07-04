@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-digitalz.local/schemas/client.schema.json",
+  "title": "AG Digitalz OS Client",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "clientId",
+    "clientName",
+    "status",
+    "contactOwner",
+    "brandNames",
+    "industry",
+    "systemsPurchased",
+    "notes",
+    "privacyLevel",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "template": { "type": "boolean", "const": true },
+    "clientId": { "type": "string", "pattern": "^client-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "clientName": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": [
+        "prospect",
+        "onboarding",
+        "active_draft",
+        "active_staging",
+        "active_live",
+        "paused",
+        "archived"
+      ]
+    },
+    "contactOwner": { "type": "string", "minLength": 1 },
+    "brandNames": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "industry": { "type": "string", "minLength": 1 },
+    "systemsPurchased": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "privacyLevel": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted", "customer_data"]
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}
