@@ -1,0 +1,83 @@
+{
+  "netlifyPlanId": "netlify-plan-20260704-test-construction-staging",
+  "status": "planned",
+  "mode": "approval_package_only",
+  "connectorId": "connector-netlify-mcp",
+  "projectId": "project-unregistered-construction-website",
+  "targetRepository": "gurnoorbassi/ag-test-construction-website",
+  "targetBranch": "main",
+  "targetMainSha": "8c635538d7d5b7bb9918d2ea900c8f934ee98d49",
+  "targetPullRequest": "https://github.com/gurnoorbassi/ag-test-construction-website/pull/1",
+  "riskLevel": "R4",
+  "proposedAction": "Create or connect one Netlify staging site for the test construction website and deploy from main.",
+  "stagingScope": {
+    "siteName": "REQUIRED_OWNER_APPROVED_NETLIFY_STAGING_SITE_NAME",
+    "productionDeployAllowed": false,
+    "customDomainAllowed": false,
+    "dnsChangeAllowed": false,
+    "paidFeaturesAllowed": false,
+    "netlifyFormsAllowed": false,
+    "analyticsAllowed": false,
+    "deployHooksAllowed": false
+  },
+  "buildSettings": {
+    "baseDirectory": ".",
+    "buildCommand": "not_configured_static_site",
+    "publishDirectory": ".",
+    "nodeVersion": "not_required",
+    "environmentVariablesRequired": []
+  },
+  "preExecutionChecks": [
+    "Confirm active approval lock approval-20260704-netlify-staging-test-construction exists and is unexpired.",
+    "Run npm.cmd run validate in AG OS.",
+    "Run npm.cmd run boot:check in AG OS.",
+    "Run node --test tests/*.test.mjs in AG OS.",
+    "Confirm target repository is gurnoorbassi/ag-test-construction-website.",
+    "Confirm target branch is main.",
+    "Confirm target main SHA is 8c635538d7d5b7bb9918d2ea900c8f934ee98d49 or stop for renewed approval.",
+    "Confirm no environment variables are required for this static staging site.",
+    "Confirm Netlify action is staging-only and no custom domain or DNS change is requested."
+  ],
+  "validationPlan": [
+    "Use target repo static files from main.",
+    "Use Netlify publish directory root because index.html is at repository root.",
+    "Do not add netlify.toml unless a later PR explicitly approves repository changes.",
+    "Do not add deploy hooks, tracking scripts, analytics, forms, or environment variables.",
+    "After any future approved deploy, record Netlify deploy result, URL, deploy id if available, and cost ledger entry in AG OS."
+  ],
+  "costEstimate": {
+    "estimatedTaskCostUsd": 0,
+    "paidToolsAllowed": false,
+    "budgetStatus": "within_limit",
+    "stopIfPaidFeatureRequired": true
+  },
+  "rollbackPlan": [
+    "If the staging deploy is created successfully but should not remain public, stop and ask the owner before deleting or disabling the Netlify site unless immediate exposure risk exists.",
+    "If the wrong repository, branch, or commit is deployed, stop all further action, record an incident/audit event, and do not redeploy until owner approval.",
+    "If a custom domain, DNS, paid feature, credential, or production deploy becomes necessary, stop before action.",
+    "If rollback is approved, use Netlify rollback or site disable/delete path appropriate to the actual result and record the action in AG OS."
+  ],
+  "stopConditions": [
+    "No active approval lock for this exact Netlify staging action.",
+    "Target repository, branch, or main SHA differs from this plan.",
+    "Netlify asks for a paid feature, custom domain, production deploy, DNS change, or credential storage in source control.",
+    "Environment variables become required.",
+    "Deploy would expose customer data, production data, tracking, analytics, live forms, or private endpoints.",
+    "Validation, boot check, runtime tests, or target repo checks fail.",
+    "Any action would touch n8n, Lead Gen, AI Receptionist, or the Constitution."
+  ],
+  "safety": {
+    "executesNetlifyAction": false,
+    "createsSite": false,
+    "deploysStaging": false,
+    "deploysProduction": false,
+    "changesDomain": false,
+    "changesDns": false,
+    "usesPaidAction": false,
+    "usesCredentialsInRepo": false,
+    "touchesProductionData": false,
+    "touchesCustomerData": false
+  },
+  "createdAt": "2026-07-04T00:00:00Z",
+  "updatedAt": "2026-07-04T00:00:00Z"
+}

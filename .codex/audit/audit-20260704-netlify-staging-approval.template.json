@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260704-netlify-staging-approval",
+  "occurredAt": "REQUIRED_OCCURRED_AT",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for AG OS to create or connect one Netlify staging site and deploy gurnoorbassi/ag-test-construction-website from main. This audit event does not execute the deployment.",
+  "scope": "approval-20260704-netlify-staging-test-construction",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-netlify-staging-test-construction"
+    },
+    {
+      "type": "document",
+      "reference": "docs/netlify-staging-approval-package.md"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/netlify/netlify-plan-20260704-test-construction-staging.json"
+    },
+    {
+      "type": "commit",
+      "reference": "8c635538d7d5b7bb9918d2ea900c8f934ee98d49"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Future live execution remains blocked until the approval lock is converted from template to active approved record with exact owner approval text, approval timestamp, expiration, current validation evidence, and the same staging-only Netlify scope. This template does not authorize deployment, production hosting, custom domain, DNS, paid feature, credential storage, n8n, Lead Gen, AI Receptionist, or Constitution changes.",
+  "createdAt": "REQUIRED_CREATED_AT"
+}

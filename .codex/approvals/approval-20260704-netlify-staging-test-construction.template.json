@@ -1,0 +1,71 @@
+{
+  "approvalId": "approval-20260704-netlify-staging-test-construction",
+  "status": "revoked",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "REQUIRED_APPROVER_ID",
+  "commandCategory": "deploy_staging",
+  "requestedAction": "Create or connect one Netlify staging site for gurnoorbassi/ag-test-construction-website and deploy staging from main.",
+  "target": "netlify:REQUIRED_OWNER_APPROVED_NETLIFY_STAGING_SITE_NAME",
+  "scope": "This approval package, if converted into an active approved lock, allows AG OS to use Netlify for exactly one future staging-only deployment milestone for gurnoorbassi/ag-test-construction-website. The allowed future actions are limited to creating or connecting one Netlify staging site, deploying from main at commit 8c635538d7d5b7bb9918d2ea900c8f934ee98d49, recording the Netlify deployment result, and stopping before production, custom domain, DNS, paid features, credentials in source control, n8n, Lead Gen, AI Receptionist, or Constitution changes.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/budget.json"
+  },
+  "approvalRequiredFor": [
+    "connect_netlify",
+    "deploy_staging"
+  ],
+  "approvedActions": [
+    "connect_netlify",
+    "deploy_staging"
+  ],
+  "prohibitedActions": [
+    "deploy_production",
+    "create_production_deploy",
+    "change_domain",
+    "change_dns",
+    "connect_n8n",
+    "use_paid_service",
+    "use_credentials",
+    "add_secrets",
+    "add_tracking_scripts",
+    "wire_forms_to_live_services",
+    "access_production_data",
+    "access_customer_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target branch changes, the target main SHA changes without renewed approval, a custom domain or DNS change is needed, a paid Netlify feature is required, credentials would need to be stored in the repository, validation or boot check fails, target repo checks fail, Netlify reports a configuration or billing blocker, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond one staging-only Netlify deployment.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner instruction requested an approval package only for Netlify staging deployment of gurnoorbassi/ag-test-construction-website.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/netlify/netlify-plan-20260704-test-construction-staging.json",
+      "verified": false
+    },
+    {
+      "type": "other",
+      "reference": "docs/netlify-staging-approval-package.md",
+      "verified": false
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs must pass immediately before execution.",
+      "verified": false
+    }
+  ],
+  "approvalText": "REQUIRED_EXACT_OWNER_APPROVAL_TEXT",
+  "approvedAt": "REQUIRED_APPROVED_AT",
+  "expiresAt": "REQUIRED_EXPIRES_AT",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
