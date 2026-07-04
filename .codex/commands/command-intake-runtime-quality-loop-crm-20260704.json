@@ -1,0 +1,37 @@
+{
+  "commandIntakeId": "command-intake-runtime-quality-loop-crm-20260704",
+  "status": "classified",
+  "rawCommand": "Make me a CRM for a local service business.",
+  "normalizedCommand": "Create a plan-only crm plan.",
+  "commandCategory": "plan_only",
+  "projectId": "project-unregistered-crm",
+  "riskLevel": "R1",
+  "classification": {
+    "requiresPlan": true,
+    "requiresApproval": false,
+    "requiresLiveService": false,
+    "requiresDeployment": false,
+    "requiresDomainChange": false,
+    "requiresPaidAction": false,
+    "requiresProductionData": false
+  },
+  "productContext": {
+    "productType": "crm",
+    "archetypeId": "archetype-crm",
+    "archetypeRegistered": true,
+    "archetypeGap": null
+  },
+  "plannedOutput": "Plan-only command intake record for crm.",
+  "nextRecord": {
+    "jobId": "job-runtime-quality-loop-crm-20260704",
+    "planId": "plan-runtime-quality-loop-crm-20260704"
+  },
+  "safety": {
+    "executesCommand": false,
+    "createsLiveSideEffect": false,
+    "usesCredentials": false,
+    "callsConnector": false
+  },
+  "createdAt": "2026-07-04T08:20:00.000Z",
+  "updatedAt": "2026-07-04T08:20:00.000Z"
+}
