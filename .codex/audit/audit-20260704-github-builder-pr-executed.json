@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260704-github-builder-pr-executed",
+  "occurredAt": "2026-07-04T09:01:53.688Z",
+  "actor": "ag-os-runtime",
+  "eventType": "registry_change",
+  "summary": "Executed the first approved GitHub builder milestone by creating one branch, adding approved starter construction website files, and opening one pull request in gurnoorbassi/ag-test-construction-website.",
+  "scope": "live_github_builder_pr_ag_test_construction_website",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-github-builder-pr"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-20260704-github-builder-pr-live-result"
+    },
+    {
+      "type": "other",
+      "reference": "cost-ledger-20260704-github-builder-pr"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-test-construction-website/pull/1"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "The action stayed inside the approved target repository and branch. The target PR was opened but not merged. No deployment, Netlify, n8n, domain or DNS change, paid action, credential, production data, customer data, tracking script, wired live form, Lead Gen change, AI Receptionist change, Constitution change, additional repository, additional branch, or additional pull request occurred.",
+  "createdAt": "2026-07-04T09:01:53.688Z"
+}
