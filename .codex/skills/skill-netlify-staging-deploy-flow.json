@@ -1,0 +1,41 @@
+{
+  "$schema": "../../schemas/skill.schema.json",
+  "recordType": "skill",
+  "id": "skill-netlify-staging-deploy-flow",
+  "name": "Netlify staging deploy on staging-only site",
+  "status": "draft",
+  "category": "delivery",
+  "appliesTo": ["any"],
+  "procedure": [
+    "Confirm the deploy targets the dedicated staging-only Netlify site; production sites, custom domains, and DNS are out of scope.",
+    "Confirm a deploy plan record exists naming the site, source branch or commit, and expected artifact.",
+    "Confirm a valid, unexpired approval lock covers this deploy per capability-netlify-staging-deploy-approved.",
+    "Deploy the built artifact to the staging site through the gated connector.",
+    "Verify the staging URL serves the expected build and record the URL, deploy id, and source SHA as staging proof.",
+    "Record deploy cost against the per-task cap."
+  ],
+  "qualityChecklist": [
+    "Deploy record names the staging site and cites the approval lock.",
+    "Staging URL, deploy id, and source SHA are recorded as proof.",
+    "No paid Netlify feature was enabled.",
+    "No domain or DNS setting was touched.",
+    "Owner can open the staging URL and see the reviewed build."
+  ],
+  "commonFailures": [
+    "Deploying an unreviewed SHA; staging must serve the build the quality score covered.",
+    "Recording only the staging URL without the deploy id and SHA, which breaks the proof chain.",
+    "Assuming a staging approval extends to a second deploy; each deploy needs its own valid lock unless the lock scope says otherwise."
+  ],
+  "evidence": {
+    "proofRecords": [
+      ".codex/netlify/netlify-plan-20260704-test-construction-staging.json"
+    ],
+    "timesApplied": 1,
+    "lastAppliedDate": "2026-07-04"
+  },
+  "riskNotes": "Gated connector execution on a staging-only site. Production deploys, domains, DNS, and paid features remain blocked capabilities. This skill never grants deploy permission.",
+  "owner": "gurnoorbassi",
+  "version": 1,
+  "createdAt": "2026-07-04T00:00:00Z",
+  "updatedAt": "2026-07-04T00:00:00Z"
+}

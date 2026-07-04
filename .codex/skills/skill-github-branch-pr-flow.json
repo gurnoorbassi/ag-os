@@ -1,0 +1,45 @@
+{
+  "$schema": "../../schemas/skill.schema.json",
+  "recordType": "skill",
+  "id": "skill-github-branch-pr-flow",
+  "name": "GitHub branch and PR creation under approval gate",
+  "status": "draft",
+  "category": "build",
+  "appliesTo": ["any"],
+  "procedure": [
+    "Confirm a GitHub execution plan record exists naming the repository, branch, files, and PR to be created.",
+    "Confirm the GitHub MCP execution gate record passes and a valid, unexpired approval lock covers this exact scope.",
+    "Create the branch under the worker's own prefix only (codex/* for Codex, fable/* for Fable).",
+    "Create or update only the files named in the execution plan; anything else is out of scope.",
+    "Open the PR against the default branch with a description linking the plan and intake records.",
+    "Record the resulting PR URL and commit SHAs back into the execution records as evidence."
+  ],
+  "qualityChecklist": [
+    "Approval lock id is cited in the execution record and was valid at execution time.",
+    "Branch name matches the worker prefix rule.",
+    "File set in the PR exactly matches the execution plan.",
+    "PR body links back to the plan and command intake records.",
+    "Evidence (PR URL, SHAs) is recorded before the session ends."
+  ],
+  "commonFailures": [
+    "Executing with an expired approval lock; the gate check must run at execution time, not planning time.",
+    "Scope drift: touching files not named in the execution plan invalidates the approval.",
+    "Leaving the PR URL only in chat, which loses the evidence trail."
+  ],
+  "evidence": {
+    "sourceLessons": [
+      ".codex/memory/lessons/candidates/lesson-20260703-github-repo-creation-gates.json"
+    ],
+    "proofRecords": [
+      ".codex/github/github-plan-runtime-github-construction-website-repo-20260703.json",
+      ".codex/github/github-mcp-gate-runtime-github-construction-website-repo-20260703.json"
+    ],
+    "timesApplied": 1,
+    "lastAppliedDate": "2026-07-03"
+  },
+  "riskNotes": "Gated connector execution. Requires a passing GitHub MCP execution gate and a valid scoped approval lock per capability-github-branch-pr-creation-approved. This skill describes how, never whether.",
+  "owner": "gurnoorbassi",
+  "version": 1,
+  "createdAt": "2026-07-04T00:00:00Z",
+  "updatedAt": "2026-07-04T00:00:00Z"
+}
