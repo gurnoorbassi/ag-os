@@ -196,6 +196,32 @@ test("validator fails on an invalid GitHub MCP execution gate runtime record", (
   assert.match(result.output, /github-mcp-gate-runtime-github-construction-website-repo-20260703\.json\.mode must be "execution_gate_only"/);
 }));
 
+test("validator fails when an enforced schema uses an unsupported structural keyword", () => withTempRepo((root) => {
+  const schemaPath = "schemas/cost-ledger.schema.json";
+  const schema = readJson(root, schemaPath);
+  schema.properties.costLedgerId.$ref = "#/$defs/costLedgerId";
+  writeJson(root, schemaPath, schema);
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /unsupported schema keyword \$ref in enforced schema schemas\/cost-ledger\.schema\.json/);
+}));
+
+test("validator warns when format keywords are present but not enforced", () => withTempRepo((root) => {
+  const result = runValidator(root);
+
+  assert.equal(result.status, 0, result.output);
+  assert.match(result.output, /WARN schema format keyword is present but not enforced/);
+}));
+
+test("validator reports unsupported keywords in orphan schemas without failing", () => withTempRepo((root) => {
+  const result = runValidator(root);
+
+  assert.equal(result.status, 0, result.output);
+  assert.match(result.output, /WARN unsupported schema keyword \$ref in orphan schema schemas\/state-management\.schema\.json/);
+}));
+
 test("validator still succeeds on the real repo after invalid temp fixtures are cleaned up", () => {
   const result = runValidator(repoRoot);
 

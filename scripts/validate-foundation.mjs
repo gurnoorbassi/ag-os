@@ -282,14 +282,69 @@ const runtimeRecordDirectories = [
   }
 ];
 let failures = 0;
+let warnings = 0;
 
 function fail(message) {
   failures += 1;
   console.error(`FAIL ${message}`);
 }
 
+function warn(message) {
+  warnings += 1;
+  console.warn(`WARN ${message}`);
+}
+
 function pass(message) {
   console.log(`PASS ${message}`);
+}
+
+const unsupportedStructuralKeywords = new Set([
+  "$ref",
+  "oneOf",
+  "anyOf",
+  "allOf",
+  "if",
+  "then",
+  "else",
+  "patternProperties",
+  "dependentRequired"
+]);
+
+const enforcedSchemaPaths = new Set([
+  ...templateRecords.map((record) => record.schemaPath),
+  ...schemaValidatedRecords.map((record) => record.schemaPath),
+  ...schemaValidatedRecordDirectories.map((directory) => directory.schemaPath),
+  ...knowledgeRecordDirectories.map((directory) => directory.schemaPath),
+  ...engineRecordDirectories.map((directory) => directory.schemaPath),
+  ...runtimeRecordDirectories.map((directory) => directory.schemaPath)
+]);
+
+function inspectSchemaKeywordSupport(schema, schemaPath, enforced, location = "$") {
+  if (!schema || typeof schema !== "object") {
+    return;
+  }
+
+  if (Array.isArray(schema)) {
+    schema.forEach((item, index) => inspectSchemaKeywordSupport(item, schemaPath, enforced, `${location}[${index}]`));
+    return;
+  }
+
+  for (const [key, value] of Object.entries(schema)) {
+    if (key === "format") {
+      warn(`schema format keyword is present but not enforced: ${schemaPath} at ${location}.format`);
+    }
+
+    if (unsupportedStructuralKeywords.has(key)) {
+      const message = `unsupported schema keyword ${key} in ${enforced ? "enforced" : "orphan"} schema ${schemaPath} at ${location}.${key}`;
+      if (enforced) {
+        fail(message);
+      } else {
+        warn(message);
+      }
+    }
+
+    inspectSchemaKeywordSupport(value, schemaPath, enforced, `${location}.${key}`);
+  }
 }
 
 for (const requiredPath of requiredPaths) {
@@ -323,8 +378,10 @@ if (existsSync(constitutionPath)) {
 
 for (const schemaName of readdirSync(path.join(root, "schemas")).filter((name) => name.endsWith(".json"))) {
   const schemaPath = path.join(root, "schemas", schemaName);
+  const relativeSchemaPath = `schemas/${schemaName}`;
   try {
     const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
+    inspectSchemaKeywordSupport(schema, relativeSchemaPath, enforcedSchemaPaths.has(relativeSchemaPath));
     if (schema.$schema !== "https://json-schema.org/draft/2020-12/schema") {
       fail(`${schemaName} must use JSON Schema draft 2020-12`);
     }
