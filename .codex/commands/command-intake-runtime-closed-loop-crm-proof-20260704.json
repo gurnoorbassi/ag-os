@@ -1,0 +1,61 @@
+{
+  "understanding": {
+    "producedBy": "codex-closed-loop-proof-run",
+    "inferredBusinessObjective": "Plan a CRM for a local service business using the CRM product archetype.",
+    "productArchetype": "archetype-crm",
+    "targetUser": "Owner or operator of a local service business.",
+    "successCriteria": [
+      "Plan cites archetype-crm and uses CRM phases, modules, quality checklist, gates, and stop conditions.",
+      "Plan remains offline and plan-only with zero cost.",
+      "Plan includes explicit approval gates before any live service, credential, deployment, paid action, or production/customer data handling."
+    ],
+    "criticalUnknowns": [
+      "Which local service niche and sales workflow should be modeled first?"
+    ],
+    "confidence": "high",
+    "assumptions": [
+      "This run is proof of the offline AG OS intelligence loop only.",
+      "No real customer, production, credential, domain, or connector payload is available or allowed.",
+      "The CRM should start with local/repository records and no live integrations."
+    ],
+    "ownerConstraints": [
+      "Plan-only.",
+      "No live services, credentials, deployments, domain/DNS, paid tools, customer data, posting, outreach, phone/voice actions, n8n activation, Netlify activation, Lead Gen changes, AI Receptionist changes, Constitution changes, accepted lessons, permanent memory, or approval bypass."
+    ]
+  },
+  "commandIntakeId": "command-intake-runtime-closed-loop-crm-proof-20260704",
+  "status": "classified",
+  "rawCommand": "Make me a CRM for a local service business.",
+  "normalizedCommand": "Create a plan-only crm plan.",
+  "commandCategory": "plan_only",
+  "projectId": "project-unregistered-crm",
+  "riskLevel": "R1",
+  "classification": {
+    "requiresPlan": true,
+    "requiresApproval": false,
+    "requiresLiveService": false,
+    "requiresDeployment": false,
+    "requiresDomainChange": false,
+    "requiresPaidAction": false,
+    "requiresProductionData": false
+  },
+  "productContext": {
+    "productType": "crm",
+    "archetypeId": "archetype-crm",
+    "archetypeRegistered": true,
+    "archetypeGap": null
+  },
+  "plannedOutput": "Plan-only command intake record for crm.",
+  "nextRecord": {
+    "jobId": "job-runtime-closed-loop-crm-proof-20260704",
+    "planId": "plan-runtime-closed-loop-crm-proof-20260704"
+  },
+  "safety": {
+    "executesCommand": false,
+    "createsLiveSideEffect": false,
+    "usesCredentials": false,
+    "callsConnector": false
+  },
+  "createdAt": "2026-07-04T08:15:23.676Z",
+  "updatedAt": "2026-07-04T08:15:23.676Z"
+}

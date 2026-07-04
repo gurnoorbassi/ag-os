@@ -1,0 +1,14 @@
+{
+  "id": "audit-runtime-closed-loop-crm-proof-20260704",
+  "occurredAt": "2026-07-04T08:15:23.935Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "validation_run",
+  "summary": "Closed-loop CRM proof run created offline plan-only records for command intake, job, route, plan, cost, execution validation, critique, quality score, and lesson candidates.",
+  "scope": "closed_loop_proof_run",
+  "source": "local_validation",
+  "relatedArtifacts": [],
+  "riskLevel": "low",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "createdAt": "2026-07-04T08:15:23.935Z"
+}
