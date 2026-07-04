@@ -141,6 +141,61 @@ test("validator exits nonzero when a temp record is invalid JSON", () => withTem
   assert.match(result.output, /connector registry could not be validated/);
 }));
 
+test("validator accepts current tracked runtime records in an isolated copy", () => withTempRepo((root) => {
+  const result = runValidator(root);
+
+  assert.equal(result.status, 0, result.output);
+  assert.match(result.output, /Foundation validation passed\./);
+}));
+
+test("validator fails on an invalid cost ledger runtime record", () => withTempRepo((root) => {
+  const recordPath = ".codex/costs/cost-ledger-runtime-construction-website-automated-20260703.json";
+  const costLedger = readJson(root, recordPath);
+  delete costLedger.summary.budgetStatus;
+  writeJson(root, recordPath, costLedger);
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /cost-ledger-runtime-construction-website-automated-20260703\.json\.summary missing required field: budgetStatus/);
+}));
+
+test("validator fails on an invalid connector execution runtime record", () => withTempRepo((root) => {
+  const recordPath = ".codex/connectors/connector-exec-runtime-github-construction-website-repo-20260703-create-repo.json";
+  const connectorExecution = readJson(root, recordPath);
+  connectorExecution.status = "unsupported";
+  writeJson(root, recordPath, connectorExecution);
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /connector-exec-runtime-github-construction-website-repo-20260703-create-repo\.json\.status must use a schema enum value/);
+}));
+
+test("validator fails on an invalid GitHub execution plan runtime record", () => withTempRepo((root) => {
+  const recordPath = ".codex/github/github-plan-runtime-github-construction-website-repo-20260703.json";
+  const githubPlan = readJson(root, recordPath);
+  githubPlan.plannedActions = [];
+  writeJson(root, recordPath, githubPlan);
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /github-plan-runtime-github-construction-website-repo-20260703\.json\.plannedActions must include at least 1 item/);
+}));
+
+test("validator fails on an invalid GitHub MCP execution gate runtime record", () => withTempRepo((root) => {
+  const recordPath = ".codex/github/github-mcp-gate-runtime-github-construction-website-repo-20260703.json";
+  const githubGate = readJson(root, recordPath);
+  githubGate.mode = "unsupported";
+  writeJson(root, recordPath, githubGate);
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /github-mcp-gate-runtime-github-construction-website-repo-20260703\.json\.mode must be "execution_gate_only"/);
+}));
+
 test("validator still succeeds on the real repo after invalid temp fixtures are cleaned up", () => {
   const result = runValidator(repoRoot);
 

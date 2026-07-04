@@ -255,6 +255,32 @@ const engineRecordDirectories = [
     schemaPath: "schemas/approval-lock.schema.json"
   }
 ];
+const runtimeRecordDirectories = [
+  {
+    name: "cost ledger",
+    recordDir: ".codex/costs",
+    schemaPath: "schemas/cost-ledger.schema.json",
+    includePrefixes: ["cost-ledger-"]
+  },
+  {
+    name: "connector execution",
+    recordDir: ".codex/connectors",
+    schemaPath: "schemas/connector-execution.schema.json",
+    includePrefixes: ["connector-exec-"]
+  },
+  {
+    name: "GitHub execution plan",
+    recordDir: ".codex/github",
+    schemaPath: "schemas/github-execution-plan.schema.json",
+    includePrefixes: ["github-plan-"]
+  },
+  {
+    name: "GitHub MCP execution gate",
+    recordDir: ".codex/github",
+    schemaPath: "schemas/github-mcp-execution-gate.schema.json",
+    includePrefixes: ["github-mcp-gate-"]
+  }
+];
 let failures = 0;
 
 function fail(message) {
@@ -333,7 +359,18 @@ function isTemplateRecordPath(recordPath) {
 
 function listEngineJsonRecords(recordDirectory) {
   const excludedFiles = new Set(recordDirectory.excludeFiles ?? []);
-  return listJsonRecords(recordDirectory.recordDir).filter((recordPath) => !excludedFiles.has(path.basename(recordPath)));
+  return listJsonRecords(recordDirectory.recordDir).filter((recordPath) => {
+    const name = path.basename(recordPath);
+    if (excludedFiles.has(name)) {
+      return false;
+    }
+
+    if (recordDirectory.includePrefixes?.length > 0) {
+      return recordDirectory.includePrefixes.some((prefix) => name.startsWith(prefix));
+    }
+
+    return true;
+  });
 }
 
 function assertNoPlaceholders(value, location) {
@@ -1050,6 +1087,47 @@ for (const engineRecordDirectory of engineRecordDirectories) {
     }
   } catch (error) {
     fail(`${engineRecordDirectory.name} records could not be validated: ${error.message}`);
+  }
+}
+
+for (const runtimeRecordDirectory of runtimeRecordDirectories) {
+  try {
+    if (!existsSync(path.join(root, runtimeRecordDirectory.recordDir))) {
+      pass(`no ${runtimeRecordDirectory.name} directory present yet: ${runtimeRecordDirectory.recordDir}`);
+      continue;
+    }
+
+    const schema = readJson(runtimeRecordDirectory.schemaPath);
+    const recordPaths = listEngineJsonRecords(runtimeRecordDirectory);
+    let activeRecordCount = 0;
+
+    for (const recordPath of recordPaths) {
+      const record = readJson(recordPath);
+      const failuresBeforeRecord = failures;
+
+      if (isTemplateRecordPath(recordPath)) {
+        validateTemplateObject(record, schema, recordPath);
+        if (failures === failuresBeforeRecord) {
+          pass(`${runtimeRecordDirectory.name} template structurally valid: ${recordPath}`);
+        }
+        continue;
+      }
+
+      activeRecordCount += 1;
+      assertNoPlaceholders(record, recordPath);
+      assertNoFixtureMarkers(record, recordPath);
+      validateSchemaObject(record, schema, recordPath);
+
+      if (failures === failuresBeforeRecord) {
+        pass(`${runtimeRecordDirectory.name} active record structurally valid: ${recordPath}`);
+      }
+    }
+
+    if (activeRecordCount === 0) {
+      pass(`no active ${runtimeRecordDirectory.name} records found in ${runtimeRecordDirectory.recordDir}`);
+    }
+  } catch (error) {
+    fail(`${runtimeRecordDirectory.name} records could not be validated: ${error.message}`);
   }
 }
 
