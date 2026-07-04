@@ -15,3 +15,4 @@ secrets/
 credentials/
 local/
 .codex/**/local-*
+.codex/**/runtime-*-scratch-*.json
