@@ -1,0 +1,23 @@
+{
+  "template": true,
+  "templateId": "social-media-content-calendar-template-v1",
+  "recordType": "social_media_content_calendar",
+  "status": "template",
+  "clientName": "REQUIRED_CLIENT_NAME",
+  "brandName": "REQUIRED_BRAND_NAME",
+  "platforms": "REQUIRED_PLATFORMS",
+  "postingVolume": "REQUIRED_POSTING_VOLUME",
+  "reportingCadence": "REQUIRED_REPORTING_CADENCE",
+  "postingMode": "draft_only",
+  "approvalRequired": true,
+  "livePostingBlocked": true,
+  "credentialsStored": false,
+  "calendarItems": [],
+  "blockedActions": {
+    "liveScheduling": true,
+    "livePosting": true,
+    "socialAccountConnection": true,
+    "analyticsApiPull": true
+  }
+}
+

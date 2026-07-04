@@ -1,0 +1,31 @@
+{
+  "template": true,
+  "templateId": "social-media-approval-template-v1",
+  "recordType": "social_media_draft_approval",
+  "status": "template",
+  "clientName": "REQUIRED_CLIENT_NAME",
+  "brandName": "REQUIRED_BRAND_NAME",
+  "approvalOwner": "REQUIRED_APPROVAL_OWNER",
+  "postingMode": "draft_only",
+  "approvalRequired": true,
+  "livePostingBlocked": true,
+  "credentialsStored": false,
+  "approvalScope": {
+    "draftContentReview": true,
+    "internalCalendarReview": true,
+    "weeklyReportReview": true,
+    "socialOAuth": false,
+    "posting": false,
+    "scheduling": false,
+    "analyticsApi": false,
+    "n8nActivation": false,
+    "paidTools": false
+  },
+  "requiredBeforeLiveAction": [
+    "owner_approval",
+    "approval_lock",
+    "audit_event",
+    "validation",
+    "stop_condition_review"
+  ]
+}
