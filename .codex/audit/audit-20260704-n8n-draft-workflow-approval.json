@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260704-n8n-draft-workflow-approval",
+  "occurredAt": "2026-07-04T11:18:16Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for AG OS to create one inactive n8n draft workflow for construction website lead intake follow-up proof, export and validate the workflow JSON, record the result, and stop before activation or outbound messaging.",
+  "scope": "approval-20260704-n8n-draft-workflow-proof",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-n8n-draft-workflow-proof"
+    },
+    {
+      "type": "document",
+      "reference": "docs/n8n-draft-workflow-approval-package.md"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/n8n/n8n-plan-20260704-construction-lead-draft-proof.json"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "This audit event records owner approval only. It does not create, activate, or execute an n8n workflow. The approved future execution scope is one inactive draft workflow named Construction Website Lead Intake Follow-up Draft, placeholder/test payloads only, JSON export and validation only, no credentials, no outbound messages, no real external APIs, no production n8n workflow changes, no Lead Gen workflow changes, no AI Receptionist workflow changes, no deployment, no domain or DNS change, no paid tool, no customer data, no production data, and no Constitution change.",
+  "createdAt": "2026-07-04T11:18:16Z"
+}

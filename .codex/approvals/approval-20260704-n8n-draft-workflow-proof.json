@@ -1,0 +1,80 @@
+{
+  "approvalId": "approval-20260704-n8n-draft-workflow-proof",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "commandCategory": "connect_service",
+  "requestedAction": "Create one inactive n8n draft workflow for construction website lead intake follow-up proof, export its workflow JSON, validate the exported JSON, record the result, and stop before activation or outbound messaging.",
+  "target": "n8n:Construction Website Lead Intake Follow-up Draft",
+  "scope": "This approval allows AG OS to create exactly one inactive n8n draft workflow named Construction Website Lead Intake Follow-up Draft for a construction website lead intake follow-up proof. The allowed actions are limited to creating the inactive draft workflow, using placeholder or test payloads only, exporting the workflow JSON, validating the workflow JSON, recording audit, connector result, cost ledger, and workflow export proof records, and stopping before workflow activation, credentials, outbound messages, real external APIs, production n8n workflows, Lead Gen workflows, AI Receptionist workflows, deployments, domain or DNS changes, paid tools, customer data, production data, or Constitution changes.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/budget.json"
+  },
+  "approvalRequiredFor": [
+    "workflow_create",
+    "workflow_export",
+    "workflow_validation"
+  ],
+  "approvedActions": [
+    "create_inactive_n8n_draft_workflow",
+    "export_n8n_workflow_json",
+    "validate_n8n_workflow_json",
+    "record_n8n_draft_result"
+  ],
+  "prohibitedActions": [
+    "activate_workflow",
+    "connect_credentials",
+    "send_email",
+    "send_sms",
+    "send_whatsapp",
+    "send_outbound_message",
+    "call_real_external_api",
+    "touch_production_n8n_workflow",
+    "touch_lead_gen_workflow",
+    "touch_ai_receptionist_workflow",
+    "deploy",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "use_credentials",
+    "add_secrets",
+    "access_production_data",
+    "access_customer_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the workflow name changes, the workflow scope changes, credentials are needed, activation is needed, outbound email, SMS, WhatsApp, posting, or live outreach is needed, a real external API is needed, production n8n workflows would be touched, Lead Gen or AI Receptionist workflows would be touched, validation or boot check fails, n8n validation fails, a paid service is required, customer or production data is needed, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond one inactive draft workflow proof.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner instruction: Owner approval granted for approval-20260704-n8n-draft-workflow-proof. AG OS may execute the approved n8n draft workflow proof for construction website lead intake follow-up draft.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/n8n/n8n-plan-20260704-construction-lead-draft-proof.json",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "docs/n8n-draft-workflow-approval-package.md",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "Pre-execution checks passed on 2026-07-04T11:19Z: npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs.",
+      "verified": true
+    }
+  ],
+  "approvalText": "Owner approval granted for approval-20260704-n8n-draft-workflow-proof. AG OS may execute the approved n8n draft workflow proof for construction website lead intake follow-up draft. No workflow activation, credentials, outbound messages, email, SMS, WhatsApp, real external APIs, production n8n workflows, Lead Gen workflows, AI Receptionist workflows, deployments, domain/DNS changes, paid tools, Constitution changes, real customer data, or live automations are approved.",
+  "approvedAt": "2026-07-04T11:18:16Z",
+  "expiresAt": "2026-07-05T11:18:16Z",
+  "createdAt": "2026-07-04T11:18:16Z",
+  "updatedAt": "2026-07-04T11:20:06Z"
+}
