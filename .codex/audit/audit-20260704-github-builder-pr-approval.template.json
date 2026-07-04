@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260704-github-builder-pr-approval",
+  "occurredAt": "REQUIRED_OCCURRED_AT",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for AG OS to create one branch, add approved starter construction website files, and open one pull request in gurnoorbassi/ag-test-construction-website. This audit event does not execute the action.",
+  "scope": "approval-20260704-github-builder-pr",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-github-builder-pr"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/github/github-plan-20260704-test-construction-builder-pr.json"
+    },
+    {
+      "type": "document",
+      "reference": "docs/github-builder-milestone-approval-package.md"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Future live execution remains blocked until the approval lock is converted from template to active approved record with exact owner approval text, approval timestamp, expiration, current validation evidence, and the same scoped branch and PR limits.",
+  "createdAt": "REQUIRED_CREATED_AT"
+}
