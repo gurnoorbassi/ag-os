@@ -1,0 +1,81 @@
+{
+  "approvalId": "approval-20260704-target-pr-merge-construction-website",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "commandCategory": "build",
+  "requestedAction": "Merge exactly one reviewed pull request: gurnoorbassi/ag-test-construction-website#1 into main.",
+  "target": "github:gurnoorbassi/ag-test-construction-website#1",
+  "scope": "This approval allows AG OS to use GitHub MCP for exactly one live target repository merge: merge pull request #1 in gurnoorbassi/ag-test-construction-website into main. The merge is allowed only if AG OS PR #71 is already merged, AG OS main matches origin/main, the AG OS review records exist in main, target PR #1 is still open and mergeable, the target PR head and reviewed file set are unchanged from the recorded review, and AG OS validation, boot check, and runtime tests pass immediately before execution. This approval does not allow deployment, Netlify, n8n, domain or DNS changes, paid actions, credentials, tracking scripts, wired live forms, production data, customer data, Lead Gen changes, AI Receptionist changes, Constitution changes, additional repositories, additional branches, additional pull requests, or any target repo action other than merging PR #1.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260704-target-pr-merge-construction-website.json"
+  },
+  "approvalRequiredFor": [
+    "merge_pr"
+  ],
+  "approvedActions": [
+    "merge_pr"
+  ],
+  "prohibitedActions": [
+    "create_repo",
+    "create_branch",
+    "create_files",
+    "update_files",
+    "open_pr",
+    "open_more_than_one_pr",
+    "deploy_staging",
+    "deploy_production",
+    "connect_netlify",
+    "connect_n8n",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "use_credentials",
+    "add_secrets",
+    "add_tracking_scripts",
+    "wire_forms_to_live_services",
+    "access_production_data",
+    "access_customer_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, AG OS PR #71 is not merged into main, local AG OS main does not match origin/main, the AG OS review records are missing from main, target PR #1 is closed, already merged, not mergeable, has a different target repository, has a different head SHA than the reviewed head, changes files outside README.md, package.json, index.html, src/styles.css, and src/main.js, validation or boot check fails, runtime tests fail, GitHub reports a conflict, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond merging exactly target PR #1.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner approval granted to merge only target repo PR #1: gurnoorbassi/ag-test-construction-website#1.",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/71",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-test-construction-website/pull/1",
+      "verified": true
+    },
+    {
+      "type": "review_note",
+      "reference": ".codex/audit/audit-runtime-target-pr-review-construction-website-20260704.json",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs must pass immediately before execution.",
+      "verified": false
+    }
+  ],
+  "approvalText": "Owner approval granted to merge only target repo PR #1: gurnoorbassi/ag-test-construction-website#1. Allowed live action: merge PR #1 into main in gurnoorbassi/ag-test-construction-website. Do not deploy, connect Netlify, touch n8n, touch domain/DNS, use paid tools, add credentials, add tracking scripts, wire live forms, touch production/customer data, touch Lead Gen, touch AI Receptionist, or change Constitution.",
+  "approvedAt": "2026-07-04T10:16:16.617Z",
+  "expiresAt": "2026-07-05T10:16:16.617Z",
+  "createdAt": "2026-07-04T10:16:16.617Z",
+  "updatedAt": "2026-07-04T10:16:16.617Z"
+}
