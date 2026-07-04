@@ -33,6 +33,7 @@ const requiredPaths = [
   "docs/n8n-workflow-policy.md",
   "docs/watchdog-alert-policy.md",
   "docs/product-project-policy.md",
+  "docs/critic-worker.md",
   ".codex/agents/README.md",
   ".codex/tasks/README.md",
   ".codex/locks/README.md",
@@ -44,6 +45,7 @@ const requiredPaths = [
   ".codex/quality/README.md",
   ".codex/quality/policy.json",
   ".codex/quality-scores/README.md",
+  ".codex/critiques/README.md",
   ".codex/security/README.md",
   ".codex/security/policy.json",
   ".codex/watchdog/README.md",
@@ -89,6 +91,7 @@ const requiredPaths = [
   "schemas/memory.schema.json",
   "schemas/cost.schema.json",
   "schemas/quality-check.schema.json",
+  "schemas/plan-critique.schema.json",
   "schemas/security-review.schema.json",
   "schemas/deployment.schema.json"
 ];
@@ -286,6 +289,12 @@ const runtimeRecordDirectories = [
     recordDir: ".codex/quality-scores",
     schemaPath: "schemas/quality-score.schema.json",
     includePrefixes: ["quality-score-"]
+  },
+  {
+    name: "plan critique",
+    recordDir: ".codex/critiques",
+    schemaPath: "schemas/plan-critique.schema.json",
+    includePrefixes: ["critique-"]
   }
 ];
 let failures = 0;

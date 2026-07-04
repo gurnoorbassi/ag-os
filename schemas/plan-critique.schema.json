@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/plan-critique.schema.json",
+  "title": "AG OS Plan Critique",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "critiqueId",
+    "sourcePlanId",
+    "sourcePlanPath",
+    "archetypeId",
+    "archetypeFile",
+    "reviewerType",
+    "authority",
+    "reviewStatus",
+    "blocksBuildMode",
+    "findings",
+    "requiredFixes",
+    "optionalImprovements",
+    "evidence",
+    "generatedBy",
+    "limitations",
+    "createdAt"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "critiqueId": { "type": "string", "pattern": "^critique-[a-z0-9-]+$" },
+    "sourcePlanId": { "type": "string", "minLength": 1 },
+    "sourcePlanPath": { "type": "string", "minLength": 1 },
+    "sourceCommandIntakePath": { "type": "string" },
+    "qualityScoreId": { "type": "string" },
+    "qualityScorePath": { "type": "string" },
+    "archetypeId": { "type": "string", "pattern": "^archetype-[a-z0-9-]+$" },
+    "archetypeFile": { "type": "string", "minLength": 1 },
+    "reviewerType": { "type": "string", "enum": ["critic_worker"] },
+    "authority": { "type": "string", "const": "advisory_only" },
+    "reviewStatus": { "type": "string", "enum": ["pass", "review", "fail"] },
+    "blocksBuildMode": { "type": "boolean" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "findingId",
+          "severity",
+          "category",
+          "message",
+          "evidence"
+        ],
+        "properties": {
+          "findingId": { "type": "string", "pattern": "^finding-[a-z0-9-]+$" },
+          "severity": { "type": "string", "enum": ["info", "low", "medium", "high", "critical"] },
+          "category": {
+            "type": "string",
+            "enum": [
+              "archetype_match",
+              "quality_checklist",
+              "known_pitfalls",
+              "approval_gates",
+              "stop_conditions",
+              "cost_discipline",
+              "assumptions",
+              "critical_questions",
+              "live_action_implication",
+              "quality_score",
+              "owner_preferences",
+              "lessons"
+            ]
+          },
+          "message": { "type": "string", "minLength": 1 },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "requiredFix": { "type": "string" },
+          "optionalImprovement": { "type": "string" }
+        }
+      }
+    },
+    "requiredFixes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "optionalImprovements": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "generatedBy": { "type": "string", "minLength": 1 },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "createdAt": { "type": "string", "minLength": 1 }
+  }
+}
