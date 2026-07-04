@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260704-runtime-target-pr-review-social-media-system-v1-20260704-01",
+  "title": "Social media starter PRs need explicit blocked-default review",
+  "lesson": "Before a social media operations starter PR can be considered ready for owner-approved merge, AG OS should verify not only file scope and syntax but also blocked live-action defaults: social accounts remain not_connected, posting mode remains draft_only, approval remains required, live posting and scheduling remain blocked, analytics and n8n activation remain blocked, credentials are not stored, and all client-specific fields remain REQUIRED_ placeholders.",
+  "sources": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/1",
+    ".codex/audit/audit-runtime-target-pr-review-social-media-system-v1-20260704.json",
+    ".codex/critiques/critique-runtime-target-pr-review-social-media-system-v1-20260704.json",
+    ".codex/quality-scores/quality-score-runtime-target-pr-review-social-media-system-v1-20260704.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "high",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "appliesTo": [
+    "target repo builder PR review",
+    "social media operations system",
+    "draft-only connector readiness",
+    "blocked live action review"
+  ],
+  "sourceScoreId": "quality-score-runtime-target-pr-review-social-media-system-v1-20260704",
+  "generatedBy": "ag-os-reviewer",
+  "whyThisMatters": "Social media systems can accidentally imply posting, scheduling, account connection, analytics, or credential handling. Explicit blocked-default review prevents that drift before merge.",
+  "whenToUse": "Use before asking to merge future AG OS-created social media operations target repo PRs.",
+  "whenNotToUse": "Do not treat this candidate lesson as approval to merge, deploy, connect accounts, use credentials, schedule, post, activate automations, or create accepted memory.",
+  "notes": "Candidate only. Not accepted permanent truth until reviewed and promoted per docs/memory-learning-policy.md.",
+  "createdAt": "2026-07-04T21:52:00Z",
+  "updatedAt": "2026-07-04T21:52:00Z"
+}
