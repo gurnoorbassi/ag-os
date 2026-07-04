@@ -287,6 +287,20 @@ function buildWorkerBriefing() {
     }))
     .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
 
+  const skillSummaries = listDirectJson(".codex/skills").map((skillPath) => {
+    const skill = readJson(skillPath);
+    return { id: skill.id, name: skill.name, category: skill.category, status: skill.status, skillPath };
+  });
+  const activeSkills = skillSummaries.filter((skill) => skill.status === "active");
+  const skillLibrary = {
+    directoryExists: existsSync(path.join(root, ".codex/skills")),
+    count: skillSummaries.length,
+    activeCount: activeSkills.length,
+    draftCount: skillSummaries.filter((skill) => skill.status === "draft").length,
+    deprecatedCount: skillSummaries.filter((skill) => skill.status === "deprecated").length,
+    skillsGrantPermission: false
+  };
+
   const activeApprovals = listDirectJson(".codex/approvals").map((approvalPath) => {
     const approval = readJson(approvalPath);
     return { approvalId: approval.approvalId, status: approval.status, expiresAt: approval.expiresAt ?? null };
@@ -374,6 +388,8 @@ function buildWorkerBriefing() {
     archetypes,
     acceptedLessons,
     lessonMemory,
+    activeSkills,
+    skillLibrary,
     activeApprovals,
     connectorStatus,
     qualityScores,

@@ -210,6 +210,12 @@ const knowledgeRecordDirectories = [
     allowedStatuses: ["candidate", "rejected"]
   },
   {
+    name: "skill",
+    recordDir: ".codex/skills",
+    schemaPath: "schemas/skill.schema.json",
+    allowedStatuses: ["draft", "active", "deprecated"]
+  },
+  {
     name: "owner preference profile",
     recordDir: ".codex/owners/preferences",
     schemaPath: "schemas/owner-preferences.schema.json",

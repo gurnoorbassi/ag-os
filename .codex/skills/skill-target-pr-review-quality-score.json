@@ -1,0 +1,47 @@
+{
+  "$schema": "../../schemas/skill.schema.json",
+  "recordType": "skill",
+  "id": "skill-target-pr-review-quality-score",
+  "name": "Target repository PR review with quality score",
+  "status": "draft",
+  "category": "review",
+  "appliesTo": ["any"],
+  "procedure": [
+    "Confirm the target repository and PR are named in an approved command intake or plan record before reading anything.",
+    "Read the PR diff in full; never review from the PR description alone.",
+    "Score the change against the applicable archetype checklist and the quality policy dimensions.",
+    "Write an advisory critique record listing findings and required fixes; critique is not approval.",
+    "Write a quality-score record with overallScore, meetsBar, and reviewStatus, citing the reviewed head SHA.",
+    "Write a cost record for the review run against the per-task cap.",
+    "Emit candidate lessons for anything learned; candidates stay out of accepted memory until owner review."
+  ],
+  "qualityChecklist": [
+    "Quality-score record cites the exact reviewed head SHA.",
+    "Every finding in the critique maps to a file or behavior in the diff, not speculation.",
+    "meetsBar reflects the archetype checklist, not reviewer mood.",
+    "Cost record exists for the run.",
+    "No merge action taken; review output is advisory only."
+  ],
+  "commonFailures": [
+    "Reviewing a stale head SHA: if the PR moves after review, the score no longer applies and merge must not proceed on it.",
+    "Treating the critique as approval; approval is a separate owner-gated action.",
+    "Skipping the cost record on small reviews, which breaks Cost OS accounting."
+  ],
+  "evidence": {
+    "sourceLessons": [
+      ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-construction-website-20260704-01.json",
+      ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-social-media-system-v1-20260704-01.json"
+    ],
+    "proofRecords": [
+      ".codex/quality-scores/quality-score-runtime-target-pr-review-construction-website-20260704.json",
+      ".codex/quality-scores/quality-score-runtime-target-pr-review-social-media-system-v1-20260704.json"
+    ],
+    "timesApplied": 2,
+    "lastAppliedDate": "2026-07-04"
+  },
+  "riskNotes": "Read-only against the target repository. Produces advisory records only. Merge remains a separate owner-approved gated action under capability-target-pr-merge-approved.",
+  "owner": "gurnoorbassi",
+  "version": 1,
+  "createdAt": "2026-07-04T00:00:00Z",
+  "updatedAt": "2026-07-04T00:00:00Z"
+}

@@ -45,6 +45,7 @@
       "items": { "type": "string", "minLength": 1 }
     },
     "sourceScoreId": { "type": "string", "pattern": "^quality-score-[a-z0-9-]+$" },
+    "promotedToSkill": { "type": "string", "pattern": "^skill-[a-z0-9-]+$" },
     "generatedBy": { "type": "string", "minLength": 1 },
     "whyThisMatters": { "type": "string", "minLength": 1 },
     "whenToUse": { "type": "string", "minLength": 1 },
