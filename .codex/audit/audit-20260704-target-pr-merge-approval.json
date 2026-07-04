@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260704-target-pr-merge-approval",
+  "occurredAt": "2026-07-04T10:16:16.617Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner approved the scoped live merge of target repo PR gurnoorbassi/ag-test-construction-website#1 after AG OS review records were merged.",
+  "scope": "approval-20260704-target-pr-merge-construction-website",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-target-pr-merge-construction-website"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-test-construction-website/pull/1"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/71"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/audit/audit-runtime-target-pr-review-construction-website-20260704.json"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Approval is limited to merging exactly target repo PR #1 into main. It does not authorize deployment, Netlify, n8n, domain or DNS changes, paid actions, credentials, tracking scripts, wired live forms, production data, customer data, Lead Gen changes, AI Receptionist changes, Constitution changes, additional repositories, additional branches, additional pull requests, or target repo content changes.",
+  "createdAt": "2026-07-04T10:16:16.617Z"
+}

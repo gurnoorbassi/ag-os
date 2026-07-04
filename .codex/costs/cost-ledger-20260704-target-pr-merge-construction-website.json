@@ -1,0 +1,46 @@
+{
+  "costLedgerId": "cost-ledger-20260704-target-pr-merge-construction-website",
+  "status": "active",
+  "budgetLimitsUsd": {
+    "perTaskMax": 5,
+    "dailyMax": 10,
+    "monthlyMax": 50
+  },
+  "entries": [
+    {
+      "costEntryId": "cost-entry-20260704-target-pr-merge-construction-website-estimated",
+      "jobId": "job-20260704-target-pr-merge-construction-website",
+      "projectId": "project-unregistered-construction-website",
+      "costType": "estimated",
+      "amountUsd": 0,
+      "approvalRequired": true,
+      "approvalId": "approval-20260704-target-pr-merge-construction-website",
+      "status": "approved"
+    },
+    {
+      "costEntryId": "cost-entry-20260704-target-pr-merge-construction-website-actual",
+      "jobId": "job-20260704-target-pr-merge-construction-website",
+      "projectId": "project-unregistered-construction-website",
+      "costType": "actual",
+      "amountUsd": 0,
+      "approvalRequired": true,
+      "approvalId": "approval-20260704-target-pr-merge-construction-website",
+      "status": "recorded"
+    }
+  ],
+  "summary": {
+    "estimatedTaskCostUsd": 0,
+    "actualTaskCostUsd": 0,
+    "dailyActualUsd": 0,
+    "monthlyActualUsd": 0,
+    "budgetStatus": "within_limit"
+  },
+  "safety": {
+    "createsBillingChange": false,
+    "usesPaidService": false,
+    "usesLiveApi": false,
+    "requiresOwnerApproval": true
+  },
+  "createdAt": "2026-07-04T10:18:46.000Z",
+  "updatedAt": "2026-07-04T10:18:46.000Z"
+}
