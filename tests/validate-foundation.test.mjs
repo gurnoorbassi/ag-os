@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -62,6 +62,31 @@ function ensureQualityScoresFoundation(root) {
   if (!existsSync(readmePath)) {
     writeFileSync(readmePath, "# Quality Scores\n");
   }
+}
+
+function clearJsonRecords(root, relativeDir, prefix) {
+  const directory = path.join(root, relativeDir);
+  if (!existsSync(directory)) {
+    return;
+  }
+
+  for (const name of readdirSync(directory)) {
+    if (!name.endsWith(".json")) {
+      continue;
+    }
+    if (prefix && !name.startsWith(prefix)) {
+      continue;
+    }
+    rmSync(path.join(directory, name), { force: true });
+  }
+}
+
+function clearQualityScoreRecords(root) {
+  clearJsonRecords(root, ".codex/quality-scores", "quality-score-");
+}
+
+function clearLessonCandidateRecords(root) {
+  clearJsonRecords(root, ".codex/memory/lessons/candidates", "lesson-");
 }
 
 function withTempRepo(assertion) {
@@ -218,6 +243,7 @@ test("validator fails on an invalid GitHub MCP execution gate runtime record", (
 
 test("validator allows an empty quality-score directory", () => withTempRepo((root) => {
   ensureQualityScoresFoundation(root);
+  clearQualityScoreRecords(root);
 
   const result = runValidator(root);
 
@@ -327,6 +353,7 @@ test("validator accepts a generated lesson candidate with candidate-only metadat
 
 test("boot check remains ready when no quality-score records exist", () => withTempRepo((root) => {
   ensureQualityScoresFoundation(root);
+  clearQualityScoreRecords(root);
 
   const result = runBootCheck(root);
 
@@ -341,6 +368,8 @@ test("boot check remains ready when no quality-score records exist", () => withT
 
 test("boot check surfaces quality scores and keeps candidate lessons out of accepted truth", () => withTempRepo((root) => {
   ensureQualityScoresFoundation(root);
+  clearQualityScoreRecords(root);
+  clearLessonCandidateRecords(root);
   writeJson(root, ".codex/quality-scores/quality-score-20260704-crm-plan-quality.json", {
     "$schema": "../../schemas/quality-score.schema.json",
     scoreId: "quality-score-20260704-crm-plan-quality",
@@ -420,7 +449,7 @@ test("boot check surfaces quality scores and keeps candidate lessons out of acce
   assert.equal(report.briefing.qualityScores.count, 1);
   assert.equal(report.briefing.qualityScores.latest.scoreId, "quality-score-20260704-crm-plan-quality");
   assert.equal(report.briefing.lessonMemory.acceptedCount, 1);
-  assert.equal(report.briefing.lessonMemory.candidateCount, 2);
+  assert.equal(report.briefing.lessonMemory.candidateCount, 1);
   assert.equal(report.briefing.lessonMemory.candidatesLoadedAsTruth, false);
   assert.equal(report.briefing.acceptedLessons.length, 1);
   assert.equal(report.briefing.acceptedLessons[0].lessonId, "lesson-20260704-accepted-quality-loop");
