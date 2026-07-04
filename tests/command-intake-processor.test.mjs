@@ -22,6 +22,8 @@ test("builds a plan-only command intake record for a construction website", () =
   assert.equal(record.rawCommand, "make me a construction website");
   assert.equal(record.commandCategory, "plan_only");
   assert.equal(record.projectId, "project-unregistered-construction-website");
+  assert.equal(record.productContext.archetypeId, "archetype-website");
+  assert.equal(record.productContext.archetypeGap, null);
   assert.equal(record.riskLevel, "R1");
   assert.equal(record.classification.requiresPlan, true);
   assert.equal(record.classification.requiresApproval, false);
@@ -39,6 +41,124 @@ test("builds a plan-only command intake record for a construction website", () =
     callsConnector: false
   });
   assert.equal(JSON.stringify(record).includes("REQUIRED_"), false);
+});
+
+test("classifies Archetype Pack v1 intake commands without website fallback", () => {
+  const cases = [
+    {
+      command: "Make me a client portal for an agency.",
+      runId: "client-portal-intake-gap",
+      archetypeId: "archetype-client-portal",
+      productType: "client portal",
+      projectId: "project-unregistered-client-portal"
+    },
+    {
+      command: "Make me a construction client portal.",
+      runId: "construction-client-portal-intake-gap",
+      archetypeId: "archetype-client-portal",
+      productType: "client portal",
+      projectId: "project-unregistered-client-portal"
+    },
+    {
+      command: "Make me an ecommerce store for one hero product.",
+      runId: "ecommerce-store-intake-gap",
+      archetypeId: "archetype-ecommerce-store",
+      productType: "ecommerce store",
+      projectId: "project-unregistered-ecommerce-store"
+    },
+    {
+      command: "Make me an e-commerce store for one hero product.",
+      runId: "e-commerce-store-intake-gap",
+      archetypeId: "archetype-ecommerce-store",
+      productType: "ecommerce store",
+      projectId: "project-unregistered-ecommerce-store"
+    },
+    {
+      command: "Make me an online store for one hero product.",
+      runId: "online-store-intake-gap",
+      archetypeId: "archetype-ecommerce-store",
+      productType: "ecommerce store",
+      projectId: "project-unregistered-ecommerce-store"
+    },
+    {
+      command: "Make me a hero product store.",
+      runId: "hero-product-store-intake-gap",
+      archetypeId: "archetype-ecommerce-store",
+      productType: "ecommerce store",
+      projectId: "project-unregistered-ecommerce-store"
+    },
+    {
+      command: "Make me an AI receptionist for a pizza shop.",
+      runId: "ai-receptionist-intake-gap",
+      archetypeId: "archetype-ai-tool",
+      productType: "ai receptionist",
+      projectId: "project-unregistered-ai-receptionist"
+    },
+    {
+      command: "Make me a receptionist for a pizza shop.",
+      runId: "receptionist-intake-gap",
+      archetypeId: "archetype-ai-tool",
+      productType: "ai receptionist",
+      projectId: "project-unregistered-ai-receptionist"
+    },
+    {
+      command: "Make me a phone receptionist for a pizza shop.",
+      runId: "phone-receptionist-intake-gap",
+      archetypeId: "archetype-ai-tool",
+      productType: "ai receptionist",
+      projectId: "project-unregistered-ai-receptionist"
+    },
+    {
+      command: "Make me call answering for a pizza shop.",
+      runId: "call-answering-intake-gap",
+      archetypeId: "archetype-ai-tool",
+      productType: "ai receptionist",
+      projectId: "project-unregistered-ai-receptionist"
+    },
+    {
+      command: "Make me a pizza shop receptionist.",
+      runId: "pizza-shop-receptionist-intake-gap",
+      archetypeId: "archetype-ai-tool",
+      productType: "ai receptionist",
+      projectId: "project-unregistered-ai-receptionist"
+    },
+    {
+      command: "Make me a social media management system.",
+      runId: "social-media-intake",
+      archetypeId: "archetype-social-media-content-operations-system",
+      productType: "social media content operations",
+      projectId: "project-unregistered-social-media-content-operations"
+    }
+  ];
+
+  for (const item of cases) {
+    const record = buildCommandIntakeRecord({
+      command: item.command,
+      runId: item.runId,
+      now: fixedNow
+    });
+
+    assert.equal(record.productContext.productType, item.productType);
+    assert.equal(record.productContext.archetypeId, item.archetypeId);
+    assert.equal(record.productContext.archetypeRegistered, true);
+    assert.equal(record.productContext.archetypeGap, null);
+    assert.equal(record.projectId, item.projectId);
+    assert.equal(record.projectId.includes("website"), false);
+  }
+});
+
+test("keeps unknown product types as explicit archetype gaps", () => {
+  const record = buildCommandIntakeRecord({
+    command: "make me a vendor scheduling hub",
+    runId: "unknown-product-type",
+    now: fixedNow
+  });
+
+  assert.equal(record.productContext.productType, "unclassified product");
+  assert.equal(record.productContext.archetypeId, null);
+  assert.equal(record.productContext.archetypeRegistered, false);
+  assert.equal(record.productContext.archetypeGap, "no_product_type_match");
+  assert.equal(record.projectId, "project-unregistered-vendor-scheduling-hub");
 });
 
 test("writes command intake records to a local workspace only", () => {
