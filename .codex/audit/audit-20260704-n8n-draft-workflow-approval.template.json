@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260704-n8n-draft-workflow-approval",
+  "occurredAt": "REQUIRED_OCCURRED_AT",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for AG OS to create one inactive n8n draft workflow for construction website lead intake follow-up proof, export and validate the workflow JSON, and record the result. This audit event does not create, activate, or execute the workflow.",
+  "scope": "approval-20260704-n8n-draft-workflow-proof",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-n8n-draft-workflow-proof"
+    },
+    {
+      "type": "document",
+      "reference": "docs/n8n-draft-workflow-approval-package.md"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/n8n/n8n-plan-20260704-construction-lead-draft-proof.json"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Future live execution remains blocked until the approval lock is converted from template to active approved record with exact owner approval text, approval timestamp, expiration, current validation evidence, and the same inactive draft-only n8n scope. This template does not authorize workflow activation, credential connection, outbound messages, real external API calls, production n8n workflow changes, Lead Gen workflow changes, AI Receptionist workflow changes, deployment, domain or DNS changes, paid tools, customer data, production data, or Constitution changes.",
+  "createdAt": "REQUIRED_CREATED_AT"
+}

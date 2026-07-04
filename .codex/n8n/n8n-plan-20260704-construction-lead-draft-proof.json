@@ -1,0 +1,158 @@
+{
+  "n8nPlanId": "n8n-plan-20260704-construction-lead-draft-proof",
+  "status": "planned",
+  "mode": "approval_package_only",
+  "connectorId": "connector-n8n-mcp",
+  "projectId": "project-unregistered-construction-website",
+  "targetWorkflowName": "REQUIRED_OWNER_APPROVED_DRAFT_WORKFLOW_NAME",
+  "workflowPurpose": "Construction website lead intake follow-up draft workflow proof.",
+  "riskLevel": "R4",
+  "proposedAction": "Create one inactive n8n draft workflow, export workflow JSON, validate workflow JSON, record audit, connector result, and cost ledger records, then stop.",
+  "draftOnlyScope": {
+    "workflowActive": false,
+    "activationAllowed": false,
+    "credentialsAllowed": false,
+    "realExternalApiCallsAllowed": false,
+    "outboundMessagesAllowed": false,
+    "productionWorkflowChangesAllowed": false,
+    "leadGenWorkflowChangesAllowed": false,
+    "aiReceptionistWorkflowChangesAllowed": false,
+    "deploymentsAllowed": false,
+    "domainDnsChangesAllowed": false,
+    "paidToolsAllowed": false
+  },
+  "expectedWorkflowBehavior": [
+    "Receive a future website contact form payload through a webhook node while the workflow remains inactive.",
+    "Validate required fields using a local workflow validation step.",
+    "Create an in-workflow draft lead object or placeholder task object only.",
+    "Create an internal follow-up task object only.",
+    "Log the intake event inside the workflow execution path.",
+    "Stop before sending any outbound message or calling any real external service."
+  ],
+  "expectedNodes": [
+    {
+      "nodeKey": "webhook_intake",
+      "nodeRole": "Receive test contact form payload",
+      "expectedType": "webhook",
+      "activationBlocked": true,
+      "credentialsRequired": false,
+      "notes": "Webhook is for draft workflow shape only. Do not activate the workflow or expose a live intake endpoint."
+    },
+    {
+      "nodeKey": "validate_required_fields",
+      "nodeRole": "Validate required fields",
+      "expectedType": "code_or_if",
+      "activationBlocked": true,
+      "credentialsRequired": false,
+      "requiredFields": [
+        "fullName",
+        "email",
+        "message",
+        "source"
+      ]
+    },
+    {
+      "nodeKey": "build_draft_lead_record",
+      "nodeRole": "Create draft lead object",
+      "expectedType": "set_or_edit_fields",
+      "activationBlocked": true,
+      "credentialsRequired": false,
+      "notes": "No database, CRM, Postgres, or production lead write is allowed in this proof."
+    },
+    {
+      "nodeKey": "build_internal_follow_up_task",
+      "nodeRole": "Create internal follow-up task object",
+      "expectedType": "set_or_edit_fields",
+      "activationBlocked": true,
+      "credentialsRequired": false,
+      "notes": "The task object is a placeholder output inside the workflow only, not a live task in any external system."
+    },
+    {
+      "nodeKey": "log_event",
+      "nodeRole": "Log draft intake event",
+      "expectedType": "set_or_noop",
+      "activationBlocked": true,
+      "credentialsRequired": false,
+      "notes": "Use non-sensitive workflow-local logging only."
+    },
+    {
+      "nodeKey": "stop_before_outbound",
+      "nodeRole": "End before outbound message",
+      "expectedType": "noop_or_respond",
+      "activationBlocked": true,
+      "credentialsRequired": false,
+      "notes": "No email, SMS, WhatsApp, posting, outreach, phone, or voice action is allowed."
+    }
+  ],
+  "placeholderTestPayload": {
+    "fullName": "TEST_REQUIRED_FULL_NAME",
+    "email": "TEST_REQUIRED_EMAIL",
+    "phone": "TEST_OPTIONAL_PHONE",
+    "serviceInterest": "TEST_OPTIONAL_SERVICE_INTEREST",
+    "message": "TEST_REQUIRED_MESSAGE",
+    "source": "TEST_CONSTRUCTION_WEBSITE_CONTACT_FORM",
+    "submittedAt": "TEST_ISO_TIMESTAMP"
+  },
+  "credentialPolicy": [
+    "Do not connect n8n credentials.",
+    "Do not create or store credentials in AG OS, n8n workflow JSON, docs, logs, or PR text.",
+    "Do not use Postgres, email, SMS, WhatsApp, CRM, form provider, or domain credentials.",
+    "If credentials are required, stop and request a new approval package."
+  ],
+  "preExecutionChecks": [
+    "Confirm active approval lock approval-20260704-n8n-draft-workflow-proof exists and is unexpired.",
+    "Run npm.cmd run validate in AG OS.",
+    "Run npm.cmd run boot:check in AG OS.",
+    "Run node --test tests/*.test.mjs in AG OS.",
+    "Confirm n8n connector scope is limited to creating one inactive draft workflow.",
+    "Confirm workflow name is owner-approved.",
+    "Confirm no credentials, activation, outbound message, real external API, production workflow, Lead Gen workflow, or AI Receptionist workflow action is requested."
+  ],
+  "validationPlan": [
+    "Create only an inactive n8n draft workflow if later approved.",
+    "Export the workflow JSON after draft creation.",
+    "Validate exported workflow JSON for required draft-only nodes, inactive state, missing credentials, no outbound integrations, no real API calls, and no production workflow references.",
+    "Record the export and validation result in AG OS.",
+    "Do not activate, execute with real payloads, or connect credentials."
+  ],
+  "costEstimate": {
+    "estimatedTaskCostUsd": 0,
+    "paidToolsAllowed": false,
+    "budgetStatus": "within_limit",
+    "stopIfPaidFeatureRequired": true
+  },
+  "rollbackPlan": [
+    "If the draft workflow is created with the wrong name or scope, stop and record an audit event.",
+    "If the workflow is accidentally active, immediately deactivate it if safe, record an incident and audit event, and notify the owner.",
+    "If credentials, outbound messaging, real API calls, production workflow changes, Lead Gen changes, or AI Receptionist changes appear in the draft, stop and do not proceed.",
+    "Archive or delete the draft workflow only after owner approval unless immediate exposure risk exists.",
+    "Keep the exported workflow JSON and validation result as evidence for any cleanup decision."
+  ],
+  "stopConditions": [
+    "No active approval lock for this exact n8n draft workflow proof.",
+    "Workflow name is not owner-approved.",
+    "n8n asks for credentials.",
+    "Workflow activation is required.",
+    "Any outbound email, SMS, WhatsApp, posting, live outreach, phone, or voice action is needed.",
+    "Any real external API call is needed.",
+    "Any production n8n workflow, Lead Gen workflow, or AI Receptionist workflow would be touched.",
+    "Any deployment, domain, DNS, paid tool, customer data, production data, credential, or Constitution change becomes necessary.",
+    "AG OS validation, boot check, runtime tests, workflow export, or workflow JSON validation fails."
+  ],
+  "safety": {
+    "executesN8nAction": false,
+    "createsWorkflow": false,
+    "activatesWorkflow": false,
+    "connectsCredentials": false,
+    "sendsMessages": false,
+    "callsRealExternalServices": false,
+    "touchesProductionWorkflow": false,
+    "touchesLeadGenWorkflow": false,
+    "touchesAiReceptionistWorkflow": false,
+    "usesPaidAction": false,
+    "touchesProductionData": false,
+    "touchesCustomerData": false
+  },
+  "createdAt": "2026-07-04T00:00:00Z",
+  "updatedAt": "2026-07-04T00:00:00Z"
+}
