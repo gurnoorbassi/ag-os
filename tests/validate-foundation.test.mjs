@@ -238,6 +238,93 @@ test("validator fails on an invalid quality-score record", () => withTempRepo((r
   assert.match(result.output, /quality-score-invalid\.json missing required field: projectId/);
 }));
 
+test("validator accepts a generated plan quality-score record", () => withTempRepo((root) => {
+  ensureQualityScoresFoundation(root);
+  writeJson(root, ".codex/quality-scores/quality-score-20260704-crm-plan-quality.json", {
+    "$schema": "../../schemas/quality-score.schema.json",
+    scoreId: "quality-score-20260704-crm-plan-quality",
+    status: "candidate",
+    scoreType: "plan_quality_score",
+    projectId: "project-unregistered-crm",
+    planId: "plan-crm-quality-test",
+    sourcePlanPath: ".codex/plans/plan-crm-quality-test.json",
+    outputType: "crm",
+    archetypeId: "archetype-crm",
+    archetypeFile: ".codex/archetypes/crm-system.json",
+    checklistItemsEvaluated: [
+      "Core entities, statuses, required fields, and transitions are validated."
+    ],
+    dimensions: {
+      completeness: 9,
+      craft: 9,
+      maintainability: 9,
+      ux: 7,
+      security: 10,
+      performance: 7,
+      ownerAcceptance: 8,
+      archetypeFit: 10,
+      costDiscipline: 10
+    },
+    overallScore: 8.8,
+    meetsBar: true,
+    reviewStatus: "review",
+    improvementRecommendations: [
+      "Carry archetype UX expectations into the next plan artifact before build mode."
+    ],
+    lessonCandidates: [],
+    evidence: [
+      ".codex/plans/plan-crm-quality-test.json"
+    ],
+    generatedBy: "scripts/process-quality-score.mjs",
+    limitations: [
+      "No product output was provided; this is a plan quality only score."
+    ],
+    notes: "Candidate score only.",
+    createdAt: "2026-07-04T08:00:00.000Z",
+    updatedAt: "2026-07-04T08:00:00.000Z"
+  });
+
+  const result = runValidator(root);
+
+  assert.equal(result.status, 0, result.output);
+  assert.match(result.output, /quality score active record structurally valid: \.codex\/quality-scores\/quality-score-20260704-crm-plan-quality\.json/);
+}));
+
+test("validator accepts a generated lesson candidate with candidate-only metadata", () => withTempRepo((root) => {
+  writeJson(root, ".codex/memory/lessons/candidates/lesson-20260704-crm-plan-quality-01.json", {
+    "$schema": "../../../../schemas/lesson.schema.json",
+    lessonId: "lesson-20260704-crm-plan-quality-01",
+    title: "Improve low quality dimensions for archetype-crm",
+    lesson: "When a plan quality score has below-bar dimensions, keep the work in plan-only review and strengthen the weak dimensions before build mode.",
+    sources: [
+      ".codex/quality-scores/quality-score-20260704-crm-plan-quality.json",
+      ".codex/plans/plan-crm-quality-test.json"
+    ],
+    scope: "agent_shared",
+    confidence: "medium",
+    status: "candidate",
+    owner: "owner-gurnoor-bassi",
+    projectId: "project-unregistered-crm",
+    appliesTo: [
+      "archetype-crm",
+      "plan_quality_score"
+    ],
+    sourceScoreId: "quality-score-20260704-crm-plan-quality",
+    generatedBy: "scripts/process-lesson-candidates.mjs",
+    whyThisMatters: "Quality OS should turn weak score evidence into specific planning work.",
+    whenToUse: "Use when a quality score has one or more dimensions below 8/10.",
+    whenNotToUse: "Do not use as authority to approve execution or live connectors.",
+    notes: "Candidate only.",
+    createdAt: "2026-07-04T08:05:00.000Z",
+    updatedAt: "2026-07-04T08:05:00.000Z"
+  });
+
+  const result = runValidator(root);
+
+  assert.equal(result.status, 0, result.output);
+  assert.match(result.output, /lesson candidate active record structurally valid: \.codex\/memory\/lessons\/candidates\/lesson-20260704-crm-plan-quality-01\.json/);
+}));
+
 test("boot check remains ready when no quality-score records exist", () => withTempRepo((root) => {
   ensureQualityScoresFoundation(root);
 
