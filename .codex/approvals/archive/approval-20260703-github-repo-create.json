@@ -1,6 +1,6 @@
 {
   "approvalId": "approval-20260703-github-repo-create",
-  "status": "approved",
+  "status": "expired",
   "ownerId": "owner-gurnoor-bassi",
   "requestedBy": "ag-os-runtime",
   "approvedBy": "owner-gurnoor-bassi",
@@ -45,7 +45,7 @@
     "change_lead_gen",
     "change_ai_receptionist"
   ],
-  "revocationPath": "Owner can revoke this approval by setting approval status to revoked before execution. This approval also expires automatically after expiresAt, and is invalidated if the repository name changes, repository visibility is not private, validation or boot check fails, an incident opens for this scope, the action expands beyond creating one private GitHub repo, starter README content exceeds the approved scope, or any prohibited action becomes necessary.",
+  "revocationPath": "This approval expired at 2026-07-04T21:06:41Z and is no longer valid for gated actions. Historical proof remains preserved in the approval, audit, connector execution, and cost records. Any future GitHub repository creation requires a new scoped owner approval lock.",
   "evidence": [
     {
       "type": "owner_instruction",
@@ -77,5 +77,5 @@
   "approvedAt": "2026-07-03T21:06:41Z",
   "expiresAt": "2026-07-04T21:06:41Z",
   "createdAt": "2026-07-03T21:06:41Z",
-  "updatedAt": "2026-07-03T21:06:41Z"
+  "updatedAt": "2026-07-04T21:16:23Z"
 }

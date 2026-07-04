@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260704-expire-stale-github-repo-create-approval",
+  "occurredAt": "2026-07-04T21:16:23Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "registry_change",
+  "summary": "Marked stale expired approval lock approval-20260703-github-repo-create as expired so it no longer authorizes gated actions or blocks boot.",
+  "scope": "approval-20260703-github-repo-create-expiration-cleanup",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": ".codex/approvals/archive/approval-20260703-github-repo-create.json"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/audit/audit-20260703-github-repo-create-owner-approved.json"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/audit/audit-20260703-github-repo-create-executed.json"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/connectors/connector-exec-20260703-github-repo-create-live-result.json"
+    }
+  ],
+  "riskLevel": "low",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "No historical proof was deleted. The expired approval lock was moved out of the active approvals directory into .codex/approvals/archive/ so it no longer authorizes gated actions or blocks boot. No live GitHub, Netlify, n8n, deployment, domain, DNS, credential, paid, production data, customer data, Lead Gen, AI Receptionist, or Constitution action occurred. The prior live action was already completed and recorded; this cleanup only changes the approval lock from approved to expired after its expiresAt timestamp passed.",
+  "createdAt": "2026-07-04T21:16:23Z"
+}

@@ -9,7 +9,7 @@
       "name": "GitHub private repository creation with approval",
       "type": "connector_execution",
       "proofRecords": [
-        ".codex/approvals/approval-20260703-github-repo-create.json",
+        ".codex/approvals/archive/approval-20260703-github-repo-create.json",
         ".codex/audit/audit-20260703-github-repo-create-owner-approved.json",
         ".codex/audit/audit-20260703-github-repo-create-executed.json",
         ".codex/connectors/connector-exec-20260703-github-repo-create-live-result.json"
@@ -31,7 +31,7 @@
       ],
       "lastProvenDate": "2026-07-03",
       "sourceRecords": [
-        ".codex/approvals/approval-20260703-github-repo-create.json",
+        ".codex/approvals/archive/approval-20260703-github-repo-create.json",
         ".codex/boot/boot-runtime-github-construction-website-repo-20260703.json",
         ".codex/audit/audit-20260703-github-repo-create-owner-approved.json",
         ".codex/audit/audit-20260703-github-repo-create-executed.json",
