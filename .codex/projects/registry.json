@@ -19,6 +19,14 @@
       "owner": "owner-gurnoor-bassi",
       "riskLevel": "medium",
       "lastReviewedAt": "2026-07-03T11:32:35Z"
+    },
+    {
+      "projectId": "project-social-media-management-system-v1",
+      "recordPath": ".codex/projects/social-media-management-system-v1.json",
+      "status": "planned",
+      "owner": "owner-gurnoor-bassi",
+      "riskLevel": "medium",
+      "lastReviewedAt": "2026-07-04T12:40:00Z"
     }
   ],
   "rules": {

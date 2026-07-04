@@ -14,7 +14,7 @@ window.AG_OS_DASHBOARD_DATA = {
   },
   "projectRegistry": {
     "status": "active",
-    "count": 2,
+    "count": 3,
     "source": ".codex/projects/registry.json",
     "projects": [
       {
@@ -38,6 +38,17 @@ window.AG_OS_DASHBOARD_DATA = {
         "owner": "owner-gurnoor-bassi",
         "recordPath": ".codex/projects/ag-digitalz-ai-receptionist.json",
         "boundary": "Separate product project; no live service status inferred beyond repository records."
+      },
+      {
+        "id": "project-social-media-management-system-v1",
+        "name": "Social Media Management System v1",
+        "status": "planned",
+        "managementMode": "managed_staging",
+        "projectType": "product_project",
+        "riskLevel": "medium",
+        "owner": "owner-gurnoor-bassi",
+        "recordPath": ".codex/projects/social-media-management-system-v1.json",
+        "boundary": "Do not create a GitHub repository."
       }
     ]
   },
