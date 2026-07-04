@@ -26,6 +26,23 @@ Model decides. Script verifies. MCP executes. Owner approves.
 
 Workers are stateless and interchangeable. The repository is the only shared brain. Workers must not rely on chat history, session memory, or another worker's unrecorded context.
 
+## Parallel Operation
+
+Fable and Codex may run at the same time on the same repository. To prevent one worker from moving another's checkout, each worker operates in its own git worktree over the shared repository history:
+
+- Codex uses the primary checkout (the repository root directory).
+- Fable uses a separate worktree directory (for example a sibling `AG-OS-fable` directory) created with `git worktree add`.
+
+Rules for parallel operation:
+
+- Each worker branches only under its own prefix: Codex uses `codex/*`, Fable uses `fable/*`. Git refuses to check out the same branch in two worktrees, which enforces this boundary at the filesystem level.
+- No worker switches, resets, or rebases a branch it does not own, and no worker touches another worker's worktree directory.
+- Coordination happens through merged records on `main`, never through a shared working tree. A worker reads the other's output only after it is merged.
+- Division of labor follows `docs/executor-selection-policy.md`: Fable takes understanding, architecture, judgment, planning, and review; Codex takes implementation, file edits, validation runs, PRs, and gated MCP execution.
+- The owner remains the coordinator. When two workers would touch the same records or the same gated action, the owner sequences them; workers do not self-negotiate ordering.
+
+The repository has zero runtime dependencies, so a fresh worktree needs no install and can run `npm run validate` and `npm run boot:check` immediately.
+
 ## Worker Session Contract
 
 At session start, a worker must read, in order:
