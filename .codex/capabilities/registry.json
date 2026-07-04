@@ -5,28 +5,356 @@
   "status": "active",
   "capabilities": [
     {
-      "id": "capability-live-github-private-repo-creation",
-      "name": "Live GitHub private repository creation",
+      "id": "capability-github-private-repo-creation-approved",
+      "name": "GitHub private repository creation with approval",
       "type": "connector_execution",
-      "provenBy": [
+      "proofRecords": [
+        ".codex/approvals/approval-20260703-github-repo-create.json",
+        ".codex/audit/audit-20260703-github-repo-create-owner-approved.json",
+        ".codex/audit/audit-20260703-github-repo-create-executed.json",
+        ".codex/connectors/connector-exec-20260703-github-repo-create-live-result.json"
+      ],
+      "approvalRequirement": "Requires a scoped, active, unexpired owner approval lock naming the exact private repository creation action.",
+      "riskTier": "R4",
+      "boundaries": [
+        "Proven only for creating one private GitHub repository after owner approval.",
+        "Does not authorize creating additional repositories without a new approval lock.",
+        "Does not authorize deployment, Netlify connection, n8n workflow changes, domain/DNS changes, paid tools, credentials, or production/customer data."
+      ],
+      "blockedCapabilities": [
+        "production deployment",
+        "domain or DNS changes",
+        "custom domains",
+        "paid tools",
+        "credential handling",
+        "production/customer data handling"
+      ],
+      "lastProvenDate": "2026-07-03",
+      "sourceRecords": [
         ".codex/approvals/approval-20260703-github-repo-create.json",
         ".codex/boot/boot-runtime-github-construction-website-repo-20260703.json",
         ".codex/audit/audit-20260703-github-repo-create-owner-approved.json",
         ".codex/audit/audit-20260703-github-repo-create-executed.json",
         ".codex/connectors/connector-exec-20260703-github-repo-create-live-result.json"
       ],
-      "boundaries": [
-        "Requires a scoped, unexpired approval lock for the exact repository target.",
-        "Requires a passing boot check and foundation validation before execution.",
-        "Requires audit events for approval and execution.",
-        "Stops before any deploy, domain or DNS change, workflow activation, or paid action.",
-        "Netlify actions, n8n actions, live deploys, social posting, production changes, and domain changes are not proven capabilities."
-      ],
       "owner": "owner-gurnoor-bassi",
-      "status": "active",
+      "status": "proven",
       "safetyTier": "owner_approval_required",
       "approvalRequired": true,
-      "notes": "Proven on 2026-07-03 through the full gate chain. This record describes a proven capability; it does not authorize any future execution without a new approval lock."
+      "notes": "Capability describes proof already recorded in AG OS. It does not grant standing approval for future repository creation."
+    },
+    {
+      "id": "capability-github-branch-pr-creation-approved",
+      "name": "GitHub branch and pull request creation with approval",
+      "type": "connector_execution",
+      "proofRecords": [
+        ".codex/approvals/approval-20260704-github-builder-pr.json",
+        ".codex/audit/audit-20260704-github-builder-pr-approval.json",
+        ".codex/audit/audit-20260704-github-builder-pr-executed.json",
+        ".codex/connectors/connector-exec-20260704-github-builder-pr-live-result.json",
+        ".codex/costs/cost-ledger-20260704-github-builder-pr.json"
+      ],
+      "approvalRequirement": "Requires owner approval for the exact target repo, branch name, file set, and PR scope.",
+      "riskTier": "R4",
+      "boundaries": [
+        "Proven only for creating one branch, adding/updating approved starter files, and opening one PR in the test repository.",
+        "Does not authorize merging the PR without separate approval.",
+        "Does not authorize deployments, Netlify connection, n8n activation, domain/DNS changes, paid tools, credentials, tracking scripts, live forms, or production/customer data."
+      ],
+      "blockedCapabilities": [
+        "unapproved repository edits",
+        "automatic PR merge",
+        "deployment",
+        "domain or DNS changes",
+        "tracking scripts",
+        "live form wiring"
+      ],
+      "lastProvenDate": "2026-07-04",
+      "sourceRecords": [
+        ".codex/approvals/approval-20260704-github-builder-pr.json",
+        ".codex/audit/audit-20260704-github-builder-pr-approval.json",
+        ".codex/audit/audit-20260704-github-builder-pr-executed.json",
+        ".codex/connectors/connector-exec-20260704-github-builder-pr-live-result.json",
+        ".codex/costs/cost-ledger-20260704-github-builder-pr.json",
+        ".codex/github/github-plan-20260704-test-construction-builder-pr.json"
+      ],
+      "owner": "owner-gurnoor-bassi",
+      "status": "proven",
+      "safetyTier": "owner_approval_required",
+      "approvalRequired": true,
+      "notes": "Proven through the approved test construction website builder milestone."
+    },
+    {
+      "id": "capability-target-pr-review-critique-quality-score",
+      "name": "Target repository PR review with critique and quality score",
+      "type": "validation",
+      "proofRecords": [
+        ".codex/audit/audit-runtime-target-pr-review-construction-website-20260704.json",
+        ".codex/critiques/critique-runtime-target-pr-review-construction-website-20260704.json",
+        ".codex/quality-scores/quality-score-runtime-target-pr-review-construction-website-20260704.json",
+        ".codex/costs/cost-ledger-runtime-target-pr-review-construction-website-20260704.json"
+      ],
+      "approvalRequirement": "Owner approval is required when the review inspects a live target repository PR or gates a later live merge.",
+      "riskTier": "R2",
+      "boundaries": [
+        "Proven for advisory review of a target repo PR with source-controlled audit, critique, quality score, and candidate lesson records.",
+        "Critique output is advisory and cannot approve live action.",
+        "Quality score status remains candidate unless separately promoted by an approved process."
+      ],
+      "blockedCapabilities": [
+        "automatic target PR merge",
+        "accepted lesson creation",
+        "permanent memory creation",
+        "production/customer data review without explicit approval"
+      ],
+      "lastProvenDate": "2026-07-04",
+      "sourceRecords": [
+        ".codex/audit/audit-runtime-target-pr-review-construction-website-20260704.json",
+        ".codex/critiques/critique-runtime-target-pr-review-construction-website-20260704.json",
+        ".codex/quality-scores/quality-score-runtime-target-pr-review-construction-website-20260704.json",
+        ".codex/costs/cost-ledger-runtime-target-pr-review-construction-website-20260704.json",
+        ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-construction-website-20260704-01.json"
+      ],
+      "owner": "owner-gurnoor-bassi",
+      "status": "proven",
+      "safetyTier": "tier_2",
+      "approvalRequired": true,
+      "notes": "Proven against the test construction website target PR. It is a review capability, not a merge or deployment capability."
+    },
+    {
+      "id": "capability-target-pr-merge-approved",
+      "name": "Target repository PR merge with approval",
+      "type": "connector_execution",
+      "proofRecords": [
+        ".codex/approvals/approval-20260704-target-pr-merge-construction-website.json",
+        ".codex/audit/audit-20260704-target-pr-merge-approval.json",
+        ".codex/audit/audit-20260704-target-pr-merge-executed.json",
+        ".codex/connectors/connector-exec-20260704-target-pr-merge-live-result.json",
+        ".codex/costs/cost-ledger-20260704-target-pr-merge-construction-website.json"
+      ],
+      "approvalRequirement": "Requires owner approval for the exact target repo, PR number, reviewed head SHA, and merge scope.",
+      "riskTier": "R4",
+      "boundaries": [
+        "Proven only for merging one reviewed PR after AG OS review records were merged into source of truth.",
+        "Requires confirming reviewed files and head SHA are unchanged before merge.",
+        "Does not authorize deployment, Netlify activation, domain/DNS changes, n8n changes, paid tools, credentials, or production/customer data."
+      ],
+      "blockedCapabilities": [
+        "unreviewed target PR merge",
+        "automatic merge after critique",
+        "deployment",
+        "domain or DNS changes",
+        "production/customer data handling"
+      ],
+      "lastProvenDate": "2026-07-04",
+      "sourceRecords": [
+        ".codex/approvals/approval-20260704-target-pr-merge-construction-website.json",
+        ".codex/audit/audit-20260704-target-pr-merge-approval.json",
+        ".codex/audit/audit-20260704-target-pr-merge-executed.json",
+        ".codex/connectors/connector-exec-20260704-target-pr-merge-live-result.json",
+        ".codex/costs/cost-ledger-20260704-target-pr-merge-construction-website.json"
+      ],
+      "owner": "owner-gurnoor-bassi",
+      "status": "proven",
+      "safetyTier": "owner_approval_required",
+      "approvalRequired": true,
+      "notes": "Proven for the test construction website target PR merge only."
+    },
+    {
+      "id": "capability-netlify-staging-deploy-approved",
+      "name": "Netlify staging deployment on dedicated staging-only site with approval",
+      "type": "connector_execution",
+      "proofRecords": [
+        ".codex/approvals/approval-20260704-netlify-staging-test-construction.json",
+        ".codex/audit/audit-20260704-netlify-staging-approval.json",
+        ".codex/audit/audit-20260704-netlify-staging-executed.json",
+        ".codex/connectors/connector-exec-20260704-netlify-staging-live-result.json",
+        ".codex/costs/cost-ledger-20260704-netlify-staging-test-construction.json"
+      ],
+      "approvalRequirement": "Requires owner approval for the exact repo, source SHA, dedicated staging-only site, and no-domain deployment scope.",
+      "riskTier": "R4",
+      "boundaries": [
+        "Proven only for a dedicated staging-only Netlify site.",
+        "Netlify production context is recorded only as the primary context of the dedicated staging-only site.",
+        "Does not authorize AG Digitalz production deployment, custom domains, DNS changes, paid Netlify features, environment variable values, forms, tracking, or production/customer data."
+      ],
+      "blockedCapabilities": [
+        "production deployment",
+        "custom domains",
+        "domain or DNS changes",
+        "paid Netlify features",
+        "environment variable value management",
+        "customer production system deployment"
+      ],
+      "lastProvenDate": "2026-07-04",
+      "sourceRecords": [
+        ".codex/approvals/approval-20260704-netlify-staging-test-construction.json",
+        ".codex/audit/audit-20260704-netlify-staging-approval.json",
+        ".codex/audit/audit-20260704-netlify-staging-executed.json",
+        ".codex/connectors/connector-exec-20260704-netlify-staging-live-result.json",
+        ".codex/costs/cost-ledger-20260704-netlify-staging-test-construction.json",
+        ".codex/netlify/netlify-plan-20260704-test-construction-staging.json"
+      ],
+      "owner": "owner-gurnoor-bassi",
+      "status": "proven",
+      "safetyTier": "owner_approval_required",
+      "approvalRequired": true,
+      "notes": "Proven for the test construction website staging-only Netlify milestone. Production deployment remains blocked."
+    },
+    {
+      "id": "capability-n8n-inactive-draft-workflow-export-approved",
+      "name": "n8n inactive draft workflow creation and export with approval",
+      "type": "connector_execution",
+      "proofRecords": [
+        ".codex/approvals/approval-20260704-n8n-draft-workflow-proof.json",
+        ".codex/audit/audit-20260704-n8n-draft-workflow-executed.json",
+        ".codex/connectors/connector-exec-20260704-n8n-draft-workflow-live-result.json",
+        ".codex/costs/cost-ledger-20260704-n8n-draft-workflow-proof-success.json",
+        ".codex/n8n/exports/n8n-export-20260704-construction-lead-draft-proof-success.json"
+      ],
+      "approvalRequirement": "Requires owner approval for the exact inactive workflow purpose, no-credential scope, and no-activation proof.",
+      "riskTier": "R4",
+      "boundaries": [
+        "Proven only for creating one inactive draft workflow and exporting source-controlled workflow JSON.",
+        "Workflow active status must remain false.",
+        "Does not authorize workflow activation, workflow credentials, outbound email/SMS/WhatsApp, real external API calls, production n8n workflow changes, Lead Gen workflow changes, or AI Receptionist workflow changes."
+      ],
+      "blockedCapabilities": [
+        "n8n workflow activation",
+        "n8n credential connection",
+        "outbound email/SMS/WhatsApp",
+        "real external API workflow calls",
+        "production n8n workflow management",
+        "Lead Gen workflow management",
+        "AI Receptionist workflow management"
+      ],
+      "lastProvenDate": "2026-07-04",
+      "sourceRecords": [
+        ".codex/approvals/approval-20260704-n8n-draft-workflow-proof.json",
+        ".codex/audit/audit-20260704-n8n-draft-workflow-approval.json",
+        ".codex/audit/audit-20260704-n8n-draft-workflow-blocked.json",
+        ".codex/connectors/connector-exec-20260704-n8n-draft-workflow-blocked-oauth.json",
+        ".codex/audit/audit-20260704-n8n-draft-workflow-executed.json",
+        ".codex/connectors/connector-exec-20260704-n8n-draft-workflow-live-result.json",
+        ".codex/costs/cost-ledger-20260704-n8n-draft-workflow-proof-success.json",
+        ".codex/n8n/n8n-plan-20260704-construction-lead-draft-proof.json",
+        ".codex/n8n/exports/n8n-export-20260704-construction-lead-draft-proof-success.json"
+      ],
+      "owner": "owner-gurnoor-bassi",
+      "status": "proven",
+      "safetyTier": "owner_approval_required",
+      "approvalRequired": true,
+      "notes": "Proven after the earlier OAuth-blocked attempt was recorded and preserved. This is draft-only workflow creation/export, not live automation."
+    },
+    {
+      "id": "capability-quality-score-generation",
+      "name": "Quality score generation",
+      "type": "validation",
+      "proofRecords": [
+        ".codex/quality-scores/quality-score-20260704-runtime-closed-loop-crm-proof-20260704.json",
+        ".codex/quality-scores/quality-score-20260704-runtime-quality-loop-crm-20260704.json",
+        ".codex/quality-scores/quality-score-runtime-target-pr-review-construction-website-20260704.json"
+      ],
+      "approvalRequirement": "No owner approval is required for local plan-only quality score generation; owner approval is required before using a score to justify any gated live action.",
+      "riskTier": "R1",
+      "boundaries": [
+        "Proven for source-controlled candidate quality score records.",
+        "Quality scores cannot approve live actions, bypass gates, create accepted lessons, or write permanent memory.",
+        "Scores remain advisory unless a separate approved workflow promotes their use."
+      ],
+      "blockedCapabilities": [
+        "automatic live action approval",
+        "accepted lesson creation",
+        "permanent memory creation",
+        "production/customer data scoring without explicit approval"
+      ],
+      "lastProvenDate": "2026-07-04",
+      "sourceRecords": [
+        "scripts/process-quality-score.mjs",
+        "schemas/quality-score.schema.json",
+        ".codex/quality-scores/quality-score-20260704-runtime-closed-loop-crm-proof-20260704.json",
+        ".codex/quality-scores/quality-score-20260704-runtime-quality-loop-crm-20260704.json",
+        ".codex/quality-scores/quality-score-runtime-target-pr-review-construction-website-20260704.json"
+      ],
+      "owner": "owner-gurnoor-bassi",
+      "status": "proven",
+      "safetyTier": "tier_1",
+      "approvalRequired": false,
+      "notes": "Proven for local/candidate scoring records only."
+    },
+    {
+      "id": "capability-lesson-candidate-generation",
+      "name": "Lesson candidate generation",
+      "type": "registry_management",
+      "proofRecords": [
+        ".codex/memory/lessons/candidates/lesson-20260704-runtime-closed-loop-crm-proof-20260704-01.json",
+        ".codex/memory/lessons/candidates/lesson-20260704-runtime-closed-loop-crm-proof-20260704-02.json",
+        ".codex/memory/lessons/candidates/lesson-20260704-runtime-closed-loop-crm-proof-20260704-03.json",
+        ".codex/memory/lessons/candidates/lesson-20260704-runtime-quality-loop-crm-20260704-01.json",
+        ".codex/memory/lessons/candidates/lesson-20260704-runtime-quality-loop-crm-20260704-02.json",
+        ".codex/memory/lessons/candidates/lesson-20260704-runtime-quality-loop-crm-20260704-03.json"
+      ],
+      "approvalRequirement": "No owner approval is required for local candidate lesson generation; owner approval is required before accepting or promoting any lesson as durable truth.",
+      "riskTier": "R1",
+      "boundaries": [
+        "Proven only for candidate lesson records.",
+        "Candidate lessons are not accepted truth and are not permanent memory.",
+        "Candidate lessons cannot relax security rules, approval gates, cost limits, or live-action restrictions."
+      ],
+      "blockedCapabilities": [
+        "automatic accepted lessons",
+        "automatic permanent memory",
+        "lesson-based approval bypass",
+        "security or cost rule weakening"
+      ],
+      "lastProvenDate": "2026-07-04",
+      "sourceRecords": [
+        "scripts/process-lesson-candidates.mjs",
+        "schemas/lesson.schema.json",
+        ".codex/memory/lessons/candidates/lesson-20260704-runtime-closed-loop-crm-proof-20260704-01.json",
+        ".codex/memory/lessons/candidates/lesson-20260704-runtime-quality-loop-crm-20260704-01.json",
+        ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-construction-website-20260704-01.json"
+      ],
+      "owner": "owner-gurnoor-bassi",
+      "status": "proven",
+      "safetyTier": "tier_1",
+      "approvalRequired": false,
+      "notes": "Proven as candidate-only learning support. Accepted lesson promotion remains blocked without owner approval."
+    },
+    {
+      "id": "capability-critic-review-generation",
+      "name": "Critic review generation",
+      "type": "validation",
+      "proofRecords": [
+        ".codex/critiques/critique-20260704-runtime-closed-loop-crm-proof-20260704.json",
+        ".codex/critiques/critique-runtime-target-pr-review-construction-website-20260704.json"
+      ],
+      "approvalRequirement": "No owner approval is required for local advisory critique generation; owner approval remains required for any gated live action regardless of critique status.",
+      "riskTier": "R1",
+      "boundaries": [
+        "Proven only for advisory critique records.",
+        "Critique is not approval and cannot bypass approval gates.",
+        "Critic cannot edit plans directly, activate live actions, create accepted lessons, or write permanent memory."
+      ],
+      "blockedCapabilities": [
+        "critic-approved live action",
+        "approval gate bypass",
+        "direct plan mutation by critic",
+        "accepted lesson creation",
+        "permanent memory creation"
+      ],
+      "lastProvenDate": "2026-07-04",
+      "sourceRecords": [
+        "scripts/process-plan-critique.mjs",
+        "schemas/plan-critique.schema.json",
+        ".codex/critiques/critique-20260704-runtime-closed-loop-crm-proof-20260704.json",
+        ".codex/critiques/critique-runtime-target-pr-review-construction-website-20260704.json"
+      ],
+      "owner": "owner-gurnoor-bassi",
+      "status": "proven",
+      "safetyTier": "tier_1",
+      "approvalRequired": false,
+      "notes": "Proven for advisory critique generation only. Critiques never count as owner approval."
     }
   ],
   "allowedCapabilityTypes": [
@@ -36,7 +364,8 @@
     "validation",
     "registry_management",
     "documentation",
-    "approval_packet"
+    "approval_packet",
+    "connector_execution"
   ],
   "rules": {
     "credentialsAllowed": false,
@@ -47,5 +376,5 @@
     "customerDataAllowed": false,
     "deploymentAllowedByDefault": false
   },
-  "notes": "Foundation registry only. No capability records are registered yet; future records require explicit scope, owner, safety tier, and validation."
+  "notes": "Registry reflects the AG OS v1 builder proof chain through 2026-07-04. Proven capabilities still require their recorded approval gates where applicable. Draft-only or blocked areas remain unproven: production deployment, domain/DNS changes, custom domains, paid Netlify features, n8n activation, n8n credentials, outbound email/SMS/WhatsApp, real external API workflows, live social posting, social account connections, analytics API pulls, production/customer data handling, Lead Gen production management, and AI Receptionist production management."
 }

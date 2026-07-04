@@ -46,6 +46,13 @@ function projectRecord(entry) {
   };
 }
 
+function capabilityTypeLabel(type) {
+  if (type === "connector_execution") {
+    return `${type}: approval-gated capability type`;
+  }
+  return `${type}: local-safe capability type`;
+}
+
 export function collectDashboardData() {
   const constitution = readText("docs/ag-os-constitution-v1.md");
   const projectRegistry = readJson(".codex/projects/registry.json");
@@ -113,7 +120,7 @@ export function collectDashboardData() {
     capabilityRegistry: {
       status: capabilityRegistry.status,
       count: capabilityRegistry.capabilities.length,
-      allowedTypes: capabilityRegistry.allowedCapabilityTypes.map((type) => `${type}: allowed foundation type`)
+      allowedTypes: capabilityRegistry.allowedCapabilityTypes.map(capabilityTypeLabel)
     },
     watchdog: {
       status: watchdogPolicy.status,

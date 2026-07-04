@@ -94,15 +94,16 @@ window.AG_OS_DASHBOARD_DATA = {
   },
   "capabilityRegistry": {
     "status": "active",
-    "count": 1,
+    "count": 9,
     "allowedTypes": [
-      "discussion: allowed foundation type",
-      "planning: allowed foundation type",
-      "local_build: allowed foundation type",
-      "validation: allowed foundation type",
-      "registry_management: allowed foundation type",
-      "documentation: allowed foundation type",
-      "approval_packet: allowed foundation type"
+      "discussion: local-safe capability type",
+      "planning: local-safe capability type",
+      "local_build: local-safe capability type",
+      "validation: local-safe capability type",
+      "registry_management: local-safe capability type",
+      "documentation: local-safe capability type",
+      "approval_packet: local-safe capability type",
+      "connector_execution: approval-gated capability type"
     ]
   },
   "watchdog": {
