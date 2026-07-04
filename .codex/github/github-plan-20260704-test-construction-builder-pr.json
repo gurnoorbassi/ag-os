@@ -1,0 +1,142 @@
+{
+  "githubExecutionPlanId": "github-plan-20260704-test-construction-builder-pr",
+  "status": "planned",
+  "mode": "planning_only",
+  "connectorId": "connector-github-mcp",
+  "commandId": "command-intake-runtime-github-construction-website-repo-20260703",
+  "projectId": "project-unregistered-construction-website",
+  "requestedRepositoryName": "gurnoorbassi/ag-test-construction-website",
+  "riskLevel": "R4",
+  "plannedActions": [
+    {
+      "actionId": "github-action-20260704-test-construction-create-branch",
+      "actionType": "create_branch",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-builder-branch-create",
+      "requiredEvidence": [
+        "active_owner_approval_lock",
+        "target_repository",
+        "target_branch",
+        "boot_check_ready"
+      ],
+      "rollbackRequired": true
+    },
+    {
+      "actionId": "github-action-20260704-test-construction-create-files",
+      "actionType": "create_files",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-builder-file-create",
+      "requiredEvidence": [
+        "active_owner_approval_lock",
+        "starter_file_manifest",
+        "no_credentials_scan",
+        "local_validation_plan"
+      ],
+      "rollbackRequired": true
+    },
+    {
+      "actionId": "github-action-20260704-test-construction-update-readme",
+      "actionType": "update_files",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-builder-file-update",
+      "requiredEvidence": [
+        "active_owner_approval_lock",
+        "readme_update_scope",
+        "diff_review"
+      ],
+      "rollbackRequired": true
+    },
+    {
+      "actionId": "github-action-20260704-test-construction-open-pr",
+      "actionType": "open_pr",
+      "status": "blocked",
+      "approvalRequired": true,
+      "approvalGate": "approval-github-builder-open-pr",
+      "requiredEvidence": [
+        "active_owner_approval_lock",
+        "branch_ref",
+        "pr_title",
+        "pr_body",
+        "local_validation_result"
+      ],
+      "rollbackRequired": false
+    }
+  ],
+  "approvalGates": [
+    "approval-github-builder-branch-create",
+    "approval-github-builder-file-create",
+    "approval-github-builder-file-update",
+    "approval-github-builder-open-pr"
+  ],
+  "plannedWork": {
+    "detectedProjectType": "website",
+    "recommendedStack": "Bootstrap Mode static HTML, CSS, and JavaScript with zero runtime dependencies. package.json is allowed only for local checks if useful. Keep the site Netlify-compatible for a later approved staging step, but do not add Netlify activation, deployment hooks, paid services, forms wired to live services, analytics, tracking scripts, or external APIs.",
+    "starterFiles": [
+      {
+        "path": "README.md",
+        "purpose": "Update project purpose, local check commands, safety boundaries, and future deployment approval gates if needed."
+      },
+      {
+        "path": "package.json",
+        "purpose": "Define zero-dependency local scripts for checking the static starter site if needed."
+      },
+      {
+        "path": "index.html",
+        "purpose": "Create the basic construction website homepage with hero, services, proof placeholder copy, and contact CTA sections."
+      },
+      {
+        "path": "src/styles.css",
+        "purpose": "Provide simple responsive styling for the static homepage."
+      },
+      {
+        "path": "src/main.js",
+        "purpose": "Provide local-only progressive enhancement without tracking, external API calls, or live form submission."
+      }
+    ],
+    "pullRequestFlow": [
+      "Confirm active approval lock exists for approval-20260704-github-builder-pr.",
+      "Confirm boot check and validation pass immediately before execution.",
+      "Create branch ag-os/starter-construction-website-v1 in gurnoorbassi/ag-test-construction-website.",
+      "Write only the approved starter files.",
+      "Run the local validation plan on the prepared file set before opening the pull request when practical.",
+      "Open one pull request from ag-os/starter-construction-website-v1 to main.",
+      "Stop after reporting the pull request link."
+    ],
+    "ciPolling": [
+      "No CI polling is approved by this package.",
+      "If GitHub runs checks automatically after the pull request opens, do not poll or act on them unless the owner separately approves CI status checking.",
+      "Do not rerun jobs, edit workflow files, or change repository settings."
+    ],
+    "mergeRules": [
+      "No merge is approved by this package.",
+      "A later merge requires separate owner approval, validation evidence, CI evidence if applicable, safe-merge review, and a new audit event.",
+      "Block merge for any credential, live service, deployment, domain or DNS, paid action, production data, customer data, Lead Gen, AI Receptionist, or Constitution concern."
+    ],
+    "stopConditions": [
+      "Stop before any GitHub MCP execution without an active approved lock.",
+      "Stop if the target repository is not gurnoorbassi/ag-test-construction-website.",
+      "Stop if the branch name changes from ag-os/starter-construction-website-v1.",
+      "Stop if more than one pull request is needed.",
+      "Stop before merge, deployment, Netlify, n8n, domain or DNS, paid action, credential, secret, production data, or customer data handling.",
+      "Stop before adding tracking scripts, external paid APIs, wired live forms, or real client data.",
+      "Stop before touching Lead Gen, AI Receptionist, or the Constitution.",
+      "Stop if validation, boot check, or diff review fails."
+    ]
+  },
+  "safety": {
+    "executesGitHubAction": false,
+    "createsRepository": false,
+    "writesRepositoryContent": false,
+    "opensPullRequest": false,
+    "pollsCi": false,
+    "mergesPullRequest": false,
+    "usesCredentials": false,
+    "touchesProductionData": false,
+    "usesPaidAction": false
+  },
+  "createdAt": "2026-07-04T08:35:00.000Z",
+  "updatedAt": "2026-07-04T08:35:00.000Z"
+}

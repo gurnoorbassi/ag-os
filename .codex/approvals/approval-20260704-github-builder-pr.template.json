@@ -1,0 +1,81 @@
+{
+  "approvalId": "approval-20260704-github-builder-pr",
+  "status": "revoked",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "REQUIRED_APPROVER_ID",
+  "commandCategory": "build",
+  "requestedAction": "Create one branch, add starter construction website files, and open one pull request in gurnoorbassi/ag-test-construction-website.",
+  "target": "github:gurnoorbassi/ag-test-construction-website#ag-os/starter-construction-website-v1",
+  "scope": "This approval package, if converted into an active approved lock, allows AG OS to use GitHub MCP for exactly one future builder milestone in the existing private test repository gurnoorbassi/ag-test-construction-website. The allowed live actions are limited to creating branch ag-os/starter-construction-website-v1, adding or updating the approved starter website files, and opening exactly one pull request to main. This approval does not allow merging, deployments, Netlify, n8n, domain or DNS changes, paid actions, credentials, production data, customer data, tracking scripts, wired live forms, Lead Gen changes, AI Receptionist changes, or Constitution changes.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/budget.json"
+  },
+  "approvalRequiredFor": [
+    "create_branch",
+    "create_files",
+    "update_files",
+    "open_pr"
+  ],
+  "approvedActions": [
+    "create_branch",
+    "create_files",
+    "update_files",
+    "open_pr"
+  ],
+  "prohibitedActions": [
+    "create_repo",
+    "create_more_than_one_branch",
+    "open_more_than_one_pr",
+    "merge_pr",
+    "poll_ci",
+    "deploy_staging",
+    "deploy_production",
+    "connect_netlify",
+    "connect_n8n",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "use_credentials",
+    "add_secrets",
+    "add_tracking_scripts",
+    "wire_forms_to_live_services",
+    "access_production_data",
+    "access_customer_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target branch changes, more than one pull request is needed, merge or deployment is requested, validation or boot check fails, GitHub reports a conflict, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond creating one branch, writing the approved starter files, and opening one pull request.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner instruction requested an approval package only for the first real builder milestone in gurnoorbassi/ag-test-construction-website.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/github/github-plan-20260704-test-construction-builder-pr.json",
+      "verified": false
+    },
+    {
+      "type": "other",
+      "reference": "docs/github-builder-milestone-approval-package.md",
+      "verified": false
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs must pass immediately before execution.",
+      "verified": false
+    }
+  ],
+  "approvalText": "REQUIRED_EXACT_OWNER_APPROVAL_TEXT",
+  "approvedAt": "REQUIRED_APPROVED_AT",
+  "expiresAt": "REQUIRED_EXPIRES_AT",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
