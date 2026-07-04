@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260704-runtime-target-pr-review-construction-website-20260704-01",
+  "title": "Target repo builder PRs need a local static review gate before merge",
+  "lesson": "The first AG OS-created target repo builder PR was safest to review by combining GitHub changed-file inspection, a temp clone, the target repo's own safe package script, JavaScript syntax checks, approved file-scope verification, relative path checks, and code-file scans for credentials, tracking, live forms, external APIs, deploy config, and paid integrations. Future target repo builder PRs should use this review gate before asking the owner for merge approval.",
+  "sources": [
+    "https://github.com/gurnoorbassi/ag-test-construction-website/pull/1",
+    ".codex/audit/audit-runtime-target-pr-review-construction-website-20260704.json",
+    ".codex/critiques/critique-runtime-target-pr-review-construction-website-20260704.json",
+    ".codex/quality-scores/quality-score-runtime-target-pr-review-construction-website-20260704.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "high",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-unregistered-construction-website",
+  "appliesTo": [
+    "target repo builder PR review",
+    "GitHub connector execution review",
+    "Bootstrap Mode static websites"
+  ],
+  "sourceScoreId": "quality-score-runtime-target-pr-review-construction-website-20260704",
+  "generatedBy": "ag-os-reviewer",
+  "whyThisMatters": "The review gate catches scope, safety, and basic technical issues before AG OS asks for owner approval to merge a target repo PR.",
+  "whenToUse": "Use before asking to merge future AG OS-created target repo PRs, especially static website starter PRs.",
+  "whenNotToUse": "Do not treat this as approval to merge, deploy, connect services, add credentials, or skip owner approval.",
+  "notes": "Candidate only. Not accepted permanent truth until reviewed and promoted per docs/memory-learning-policy.md.",
+  "createdAt": "2026-07-04T09:33:20.653Z",
+  "updatedAt": "2026-07-04T09:33:20.653Z"
+}

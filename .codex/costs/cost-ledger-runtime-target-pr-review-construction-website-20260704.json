@@ -1,0 +1,44 @@
+{
+  "costLedgerId": "cost-ledger-runtime-target-pr-review-construction-website-20260704",
+  "status": "active",
+  "budgetLimitsUsd": {
+    "perTaskMax": 5,
+    "dailyMax": 10,
+    "monthlyMax": 50
+  },
+  "entries": [
+    {
+      "costEntryId": "cost-entry-runtime-target-pr-review-construction-website-20260704-estimated",
+      "jobId": "runtime-target-pr-review-construction-website-20260704",
+      "projectId": "project-unregistered-construction-website",
+      "costType": "estimated",
+      "amountUsd": 0,
+      "approvalRequired": false,
+      "status": "recorded"
+    },
+    {
+      "costEntryId": "cost-entry-runtime-target-pr-review-construction-website-20260704-actual",
+      "jobId": "runtime-target-pr-review-construction-website-20260704",
+      "projectId": "project-unregistered-construction-website",
+      "costType": "actual",
+      "amountUsd": 0,
+      "approvalRequired": false,
+      "status": "recorded"
+    }
+  ],
+  "summary": {
+    "estimatedTaskCostUsd": 0,
+    "actualTaskCostUsd": 0,
+    "dailyActualUsd": 0,
+    "monthlyActualUsd": 0,
+    "budgetStatus": "within_limit"
+  },
+  "safety": {
+    "createsBillingChange": false,
+    "usesPaidService": false,
+    "usesLiveApi": false,
+    "requiresOwnerApproval": false
+  },
+  "createdAt": "2026-07-04T09:33:20.653Z",
+  "updatedAt": "2026-07-04T09:33:20.653Z"
+}
