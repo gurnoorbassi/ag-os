@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260704-n8n-draft-workflow-blocked",
+  "occurredAt": "2026-07-04T11:20:06Z",
+  "actor": "ag-os-runtime",
+  "eventType": "validation_run",
+  "summary": "n8n draft workflow proof was blocked before workflow creation because the n8n MCP required OAuth authorization while reading the SDK reference.",
+  "scope": "approval-20260704-n8n-draft-workflow-proof",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-n8n-draft-workflow-proof"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-20260704-n8n-draft-workflow-blocked-oauth"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/n8n/n8n-plan-20260704-construction-lead-draft-proof.json"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "AG OS completed local approval, validation, boot, and test gates, then attempted the required first n8n SDK reference step. The n8n MCP returned OAuth authorization required before any workflow code validation, workflow creation, workflow activation, credential connection, outbound message, real external API call, production workflow change, Lead Gen workflow change, AI Receptionist workflow change, deployment, domain or DNS change, paid action, customer data use, production data use, or Constitution change occurred.",
+  "createdAt": "2026-07-04T11:20:06Z"
+}
