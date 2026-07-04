@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260704-social-media-netlify-staging-approval",
+  "occurredAt": "REQUIRED_OCCURRED_AT",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for AG OS to create or connect one dedicated Netlify staging-only site and deploy gurnoorbassi/ag-social-media-management-system from main. This audit event does not execute the deployment.",
+  "scope": "approval-20260704-social-media-netlify-staging",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-social-media-netlify-staging"
+    },
+    {
+      "type": "document",
+      "reference": "docs/social-media-netlify-staging-approval-package.md"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/netlify/netlify-plan-20260704-social-media-staging.json"
+    },
+    {
+      "type": "commit",
+      "reference": "d3fcd8c6435433169686c2ec404a5f00c6cc62bd"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Future live execution remains blocked until the approval lock is converted from template to active approved record with exact owner approval text, approval timestamp, expiration, current validation evidence, and the same staging-only Netlify scope. This template does not authorize deployment, production hosting, custom domain, DNS, paid feature, secrets, social account connection, social credentials, posting, scheduling, analytics API use, n8n activation, real client data, Lead Gen, AI Receptionist, or Constitution changes.",
+  "createdAt": "REQUIRED_CREATED_AT"
+}
