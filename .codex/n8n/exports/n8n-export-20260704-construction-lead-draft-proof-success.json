@@ -1,0 +1,167 @@
+{
+  "exportId": "n8n-export-20260704-construction-lead-draft-proof-success",
+  "exportType": "inactive_draft_workflow_proof",
+  "approvalId": "approval-20260704-n8n-draft-workflow-proof",
+  "workflowId": "WaD4uysb8ic0rfsH",
+  "workflowName": "Construction Website Lead Intake Follow-up Draft",
+  "workflowUrl": "https://n8n.agdigitalz.net/workflow/WaD4uysb8ic0rfsH",
+  "active": false,
+  "isArchived": false,
+  "versionId": "17eb4e40-6f95-47bc-9042-9f77f1907d73",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "createdAt": "2026-07-04T11:55:13.848Z",
+  "exportedAt": "2026-07-04T11:56:19.923Z",
+  "validation": {
+    "workflowSdkValidationPassed": true,
+    "nodeCount": 6,
+    "activeStatusVerifiedFalse": true,
+    "credentialsConnected": false,
+    "outboundMessageNodesConfigured": false,
+    "realExternalApiNodesConfigured": false,
+    "productionWorkflowTouched": false,
+    "leadGenWorkflowTouched": false,
+    "aiReceptionistWorkflowTouched": false,
+    "usesPlaceholderPayloadOnly": true
+  },
+  "workflow": {
+    "id": "WaD4uysb8ic0rfsH",
+    "name": "Construction Website Lead Intake Follow-up Draft",
+    "active": false,
+    "settings": {
+      "executionOrder": "v1",
+      "availableInMCP": true
+    },
+    "connections": {
+      "Future Contact Form Webhook": {
+        "main": [
+          [
+            {
+              "node": "Validate Required Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate Required Fields": {
+        "main": [
+          [
+            {
+              "node": "Build Draft Lead Placeholder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Draft Lead Placeholder": {
+        "main": [
+          [
+            {
+              "node": "Build Internal Follow-up Task Placeholder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Internal Follow-up Task Placeholder": {
+        "main": [
+          [
+            {
+              "node": "Log Draft Intake Event Locally",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log Draft Intake Event Locally": {
+        "main": [
+          [
+            {
+              "node": "Stop Before Outbound Messages",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodes": [
+      {
+        "id": "b69a9887-45f5-4c54-9b0b-3d1196d1519d",
+        "name": "Future Contact Form Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "construction-lead-intake-draft-proof",
+          "authentication": "none",
+          "responseMode": "onReceived",
+          "options": {
+            "noResponseBody": false,
+            "responseData": "Draft workflow received placeholder payload only. Outbound messages are disabled."
+          }
+        },
+        "webhookId": "2315dde8-0d10-4cec-a4f5-df3f695b6af6"
+      },
+      {
+        "id": "67bdf68e-2d75-446b-bc75-2818786eb62e",
+        "name": "Validate Required Fields",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "const requiredFields = ['fullName', 'email', 'message', 'source'];\nreturn $input.all().map((item) => {\n  const body = item.json.body ?? {};\n  const missingFields = requiredFields.filter((field) => !body[field]);\n  return {\n    json: {\n      body,\n      validation: {\n        isValid: missingFields.length === 0,\n        requiredFields,\n        missingFields,\n        proofMode: 'placeholder_test_payload_only',\n        realCustomerDataUsed: false\n      }\n    }\n  };\n});"
+        }
+      },
+      {
+        "id": "2faf61da-b6c8-4a8e-9117-93c5c2847fd0",
+        "name": "Build Draft Lead Placeholder",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return $input.all().map((item) => {\n  const body = item.json.body;\n  return {\n    json: {\n      ...item.json,\n      draftLead: {\n        fullName: body.fullName,\n        email: body.email,\n        phone: body.phone ?? null,\n        serviceInterest: body.serviceInterest ?? null,\n        message: body.message,\n        source: body.source,\n        submittedAt: body.submittedAt ?? null,\n        status: 'draft_placeholder_only',\n        productionWrite: false,\n        externalSystemWrite: false\n      }\n    }\n  };\n});"
+        }
+      },
+      {
+        "id": "699f5181-55db-4837-84d7-48eeac2185a9",
+        "name": "Build Internal Follow-up Task Placeholder",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return $input.all().map((item) => ({\n  json: {\n    ...item.json,\n    followUpTask: {\n      title: 'Review construction website lead placeholder',\n      owner: 'internal_follow_up_owner_placeholder',\n      dueWindow: 'next_business_day_placeholder',\n      status: 'placeholder_task_only',\n      externalTaskCreated: false,\n      outboundMessageAllowed: false\n    }\n  }\n}));"
+        }
+      },
+      {
+        "id": "5360bb93-cde4-4f7f-8dcf-ca613ac0c2b2",
+        "name": "Log Draft Intake Event Locally",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return $input.all().map((item) => ({\n  json: {\n    ...item.json,\n    draftLog: {\n      eventType: 'construction_lead_intake_placeholder_received',\n      loggedInsideWorkflowOnly: true,\n      persistedToExternalSystem: false,\n      containsRealCustomerData: false\n    }\n  }\n}));"
+        }
+      },
+      {
+        "id": "f68d3c65-6835-4d9f-b0a0-7fecafb72e5e",
+        "name": "Stop Before Outbound Messages",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "mode": "runOnceForAllItems",
+          "language": "javaScript",
+          "jsCode": "return $input.all().map((item) => ({\n  json: {\n    ...item.json,\n    proofResult: {\n      stoppedBeforeOutboundMessages: true,\n      emailSent: false,\n      smsSent: false,\n      whatsappSent: false,\n      realExternalApiCalled: false,\n      credentialsUsed: false,\n      productionWorkflowTouched: false,\n      leadGenWorkflowTouched: false,\n      aiReceptionistWorkflowTouched: false\n    }\n  }\n}));"
+        }
+      }
+    ]
+  }
+}
