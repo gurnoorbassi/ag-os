@@ -1,0 +1,78 @@
+{
+  "approvalId": "approval-20260704-social-media-system-v1-package",
+  "status": "revoked",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os",
+  "approvedBy": "REQUIRED_APPROVAL_OWNER",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "plan_only",
+  "requestedAction": "Approve merging the Social Media Management System v1 draft/staging approval and build package into AG OS source of truth.",
+  "target": "ag-os:project-social-media-management-system-v1",
+  "scope": "This approval package, if converted into an active approved lock, allows only the AG OS source-of-truth package for Social Media Management System v1 to be reviewed and merged. It does not authorize repository creation, branch creation, file changes in a product repo, Netlify deployment, n8n workflow creation or activation, social account connection, credential handling, live posting, scheduling, outbound messaging, analytics API usage, paid tools, production/customer data, Lead Gen changes, AI Receptionist changes, or Constitution changes.",
+  "riskLevel": "R2",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/budget.json"
+  },
+  "approvalRequiredFor": [
+    "project_registry_change",
+    "approval_package_merge"
+  ],
+  "approvedActions": [
+    "merge_package",
+    "record_project_metadata",
+    "record_approval_package"
+  ],
+  "prohibitedActions": [
+    "create_repo",
+    "create_branch",
+    "open_product_pr",
+    "deploy_staging",
+    "deploy_production",
+    "connect_social_account",
+    "use_credentials",
+    "post_content",
+    "schedule_content",
+    "send_message",
+    "activate_n8n_workflow",
+    "call_external_api",
+    "use_paid_service",
+    "access_customer_data",
+    "access_production_data",
+    "change_domain",
+    "change_dns",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the package scope expands beyond AG OS source-of-truth planning records and docs, validation fails, boot check fails, CI fails, any live action becomes necessary, any prohibited action becomes necessary, client-specific private data is requested, a credential is needed, a paid service is needed, or the action tries to create, build, deploy, connect, schedule, post, message, or access production/customer data.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner instruction requested a Social Media Management System v1 approval/build package only, with no live build, no repo creation, no deployment, no social connection, no credentials, no posting, no scheduling, no n8n live automation, and no paid tools.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/projects/social-media-management-system-v1.json",
+      "verified": false
+    },
+    {
+      "type": "other",
+      "reference": "docs/social-media-management-system-v1-approval-package.md",
+      "verified": false
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run validate, npm.cmd run boot:check, node --test tests/*.test.mjs, and git diff --check must pass before package merge.",
+      "verified": false
+    }
+  ],
+  "approvalText": "REQUIRED_EXACT_OWNER_APPROVAL_TEXT",
+  "approvedAt": "REQUIRED_APPROVED_AT",
+  "expiresAt": "REQUIRED_EXPIRES_AT",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

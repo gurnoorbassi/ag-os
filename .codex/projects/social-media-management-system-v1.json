@@ -1,0 +1,93 @@
+{
+  "id": "project-social-media-management-system-v1",
+  "name": "Social Media Management System v1",
+  "status": "planned",
+  "owner": "owner-gurnoor-bassi",
+  "projectType": "product_project",
+  "managementMode": "managed_staging",
+  "goal": "Prepare the first reusable AG OS client-system package for social media content operations in draft and staging mode only.",
+  "knownFacts": [
+    "This project is a planned product project package, not AG OS core.",
+    "The package is draft and staging only until separate owner approval authorizes a repository, build, deployment, connector use, or live action.",
+    "The proposed future repository name is ag-social-media-management-system.",
+    "The system must support multiple clients, multiple brands per client, and multiple platform accounts per client without hardcoded client records.",
+    "Every platform account starts not connected, draft only, approval required, and live posting blocked.",
+    "No social account connection, credential, live posting, scheduling, direct message, comment, analytics API, external platform API call, production data, or customer data is authorized by this record."
+  ],
+  "scope": [
+    "Record production-clean AG OS project metadata for Social Media Management System v1.",
+    "Prepare approval and build package documentation for a future draft/staging build.",
+    "Define client, brand, platform account, content, post package, approval, report, and activity-log models.",
+    "Define safety gates for draft-only operation and blocked live actions.",
+    "Document future connector paths for GitHub, Netlify, n8n, social OAuth, analytics, scheduling, and client portal integration without activating them."
+  ],
+  "outOfScope": [
+    "Do not create a GitHub repository.",
+    "Do not create branches, files, or pull requests in a target product repository.",
+    "Do not deploy to Netlify or any other host.",
+    "Do not connect social accounts.",
+    "Do not use or store credentials.",
+    "Do not post, schedule, send messages, manage comments, or perform live outreach.",
+    "Do not activate n8n workflows.",
+    "Do not call social, analytics, scheduling, or external platform APIs.",
+    "Do not use paid tools.",
+    "Do not use production or customer data.",
+    "Do not modify Lead Gen production, the AI Receptionist repository, or the Constitution."
+  ],
+  "trustLevel": 0,
+  "stack": [
+    "GitHub source of truth",
+    "Bootstrap Mode",
+    "Static or lightweight app frontend when separately approved",
+    "Netlify staging only when separately approved",
+    "Source-controlled placeholder data only for structure",
+    "n8n draft workflow only when separately approved"
+  ],
+  "risks": [
+    {
+      "risk": "Social media systems can accidentally cross into live posting, scheduling, account connection, analytics API, or credential handling.",
+      "mitigation": "Keep v1 in draft-only mode with live posting blocked, approval required, and every connector status not connected or blocked until separate owner approval."
+    },
+    {
+      "risk": "Client-system reuse can drift into hardcoded client assumptions.",
+      "mitigation": "Use neutral client, brand, and account models in active records, keep unknown client values in docs/templates only, and add real clients later through owner-approved records."
+    },
+    {
+      "risk": "Content operations can create unapproved costs through AI, media processing, storage, scheduling, or platform tools.",
+      "mitigation": "Use Bootstrap Mode, local/source-controlled structure first, and require Cost OS approval before any paid tool or live API usage."
+    }
+  ],
+  "approvalRequiredFor": [
+    "repository creation",
+    "branch creation",
+    "file creation or update in a product repository",
+    "pull request creation",
+    "target repository pull request merge",
+    "Netlify staging deployment",
+    "n8n draft workflow creation",
+    "n8n workflow activation",
+    "social account connection",
+    "social OAuth",
+    "credential handling",
+    "live posting",
+    "scheduling activation",
+    "direct messages or comments",
+    "analytics API usage",
+    "paid tools",
+    "production or customer data handling",
+    "domain or DNS changes"
+  ],
+  "qualityGates": [
+    "Project package remains draft/staging only.",
+    "Data model supports Client, Brand, PlatformAccount, ContentItem, PostPackage, PostVariant, Approval, WeeklyReport, and ActivityLog.",
+    "Every account defaults to not connected, draft only, approval required, and live posting blocked.",
+    "No live connector, credential, paid tool, production data, or customer data is introduced.",
+    "Future build plan preserves the social media content operations archetype quality checklist.",
+    "Validation, boot check, tests, and git diff check pass before package PR merge."
+  ],
+  "securityReview": "Production-clean metadata and docs only. No social credentials, account tokens, platform secrets, client private data, production data, live endpoints, or external API payloads are recorded.",
+  "costTracking": "No paid actions authorized. Future build, connector, AI, media, storage, scheduling, analytics, or platform costs require Cost OS review and owner approval.",
+  "deploymentPlan": "No deployment in this PR. Future Netlify staging deployment requires a separate approval package, active approval lock, validation, boot check, target repo review, and recorded connector result.",
+  "createdAt": "2026-07-04T12:40:00Z",
+  "updatedAt": "2026-07-04T12:40:00Z"
+}
