@@ -50,6 +50,24 @@ const PRODUCT_TYPE_MATCHERS = [
     pattern: /\btraining\s+platform\b|\bemployee\s+training\b|\bcourse\s+platform\b/
   },
   {
+    productType: "client portal",
+    slug: "client-portal",
+    archetypeId: "archetype-client-portal",
+    pattern: /\bclient\s+portal\b|\bcustomer\s+portal\b|\bagency\s+portal\b/
+  },
+  {
+    productType: "ecommerce store",
+    slug: "ecommerce-store",
+    archetypeId: "archetype-ecommerce-store",
+    pattern: /\be[-\s]?commerce\b|\bonline\s+store\b|\bhero\s+product\s+store\b|\b(store|shop)\s+for\s+(?:one|1)\s+hero\s+product\b/
+  },
+  {
+    productType: "ai receptionist",
+    slug: "ai-receptionist",
+    archetypeId: "archetype-ai-tool",
+    pattern: /\bai\s+receptionist\b|\bphone\s+receptionist\b|\bpizza\s+shop\s+receptionist\b|\bcall\s+answering\b|\breceptionist\b/
+  },
+  {
     productType: "ai tool",
     slug: "ai-tool",
     archetypeId: "archetype-ai-tool",
