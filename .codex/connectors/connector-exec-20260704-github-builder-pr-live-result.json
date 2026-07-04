@@ -1,0 +1,92 @@
+{
+  "connectorExecutionId": "connector-exec-20260704-github-builder-pr-live-result",
+  "status": "done",
+  "connectorId": "connector-github-mcp",
+  "requestedAction": "create_branch_create_files_update_files_open_pr",
+  "riskLevel": "R4",
+  "projectId": "project-unregistered-construction-website",
+  "approvalRequired": true,
+  "approvalId": "approval-20260704-github-builder-pr",
+  "requiredPermissions": [
+    "owner_approval",
+    "active_approval_lock",
+    "boot_check_passed",
+    "foundation_validation_passed",
+    "runtime_tests_passed"
+  ],
+  "evidenceRequired": [
+    "approval_lock_approved",
+    "approval_lock_not_expired",
+    "target_repository_scope_exact_match",
+    "target_branch_scope_exact_match",
+    "approved_file_manifest_exact_match",
+    "boot_check_passed",
+    "foundation_validation_passed",
+    "runtime_tests_passed",
+    "pull_request_opened"
+  ],
+  "safety": {
+    "executesLiveAction": true,
+    "usesCredentials": false,
+    "triggersDeployment": false,
+    "changesDomain": false,
+    "usesPaidAction": false,
+    "accessesProductionData": false
+  },
+  "result": {
+    "repositoryFullName": "gurnoorbassi/ag-test-construction-website",
+    "repositoryUrl": "https://github.com/gurnoorbassi/ag-test-construction-website",
+    "repositoryVisibility": "private",
+    "baseBranch": "main",
+    "targetBranch": "ag-os/starter-construction-website-v1",
+    "pullRequestNumber": 1,
+    "pullRequestState": "open",
+    "pullRequestUrl": "https://github.com/gurnoorbassi/ag-test-construction-website/pull/1",
+    "pullRequestMerged": false,
+    "headSha": "6af3574df8ef93bb04010e3757587dc3b904afcf",
+    "filesChanged": [
+      "README.md",
+      "package.json",
+      "index.html",
+      "src/styles.css",
+      "src/main.js"
+    ],
+    "createdFiles": [
+      "package.json",
+      "index.html",
+      "src/styles.css",
+      "src/main.js"
+    ],
+    "updatedFiles": [
+      "README.md"
+    ],
+    "verifiedBy": "github_mcp",
+    "verifiedAt": "2026-07-04T09:01:53.688Z"
+  },
+  "prohibitedActionsConfirmedFalse": [
+    "create_repo",
+    "create_more_than_one_branch",
+    "open_more_than_one_pr",
+    "merge_pr",
+    "poll_ci",
+    "deploy_staging",
+    "deploy_production",
+    "connect_netlify",
+    "connect_n8n",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "use_credentials",
+    "add_secrets",
+    "add_tracking_scripts",
+    "wire_forms_to_live_services",
+    "access_production_data",
+    "access_customer_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "notes": "Executed exactly the owner-approved GitHub builder milestone: created branch ag-os/starter-construction-website-v1 in gurnoorbassi/ag-test-construction-website, added or updated the five approved starter files, and opened one pull request to main. The target PR was not merged. No deployment, Netlify, n8n, domain or DNS change, paid action, credential, production data, customer data, tracking script, wired live form, Lead Gen change, AI Receptionist change, Constitution change, additional repository, additional branch, or additional pull request occurred.",
+  "createdAt": "2026-07-04T09:01:53.688Z",
+  "updatedAt": "2026-07-04T09:01:53.688Z"
+}

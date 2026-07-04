@@ -1,0 +1,86 @@
+{
+  "approvalId": "approval-20260704-github-builder-pr",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "commandCategory": "build",
+  "requestedAction": "Create one branch, add starter construction website files, and open one pull request in gurnoorbassi/ag-test-construction-website.",
+  "target": "github:gurnoorbassi/ag-test-construction-website#ag-os/starter-construction-website-v1",
+  "scope": "This approval allows AG OS to use GitHub MCP for exactly one live builder milestone in the existing private test repository gurnoorbassi/ag-test-construction-website. The allowed live actions are limited to creating branch ag-os/starter-construction-website-v1, adding or updating README.md, package.json, index.html, src/styles.css, and src/main.js, and opening exactly one pull request to main. This approval does not allow merging, deployments, Netlify, n8n, domain or DNS changes, paid actions, credentials, production data, customer data, tracking scripts, wired live forms, Lead Gen changes, AI Receptionist changes, Constitution changes, additional repositories, additional branches, or additional pull requests.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260704-github-builder-pr.json"
+  },
+  "approvalRequiredFor": [
+    "create_branch",
+    "create_files",
+    "update_files",
+    "open_pr"
+  ],
+  "approvedActions": [
+    "create_branch",
+    "create_files",
+    "update_files",
+    "open_pr"
+  ],
+  "prohibitedActions": [
+    "create_repo",
+    "create_more_than_one_branch",
+    "open_more_than_one_pr",
+    "merge_pr",
+    "poll_ci",
+    "deploy_staging",
+    "deploy_production",
+    "connect_netlify",
+    "connect_n8n",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "use_credentials",
+    "add_secrets",
+    "add_tracking_scripts",
+    "wire_forms_to_live_services",
+    "access_production_data",
+    "access_customer_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target branch changes, more than one pull request is needed, merge or deployment is requested, validation or boot check fails, GitHub reports a conflict, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond creating one branch, writing the approved starter files, and opening one pull request.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner approval granted for approval-20260704-github-builder-pr. Allowed live action: create branch ag-os/starter-construction-website-v1 in gurnoorbassi/ag-test-construction-website, add/update the five approved starter files, and open one PR to main.",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/69",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/github/github-plan-20260704-test-construction-builder-pr.json",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "docs/github-builder-milestone-approval-package.md",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs must pass immediately before execution.",
+      "verified": false
+    }
+  ],
+  "approvalText": "Owner approval granted for approval-20260704-github-builder-pr. AG OS may execute the approved live GitHub builder milestone in gurnoorbassi/ag-test-construction-website by creating branch ag-os/starter-construction-website-v1, adding or updating README.md, package.json, index.html, src/styles.css, and src/main.js, and opening one PR to main. Do not merge, deploy, connect Netlify, touch n8n, touch domain/DNS, use paid tools, add credentials, add production/customer data, add tracking scripts, wire live forms, touch Lead Gen, touch AI Receptionist, change Constitution, create additional repos, or execute outside the approved target repo/branch/PR action.",
+  "approvedAt": "2026-07-04T08:55:58.002Z",
+  "expiresAt": "2026-07-05T08:55:58.002Z",
+  "createdAt": "2026-07-04T08:55:58.002Z",
+  "updatedAt": "2026-07-04T08:55:58.002Z"
+}

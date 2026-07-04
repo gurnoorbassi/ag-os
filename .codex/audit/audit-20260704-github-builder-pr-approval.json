@@ -1,0 +1,36 @@
+{
+  "id": "audit-20260704-github-builder-pr-approval",
+  "occurredAt": "2026-07-04T08:55:58.002Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for AG OS to create branch ag-os/starter-construction-website-v1, add approved starter construction website files, and open one pull request in gurnoorbassi/ag-test-construction-website.",
+  "scope": "approval-20260704-github-builder-pr",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-github-builder-pr"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/69"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/github/github-plan-20260704-test-construction-builder-pr.json"
+    },
+    {
+      "type": "document",
+      "reference": "docs/github-builder-milestone-approval-package.md"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-test-construction-website/pull/1"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "This audit event records owner approval only. The approved target was gurnoorbassi/ag-test-construction-website on branch ag-os/starter-construction-website-v1, and the execution chain later opened target pull request https://github.com/gurnoorbassi/ag-test-construction-website/pull/1. The separate execution audit records whether the GitHub branch, files, and target-repo pull request were created. This approval does not authorize merge, deployment, Netlify, n8n, domain or DNS changes, paid actions, credentials, production data, customer data, tracking scripts, wired live forms, Lead Gen changes, AI Receptionist changes, Constitution changes, additional repositories, additional branches, or additional pull requests.",
+  "createdAt": "2026-07-04T08:55:58.002Z"
+}
