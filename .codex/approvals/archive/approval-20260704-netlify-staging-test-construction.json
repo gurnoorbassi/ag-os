@@ -1,6 +1,6 @@
 {
   "approvalId": "approval-20260704-netlify-staging-test-construction",
-  "status": "approved",
+  "status": "expired",
   "ownerId": "owner-gurnoor-bassi",
   "requestedBy": "ag-os-runtime",
   "approvedBy": "owner-gurnoor-bassi",
@@ -40,7 +40,7 @@
     "change_ai_receptionist",
     "change_constitution"
   ],
-  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target branch changes, the target main SHA changes without renewed approval, a custom domain or DNS change is needed, a paid Netlify feature is required, credentials would need to be stored in the repository, validation or boot check fails, target repo checks fail, Netlify reports a configuration or billing blocker, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond one staging-only Netlify deployment.",
+  "revocationPath": "This approval expired at 2026-07-05T10:50:47.913Z and is no longer valid for gated actions. Historical proof remains preserved in approval, audit, connector execution, cost, and Netlify records. Any future Netlify staging action requires a new scoped owner approval lock.",
   "evidence": [
     {
       "type": "owner_instruction",
@@ -72,5 +72,5 @@
   "approvedAt": "2026-07-04T10:50:47.910Z",
   "expiresAt": "2026-07-05T10:50:47.913Z",
   "createdAt": "2026-07-04T10:50:47.910Z",
-  "updatedAt": "2026-07-04T10:50:47.910Z"
+  "updatedAt": "2026-07-05T19:00:00Z"
 }

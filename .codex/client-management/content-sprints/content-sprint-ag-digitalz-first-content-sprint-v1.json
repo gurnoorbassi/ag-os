@@ -45,8 +45,8 @@
   "platforms": [
     {
       "platform": "Instagram",
-      "handle": "not_provided",
-      "handleStatus": "pending_owner_input",
+      "handle": "@agdigitalz",
+      "handleStatus": "public_handle_provided",
       "connectionStatus": "not_connected",
       "postingMode": "draft_only",
       "approvalRequired": true,
@@ -177,5 +177,5 @@
     ".codex/costs/cost-ledger-20260704-ag-digitalz-draft-approval-netlify-staging.json"
   ],
   "createdAt": "2026-07-05T04:36:18Z",
-  "updatedAt": "2026-07-05T06:40:50Z"
+  "updatedAt": "2026-07-05T08:30:00Z"
 }

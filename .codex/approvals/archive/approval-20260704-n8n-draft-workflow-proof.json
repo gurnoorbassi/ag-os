@@ -1,6 +1,6 @@
 {
   "approvalId": "approval-20260704-n8n-draft-workflow-proof",
-  "status": "approved",
+  "status": "expired",
   "ownerId": "owner-gurnoor-bassi",
   "requestedBy": "ag-os-runtime",
   "approvedBy": "owner-gurnoor-bassi",
@@ -49,7 +49,7 @@
     "change_ai_receptionist",
     "change_constitution"
   ],
-  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the workflow name changes, the workflow scope changes, credentials are needed, activation is needed, outbound email, SMS, WhatsApp, posting, or live outreach is needed, a real external API is needed, production n8n workflows would be touched, Lead Gen or AI Receptionist workflows would be touched, validation or boot check fails, n8n validation fails, a paid service is required, customer or production data is needed, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond one inactive draft workflow proof.",
+  "revocationPath": "This approval expired at 2026-07-05T11:18:16Z and is no longer valid for gated actions. Historical proof remains preserved in approval, audit, connector execution, cost, and n8n export records. Any future n8n workflow action requires a new scoped owner approval lock.",
   "evidence": [
     {
       "type": "owner_instruction",
@@ -76,5 +76,5 @@
   "approvedAt": "2026-07-04T11:18:16Z",
   "expiresAt": "2026-07-05T11:18:16Z",
   "createdAt": "2026-07-04T11:18:16Z",
-  "updatedAt": "2026-07-04T11:20:06Z"
+  "updatedAt": "2026-07-05T19:00:00Z"
 }
