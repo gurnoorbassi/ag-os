@@ -1,0 +1,19 @@
+{
+  "template": true,
+  "templateType": "access_needed",
+  "accessRequestId": "REQUIRED_ACCESS_REQUEST_ID",
+  "clientId": "REQUIRED_CLIENT_ID",
+  "engagementId": "REQUIRED_ENGAGEMENT_ID",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "platform": "REQUIRED_PLATFORM",
+  "accessType": "REQUIRED_ACCESS_TYPE",
+  "status": "not_requested",
+  "reason": "REQUIRED_ACCESS_REASON",
+  "requestedBy": "REQUIRED_REQUESTED_BY",
+  "approvalOwner": "REQUIRED_APPROVAL_OWNER",
+  "credentialStoragePolicy": "Credentials and secret values must never be stored in AG OS records.",
+  "connectionAllowed": false,
+  "liveActionAllowed": false,
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

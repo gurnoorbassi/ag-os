@@ -1,0 +1,24 @@
+{
+  "template": true,
+  "templateType": "deliverable_plan",
+  "deliverableId": "REQUIRED_DELIVERABLE_ID",
+  "engagementId": "REQUIRED_ENGAGEMENT_ID",
+  "clientId": "REQUIRED_CLIENT_ID",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "deliverableName": "REQUIRED_DELIVERABLE_NAME",
+  "deliverableType": "REQUIRED_DELIVERABLE_TYPE",
+  "status": "planned",
+  "sourceRecords": [
+    "REQUIRED_SOURCE_RECORD"
+  ],
+  "targetLinks": {
+    "pullRequest": "REQUIRED_PULL_REQUEST_URL",
+    "stagingUrl": "REQUIRED_STAGING_URL",
+    "reportPath": "REQUIRED_REPORT_PATH"
+  },
+  "qualityScoreRef": "REQUIRED_QUALITY_SCORE_REF",
+  "clientApprovalRef": "REQUIRED_CLIENT_APPROVAL_REF",
+  "approvalRequired": true,
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

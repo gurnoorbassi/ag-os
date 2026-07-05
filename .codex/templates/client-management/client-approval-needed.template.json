@@ -1,0 +1,21 @@
+{
+  "template": true,
+  "templateType": "client_approval_needed",
+  "approvalRequestId": "REQUIRED_CLIENT_APPROVAL_ID",
+  "clientId": "REQUIRED_CLIENT_ID",
+  "engagementId": "REQUIRED_ENGAGEMENT_ID",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "itemType": "REQUIRED_ITEM_TYPE",
+  "itemRef": "REQUIRED_ITEM_REF",
+  "decisionNeeded": "REQUIRED_DECISION_NEEDED",
+  "status": "pending",
+  "approvalOwner": "REQUIRED_APPROVAL_OWNER",
+  "requestedAt": "REQUIRED_REQUESTED_AT",
+  "decidedAt": "REQUIRED_DECIDED_AT",
+  "notes": [
+    "REQUIRED_APPROVAL_NOTES"
+  ],
+  "liveActionAllowed": false,
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
