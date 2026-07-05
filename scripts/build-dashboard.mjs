@@ -689,13 +689,15 @@ export function collectDashboardData() {
     aiReceptionist,
     socialMediaSystem: {
       ...socialMedia,
-      currentVersion: socialMediaContentReviewBuildRecord ? "v1.4 draft PR"
+      currentVersion: socialMediaContentReviewBuildRecord
+        ? (firstContentSprint?.status === "content_review_target_pr_reviewed_pending_merge" ? "v1.4 reviewed PR" : "v1.4 draft PR")
         : socialMediaContentSprintMergeRecord ? "v1.3"
         : socialMediaContentSprintBuildRecord ? "v1.3 draft PR"
         : socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
         ? "v1.2"
         : socialMediaMergeRecord ? "v1.1" : "v1",
-      lifecycleStatus: socialMediaContentReviewBuildRecord ? "AG Digitalz content review target PR open; review required"
+      lifecycleStatus: socialMediaContentReviewBuildRecord
+        ? (firstContentSprint?.status === "content_review_target_pr_reviewed_pending_merge" ? "AG Digitalz content review target PR reviewed; merge pending" : "AG Digitalz content review target PR open; review required")
         : socialMediaContentSprintStagingRecord ? "AG Digitalz first content sprint merged and staged"
         : socialMediaContentSprintMergeRecord ? "AG Digitalz first content sprint merged; staging redeploy pending"
         : socialMediaContentSprintBuildRecord ? "AG Digitalz first content sprint target PR open; review required"
