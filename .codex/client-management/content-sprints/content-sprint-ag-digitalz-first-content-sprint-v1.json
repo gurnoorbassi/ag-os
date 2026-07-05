@@ -3,7 +3,7 @@
   "clientId": "client-ag-digitalz-internal",
   "engagementId": "engagement-ag-digitalz-social-media-v1",
   "projectId": "project-social-media-management-system-v1",
-  "status": "content_review_target_pr_merged_staging_redeploy_pending",
+  "status": "content_review_staged_pending_owner_content_approval",
   "mode": "draft_only",
   "targetRepo": "gurnoorbassi/ag-social-media-management-system",
   "targetBranch": "ag-os/ag-digitalz-content-review-v1",
@@ -12,7 +12,7 @@
   "targetHeadSha": "7e49b37330bdd54e598ac82a3ae205519725d795",
   "targetMergeSha": "68fee78ecf97c2f84a1bf76ff82658b99ee5f8ce",
   "stagingUrl": "https://ag-social-media-management-system-staging.netlify.app",
-  "stagingDeployId": "6a49e480fbe8fbbb83b933dc",
+  "stagingDeployId": "6a49f1d33942a79f4190240c",
   "stagingDeployStatus": "ready",
   "calendarDays": 7,
   "draftPostPackageCount": 21,
@@ -132,8 +132,12 @@
     ".codex/approvals/approval-20260704-target-pr-merge-ag-digitalz-content-review-v1.json",
     ".codex/audit/audit-20260704-target-pr-merge-ag-digitalz-content-review-v1-executed.json",
     ".codex/connectors/connector-exec-20260704-target-pr-merge-ag-digitalz-content-review-v1-live-result.json",
-    ".codex/costs/cost-ledger-20260704-target-pr-merge-ag-digitalz-content-review-v1.json"
+    ".codex/costs/cost-ledger-20260704-target-pr-merge-ag-digitalz-content-review-v1.json",
+    ".codex/approvals/approval-20260704-ag-digitalz-content-review-netlify-staging.json",
+    ".codex/audit/audit-20260704-ag-digitalz-content-review-netlify-staging-executed.json",
+    ".codex/connectors/connector-exec-20260704-ag-digitalz-content-review-netlify-staging-live-result.json",
+    ".codex/costs/cost-ledger-20260704-ag-digitalz-content-review-netlify-staging.json"
   ],
   "createdAt": "2026-07-05T04:36:18Z",
-  "updatedAt": "2026-07-05T05:48:00Z"
+  "updatedAt": "2026-07-05T05:55:37Z"
 }
