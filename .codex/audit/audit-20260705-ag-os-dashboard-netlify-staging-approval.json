@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260705-ag-os-dashboard-netlify-staging-approval",
+  "occurredAt": "2026-07-05T08:08:00Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for AG OS to deploy the generated AG OS Dashboard to one dedicated Netlify staging-only site.",
+  "scope": "approval-20260705-ag-os-dashboard-netlify-staging",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260705-ag-os-dashboard-netlify-staging"
+    },
+    {
+      "type": "document",
+      "reference": "docs/ag-os-dashboard-netlify-staging-approval-package.md"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/netlify/netlify-plan-20260705-ag-os-dashboard-staging.json"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Approval authorizes only one dedicated staging-only Netlify dashboard deployment and proof recording. It does not authorize custom domain, DNS, paid features, secrets, credentials, production deployment, private client data exposure, production customer data exposure, live connector writes beyond the Netlify staging deploy, social actions, n8n activation, Lead Gen changes, AI Receptionist changes, or Constitution changes.",
+  "createdAt": "2026-07-05T08:12:00Z"
+}

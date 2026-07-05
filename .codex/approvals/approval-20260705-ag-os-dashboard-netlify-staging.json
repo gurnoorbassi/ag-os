@@ -1,0 +1,78 @@
+{
+  "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-ag-os",
+  "commandCategory": "deploy_staging",
+  "requestedAction": "Create or connect one dedicated Netlify staging-only site named ag-os-dashboard-staging and deploy the generated AG OS dashboard.",
+  "target": "netlify:ag-os-dashboard-staging; ag-os:dashboard",
+  "scope": "This approval allows exactly one dedicated Netlify staging-only site named ag-os-dashboard-staging, local dashboard build with npm.cmd run dashboard:build, static deploy of the dashboard directory, HTTP 200 verification, and AG OS proof records. It does not authorize custom domain, DNS, paid Netlify features, secrets, credentials, production deployment, private client data exposure, production customer data exposure, live connector writes beyond this Netlify staging deploy, social actions, n8n activation, Lead Gen changes, AI Receptionist changes, or Constitution changes.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260705-ag-os-dashboard-netlify-staging.json"
+  },
+  "approvalRequiredFor": [
+    "connect_netlify",
+    "deploy_staging",
+    "record_proof"
+  ],
+  "approvedActions": [
+    "create_netlify_staging_site",
+    "deploy_dashboard_staging",
+    "verify_http_200",
+    "record_proof"
+  ],
+  "prohibitedActions": [
+    "deploy_production",
+    "change_domain",
+    "change_dns",
+    "add_custom_domain",
+    "use_paid_service",
+    "add_secrets",
+    "use_credentials",
+    "expose_private_client_data",
+    "expose_production_customer_data",
+    "perform_live_connector_write_beyond_netlify_deploy",
+    "connect_social_accounts",
+    "post_content",
+    "schedule_content",
+    "use_analytics_api",
+    "activate_n8n",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target main SHA changes from a7cbe9b56c57754b3628c7e51a3d42c0747d0472 before deployment, the Netlify site name changes, a custom domain or DNS change is needed, a paid Netlify feature is required, credentials or secrets would need to be stored, private client data or production customer data is found in dashboard output, validation or boot check fails, Netlify reports a configuration or billing blocker, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond one dedicated staging-only dashboard deployment.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner-approved sprint requested AG OS Dashboard private/staging control center deployment.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/netlify/netlify-plan-20260705-ag-os-dashboard-staging.json",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "docs/ag-os-dashboard-netlify-staging-approval-package.md",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "Pre-deploy dashboard build/check, validation, boot check, runtime tests, git diff --check, and focused dashboard security scan passed.",
+      "verified": true
+    }
+  ],
+  "approvalText": "Owner-approved sprint: Deploy AG OS Dashboard as private/staging control center. Allowed actions include preparing and merging the approval package, creating or connecting dedicated Netlify staging-only site ag-os-dashboard-staging, deploying the AG OS dashboard, verifying HTTP 200, recording audit/connector/cost proof, and updating dashboard records if needed. No custom domain, DNS, paid Netlify features, secrets, credentials, production deploy, real private client data exposure, production customer data exposure, live connector writes, social actions, n8n activation, Lead Gen changes, AI Receptionist changes, or Constitution changes are approved.",
+  "approvedAt": "2026-07-05T08:08:00Z",
+  "expiresAt": "2026-07-06T08:08:00Z",
+  "createdAt": "2026-07-05T08:08:00Z",
+  "updatedAt": "2026-07-05T08:12:00Z"
+}
