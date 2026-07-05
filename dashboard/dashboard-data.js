@@ -120,8 +120,8 @@ window.AG_OS_DASHBOARD_DATA = {
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/social-media-management-system-v1.json",
     "boundary": "Do not create a GitHub repository.",
-    "currentVersion": "v1.4 draft PR",
-    "lifecycleStatus": "AG Digitalz content review target PR open; review required",
+    "currentVersion": "v1.4 reviewed PR",
+    "lifecycleStatus": "AG Digitalz content review target PR reviewed; merge pending",
     "targetRepo": "gurnoorbassi/ag-social-media-management-system",
     "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/5",
     "targetPullRequestMerged": false,
@@ -165,7 +165,7 @@ window.AG_OS_DASHBOARD_DATA = {
     },
     "contentSprint": {
       "sprintId": "content-sprint-ag-digitalz-first-content-sprint-v1",
-      "status": "content_review_target_pr_open_review_required",
+      "status": "content_review_target_pr_reviewed_pending_merge",
       "mode": "draft_only",
       "targetRepo": "gurnoorbassi/ag-social-media-management-system",
       "targetBranch": "ag-os/ag-digitalz-content-review-v1",
@@ -241,7 +241,7 @@ window.AG_OS_DASHBOARD_DATA = {
         "acceptedLessonsCreated": false,
         "permanentMemoryCreated": false
       },
-      "updatedAt": "2026-07-05T05:26:42Z",
+      "updatedAt": "2026-07-05T05:39:30Z",
       "recordPath": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
       "livePostingBlocked": true,
       "schedulingBlocked": true,
@@ -855,7 +855,7 @@ window.AG_OS_DASHBOARD_DATA = {
     "contentSprints": [
       {
         "sprintId": "content-sprint-ag-digitalz-first-content-sprint-v1",
-        "status": "content_review_target_pr_open_review_required",
+        "status": "content_review_target_pr_reviewed_pending_merge",
         "mode": "draft_only",
         "targetRepo": "gurnoorbassi/ag-social-media-management-system",
         "targetBranch": "ag-os/ag-digitalz-content-review-v1",
@@ -931,7 +931,7 @@ window.AG_OS_DASHBOARD_DATA = {
           "acceptedLessonsCreated": false,
           "permanentMemoryCreated": false
         },
-        "updatedAt": "2026-07-05T05:26:42Z",
+        "updatedAt": "2026-07-05T05:39:30Z",
         "recordPath": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
       }
     ],
@@ -1963,8 +1963,19 @@ window.AG_OS_DASHBOARD_DATA = {
     "n8nActiveWorkflowSource": "source-controlled export/connector records only"
   },
   "qualityReview": {
-    "critiquesCount": 6,
+    "critiquesCount": 7,
     "latestCritiques": [
+      {
+        "critiqueId": "critique-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704",
+        "sourcePlanId": "runtime-target-pr-review-ag-digitalz-content-review-v1-20260704",
+        "archetypeId": "archetype-social-media-content-operations-system",
+        "reviewStatus": "pass",
+        "blocksBuildMode": false,
+        "findingCount": 6,
+        "requiredFixCount": 0,
+        "createdAt": "2026-07-05T05:39:30Z",
+        "recordPath": ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json"
+      },
       {
         "critiqueId": "critique-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704",
         "sourcePlanId": "runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704",
@@ -2008,23 +2019,23 @@ window.AG_OS_DASHBOARD_DATA = {
         "requiredFixCount": 0,
         "createdAt": "2026-07-04T21:52:00Z",
         "recordPath": ".codex/critiques/critique-runtime-target-pr-review-social-media-system-v1-20260704.json"
-      },
-      {
-        "critiqueId": "critique-runtime-target-pr-review-construction-website-20260704",
-        "sourcePlanId": "runtime-target-pr-review-construction-website-20260704",
-        "archetypeId": "archetype-website",
-        "reviewStatus": "pass",
-        "blocksBuildMode": false,
-        "findingCount": 4,
-        "requiredFixCount": 0,
-        "createdAt": "2026-07-04T09:33:20.653Z",
-        "recordPath": ".codex/critiques/critique-runtime-target-pr-review-construction-website-20260704.json"
       }
     ],
     "reviewRequiredCount": 0,
     "failedCount": 0,
-    "qualityScoreCount": 7,
+    "qualityScoreCount": 8,
     "latestQualityScores": [
+      {
+        "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704",
+        "scoreType": "product_quality_score",
+        "status": "candidate",
+        "projectId": "project-social-media-management-system-v1",
+        "archetypeId": "archetype-social-media-content-operations-system",
+        "overallScore": 9.5,
+        "reviewStatus": "pass",
+        "updatedAt": "2026-07-05T05:39:30Z",
+        "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json"
+      },
       {
         "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704",
         "scoreType": "product_quality_score",
@@ -2068,26 +2079,23 @@ window.AG_OS_DASHBOARD_DATA = {
         "reviewStatus": "pass",
         "updatedAt": "2026-07-04T21:52:00Z",
         "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-social-media-system-v1-20260704.json"
-      },
-      {
-        "scoreId": "quality-score-runtime-target-pr-review-construction-website-20260704",
-        "scoreType": "product_quality_score",
-        "status": "candidate",
-        "projectId": "project-unregistered-construction-website",
-        "archetypeId": "archetype-website",
-        "overallScore": 8.8,
-        "reviewStatus": "pass",
-        "updatedAt": "2026-07-04T09:33:20.653Z",
-        "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-construction-website-20260704.json"
       }
     ],
-    "candidateLessonCount": 12,
+    "candidateLessonCount": 13,
     "acceptedLessonCount": 0,
     "candidatesLoadedAsTruth": false
   },
   "costs": {
-    "ledgerCount": 28,
+    "ledgerCount": 29,
     "latestCosts": [
+      {
+        "costLedgerId": "cost-ledger-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-05T05:39:30Z",
+        "recordPath": ".codex/costs/cost-ledger-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json"
+      },
       {
         "costLedgerId": "cost-ledger-20260704-ag-digitalz-content-review-build",
         "status": "active",
@@ -2127,14 +2135,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "budgetStatus": "within_limit",
         "updatedAt": "2026-07-05T04:36:18Z",
         "recordPath": ".codex/costs/cost-ledger-20260704-ag-digitalz-first-content-sprint-build.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-20260704-ag-digitalz-netlify-staging-redeploy",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-05T02:10:39Z",
-        "recordPath": ".codex/costs/cost-ledger-20260704-ag-digitalz-netlify-staging-redeploy.json"
       }
     ],
     "totalRecordedActualUsd": 0,

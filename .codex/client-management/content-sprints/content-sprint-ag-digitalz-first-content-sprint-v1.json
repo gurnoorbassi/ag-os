@@ -3,7 +3,7 @@
   "clientId": "client-ag-digitalz-internal",
   "engagementId": "engagement-ag-digitalz-social-media-v1",
   "projectId": "project-social-media-management-system-v1",
-  "status": "content_review_target_pr_open_review_required",
+  "status": "content_review_target_pr_reviewed_pending_merge",
   "mode": "draft_only",
   "targetRepo": "gurnoorbassi/ag-social-media-management-system",
   "targetBranch": "ag-os/ag-digitalz-content-review-v1",
@@ -123,8 +123,13 @@
     ".codex/approvals/approval-20260704-ag-digitalz-content-review-build.json",
     ".codex/audit/audit-20260704-ag-digitalz-content-review-build-executed.json",
     ".codex/connectors/connector-exec-20260704-ag-digitalz-content-review-build-live-result.json",
-    ".codex/costs/cost-ledger-20260704-ag-digitalz-content-review-build.json"
+    ".codex/costs/cost-ledger-20260704-ag-digitalz-content-review-build.json",
+    ".codex/audit/audit-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json",
+    ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json",
+    ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json",
+    ".codex/costs/cost-ledger-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json",
+    ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01.json"
   ],
   "createdAt": "2026-07-05T04:36:18Z",
-  "updatedAt": "2026-07-05T05:26:42Z"
+  "updatedAt": "2026-07-05T05:39:30Z"
 }

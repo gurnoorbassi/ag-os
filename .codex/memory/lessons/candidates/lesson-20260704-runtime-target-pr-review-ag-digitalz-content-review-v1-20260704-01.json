@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01",
+  "title": "Draft approval must remain separate from live social approval",
+  "lesson": "For AG Digitalz social content workflows, approved_draft means the content can be treated as reviewed draft material only. It must not be interpreted as permission to connect accounts, schedule, post, use analytics APIs, trigger DMs/comments, activate n8n, or store credentials.",
+  "sources": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/5",
+    ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json",
+    ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "high",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "appliesTo": [
+    "social_media_content_operations_system",
+    "draft_content_approval",
+    "social_live_action_gates"
+  ],
+  "sourceScoreId": "quality-score-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704",
+  "generatedBy": "ag-os-reviewer",
+  "whyThisMatters": "It prevents a reviewed content draft from being mistaken for approval to publish, schedule, connect accounts, or run live automations.",
+  "whenToUse": "Use during content review, owner approval package preparation, target PR review, and pre-live social connector gate checks.",
+  "whenNotToUse": "Do not treat this candidate as accepted memory or permission to post, schedule, connect accounts, use analytics APIs, store credentials, or activate automations.",
+  "notes": "Candidate-only lesson. It must not be loaded as accepted truth unless owner-approved in a future promotion workflow.",
+  "createdAt": "2026-07-05T05:39:30Z",
+  "updatedAt": "2026-07-05T05:39:30Z"
+}
