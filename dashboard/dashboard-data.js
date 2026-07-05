@@ -1512,8 +1512,19 @@ window.AG_OS_DASHBOARD_DATA = {
     "n8nActiveWorkflowSource": "source-controlled export/connector records only"
   },
   "qualityReview": {
-    "critiquesCount": 4,
+    "critiquesCount": 5,
     "latestCritiques": [
+      {
+        "critiqueId": "critique-runtime-target-pr-review-ag-digitalz-draft-config-20260704",
+        "sourcePlanId": "runtime-target-pr-review-ag-digitalz-draft-config-20260704",
+        "archetypeId": "archetype-social-media-content-operations-system",
+        "reviewStatus": "pass",
+        "blocksBuildMode": false,
+        "findingCount": 6,
+        "requiredFixCount": 0,
+        "createdAt": "2026-07-05T01:59:30Z",
+        "recordPath": ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-draft-config-20260704.json"
+      },
       {
         "critiqueId": "critique-runtime-target-pr-review-social-media-system-v1-1-20260704",
         "sourcePlanId": "runtime-target-pr-review-social-media-system-v1-1-20260704",
@@ -1561,8 +1572,19 @@ window.AG_OS_DASHBOARD_DATA = {
     ],
     "reviewRequiredCount": 0,
     "failedCount": 0,
-    "qualityScoreCount": 5,
+    "qualityScoreCount": 6,
     "latestQualityScores": [
+      {
+        "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-draft-config-20260704",
+        "scoreType": "product_quality_score",
+        "status": "candidate",
+        "projectId": "project-social-media-management-system-v1",
+        "archetypeId": "archetype-social-media-content-operations-system",
+        "overallScore": 9.3,
+        "reviewStatus": "pass",
+        "updatedAt": "2026-07-05T01:59:30Z",
+        "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-draft-config-20260704.json"
+      },
       {
         "scoreId": "quality-score-runtime-target-pr-review-social-media-system-v1-1-20260704",
         "scoreType": "product_quality_score",
@@ -1606,26 +1628,23 @@ window.AG_OS_DASHBOARD_DATA = {
         "reviewStatus": "pass",
         "updatedAt": "2026-07-04T09:31:00.000Z",
         "recordPath": ".codex/quality-scores/quality-score-20260704-runtime-closed-loop-crm-proof-20260704.json"
-      },
-      {
-        "scoreId": "quality-score-20260704-runtime-quality-loop-crm-20260704",
-        "scoreType": "plan_quality_score",
-        "status": "candidate",
-        "projectId": "project-unregistered-crm",
-        "archetypeId": "archetype-crm",
-        "overallScore": 9.1,
-        "reviewStatus": "pass",
-        "updatedAt": "2026-07-04T08:25:00.000Z",
-        "recordPath": ".codex/quality-scores/quality-score-20260704-runtime-quality-loop-crm-20260704.json"
       }
     ],
-    "candidateLessonCount": 10,
+    "candidateLessonCount": 11,
     "acceptedLessonCount": 0,
     "candidatesLoadedAsTruth": false
   },
   "costs": {
-    "ledgerCount": 20,
+    "ledgerCount": 21,
     "latestCosts": [
+      {
+        "costLedgerId": "cost-ledger-runtime-target-pr-review-ag-digitalz-draft-config-20260704",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-05T01:59:30Z",
+        "recordPath": ".codex/costs/cost-ledger-runtime-target-pr-review-ag-digitalz-draft-config-20260704.json"
+      },
       {
         "costLedgerId": "cost-ledger-20260704-ag-digitalz-draft-config-build",
         "status": "active",
@@ -1665,14 +1684,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "budgetStatus": "within_limit",
         "updatedAt": "2026-07-05T00:47:02Z",
         "recordPath": ".codex/costs/cost-ledger-20260704-social-media-system-v1-1-upgrade.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-20260704-social-media-netlify-staging",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-04T23:20:51.558Z",
-        "recordPath": ".codex/costs/cost-ledger-20260704-social-media-netlify-staging.json"
       }
     ],
     "totalRecordedActualUsd": 0,
