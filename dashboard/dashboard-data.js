@@ -120,10 +120,51 @@ window.AG_OS_DASHBOARD_DATA = {
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/social-media-management-system-v1.json",
     "boundary": "Do not create a GitHub repository.",
+    "currentVersion": "v1.1",
+    "lifecycleStatus": "v1.1 merged and staged",
     "targetRepo": "gurnoorbassi/ag-social-media-management-system",
+    "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/2",
+    "targetPullRequestMerged": true,
+    "targetMergeSha": "7204846654ef448f6c0c78027a569b7707c618b8",
+    "reviewedHeadSha": "e3ab56ec0649e928418acc807c6badee2132521c",
     "stagingUrl": "https://ag-social-media-management-system-staging.netlify.app",
     "stagingStatus": "ready",
+    "latestDeployId": "6a49ad36a73303e2fa05755f",
+    "latestDeploySourceSha": "7204846654ef448f6c0c78027a569b7707c618b8",
+    "latestDeployVerifiedAt": "2026-07-05T01:02:54Z",
+    "latestDeployHttpStatus": 200,
+    "netlifyDeployContext": "production",
+    "stagingInterpretation": "This is the primary deploy context of the dedicated Netlify staging-only site, not an AG Digitalz production domain, customer production domain, or production customer system.",
     "currentMode": "draft/staging only",
+    "firstClientReadiness": {
+      "status": "intake_needed",
+      "sourceRecord": "docs/first-client-intake-needed.md",
+      "activeClientRecordsCreated": false,
+      "activeRecordCount": 0,
+      "missingRequiredFieldCount": 9,
+      "missingRequiredFields": [
+        "CLIENT_NAME",
+        "BRAND_NAME",
+        "PLATFORMS",
+        "HANDLES",
+        "POSTING_VOLUME",
+        "APPROVAL_OWNER",
+        "CONTENT_PILLARS",
+        "BRAND_VOICE",
+        "REPORTING_CADENCE"
+      ],
+      "canCreateActiveRecords": false,
+      "currentMode": "draft/staging only",
+      "nextOwnerDecision": "Provide owner-approved real values for every required first-client field before AG OS creates active client records.",
+      "safetyDefaults": [
+        "platform accounts remain not_connected",
+        "posting mode remains draft_only",
+        "approval_required remains true",
+        "live_posting_blocked remains true",
+        "no credentials or social OAuth",
+        "no posting, scheduling, analytics API, or n8n activation"
+      ]
+    },
     "safetyBlocks": {
       "livePostingBlocked": true,
       "socialOauthConnected": false,
@@ -134,7 +175,9 @@ window.AG_OS_DASHBOARD_DATA = {
     },
     "sourceRecords": [
       ".codex/projects/social-media-management-system-v1.json",
-      ".codex/connectors/connector-exec-20260704-social-media-netlify-staging-live-result.json"
+      ".codex/connectors/connector-exec-20260704-social-media-system-v1-1-upgrade-live-result.json",
+      ".codex/connectors/connector-exec-20260704-target-pr-merge-social-media-system-v1-1-live-result.json",
+      ".codex/connectors/connector-exec-20260704-social-media-netlify-staging-v1-1-live-result.json"
     ]
   },
   "connectorRegistry": {
@@ -639,6 +682,53 @@ window.AG_OS_DASHBOARD_DATA = {
     "pendingApprovalCount": 0,
     "zeroState": "No real clients are registered yet."
   },
+  "firstClientReadiness": {
+    "status": "intake_needed",
+    "sourceRecord": "docs/first-client-intake-needed.md",
+    "activeClientRecordsCreated": false,
+    "activeRecordCount": 0,
+    "missingRequiredFieldCount": 9,
+    "missingRequiredFields": [
+      "CLIENT_NAME",
+      "BRAND_NAME",
+      "PLATFORMS",
+      "HANDLES",
+      "POSTING_VOLUME",
+      "APPROVAL_OWNER",
+      "CONTENT_PILLARS",
+      "BRAND_VOICE",
+      "REPORTING_CADENCE"
+    ],
+    "canCreateActiveRecords": false,
+    "currentMode": "draft/staging only",
+    "nextOwnerDecision": "Provide owner-approved real values for every required first-client field before AG OS creates active client records.",
+    "safetyDefaults": [
+      "platform accounts remain not_connected",
+      "posting mode remains draft_only",
+      "approval_required remains true",
+      "live_posting_blocked remains true",
+      "no credentials or social OAuth",
+      "no posting, scheduling, analytics API, or n8n activation"
+    ]
+  },
+  "ownerAttention": [
+    {
+      "id": "first-client-intake-needed",
+      "status": "blocked",
+      "title": "First client intake",
+      "detail": "9 required field(s) still use REQUIRED_ placeholders.",
+      "action": "Provide owner-approved real values for every required first-client field before AG OS creates active client records.",
+      "sourceRecord": "docs/first-client-intake-needed.md"
+    },
+    {
+      "id": "live-social-integrations-blocked",
+      "status": "blocked",
+      "title": "Live social integrations",
+      "detail": "OAuth, credentials, posting, scheduling, analytics API, and n8n activation remain blocked.",
+      "action": "Use future approval packages before any live integration work.",
+      "sourceRecord": "docs/social-media-management-system-v1-future-connectors.md"
+    }
+  ],
   "approvals": {
     "activeCount": 10,
     "expiredCount": 1,
@@ -1141,6 +1231,10 @@ window.AG_OS_DASHBOARD_DATA = {
         "siteUrl": "https://ag-test-construction-website-staging.netlify.app",
         "deployStatus": "ready",
         "deployId": "6a48e6777c5c2f79b36d8c40",
+        "deployContext": "production",
+        "stagingInterpretation": "This is the primary deploy context of the dedicated Netlify staging site, not an AG Digitalz production domain or production customer system.",
+        "httpStatus": "Not recorded",
+        "verifiedAt": "2026-07-04T10:55:00.383Z",
         "sourceRepo": "gurnoorbassi/ag-test-construction-website",
         "sourceSha": "8c635538d7d5b7bb9918d2ea900c8f934ee98d49",
         "stagingOnly": true,
@@ -1153,6 +1247,10 @@ window.AG_OS_DASHBOARD_DATA = {
         "siteUrl": "https://ag-social-media-management-system-staging.netlify.app",
         "deployStatus": "ready",
         "deployId": "6a49952960455c99f92eadc0",
+        "deployContext": "production",
+        "stagingInterpretation": "This is the primary deploy context of the dedicated Netlify staging-only site, not an AG Digitalz production domain, customer production domain, or production customer system.",
+        "httpStatus": 200,
+        "verifiedAt": "2026-07-04T23:20:51.558Z",
         "sourceRepo": "gurnoorbassi/ag-social-media-management-system",
         "sourceSha": "d3fcd8c6435433169686c2ec404a5f00c6cc62bd",
         "stagingOnly": true,
@@ -1165,6 +1263,10 @@ window.AG_OS_DASHBOARD_DATA = {
         "siteUrl": "https://ag-social-media-management-system-staging.netlify.app",
         "deployStatus": "ready",
         "deployId": "6a49ad36a73303e2fa05755f",
+        "deployContext": "production",
+        "stagingInterpretation": "This is the primary deploy context of the dedicated Netlify staging-only site, not an AG Digitalz production domain, customer production domain, or production customer system.",
+        "httpStatus": 200,
+        "verifiedAt": "2026-07-05T01:02:54Z",
         "sourceRepo": "gurnoorbassi/ag-social-media-management-system",
         "sourceSha": "7204846654ef448f6c0c78027a569b7707c618b8",
         "stagingOnly": true,
@@ -1177,6 +1279,10 @@ window.AG_OS_DASHBOARD_DATA = {
         "siteUrl": "Not recorded",
         "deployStatus": "Not recorded",
         "deployId": "Not recorded",
+        "deployContext": "Not recorded",
+        "stagingInterpretation": "Not recorded",
+        "httpStatus": "Not recorded",
+        "verifiedAt": "2026-07-03T20:20:00.000Z",
         "sourceRepo": "Not recorded",
         "sourceSha": "Not recorded",
         "stagingOnly": false,

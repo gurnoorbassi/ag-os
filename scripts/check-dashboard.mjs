@@ -77,6 +77,7 @@ for (const forbiddenPattern of [
 
 for (const requiredText of [
   "Constitution",
+  "Owner Attention",
   "Project Registry",
   "Projects",
   "Connector Registry",
@@ -118,8 +119,29 @@ if (data.clientManagement.clientCount !== 0 || data.clientManagement.engagementC
 if (data.clientManagement.pendingApprovalCount !== 0) {
   fail("dashboard control center must show zero pending client approvals until client approvals exist");
 }
+if (data.firstClientReadiness.status !== "intake_needed") {
+  fail("dashboard control center must show first client intake-needed status while REQUIRED_ fields remain");
+}
+if (data.firstClientReadiness.activeClientRecordsCreated !== false) {
+  fail("dashboard control center must not claim active first-client records were created");
+}
+if (data.firstClientReadiness.missingRequiredFieldCount < 1) {
+  fail("dashboard control center must show missing first-client fields when placeholders remain");
+}
 if (data.socialMediaSystem.stagingUrl !== "https://ag-social-media-management-system-staging.netlify.app") {
   fail("dashboard control center must show the recorded Social Media staging URL");
+}
+if (data.socialMediaSystem.currentVersion !== "v1.1") {
+  fail("dashboard control center must show Social Media System v1.1 after the recorded target merge");
+}
+if (data.socialMediaSystem.targetMergeSha !== "7204846654ef448f6c0c78027a569b7707c618b8") {
+  fail("dashboard control center must show the recorded Social Media v1.1 target merge SHA");
+}
+if (data.socialMediaSystem.latestDeployId !== "6a49ad36a73303e2fa05755f") {
+  fail("dashboard control center must show the latest Social Media v1.1 staging deploy ID");
+}
+if (data.socialMediaSystem.latestDeployHttpStatus !== 200) {
+  fail("dashboard control center must show HTTP 200 for the latest Social Media staging deploy proof");
 }
 if (data.socialMediaSystem.safetyBlocks.livePostingBlocked !== true) {
   fail("dashboard control center must show Social Media live posting blocked");
