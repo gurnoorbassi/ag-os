@@ -44,6 +44,14 @@ Promotion is owner-gated. The draft skill is submitted in a PR; owner review and
 
 When a lesson is consumed by a skill, the lesson record gains `promotedToSkill: "<skill-id>"` so the same lesson is not double-promoted and the audit trail is bidirectional.
 
+Before promotion, the skill record must make the operating boundary clear in `riskNotes` or `notes`:
+
+- when AG OS should use the procedure
+- when AG OS must not use the procedure
+- which approval gates remain mandatory
+- what rollback or recovery path applies if the procedure is executed incorrectly
+- confirmation that the skill is procedural memory only and grants no permission
+
 ### Application
 
 Each time a skill is applied in real work, the applying worker updates `evidence.timesApplied` and `evidence.lastAppliedDate` in the same PR as the work it guided, citing the new proof record.
@@ -56,6 +64,16 @@ If new lessons contradict a skill, or its `commonFailures` fire repeatedly, a wo
 
 `npm run boot:check` includes skills in the worker briefing: active skills are listed for use, drafts are counted as pending review. Briefing inclusion is intelligence delivery, not authorization.
 
-## Seed Skills
+## Active Procedural Skills v1
 
-The library seeds with draft skills distilled from already-proven capability runs: target PR review with quality score, GitHub branch/PR creation under approval gate, and Netlify staging deploy on the staging-only site. Each cites its runtime proof records. They remain drafts until owner promotion.
+Owner approval in the AG OS Acceleration Sprint v1 promoted the proven seed skills to active procedural memory:
+
+- GitHub branch and PR creation under approval gate
+- Target repository PR review with quality score
+- Netlify staging deploy on a staging-only site
+
+These active skills remain non-authorizing. They help workers remember a proven procedure, but every gated action still requires the approval lock, action matrix, validation, audit, and rollback rules that would apply without the skill.
+
+## Next Draft Candidates
+
+The n8n inactive draft workflow flow and Social Media starter build flow both have proof records, but no draft skill record existed before this activation package. They should enter as draft skills first, then be promoted in a later owner-reviewed PR if their proof paths, rollback notes, and permission boundaries are complete.

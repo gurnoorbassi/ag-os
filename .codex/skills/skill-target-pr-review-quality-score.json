@@ -3,7 +3,7 @@
   "recordType": "skill",
   "id": "skill-target-pr-review-quality-score",
   "name": "Target repository PR review with quality score",
-  "status": "draft",
+  "status": "active",
   "category": "review",
   "appliesTo": ["any"],
   "procedure": [
@@ -40,8 +40,9 @@
     "lastAppliedDate": "2026-07-04"
   },
   "riskNotes": "Read-only against the target repository. Produces advisory records only. Merge remains a separate owner-approved gated action under capability-target-pr-merge-approved.",
+  "notes": "Active as a procedural memory only. Use when AG OS must review a target repository PR before owner-approved merge. Do not use as approval to merge, deploy, connect services, post, schedule, use analytics APIs, or change protected projects. Rollback is to mark the review stale if the target PR head changes, generate a new review against the new head SHA, and keep the old critique and quality score as historical source-of-truth.",
   "owner": "gurnoorbassi",
   "version": 1,
   "createdAt": "2026-07-04T00:00:00Z",
-  "updatedAt": "2026-07-04T00:00:00Z"
+  "updatedAt": "2026-07-04T23:59:00Z"
 }

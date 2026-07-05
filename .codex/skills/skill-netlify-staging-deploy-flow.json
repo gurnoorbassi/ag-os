@@ -3,7 +3,7 @@
   "recordType": "skill",
   "id": "skill-netlify-staging-deploy-flow",
   "name": "Netlify staging deploy on staging-only site",
-  "status": "draft",
+  "status": "active",
   "category": "delivery",
   "appliesTo": ["any"],
   "procedure": [
@@ -28,14 +28,18 @@
   ],
   "evidence": {
     "proofRecords": [
-      ".codex/netlify/netlify-plan-20260704-test-construction-staging.json"
+      ".codex/netlify/netlify-plan-20260704-test-construction-staging.json",
+      ".codex/connectors/connector-exec-20260704-netlify-staging-live-result.json",
+      ".codex/netlify/netlify-plan-20260704-social-media-staging.json",
+      ".codex/connectors/connector-exec-20260704-social-media-netlify-staging-live-result.json"
     ],
-    "timesApplied": 1,
+    "timesApplied": 2,
     "lastAppliedDate": "2026-07-04"
   },
   "riskNotes": "Gated connector execution on a staging-only site. Production deploys, domains, DNS, and paid features remain blocked capabilities. This skill never grants deploy permission.",
+  "notes": "Active as a procedural memory only. Use for owner-approved staging-only Netlify deploys that cite a deploy plan, source SHA, dedicated staging site, and unexpired approval lock. Do not use for production deploys, custom domains, DNS changes, paid features, secrets, social connectors, n8n activation, or customer production systems. Rollback is to stop using the staging URL, document the deploy id and source SHA, and prepare a new owner-approved staging deploy or disable the staging site if separately approved.",
   "owner": "gurnoorbassi",
   "version": 1,
   "createdAt": "2026-07-04T00:00:00Z",
-  "updatedAt": "2026-07-04T00:00:00Z"
+  "updatedAt": "2026-07-04T23:59:00Z"
 }
