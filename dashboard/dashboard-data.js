@@ -165,7 +165,7 @@ window.AG_OS_DASHBOARD_DATA = {
     },
     "contentSprint": {
       "sprintId": "content-sprint-ag-digitalz-first-content-sprint-v1",
-      "status": "target_pr_open",
+      "status": "target_pr_review_passed",
       "mode": "draft_only",
       "targetRepo": "gurnoorbassi/ag-social-media-management-system",
       "targetBranch": "ag-os/ag-digitalz-first-content-sprint-v1",
@@ -235,7 +235,7 @@ window.AG_OS_DASHBOARD_DATA = {
         "acceptedLessonsCreated": false,
         "permanentMemoryCreated": false
       },
-      "updatedAt": "2026-07-05T04:36:18Z",
+      "updatedAt": "2026-07-05T04:43:00Z",
       "recordPath": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
       "livePostingBlocked": true,
       "schedulingBlocked": true,
@@ -815,7 +815,7 @@ window.AG_OS_DASHBOARD_DATA = {
         "engagementId": "engagement-ag-digitalz-social-media-v1",
         "deliverableType": "content_calendar",
         "status": "ready_for_review",
-        "reviewStatus": "not_reviewed",
+        "reviewStatus": "pass",
         "recordPath": ".codex/client-management/deliverables/deliverable-ag-digitalz-content-calendar.json"
       },
       {
@@ -823,7 +823,7 @@ window.AG_OS_DASHBOARD_DATA = {
         "engagementId": "engagement-ag-digitalz-social-media-v1",
         "deliverableType": "post_package",
         "status": "ready_for_review",
-        "reviewStatus": "not_reviewed",
+        "reviewStatus": "pass",
         "recordPath": ".codex/client-management/deliverables/deliverable-ag-digitalz-post-package.json"
       },
       {
@@ -839,14 +839,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "engagementId": "engagement-ag-digitalz-social-media-v1",
         "deliverableType": "weekly_report",
         "status": "ready_for_review",
-        "reviewStatus": "not_reviewed",
+        "reviewStatus": "pass",
         "recordPath": ".codex/client-management/deliverables/deliverable-ag-digitalz-weekly-report.json"
       }
     ],
     "contentSprints": [
       {
         "sprintId": "content-sprint-ag-digitalz-first-content-sprint-v1",
-        "status": "target_pr_open",
+        "status": "target_pr_review_passed",
         "mode": "draft_only",
         "targetRepo": "gurnoorbassi/ag-social-media-management-system",
         "targetBranch": "ag-os/ag-digitalz-first-content-sprint-v1",
@@ -916,7 +916,7 @@ window.AG_OS_DASHBOARD_DATA = {
           "acceptedLessonsCreated": false,
           "permanentMemoryCreated": false
         },
-        "updatedAt": "2026-07-05T04:36:18Z",
+        "updatedAt": "2026-07-05T04:43:00Z",
         "recordPath": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
       }
     ],
@@ -1807,8 +1807,19 @@ window.AG_OS_DASHBOARD_DATA = {
     "n8nActiveWorkflowSource": "source-controlled export/connector records only"
   },
   "qualityReview": {
-    "critiquesCount": 5,
+    "critiquesCount": 6,
     "latestCritiques": [
+      {
+        "critiqueId": "critique-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704",
+        "sourcePlanId": "runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704",
+        "archetypeId": "archetype-social-media-content-operations-system",
+        "reviewStatus": "pass",
+        "blocksBuildMode": false,
+        "findingCount": 6,
+        "requiredFixCount": 0,
+        "createdAt": "2026-07-05T04:43:00Z",
+        "recordPath": ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704.json"
+      },
       {
         "critiqueId": "critique-runtime-target-pr-review-ag-digitalz-draft-config-20260704",
         "sourcePlanId": "runtime-target-pr-review-ag-digitalz-draft-config-20260704",
@@ -1852,23 +1863,23 @@ window.AG_OS_DASHBOARD_DATA = {
         "requiredFixCount": 0,
         "createdAt": "2026-07-04T09:33:20.653Z",
         "recordPath": ".codex/critiques/critique-runtime-target-pr-review-construction-website-20260704.json"
-      },
-      {
-        "critiqueId": "critique-20260704-runtime-closed-loop-crm-proof-20260704",
-        "sourcePlanId": "plan-runtime-closed-loop-crm-proof-20260704",
-        "archetypeId": "archetype-crm",
-        "reviewStatus": "pass",
-        "blocksBuildMode": false,
-        "findingCount": 3,
-        "requiredFixCount": 0,
-        "createdAt": "2026-07-04T09:30:00.000Z",
-        "recordPath": ".codex/critiques/critique-20260704-runtime-closed-loop-crm-proof-20260704.json"
       }
     ],
     "reviewRequiredCount": 0,
     "failedCount": 0,
-    "qualityScoreCount": 6,
+    "qualityScoreCount": 7,
     "latestQualityScores": [
+      {
+        "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704",
+        "scoreType": "product_quality_score",
+        "status": "candidate",
+        "projectId": "project-social-media-management-system-v1",
+        "archetypeId": "archetype-social-media-content-operations-system",
+        "overallScore": 9.4,
+        "reviewStatus": "pass",
+        "updatedAt": "2026-07-05T04:43:00Z",
+        "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704.json"
+      },
       {
         "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-draft-config-20260704",
         "scoreType": "product_quality_score",
@@ -1912,26 +1923,23 @@ window.AG_OS_DASHBOARD_DATA = {
         "reviewStatus": "pass",
         "updatedAt": "2026-07-04T09:33:20.653Z",
         "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-construction-website-20260704.json"
-      },
-      {
-        "scoreId": "quality-score-20260704-runtime-closed-loop-crm-proof-20260704",
-        "scoreType": "plan_quality_score",
-        "status": "candidate",
-        "projectId": "project-unregistered-crm",
-        "archetypeId": "archetype-crm",
-        "overallScore": 9.1,
-        "reviewStatus": "pass",
-        "updatedAt": "2026-07-04T09:31:00.000Z",
-        "recordPath": ".codex/quality-scores/quality-score-20260704-runtime-closed-loop-crm-proof-20260704.json"
       }
     ],
-    "candidateLessonCount": 11,
+    "candidateLessonCount": 12,
     "acceptedLessonCount": 0,
     "candidatesLoadedAsTruth": false
   },
   "costs": {
-    "ledgerCount": 24,
+    "ledgerCount": 25,
     "latestCosts": [
+      {
+        "costLedgerId": "cost-ledger-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-05T04:43:00Z",
+        "recordPath": ".codex/costs/cost-ledger-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704.json"
+      },
       {
         "costLedgerId": "cost-ledger-20260704-ag-digitalz-first-content-sprint-build",
         "status": "active",
@@ -1971,14 +1979,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "budgetStatus": "within_limit",
         "updatedAt": "2026-07-05T01:52:50Z",
         "recordPath": ".codex/costs/cost-ledger-20260704-ag-digitalz-draft-config-build.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-20260704-social-media-netlify-staging-v1-1",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-05T01:02:54Z",
-        "recordPath": ".codex/costs/cost-ledger-20260704-social-media-netlify-staging-v1-1.json"
       }
     ],
     "totalRecordedActualUsd": 0,
