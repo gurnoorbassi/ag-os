@@ -79,6 +79,23 @@ function latestBy(records, field) {
   return [...records].sort((left, right) => String(right[field] ?? "").localeCompare(String(left[field] ?? "")));
 }
 
+function connectorRecordTimestamp(record) {
+  return record.result?.verifiedAt ??
+    record.result?.mergedAt ??
+    record.updatedAt ??
+    record.createdAt ??
+    "";
+}
+
+function latestConnectorRecord(records, predicate) {
+  return latestBy(
+    records
+      .filter(predicate)
+      .map((record) => ({ ...record, sortTimestamp: connectorRecordTimestamp(record) })),
+    "sortTimestamp"
+  )[0] ?? null;
+}
+
 function unique(values) {
   return [...new Set(values.filter(Boolean))];
 }
@@ -538,8 +555,17 @@ export function collectDashboardData() {
   const skills = collectSkills();
   const clientManagement = collectClientManagement();
   const firstClientReadiness = collectFirstClientReadiness(clientManagement);
-  const socialMediaBuildRecord = githubRecords.find((record) => record.id === "connector-exec-20260704-social-media-system-v1-1-upgrade-live-result");
-  const socialMediaMergeRecord = githubRecords.find((record) => record.id === "connector-exec-20260704-target-pr-merge-social-media-system-v1-1-live-result");
+  const socialMediaBuildRecord = latestConnectorRecord(
+    githubRecords,
+    (record) => record.projectId === "project-social-media-management-system-v1" &&
+      record.action === "create_branch_update_files_open_pr"
+  );
+  const socialMediaMergeRecord = latestConnectorRecord(
+    githubRecords,
+    (record) => record.projectId === "project-social-media-management-system-v1" &&
+      record.action === "merge_pr" &&
+      record.result?.pullRequestMerged === true
+  );
   const socialMediaStagingRecords = latestBy(
     netlifyRecords.filter((record) => record.siteName === "ag-social-media-management-system-staging"),
     "verifiedAt"
@@ -616,8 +642,12 @@ export function collectDashboardData() {
     aiReceptionist,
     socialMediaSystem: {
       ...socialMedia,
-      currentVersion: socialMediaMergeRecord ? "v1.1" : "v1",
-      lifecycleStatus: socialMediaMergeRecord ? "v1.1 merged and staged" : "starter staged",
+      currentVersion: socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
+        ? "v1.2"
+        : socialMediaMergeRecord ? "v1.1" : "v1",
+      lifecycleStatus: socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
+        ? "AG Digitalz draft config merged and staged"
+        : socialMediaMergeRecord ? "v1.1 merged and staged" : "starter staged",
       targetRepo: "gurnoorbassi/ag-social-media-management-system",
       targetPullRequestUrl: socialMediaBuildRecord?.result?.pullRequestUrl ?? "Not recorded",
       targetPullRequestMerged: socialMediaMergeRecord?.result?.pullRequestMerged ?? false,

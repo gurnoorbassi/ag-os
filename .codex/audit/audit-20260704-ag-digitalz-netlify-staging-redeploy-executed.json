@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260704-ag-digitalz-netlify-staging-redeploy-executed",
+  "occurredAt": "2026-07-05T02:10:39Z",
+  "actor": "ag-os-runtime",
+  "eventType": "registry_change",
+  "summary": "Redeployed the dedicated Social Media Management System Netlify staging-only site after the AG Digitalz draft config merge.",
+  "scope": "live_netlify_staging_redeploy_ag_digitalz_social_media_system",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-ag-digitalz-netlify-staging-redeploy"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-20260704-ag-digitalz-netlify-staging-redeploy-live-result"
+    },
+    {
+      "type": "other",
+      "reference": "cost-ledger-20260704-ag-digitalz-netlify-staging-redeploy"
+    },
+    {
+      "type": "other",
+      "reference": "https://ag-social-media-management-system-staging.netlify.app"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Executed only the owner-approved staging-only Netlify redeploy for the existing dedicated staging site. Source repo main was verified at 6f54d3b5b257c2662319f39c0b89f810e22289e5 before deploy. Netlify returned deploy ready for deploy ID 6a49bd1932f7ae16701ece3f and HTTP HEAD checks returned 200 for the primary staging URL and main branch URL. Netlify labels the deploy context as production because this is the primary deploy context of the dedicated staging-only site, not an AG Digitalz production domain, customer production domain, or production customer system. No DNS change, custom domain, paid feature, sensitive value storage, target repo edit, target PR merge during deploy, social account connection, credential use, posting, scheduling, analytics API use, n8n activation, live form wiring, tracking script, private client data, production data, customer data, Lead Gen change, AI Receptionist change, or Constitution change occurred.",
+  "createdAt": "2026-07-05T02:10:39Z"
+}

@@ -140,14 +140,20 @@ if (data.firstClientReadiness.missingRequiredFieldCount !== 0) {
 if (data.socialMediaSystem.stagingUrl !== "https://ag-social-media-management-system-staging.netlify.app") {
   fail("dashboard control center must show the recorded Social Media staging URL");
 }
-if (data.socialMediaSystem.currentVersion !== "v1.1") {
-  fail("dashboard control center must show Social Media System v1.1 after the recorded target merge");
+if (data.socialMediaSystem.currentVersion !== "v1.2") {
+  fail("dashboard control center must show Social Media System v1.2 after the recorded AG Digitalz draft-config merge");
 }
-if (data.socialMediaSystem.targetMergeSha !== "7204846654ef448f6c0c78027a569b7707c618b8") {
-  fail("dashboard control center must show the recorded Social Media v1.1 target merge SHA");
+if (data.socialMediaSystem.targetMergeSha !== "6f54d3b5b257c2662319f39c0b89f810e22289e5") {
+  fail("dashboard control center must show the recorded Social Media AG Digitalz target merge SHA");
 }
-if (data.socialMediaSystem.latestDeployId !== "6a49ad36a73303e2fa05755f") {
-  fail("dashboard control center must show the latest Social Media v1.1 staging deploy ID");
+const hasAgDigitalzRedeployRecord = data.socialMediaSystem.sourceRecords.includes(
+  ".codex/connectors/connector-exec-20260704-ag-digitalz-netlify-staging-redeploy-live-result.json"
+);
+const expectedSocialMediaDeployId = hasAgDigitalzRedeployRecord
+  ? "6a49bd1932f7ae16701ece3f"
+  : "6a49ad36a73303e2fa05755f";
+if (data.socialMediaSystem.latestDeployId !== expectedSocialMediaDeployId) {
+  fail("dashboard control center must show the latest available Social Media staging deploy ID");
 }
 if (data.socialMediaSystem.latestDeployHttpStatus !== 200) {
   fail("dashboard control center must show HTTP 200 for the latest Social Media staging deploy proof");
