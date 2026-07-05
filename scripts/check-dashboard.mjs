@@ -113,20 +113,29 @@ if (data.capabilityRegistry.provenCount < 1) {
 if (data.capabilityRegistry.blockedCount < 1) {
   fail("dashboard control center must show blocked capabilities");
 }
-if (data.clientManagement.clientCount !== 0 || data.clientManagement.engagementCount !== 0) {
-  fail("dashboard control center must show zero client and engagement counts until real clients are registered");
+if (data.clientManagement.clientCount !== 1 || data.clientManagement.engagementCount !== 1) {
+  fail("dashboard control center must show the first registered client and engagement");
 }
-if (data.clientManagement.pendingApprovalCount !== 0) {
-  fail("dashboard control center must show zero pending client approvals until client approvals exist");
+if (data.clientManagement.deliverableCount !== 6) {
+  fail("dashboard control center must show six AG Digitalz deliverables");
 }
-if (data.firstClientReadiness.status !== "intake_needed") {
-  fail("dashboard control center must show first client intake-needed status while REQUIRED_ fields remain");
+if (data.clientManagement.accessRequestCount !== 4) {
+  fail("dashboard control center must show four AG Digitalz social access requests");
 }
-if (data.firstClientReadiness.activeClientRecordsCreated !== false) {
-  fail("dashboard control center must not claim active first-client records were created");
+if (data.clientManagement.pendingApprovalCount !== 4) {
+  fail("dashboard control center must show four pending AG Digitalz client approvals");
 }
-if (data.firstClientReadiness.missingRequiredFieldCount < 1) {
-  fail("dashboard control center must show missing first-client fields when placeholders remain");
+if (data.clientManagement.clients[0]?.clientName !== "AG Digitalz") {
+  fail("dashboard control center must show AG Digitalz as the first registered client");
+}
+if (data.firstClientReadiness.status !== "active_draft_configured") {
+  fail("dashboard control center must show first client active draft configured status");
+}
+if (data.firstClientReadiness.activeClientRecordsCreated !== true) {
+  fail("dashboard control center must show active first-client records were created");
+}
+if (data.firstClientReadiness.missingRequiredFieldCount !== 0) {
+  fail("dashboard control center must show no missing fields for the registered AG Digitalz client records");
 }
 if (data.socialMediaSystem.stagingUrl !== "https://ag-social-media-management-system-staging.netlify.app") {
   fail("dashboard control center must show the recorded Social Media staging URL");
@@ -148,6 +157,9 @@ if (data.socialMediaSystem.safetyBlocks.livePostingBlocked !== true) {
 }
 if (data.socialMediaSystem.safetyBlocks.socialOauthConnected !== false) {
   fail("dashboard control center must show Social Media OAuth not connected");
+}
+if (data.socialMediaSystem.safetyBlocks.clientConfigAdded !== true) {
+  fail("dashboard control center must show Social Media client config added after AG Digitalz records are registered");
 }
 if (data.connectorProofs.n8nActiveWorkflowCount !== 0) {
   fail("dashboard control center must not infer active n8n workflows from source records");

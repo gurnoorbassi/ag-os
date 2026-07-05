@@ -1,0 +1,17 @@
+{
+  "deliverableId": "deliverable-ag-digitalz-approval-record",
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "projectId": "project-social-media-management-system-v1",
+  "deliverableType": "approval_record",
+  "status": "draft",
+  "location": {
+    "path": ".codex/client-management/approvals/",
+    "link": "source_controlled_pending_approval_records"
+  },
+  "reviewStatus": "not_reviewed",
+  "qualityScoreRef": "not_scored_yet",
+  "approvalRequired": true,
+  "ownerDecisionNeeded": true,
+  "createdAt": "2026-07-05T01:45:00Z",
+  "updatedAt": "2026-07-05T01:45:00Z"
+}

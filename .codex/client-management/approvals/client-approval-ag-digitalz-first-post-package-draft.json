@@ -1,0 +1,16 @@
+{
+  "approvalId": "client-approval-ag-digitalz-first-post-package-draft",
+  "clientId": "client-ag-digitalz-internal",
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "itemType": "post_package",
+  "itemRef": "deliverable-ag-digitalz-post-package",
+  "decisionNeeded": "Approve creation of the first AG Digitalz draft post package. This does not authorize posting, scheduling, messaging, or analytics.",
+  "status": "pending",
+  "requestedAt": "2026-07-05T01:45:00Z",
+  "decidedAt": "pending_owner_decision",
+  "notes": [
+    "Post package work remains draft-only.",
+    "Claims must stay tied to proof that exists."
+  ],
+  "blockerLevel": "medium"
+}

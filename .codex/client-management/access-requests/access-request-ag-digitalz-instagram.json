@@ -1,0 +1,14 @@
+{
+  "accessRequestId": "access-request-ag-digitalz-instagram",
+  "clientId": "client-ag-digitalz-internal",
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "platform": "Instagram",
+  "accessType": "social_oauth",
+  "status": "not_requested",
+  "reason": "Future social OAuth approval required. Handle is not_provided, handle status is pending_owner_input, connection_status is not_connected, and credentials_stored is false.",
+  "requestedBy": "AG OS",
+  "approvedBy": "not_applicable_not_requested",
+  "credentialStoragePolicy": "credentials_stored false; no tokens, passwords, secrets, or OAuth values may be stored in AG OS records.",
+  "createdAt": "2026-07-05T01:45:00Z",
+  "updatedAt": "2026-07-05T01:45:00Z"
+}

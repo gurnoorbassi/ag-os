@@ -1,0 +1,44 @@
+{
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "clientId": "client-ag-digitalz-internal",
+  "projectId": "project-social-media-management-system-v1",
+  "systemType": "social_media_management_system",
+  "serviceScope": [
+    "internal draft/staging social media operations",
+    "multi-platform draft planning for Instagram, TikTok, YouTube Shorts, and LinkedIn",
+    "content intake, draft post packages, approval queue, weekly reporting, and blocked live action visibility",
+    "no live social account connection, posting, scheduling, analytics API, or n8n activation"
+  ],
+  "currentPhase": "staging",
+  "paymentStatus": "internal",
+  "startDate": "2026-07-04",
+  "targetMilestones": [
+    "record AG Digitalz internal client draft configuration",
+    "update staged Social Media Management System app with AG Digitalz draft config",
+    "review and merge target app PR after safety checks",
+    "redeploy dedicated staging-only Netlify site after target merge",
+    "keep live social actions blocked until separate owner approval"
+  ],
+  "approvalOwner": "AG Digitalz Owner",
+  "accessNeeded": [
+    "future Instagram social OAuth approval required",
+    "future TikTok social OAuth approval required",
+    "future YouTube Shorts social OAuth approval required",
+    "future LinkedIn social OAuth approval required"
+  ],
+  "blockers": [
+    "platform handles are not_provided and pending_owner_input",
+    "social OAuth is not connected",
+    "live posting is blocked",
+    "scheduling is blocked",
+    "analytics API access is blocked",
+    "n8n activation is blocked"
+  ],
+  "risks": [
+    "live social actions require separate owner approval and connector gates",
+    "platform account credentials must never be stored in source-controlled AG OS records",
+    "content claims must be limited to proof that exists"
+  ],
+  "createdAt": "2026-07-05T01:45:00Z",
+  "updatedAt": "2026-07-05T01:45:00Z"
+}

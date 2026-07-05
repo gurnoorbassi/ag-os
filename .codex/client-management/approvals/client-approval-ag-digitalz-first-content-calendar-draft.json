@@ -1,0 +1,16 @@
+{
+  "approvalId": "client-approval-ag-digitalz-first-content-calendar-draft",
+  "clientId": "client-ag-digitalz-internal",
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "itemType": "content_calendar",
+  "itemRef": "deliverable-ag-digitalz-content-calendar",
+  "decisionNeeded": "Approve creation of the first AG Digitalz content calendar draft. This does not authorize publishing or scheduling.",
+  "status": "pending",
+  "requestedAt": "2026-07-05T01:45:00Z",
+  "decidedAt": "pending_owner_decision",
+  "notes": [
+    "Calendar remains draft-only until separate owner approval.",
+    "No social account connection is authorized."
+  ],
+  "blockerLevel": "medium"
+}

@@ -1,0 +1,16 @@
+{
+  "approvalId": "client-approval-ag-digitalz-draft-workflow-setup",
+  "clientId": "client-ag-digitalz-internal",
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "itemType": "other",
+  "itemRef": "engagement-ag-digitalz-social-media-v1",
+  "decisionNeeded": "Approve draft workflow setup for internal AG Digitalz social media operations. This does not authorize OAuth, posting, scheduling, analytics, or n8n activation.",
+  "status": "pending",
+  "requestedAt": "2026-07-05T01:45:00Z",
+  "decidedAt": "pending_owner_decision",
+  "notes": [
+    "Draft workflow setup remains source-controlled and staging-only.",
+    "Live social actions remain blocked."
+  ],
+  "blockerLevel": "medium"
+}
