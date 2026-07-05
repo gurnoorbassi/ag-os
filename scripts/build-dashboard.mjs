@@ -628,6 +628,14 @@ export function collectDashboardData() {
     netlifyRecords,
     (record) => record.id === "connector-exec-20260704-ag-digitalz-content-review-netlify-staging-live-result"
   );
+  const socialMediaInteractiveUiBuildRecord = latestConnectorRecord(
+    githubRecords,
+    (record) => record.id === "connector-exec-20260705-social-media-interactive-draft-ui-build-live-result"
+  );
+  const socialMediaInteractiveUiStagingRecord = latestConnectorRecord(
+    netlifyRecords,
+    (record) => record.id === "connector-exec-20260705-social-media-interactive-draft-ui-netlify-staging-live-result"
+  );
   const firstContentSprint = clientManagement.contentSprints[0] ?? null;
   const systemBlockers = [
     ...approvals.blockedApprovals.map((approval) => `Blocked approval: ${approval.approvalId}`)
@@ -700,14 +708,18 @@ export function collectDashboardData() {
     aiReceptionist,
     socialMediaSystem: {
       ...socialMedia,
-      currentVersion: socialMediaContentReviewBuildRecord
+      currentVersion: socialMediaInteractiveUiBuildRecord
+        ? "v1.6 interactive draft UI"
+        : socialMediaContentReviewBuildRecord
         ? (socialMediaContentReviewMergeRecord ? (firstContentSprint?.status === "owner_approved_draft_content_staged_oauth_readiness_prepared" ? "v1.5 owner-approved drafts" : "v1.4") : firstContentSprint?.status === "content_review_target_pr_reviewed_pending_merge" ? "v1.4 reviewed PR" : "v1.4 draft PR")
         : socialMediaContentSprintMergeRecord ? "v1.3"
         : socialMediaContentSprintBuildRecord ? "v1.3 draft PR"
         : socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
         ? "v1.2"
         : socialMediaMergeRecord ? "v1.1" : "v1",
-      lifecycleStatus: socialMediaContentReviewBuildRecord
+      lifecycleStatus: socialMediaInteractiveUiBuildRecord
+        ? (socialMediaInteractiveUiStagingRecord ? "Interactive draft UI merged and staged; live social actions remain blocked" : "Interactive draft UI merged; staging redeploy pending")
+        : socialMediaContentReviewBuildRecord
         ? (socialMediaContentReviewStagingRecord ? (firstContentSprint?.status === "owner_approved_draft_content_staged_oauth_readiness_prepared" ? "AG Digitalz draft content approved and staged; handles pending and OAuth readiness package prepared" : "AG Digitalz content review merged and staged; owner content approval pending") : socialMediaContentReviewMergeRecord ? "AG Digitalz content review merged; staging redeploy pending" : firstContentSprint?.status === "content_review_target_pr_reviewed_pending_merge" ? "AG Digitalz content review target PR reviewed; merge pending" : "AG Digitalz content review target PR open; review required")
         : socialMediaContentSprintStagingRecord ? "AG Digitalz first content sprint merged and staged"
         : socialMediaContentSprintMergeRecord ? "AG Digitalz first content sprint merged; staging redeploy pending"
@@ -716,10 +728,10 @@ export function collectDashboardData() {
         ? "AG Digitalz draft config merged and staged"
         : socialMediaMergeRecord ? "v1.1 merged and staged" : "starter staged",
       targetRepo: "gurnoorbassi/ag-social-media-management-system",
-      targetPullRequestUrl: socialMediaContentReviewBuildRecord?.result?.pullRequestUrl ?? socialMediaContentSprintBuildRecord?.result?.pullRequestUrl ?? socialMediaBuildRecord?.result?.pullRequestUrl ?? "Not recorded",
-      targetPullRequestMerged: socialMediaContentReviewMergeRecord?.result?.pullRequestMerged ?? (socialMediaContentReviewBuildRecord ? false : socialMediaContentSprintMergeRecord?.result?.pullRequestMerged ?? socialMediaMergeRecord?.result?.pullRequestMerged ?? false),
-      targetMergeSha: socialMediaContentReviewMergeRecord?.result?.mergeCommitSha ?? socialMediaContentSprintMergeRecord?.result?.mergeCommitSha ?? socialMediaMergeRecord?.result?.mergeCommitSha ?? "Not recorded",
-      reviewedHeadSha: socialMediaContentReviewMergeRecord?.result?.headSha ?? socialMediaContentSprintMergeRecord?.result?.headSha ?? socialMediaMergeRecord?.result?.headSha ?? "Not recorded",
+      targetPullRequestUrl: socialMediaInteractiveUiBuildRecord?.result?.pullRequestUrl ?? socialMediaContentReviewBuildRecord?.result?.pullRequestUrl ?? socialMediaContentSprintBuildRecord?.result?.pullRequestUrl ?? socialMediaBuildRecord?.result?.pullRequestUrl ?? "Not recorded",
+      targetPullRequestMerged: socialMediaInteractiveUiBuildRecord?.result?.pullRequestMerged ?? socialMediaContentReviewMergeRecord?.result?.pullRequestMerged ?? (socialMediaContentReviewBuildRecord ? false : socialMediaContentSprintMergeRecord?.result?.pullRequestMerged ?? socialMediaMergeRecord?.result?.pullRequestMerged ?? false),
+      targetMergeSha: socialMediaInteractiveUiBuildRecord?.result?.mergeCommitSha ?? socialMediaContentReviewMergeRecord?.result?.mergeCommitSha ?? socialMediaContentSprintMergeRecord?.result?.mergeCommitSha ?? socialMediaMergeRecord?.result?.mergeCommitSha ?? "Not recorded",
+      reviewedHeadSha: socialMediaInteractiveUiBuildRecord?.result?.headSha ?? socialMediaContentReviewMergeRecord?.result?.headSha ?? socialMediaContentSprintMergeRecord?.result?.headSha ?? socialMediaMergeRecord?.result?.headSha ?? "Not recorded",
       stagingUrl: latestSocialMediaStaging?.siteUrl ?? "Not recorded",
       stagingStatus: latestSocialMediaStaging?.deployStatus ?? "Not recorded",
       latestDeployId: latestSocialMediaStaging?.deployId ?? "Not recorded",
@@ -776,6 +788,8 @@ export function collectDashboardData() {
         socialMediaContentReviewBuildRecord?.recordPath,
         socialMediaContentReviewMergeRecord?.recordPath,
         socialMediaContentReviewStagingRecord?.recordPath,
+        socialMediaInteractiveUiBuildRecord?.recordPath,
+        socialMediaInteractiveUiStagingRecord?.recordPath,
         socialMediaMergeRecord?.recordPath,
         latestSocialMediaStaging?.recordPath,
         firstContentSprint?.recordPath

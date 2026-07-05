@@ -1,0 +1,46 @@
+{
+  "costLedgerId": "cost-ledger-20260705-social-media-interactive-draft-ui",
+  "status": "active",
+  "budgetLimitsUsd": {
+    "perTaskMax": 5,
+    "dailyMax": 10,
+    "monthlyMax": 50
+  },
+  "entries": [
+    {
+      "costEntryId": "cost-entry-20260705-social-media-interactive-draft-ui-estimated",
+      "jobId": "job-20260705-social-media-interactive-draft-ui",
+      "projectId": "project-social-media-management-system-v1",
+      "costType": "estimated",
+      "amountUsd": 0,
+      "approvalRequired": true,
+      "approvalId": "approval-20260705-social-media-interactive-draft-ui",
+      "status": "approved"
+    },
+    {
+      "costEntryId": "cost-entry-20260705-social-media-interactive-draft-ui-actual",
+      "jobId": "job-20260705-social-media-interactive-draft-ui",
+      "projectId": "project-social-media-management-system-v1",
+      "costType": "actual",
+      "amountUsd": 0,
+      "approvalRequired": true,
+      "approvalId": "approval-20260705-social-media-interactive-draft-ui",
+      "status": "recorded"
+    }
+  ],
+  "summary": {
+    "estimatedTaskCostUsd": 0,
+    "actualTaskCostUsd": 0,
+    "dailyActualUsd": 0,
+    "monthlyActualUsd": 0,
+    "budgetStatus": "within_limit"
+  },
+  "safety": {
+    "createsBillingChange": false,
+    "usesPaidService": false,
+    "usesLiveApi": false,
+    "requiresOwnerApproval": true
+  },
+  "createdAt": "2026-07-05T07:52:00Z",
+  "updatedAt": "2026-07-05T07:52:00Z"
+}
