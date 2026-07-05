@@ -140,7 +140,7 @@ if (data.firstClientReadiness.missingRequiredFieldCount !== 0) {
 if (data.socialMediaSystem.stagingUrl !== "https://ag-social-media-management-system-staging.netlify.app") {
   fail("dashboard control center must show the recorded Social Media staging URL");
 }
-if (!["v1.2", "v1.3 draft PR", "v1.3"].includes(data.socialMediaSystem.currentVersion)) {
+if (!["v1.2", "v1.3 draft PR", "v1.3", "v1.4 draft PR"].includes(data.socialMediaSystem.currentVersion)) {
   fail("dashboard control center must show the recorded Social Media System version state");
 }
 if (data.socialMediaSystem.currentVersion === "v1.2" && data.socialMediaSystem.targetMergeSha !== "6f54d3b5b257c2662319f39c0b89f810e22289e5") {
@@ -157,6 +157,15 @@ if (data.socialMediaSystem.contentSprint.weeklyReportDraftCount !== 1) {
 }
 if (data.socialMediaSystem.contentSprint.pendingDraftApprovalCount !== 22) {
   fail("dashboard control center must show pending approvals for 21 drafts plus the weekly report draft");
+}
+if (data.socialMediaSystem.currentVersion === "v1.4 draft PR" &&
+  (data.socialMediaSystem.contentSprint.postsReviewedCount !== 21 ||
+    data.socialMediaSystem.contentSprint.postsRevisedCount !== 21 ||
+    data.socialMediaSystem.contentSprint.approvedDraftCount !== 21 ||
+    data.socialMediaSystem.contentSprint.needsRevisionCount !== 0 ||
+    data.socialMediaSystem.contentSprint.blockedByMissingProofCount !== 0 ||
+    data.socialMediaSystem.contentSprint.blockedByMissingHandleCount !== 0)) {
+  fail("dashboard control center must show content review counts for the v1.4 draft PR");
 }
 if (data.socialMediaSystem.contentSprint.socialOauthConnected !== false ||
   data.socialMediaSystem.contentSprint.credentialsStored !== false ||

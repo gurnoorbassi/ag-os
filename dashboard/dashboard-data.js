@@ -120,11 +120,11 @@ window.AG_OS_DASHBOARD_DATA = {
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/social-media-management-system-v1.json",
     "boundary": "Do not create a GitHub repository.",
-    "currentVersion": "v1.3",
-    "lifecycleStatus": "AG Digitalz first content sprint merged and staged",
+    "currentVersion": "v1.4 draft PR",
+    "lifecycleStatus": "AG Digitalz content review target PR open; review required",
     "targetRepo": "gurnoorbassi/ag-social-media-management-system",
-    "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/4",
-    "targetPullRequestMerged": true,
+    "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/5",
+    "targetPullRequestMerged": false,
     "targetMergeSha": "c6dc28dee2f50324322c476cb0d4174f853e8d68",
     "reviewedHeadSha": "02a749ff3348be9c57f34726f104f381e228b1cd",
     "stagingUrl": "https://ag-social-media-management-system-staging.netlify.app",
@@ -165,16 +165,22 @@ window.AG_OS_DASHBOARD_DATA = {
     },
     "contentSprint": {
       "sprintId": "content-sprint-ag-digitalz-first-content-sprint-v1",
-      "status": "staged_pending_owner_content_approval",
+      "status": "content_review_target_pr_open_review_required",
       "mode": "draft_only",
       "targetRepo": "gurnoorbassi/ag-social-media-management-system",
-      "targetBranch": "ag-os/ag-digitalz-first-content-sprint-v1",
-      "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/4",
-      "targetPullRequestNumber": 4,
-      "targetHeadSha": "02a749ff3348be9c57f34726f104f381e228b1cd",
+      "targetBranch": "ag-os/ag-digitalz-content-review-v1",
+      "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/5",
+      "targetPullRequestNumber": 5,
+      "targetHeadSha": "7e49b37330bdd54e598ac82a3ae205519725d795",
       "calendarDays": 7,
       "draftPostPackageCount": 21,
       "weeklyReportDraftCount": 1,
+      "postsReviewedCount": 21,
+      "postsRevisedCount": 21,
+      "approvedDraftCount": 21,
+      "needsRevisionCount": 0,
+      "blockedByMissingProofCount": 0,
+      "blockedByMissingHandleCount": 0,
       "pendingDraftApprovalCount": 22,
       "platforms": [
         {
@@ -235,7 +241,7 @@ window.AG_OS_DASHBOARD_DATA = {
         "acceptedLessonsCreated": false,
         "permanentMemoryCreated": false
       },
-      "updatedAt": "2026-07-05T04:58:46Z",
+      "updatedAt": "2026-07-05T05:26:42Z",
       "recordPath": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
       "livePostingBlocked": true,
       "schedulingBlocked": true,
@@ -259,10 +265,11 @@ window.AG_OS_DASHBOARD_DATA = {
     },
     "sourceRecords": [
       ".codex/projects/social-media-management-system-v1.json",
-      ".codex/connectors/connector-exec-20260704-ag-digitalz-first-content-sprint-build-live-result.json",
+      ".codex/connectors/connector-exec-20260704-ag-digitalz-content-review-build-live-result.json",
       ".codex/connectors/connector-exec-20260704-ag-digitalz-first-content-sprint-build-live-result.json",
       ".codex/connectors/connector-exec-20260704-target-pr-merge-ag-digitalz-first-content-sprint-v1-live-result.json",
       ".codex/connectors/connector-exec-20260704-ag-digitalz-first-content-sprint-netlify-staging-live-result.json",
+      ".codex/connectors/connector-exec-20260704-ag-digitalz-content-review-build-live-result.json",
       ".codex/connectors/connector-exec-20260704-target-pr-merge-ag-digitalz-first-content-sprint-v1-live-result.json",
       ".codex/connectors/connector-exec-20260704-ag-digitalz-first-content-sprint-netlify-staging-live-result.json",
       ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
@@ -848,16 +855,22 @@ window.AG_OS_DASHBOARD_DATA = {
     "contentSprints": [
       {
         "sprintId": "content-sprint-ag-digitalz-first-content-sprint-v1",
-        "status": "staged_pending_owner_content_approval",
+        "status": "content_review_target_pr_open_review_required",
         "mode": "draft_only",
         "targetRepo": "gurnoorbassi/ag-social-media-management-system",
-        "targetBranch": "ag-os/ag-digitalz-first-content-sprint-v1",
-        "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/4",
-        "targetPullRequestNumber": 4,
-        "targetHeadSha": "02a749ff3348be9c57f34726f104f381e228b1cd",
+        "targetBranch": "ag-os/ag-digitalz-content-review-v1",
+        "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/5",
+        "targetPullRequestNumber": 5,
+        "targetHeadSha": "7e49b37330bdd54e598ac82a3ae205519725d795",
         "calendarDays": 7,
         "draftPostPackageCount": 21,
         "weeklyReportDraftCount": 1,
+        "postsReviewedCount": 21,
+        "postsRevisedCount": 21,
+        "approvedDraftCount": 21,
+        "needsRevisionCount": 0,
+        "blockedByMissingProofCount": 0,
+        "blockedByMissingHandleCount": 0,
         "pendingDraftApprovalCount": 22,
         "platforms": [
           {
@@ -918,7 +931,7 @@ window.AG_OS_DASHBOARD_DATA = {
           "acceptedLessonsCreated": false,
           "permanentMemoryCreated": false
         },
-        "updatedAt": "2026-07-05T04:58:46Z",
+        "updatedAt": "2026-07-05T05:26:42Z",
         "recordPath": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
       }
     ],
@@ -1022,11 +1035,20 @@ window.AG_OS_DASHBOARD_DATA = {
     }
   ],
   "approvals": {
-    "activeCount": 16,
+    "activeCount": 17,
     "expiredCount": 1,
     "blockedCount": 0,
     "staleWarningCount": 0,
     "activeApprovals": [
+      {
+        "approvalId": "approval-20260704-ag-digitalz-content-review-build",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-06T05:26:42Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-content-review-build.json",
+        "archived": false
+      },
       {
         "approvalId": "approval-20260704-ag-digitalz-first-content-sprint-netlify-staging",
         "status": "approved",
@@ -1186,6 +1208,15 @@ window.AG_OS_DASHBOARD_DATA = {
     "blockedApprovals": [],
     "recentApprovedActions": [
       {
+        "approvalId": "approval-20260704-ag-digitalz-content-review-build",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-06T05:26:42Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-content-review-build.json",
+        "archived": false
+      },
+      {
         "approvalId": "approval-20260704-ag-digitalz-first-content-sprint-netlify-staging",
         "status": "approved",
         "riskLevel": "R4",
@@ -1229,15 +1260,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvedBy": "owner-gurnoor-bassi",
         "recordPath": ".codex/approvals/approval-20260704-target-pr-merge-ag-digitalz-draft-config.json",
         "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-ag-digitalz-draft-config-build",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-06T01:52:50Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-draft-config-build.json",
-        "archived": false
       }
     ]
   },
@@ -1261,6 +1283,69 @@ window.AG_OS_DASHBOARD_DATA = {
           "verifiedAt": "2026-07-03T21:18:06.600Z"
         },
         "recordPath": ".codex/connectors/connector-exec-20260703-github-repo-create-live-result.json"
+      },
+      {
+        "id": "connector-exec-20260704-ag-digitalz-content-review-build-live-result",
+        "status": "done",
+        "action": "create_branch_update_files_open_pr",
+        "projectId": "project-social-media-management-system-v1",
+        "approvalId": "approval-20260704-ag-digitalz-content-review-build",
+        "result": {
+          "repositoryFullName": "gurnoorbassi/ag-social-media-management-system",
+          "repositoryUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system",
+          "baseBranch": "main",
+          "baseSha": "c6dc28dee2f50324322c476cb0d4174f853e8d68",
+          "targetBranch": "ag-os/ag-digitalz-content-review-v1",
+          "pullRequestNumber": 5,
+          "pullRequestState": "open",
+          "pullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/5",
+          "pullRequestMerged": false,
+          "headSha": "7e49b37330bdd54e598ac82a3ae205519725d795",
+          "filesChanged": [
+            "README.md",
+            "package.json",
+            "index.html",
+            "src/main.js",
+            "src/styles.css",
+            "src/data/templates.js",
+            "src/lib/safety.js",
+            "src/lib/status.js"
+          ],
+          "contentReviewSprint": {
+            "sprintId": "ag-digitalz-content-review-refinement-v1",
+            "postsReviewed": 21,
+            "postsRevised": 21,
+            "approvedDraft": 21,
+            "needsRevision": 0,
+            "blockedByMissingProof": 0,
+            "blockedByMissingHandle": 0,
+            "weeklyReportDrafts": 1,
+            "pendingDraftApprovals": 22,
+            "missingHandles": [
+              "Instagram",
+              "TikTok",
+              "YouTube Shorts",
+              "LinkedIn"
+            ],
+            "mode": "draft_only",
+            "livePostingBlocked": true,
+            "credentialsStored": false,
+            "socialOauthConnected": false,
+            "schedulingBlocked": true,
+            "analyticsApiBlocked": true,
+            "n8nAutomationBlocked": true
+          },
+          "targetRepoChecks": [
+            "npm.cmd run check passed",
+            "npm.cmd test passed",
+            "npm.cmd run build passed",
+            "direct draft-only content review safety assertion passed",
+            "git diff --check passed"
+          ],
+          "verifiedBy": "github_mcp_and_local_git",
+          "verifiedAt": "2026-07-05T05:26:42Z"
+        },
+        "recordPath": ".codex/connectors/connector-exec-20260704-ag-digitalz-content-review-build-live-result.json"
       },
       {
         "id": "connector-exec-20260704-ag-digitalz-draft-config-build-live-result",
@@ -2001,8 +2086,16 @@ window.AG_OS_DASHBOARD_DATA = {
     "candidatesLoadedAsTruth": false
   },
   "costs": {
-    "ledgerCount": 27,
+    "ledgerCount": 28,
     "latestCosts": [
+      {
+        "costLedgerId": "cost-ledger-20260704-ag-digitalz-content-review-build",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-05T05:26:42Z",
+        "recordPath": ".codex/costs/cost-ledger-20260704-ag-digitalz-content-review-build.json"
+      },
       {
         "costLedgerId": "cost-ledger-20260704-ag-digitalz-first-content-sprint-netlify-staging",
         "status": "active",
@@ -2042,14 +2135,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "budgetStatus": "within_limit",
         "updatedAt": "2026-07-05T02:10:39Z",
         "recordPath": ".codex/costs/cost-ledger-20260704-ag-digitalz-netlify-staging-redeploy.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-20260704-target-pr-merge-ag-digitalz-draft-config",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-05T02:05:01Z",
-        "recordPath": ".codex/costs/cost-ledger-20260704-target-pr-merge-ag-digitalz-draft-config.json"
       }
     ],
     "totalRecordedActualUsd": 0,
