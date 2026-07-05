@@ -167,7 +167,12 @@ if (data.socialMediaSystem.contentSprint.socialOauthConnected !== false ||
 const hasAgDigitalzRedeployRecord = data.socialMediaSystem.sourceRecords.includes(
   ".codex/connectors/connector-exec-20260704-ag-digitalz-netlify-staging-redeploy-live-result.json"
 );
-const expectedSocialMediaDeployId = hasAgDigitalzRedeployRecord
+const hasAgDigitalzFirstContentSprintDeployRecord = data.socialMediaSystem.sourceRecords.includes(
+  ".codex/connectors/connector-exec-20260704-ag-digitalz-first-content-sprint-netlify-staging-live-result.json"
+);
+const expectedSocialMediaDeployId = hasAgDigitalzFirstContentSprintDeployRecord
+  ? "6a49e480fbe8fbbb83b933dc"
+  : hasAgDigitalzRedeployRecord
   ? "6a49bd1932f7ae16701ece3f"
   : "6a49ad36a73303e2fa05755f";
 if (data.socialMediaSystem.latestDeployId !== expectedSocialMediaDeployId) {
