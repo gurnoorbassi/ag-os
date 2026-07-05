@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01",
+  "title": "Internal social client configs must keep account access pending until owner input exists",
+  "lesson": "When converting a draft social media operations shell into a real internal brand workspace, replace placeholders only for owner-provided business configuration while keeping platform handles pending, account connection status not_connected, posting mode draft_only, approvalRequired true, livePostingBlocked true, scheduling blocked, analytics blocked, social OAuth disconnected, credentialsStored false, and n8n activation blocked.",
+  "sources": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/3",
+    ".codex/audit/audit-runtime-target-pr-review-ag-digitalz-draft-config-20260704.json",
+    ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-draft-config-20260704.json",
+    ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-draft-config-20260704.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "high",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "appliesTo": [
+    "social media operations system",
+    "internal client configuration review",
+    "account access pending state",
+    "blocked live action review"
+  ],
+  "sourceScoreId": "quality-score-runtime-target-pr-review-ag-digitalz-draft-config-20260704",
+  "generatedBy": "ag-os-reviewer",
+  "whyThisMatters": "Real internal configuration can make the system useful without crossing into credential handling, account connection, scheduling, posting, analytics, or automation activation.",
+  "whenToUse": "Use when reviewing future internal brand or client-draft social media system configuration updates before any live connector approval.",
+  "whenNotToUse": "Do not treat this candidate lesson as approval to merge, deploy, connect accounts, use credentials, schedule, post, activate automations, or create accepted memory.",
+  "notes": "Candidate only. Not accepted permanent truth until reviewed and promoted per docs/memory-learning-policy.md.",
+  "createdAt": "2026-07-05T01:59:30Z",
+  "updatedAt": "2026-07-05T01:59:30Z"
+}
