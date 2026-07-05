@@ -179,7 +179,12 @@ const hasAgDigitalzRedeployRecord = data.socialMediaSystem.sourceRecords.include
 const hasAgDigitalzFirstContentSprintDeployRecord = data.socialMediaSystem.sourceRecords.includes(
   ".codex/connectors/connector-exec-20260704-ag-digitalz-first-content-sprint-netlify-staging-live-result.json"
 );
-const expectedSocialMediaDeployId = hasAgDigitalzFirstContentSprintDeployRecord
+const hasAgDigitalzContentReviewDeployRecord = data.socialMediaSystem.sourceRecords.includes(
+  ".codex/connectors/connector-exec-20260704-ag-digitalz-content-review-netlify-staging-live-result.json"
+);
+const expectedSocialMediaDeployId = hasAgDigitalzContentReviewDeployRecord
+  ? "6a49f1d33942a79f4190240c"
+  : hasAgDigitalzFirstContentSprintDeployRecord
   ? "6a49e480fbe8fbbb83b933dc"
   : hasAgDigitalzRedeployRecord
   ? "6a49bd1932f7ae16701ece3f"
