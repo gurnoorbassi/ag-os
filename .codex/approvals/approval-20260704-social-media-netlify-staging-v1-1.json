@@ -1,0 +1,85 @@
+{
+  "approvalId": "approval-20260704-social-media-netlify-staging-v1-1",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "deploy_staging",
+  "requestedAction": "Redeploy the dedicated Netlify staging-only site ag-social-media-management-system-staging from gurnoorbassi/ag-social-media-management-system main after the v1.1 target PR merge.",
+  "target": "netlify:ag-social-media-management-system-staging",
+  "scope": "This approval allows AG OS to use Netlify for exactly one staging-only redeploy milestone for gurnoorbassi/ag-social-media-management-system. The allowed live actions are limited to redeploying the existing dedicated Netlify staging-only site ag-social-media-management-system-staging from main at commit 7204846654ef448f6c0c78027a569b7707c618b8, verifying the staging URL returns HTTP 200, recording the Netlify deployment result, and stopping before production, custom domain, DNS, paid features, secrets, social account connection, social credentials, posting, scheduling, analytics API use, n8n activation, real client data, Lead Gen, AI Receptionist, or Constitution changes.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260704-social-media-netlify-staging-v1-1.json"
+  },
+  "approvalRequiredFor": [
+    "deploy_staging"
+  ],
+  "approvedActions": [
+    "deploy_staging"
+  ],
+  "prohibitedActions": [
+    "deploy_production",
+    "create_production_deploy",
+    "change_domain",
+    "change_dns",
+    "add_custom_domain",
+    "connect_n8n",
+    "activate_n8n",
+    "connect_social_accounts",
+    "use_social_credentials",
+    "post_content",
+    "schedule_content",
+    "use_analytics_api",
+    "use_paid_service",
+    "use_credentials",
+    "add_secrets",
+    "add_tracking_scripts",
+    "wire_forms_to_live_services",
+    "access_real_client_data",
+    "access_production_data",
+    "access_customer_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution",
+    "edit_target_repo_files",
+    "merge_target_repo_pr"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target branch changes, the target main SHA changes from 7204846654ef448f6c0c78027a569b7707c618b8, the Netlify site name or id changes, a custom domain or DNS change is needed, a paid Netlify feature is required, credentials or secrets would need to be stored in the repository, social credentials or account connections become necessary, posting or scheduling becomes necessary, analytics API use becomes necessary, n8n activation becomes necessary, validation or boot check fails, target repo checks fail, Netlify reports a configuration or billing blocker, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond one dedicated staging-only Netlify redeploy.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current sprint granted scoped approval for Phase 4: redeploy the dedicated Netlify staging-only site after the Social Media v1.1 target PR merge.",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/99",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/2",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/netlify/netlify-plan-20260704-social-media-staging.json",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs passed immediately before execution.",
+      "verified": true
+    }
+  ],
+  "approvalText": "Owner-approved orchestrated task Phase 4: redeploy dedicated Netlify staging-only site ag-social-media-management-system-staging from target repo main after the Social Media v1.1 merge. Source repo gurnoorbassi/ag-social-media-management-system main SHA is 7204846654ef448f6c0c78027a569b7707c618b8. No production AG Digitalz/customer domain, DNS change, custom domain, paid Netlify features, secrets, social account connection, credentials, posting, scheduling, analytics API, n8n activation, real client data, target repo edits, Lead Gen, AI Receptionist, or Constitution change is approved.",
+  "approvedAt": "2026-07-05T00:59:30Z",
+  "expiresAt": "2026-07-06T00:59:30Z",
+  "createdAt": "2026-07-05T00:59:30Z",
+  "updatedAt": "2026-07-05T00:59:30Z"
+}
