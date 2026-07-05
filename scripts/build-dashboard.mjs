@@ -541,6 +541,15 @@ function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview 
     sourceRecord: "docs/social-media-management-system-v1-future-connectors.md"
   });
 
+  attention.push({
+    id: "manual-posting-available",
+    status: "ready",
+    title: "Manual posting available",
+    detail: "AG Digitalz approved drafts can be copied/exported for owner manual use while AG OS automation posting remains blocked.",
+    action: "Use the staged Social Media Manual Posting Pack manually, or approve a future OAuth package separately.",
+    sourceRecord: ".codex/connectors/connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result.json"
+  });
+
   return attention;
 }
 
@@ -644,6 +653,14 @@ export function collectDashboardData() {
     netlifyRecords,
     (record) => record.id === "connector-exec-20260705-ag-digitalz-instagram-handle-netlify-staging-live-result"
   );
+  const socialMediaManualPostingBuildRecord = latestConnectorRecord(
+    githubRecords,
+    (record) => record.id === "connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-build-live-result"
+  );
+  const socialMediaManualPostingStagingRecord = latestConnectorRecord(
+    netlifyRecords,
+    (record) => record.id === "connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result"
+  );
   const firstContentSprint = clientManagement.contentSprints[0] ?? null;
   const systemBlockers = [
     ...approvals.blockedApprovals.map((approval) => `Blocked approval: ${approval.approvalId}`)
@@ -716,7 +733,9 @@ export function collectDashboardData() {
     aiReceptionist,
     socialMediaSystem: {
       ...socialMedia,
-      currentVersion: socialMediaInstagramHandleBuildRecord
+      currentVersion: socialMediaManualPostingBuildRecord
+        ? "v1.8 manual posting pack"
+        : socialMediaInstagramHandleBuildRecord
         ? "v1.7 Instagram handle"
         : socialMediaInteractiveUiBuildRecord
         ? "v1.6 interactive draft UI"
@@ -727,7 +746,9 @@ export function collectDashboardData() {
         : socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
         ? "v1.2"
         : socialMediaMergeRecord ? "v1.1" : "v1",
-      lifecycleStatus: socialMediaInstagramHandleBuildRecord
+      lifecycleStatus: socialMediaManualPostingBuildRecord
+        ? (socialMediaManualPostingStagingRecord ? "Manual posting pack merged and staged; OAuth and AG OS automated posting remain blocked" : "Manual posting pack merged; staging redeploy pending")
+        : socialMediaInstagramHandleBuildRecord
         ? (socialMediaInstagramHandleStagingRecord ? "Instagram public handle recorded and staged; live social actions remain blocked" : "Instagram public handle merged; staging redeploy pending")
         : socialMediaInteractiveUiBuildRecord
         ? (socialMediaInteractiveUiStagingRecord ? "Interactive draft UI merged and staged; live social actions remain blocked" : "Interactive draft UI merged; staging redeploy pending")
@@ -740,10 +761,10 @@ export function collectDashboardData() {
         ? "AG Digitalz draft config merged and staged"
         : socialMediaMergeRecord ? "v1.1 merged and staged" : "starter staged",
       targetRepo: "gurnoorbassi/ag-social-media-management-system",
-      targetPullRequestUrl: socialMediaInstagramHandleBuildRecord?.result?.pullRequestUrl ?? socialMediaInteractiveUiBuildRecord?.result?.pullRequestUrl ?? socialMediaContentReviewBuildRecord?.result?.pullRequestUrl ?? socialMediaContentSprintBuildRecord?.result?.pullRequestUrl ?? socialMediaBuildRecord?.result?.pullRequestUrl ?? "Not recorded",
-      targetPullRequestMerged: socialMediaInstagramHandleBuildRecord?.result?.pullRequestMerged ?? socialMediaInteractiveUiBuildRecord?.result?.pullRequestMerged ?? socialMediaContentReviewMergeRecord?.result?.pullRequestMerged ?? (socialMediaContentReviewBuildRecord ? false : socialMediaContentSprintMergeRecord?.result?.pullRequestMerged ?? socialMediaMergeRecord?.result?.pullRequestMerged ?? false),
-      targetMergeSha: socialMediaInstagramHandleBuildRecord?.result?.mergeCommitSha ?? socialMediaInteractiveUiBuildRecord?.result?.mergeCommitSha ?? socialMediaContentReviewMergeRecord?.result?.mergeCommitSha ?? socialMediaContentSprintMergeRecord?.result?.mergeCommitSha ?? socialMediaMergeRecord?.result?.mergeCommitSha ?? "Not recorded",
-      reviewedHeadSha: socialMediaInstagramHandleBuildRecord?.result?.headSha ?? socialMediaInteractiveUiBuildRecord?.result?.headSha ?? socialMediaContentReviewMergeRecord?.result?.headSha ?? socialMediaContentSprintMergeRecord?.result?.headSha ?? socialMediaMergeRecord?.result?.headSha ?? "Not recorded",
+      targetPullRequestUrl: socialMediaManualPostingBuildRecord?.result?.pullRequestUrl ?? socialMediaInstagramHandleBuildRecord?.result?.pullRequestUrl ?? socialMediaInteractiveUiBuildRecord?.result?.pullRequestUrl ?? socialMediaContentReviewBuildRecord?.result?.pullRequestUrl ?? socialMediaContentSprintBuildRecord?.result?.pullRequestUrl ?? socialMediaBuildRecord?.result?.pullRequestUrl ?? "Not recorded",
+      targetPullRequestMerged: socialMediaManualPostingBuildRecord?.result?.pullRequestMerged ?? socialMediaInstagramHandleBuildRecord?.result?.pullRequestMerged ?? socialMediaInteractiveUiBuildRecord?.result?.pullRequestMerged ?? socialMediaContentReviewMergeRecord?.result?.pullRequestMerged ?? (socialMediaContentReviewBuildRecord ? false : socialMediaContentSprintMergeRecord?.result?.pullRequestMerged ?? socialMediaMergeRecord?.result?.pullRequestMerged ?? false),
+      targetMergeSha: socialMediaManualPostingBuildRecord?.result?.mergeCommitSha ?? socialMediaInstagramHandleBuildRecord?.result?.mergeCommitSha ?? socialMediaInteractiveUiBuildRecord?.result?.mergeCommitSha ?? socialMediaContentReviewMergeRecord?.result?.mergeCommitSha ?? socialMediaContentSprintMergeRecord?.result?.mergeCommitSha ?? socialMediaMergeRecord?.result?.mergeCommitSha ?? "Not recorded",
+      reviewedHeadSha: socialMediaManualPostingBuildRecord?.result?.headSha ?? socialMediaInstagramHandleBuildRecord?.result?.headSha ?? socialMediaInteractiveUiBuildRecord?.result?.headSha ?? socialMediaContentReviewMergeRecord?.result?.headSha ?? socialMediaContentSprintMergeRecord?.result?.headSha ?? socialMediaMergeRecord?.result?.headSha ?? "Not recorded",
       stagingUrl: latestSocialMediaStaging?.siteUrl ?? "Not recorded",
       stagingStatus: latestSocialMediaStaging?.deployStatus ?? "Not recorded",
       latestDeployId: latestSocialMediaStaging?.deployId ?? "Not recorded",
@@ -804,6 +825,8 @@ export function collectDashboardData() {
         socialMediaInteractiveUiStagingRecord?.recordPath,
         socialMediaInstagramHandleBuildRecord?.recordPath,
         socialMediaInstagramHandleStagingRecord?.recordPath,
+        socialMediaManualPostingBuildRecord?.recordPath,
+        socialMediaManualPostingStagingRecord?.recordPath,
         socialMediaMergeRecord?.recordPath,
         latestSocialMediaStaging?.recordPath,
         firstContentSprint?.recordPath
