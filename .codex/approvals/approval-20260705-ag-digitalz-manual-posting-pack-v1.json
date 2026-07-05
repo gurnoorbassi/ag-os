@@ -1,0 +1,91 @@
+{
+  "approvalId": "approval-20260705-ag-digitalz-manual-posting-pack-v1",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "build",
+  "requestedAction": "Add AG Digitalz Manual Posting Pack v1, merge the reviewed target PR if clean, redeploy the dedicated Netlify staging-only site, and record proof.",
+  "target": "github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging; ag-os:proof-records",
+  "scope": "This approval allows exactly one target repo branch ag-os/manual-posting-pack-v1, static frontend and README updates for manual owner-use posting guidance, copy/export tools, owner checklist, platform checklist, one target PR, review and quality score, merge if clean, one redeploy of the existing dedicated staging-only Netlify site, and AG OS proof records. It does not authorize OAuth, social account connection, credentials, automated posting, scheduling, analytics API use, DMs/comments, n8n activation, paid tools, domain/DNS, custom domain, production deploy, real client private data, Lead Gen changes, AI Receptionist changes, Constitution changes, accepted lessons, or permanent memory.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260705-ag-digitalz-manual-posting-pack-v1.json"
+  },
+  "approvalRequiredFor": [
+    "update_target_app",
+    "merge_pr",
+    "deploy_staging",
+    "record_proof"
+  ],
+  "approvedActions": [
+    "create_branch",
+    "update_files",
+    "open_pr",
+    "review_pr",
+    "merge_pr",
+    "redeploy_netlify_staging",
+    "record_proof"
+  ],
+  "prohibitedActions": [
+    "start_oauth",
+    "connect_social_accounts",
+    "store_credentials",
+    "post_content",
+    "schedule_content",
+    "use_analytics_api",
+    "send_dm",
+    "send_comment",
+    "activate_n8n",
+    "deploy_production",
+    "change_domain",
+    "change_dns",
+    "add_custom_domain",
+    "use_paid_service",
+    "access_private_client_data",
+    "access_customer_data",
+    "access_production_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution",
+    "create_accepted_lesson",
+    "create_permanent_memory"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, target PR #9 head SHA changes from 1f4b35d1db6b36b0a67cd172d0d2e71bd3b85a2c before merge, target repo main SHA differs from eaa05e5fcf9fa64e2ae85ace52f7c0949e00841d before staging redeploy, the Netlify site ID or site name changes, OAuth would start, credentials are required, a social account connection is requested, automated posting, scheduling, analytics, DMs/comments, n8n activation, paid tools, domain/DNS, custom domain, production deploy, customer data, production data, Lead Gen, AI Receptionist, Constitution, accepted lesson, or permanent memory scope appears, validation or boot check fails, target checks fail, or the action expands beyond this exact manual posting pack milestone.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner-approved sprint to add AG Digitalz Manual Posting Pack v1 without OAuth, credentials, account connection, automated posting, scheduling, analytics, DMs/comments, n8n activation, paid tools, domain/DNS, Lead Gen, AI Receptionist, or Constitution changes.",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/9",
+      "verified": true
+    },
+    {
+      "type": "review_note",
+      "reference": ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-manual-posting-pack-v1-20260705.json",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "Netlify deploy 6a4ac78160b0ee09bacf9015 ready and HTTP 200.",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "AG OS dashboard build/check, validation, boot check, runtime tests, and target repo local checks must pass before final report.",
+      "verified": false
+    }
+  ],
+  "approvalText": "Owner-approved sprint: AG Digitalz Manual Posting Pack v1. Allowed GitHub actions: create branch, update static app files, open PR, review PR, quality score, merge if clean, redeploy Netlify staging, and record proof. Do not execute OAuth, connect accounts, use credentials, automate posting, schedule, call analytics APIs, use DMs/comments, activate n8n, use paid tools, change domain/DNS, touch Lead Gen, touch AI Receptionist, or change Constitution.",
+  "approvedAt": "2026-07-05T20:55:00Z",
+  "expiresAt": "2026-07-06T20:55:00Z",
+  "createdAt": "2026-07-05T20:55:00Z",
+  "updatedAt": "2026-07-05T21:08:30Z"
+}
