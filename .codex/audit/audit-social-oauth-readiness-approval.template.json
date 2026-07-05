@@ -1,0 +1,28 @@
+{
+  "id": "audit-social-oauth-readiness-approval",
+  "occurredAt": "REQUIRED_OCCURRED_AT",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for a future Social OAuth readiness package. This audit template does not execute OAuth, connect accounts, store credentials, post, schedule, pull analytics, use DMs/comments, or activate n8n.",
+  "scope": "approval-20260704-social-oauth-readiness",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-social-oauth-readiness"
+    },
+    {
+      "type": "document",
+      "reference": "docs/social-oauth-readiness-package.md"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "confidential",
+  "liveServiceTouched": false,
+  "notes": "Future OAuth execution remains blocked until exact platform handles are provided, each platform receives separate owner approval, an active approval lock exists, a secure credential storage path is approved, and validation and boot checks pass. This template does not authorize live posting, scheduling, analytics API access, DMs/comments, outbound messaging, n8n activation, paid tools, customer data, production data, domain/DNS changes, Lead Gen changes, AI Receptionist changes, or Constitution changes.",
+  "createdAt": "REQUIRED_CREATED_AT"
+}

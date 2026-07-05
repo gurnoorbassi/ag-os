@@ -1,0 +1,92 @@
+{
+  "approvalId": "approval-20260704-ag-digitalz-draft-approval-oauth-readiness",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "build",
+  "requestedAction": "Record AG Digitalz draft-content approval, update the Social Media staging app to show owner_approved_draft state, merge the reviewed target PR, redeploy the dedicated Netlify staging-only site, and prepare Social OAuth readiness templates only.",
+  "target": "github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging; ag-os:social-oauth-readiness-package",
+  "scope": "This approval allows exactly the current orchestrated milestone: record owner approval for 21 post packages and one weekly report as draft content only, create/open/merge the reviewed Social Media target app PR #6, redeploy the dedicated staging-only Netlify site ag-social-media-management-system-staging from target repo main commit 392a582a7193412e39b264ce442e0f4949f08c0b, and prepare OAuth readiness docs/templates only. It does not authorize live posting, scheduling, social OAuth execution, account connection, analytics API use, DMs/comments, n8n activation, domain/DNS, custom domain, paid features, credentials, real client private data, Lead Gen, AI Receptionist, Constitution changes, accepted lessons, or permanent memory.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260704-ag-digitalz-draft-approval-netlify-staging.json"
+  },
+  "approvalRequiredFor": [
+    "update_target_app",
+    "merge_pr",
+    "deploy_staging",
+    "prepare_social_oauth_readiness"
+  ],
+  "approvedActions": [
+    "record_draft_content_approval",
+    "create_branch",
+    "update_files",
+    "open_pr",
+    "review_pr",
+    "merge_pr",
+    "redeploy_netlify_staging",
+    "prepare_social_oauth_readiness"
+  ],
+  "prohibitedActions": [
+    "start_oauth",
+    "connect_social_accounts",
+    "store_credentials",
+    "post_content",
+    "schedule_content",
+    "use_analytics_api",
+    "send_dm",
+    "send_comment",
+    "activate_n8n",
+    "deploy_production",
+    "change_domain",
+    "change_dns",
+    "add_custom_domain",
+    "use_paid_service",
+    "access_private_client_data",
+    "access_customer_data",
+    "access_production_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution",
+    "create_accepted_lesson",
+    "create_permanent_memory"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repo changes, target PR #6 head SHA changes from 4a8b28972ae5f5ddf733d149fcd8048ddbba83a9 before merge, target repo main SHA changes from 392a582a7193412e39b264ce442e0f4949f08c0b before staging redeploy, the Netlify site ID or site name changes, official handles are requested but remain not_provided, OAuth would start, credentials are required, a broader social permission is needed, live posting, scheduling, analytics, DMs/comments, n8n activation, paid tools, domain/DNS, custom domain, customer data, production data, Lead Gen, AI Receptionist, Constitution, accepted lesson, or permanent memory scope appears, validation or boot check fails, tests fail, or the action expands beyond this exact draft-approval/staging-readiness milestone.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner-approved orchestrated task approving 21 post packages and weekly report as draft content only and requesting Social OAuth Readiness Package preparation.",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/6",
+      "verified": true
+    },
+    {
+      "type": "review_note",
+      "reference": ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704.json",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "Netlify deploy 6a49fc6c75a309fb314ffb9d ready and HTTP 200.",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "AG OS dashboard build/check, validation, boot check, runtime tests, and target repo local checks must pass before merge.",
+      "verified": false
+    }
+  ],
+  "approvalText": "Owner-approved orchestrated task: approve 21 AG Digitalz post packages and the weekly report as draft content only, update AG OS source-of-truth, update the Social Media staging app and Dashboard Control Center, prepare a Social OAuth Readiness Package only, merge/redeploy if clean, and stop. This does not approve live posting, scheduling, social OAuth, account connection, analytics API, DMs/comments, n8n activation, domain/DNS, paid tools, credentials, Lead Gen, AI Receptionist, Constitution changes, accepted lessons, or permanent memory.",
+  "approvedAt": "2026-07-05T06:32:26Z",
+  "expiresAt": "2026-07-06T06:32:26Z",
+  "createdAt": "2026-07-05T06:32:26Z",
+  "updatedAt": "2026-07-05T06:40:50Z"
+}

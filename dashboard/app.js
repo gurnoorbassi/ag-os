@@ -414,9 +414,10 @@ function renderSocialMedia() {
       title: "First Content Sprint",
       status: system.contentSprint.status,
       metric: `${system.contentSprint.draftPostPackageCount} drafts`,
-      detail: `${system.contentSprint.calendarDays} days; ${system.contentSprint.weeklyReportDraftCount} weekly report draft; ${system.contentSprint.pendingDraftApprovalCount} pending approvals`,
+      detail: `${system.contentSprint.calendarDays} days; ${system.contentSprint.ownerApprovedDraftCount ?? 0} draft posts owner-approved; weekly report ${system.contentSprint.weeklyReportApprovalStatus ?? "not_recorded"}; ${system.contentSprint.pendingDraftApprovalCount} pending approvals`,
       meta: [
         system.contentSprint.targetPullRequestUrl,
+        `handles: ${(system.contentSprint.platforms ?? []).map((platform) => `${platform.platform}=${platform.handleStatus}`).join(", ")}`,
         `mode: ${system.contentSprint.mode}`,
         `livePostingBlocked: ${boolText(system.contentSprint.livePostingBlocked, "true", "false")}`,
         `schedulingBlocked: ${boolText(system.contentSprint.schedulingBlocked, "true", "false")}`,
