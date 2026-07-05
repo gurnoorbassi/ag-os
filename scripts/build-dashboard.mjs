@@ -161,6 +161,10 @@ function summarizeNetlify(record) {
     siteUrl: record.result?.siteUrl ?? "Not recorded",
     deployStatus: record.result?.deployStatus ?? "Not recorded",
     deployId: record.result?.deployId ?? "Not recorded",
+    deployContext: record.result?.netlifyDeployContext ?? "Not recorded",
+    stagingInterpretation: record.result?.stagingInterpretation ?? "Not recorded",
+    httpStatus: record.result?.httpStatus ?? "Not recorded",
+    verifiedAt: record.result?.verifiedAt ?? record.updatedAt ?? record.createdAt ?? "",
     sourceRepo: record.result?.repositoryFullName ?? "Not recorded",
     sourceSha: record.result?.sourceCommitSha ?? "Not recorded",
     stagingOnly: record.result?.customDomainConfigured === false && record.result?.dnsChanged === false,
@@ -236,6 +240,40 @@ function collectClientManagement() {
     accessRequestCount: countRecords(".codex/client-management/access-requests"),
     pendingApprovalCount: clientApprovalRecords.filter((approval) => approval.status === "pending").length,
     zeroState: "No real clients are registered yet."
+  };
+}
+
+function collectFirstClientReadiness(clientManagement) {
+  const sourceRecord = "docs/first-client-intake-needed.md";
+  const content = existsSync(path.join(root, sourceRecord)) ? readText(sourceRecord) : "";
+  const missingRequiredFields = [...content.matchAll(/- `([^`]+)`: `REQUIRED_[^`]+`/g)]
+    .map((match) => match[1]);
+  const activeRecordCount = clientManagement.clientCount +
+    clientManagement.engagementCount +
+    clientManagement.deliverableCount +
+    clientManagement.accessRequestCount +
+    clientManagement.pendingApprovalCount;
+
+  return {
+    status: missingRequiredFields.length > 0 ? "intake_needed" : "ready_for_owner_review",
+    sourceRecord,
+    activeClientRecordsCreated: activeRecordCount > 0,
+    activeRecordCount,
+    missingRequiredFieldCount: missingRequiredFields.length,
+    missingRequiredFields,
+    canCreateActiveRecords: missingRequiredFields.length === 0,
+    currentMode: "draft/staging only",
+    nextOwnerDecision: missingRequiredFields.length > 0
+      ? "Provide owner-approved real values for every required first-client field before AG OS creates active client records."
+      : "Review the completed first-client values before AG OS creates active client records.",
+    safetyDefaults: [
+      "platform accounts remain not_connected",
+      "posting mode remains draft_only",
+      "approval_required remains true",
+      "live_posting_blocked remains true",
+      "no credentials or social OAuth",
+      "no posting, scheduling, analytics API, or n8n activation"
+    ]
   };
 }
 
@@ -319,6 +357,54 @@ function collectSkills() {
   };
 }
 
+function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview }) {
+  const attention = [];
+
+  if (firstClientReadiness.status === "intake_needed") {
+    attention.push({
+      id: "first-client-intake-needed",
+      status: "blocked",
+      title: "First client intake",
+      detail: `${firstClientReadiness.missingRequiredFieldCount} required field(s) still use REQUIRED_ placeholders.`,
+      action: firstClientReadiness.nextOwnerDecision,
+      sourceRecord: firstClientReadiness.sourceRecord
+    });
+  }
+
+  if (approvals.blockedCount > 0 || approvals.staleWarningCount > 0) {
+    attention.push({
+      id: "approval-lock-review",
+      status: "review",
+      title: "Approval locks",
+      detail: `${approvals.blockedCount} blocked approval(s), ${approvals.staleWarningCount} stale warning(s).`,
+      action: "Review blocked or stale approval locks before executing gated work.",
+      sourceRecord: ".codex/approvals/"
+    });
+  }
+
+  if (qualityReview.reviewRequiredCount > 0 || qualityReview.failedCount > 0) {
+    attention.push({
+      id: "quality-review-needed",
+      status: "review",
+      title: "Quality review",
+      detail: `${qualityReview.reviewRequiredCount} critique(s) require review; ${qualityReview.failedCount} failed.`,
+      action: "Revise plans or obtain explicit owner override before build-mode promotion.",
+      sourceRecord: ".codex/critiques/"
+    });
+  }
+
+  attention.push({
+    id: "live-social-integrations-blocked",
+    status: "blocked",
+    title: "Live social integrations",
+    detail: "OAuth, credentials, posting, scheduling, analytics API, and n8n activation remain blocked.",
+    action: "Use future approval packages before any live integration work.",
+    sourceRecord: "docs/social-media-management-system-v1-future-connectors.md"
+  });
+
+  return attention;
+}
+
 export function collectDashboardData() {
   const constitution = readText("docs/ag-os-constitution-v1.md");
   const projectRegistry = readJson(".codex/projects/registry.json");
@@ -356,12 +442,20 @@ export function collectDashboardData() {
   const githubRecords = connectorExecutions
     .filter((record) => record.connectorId === "connector-github-mcp")
     .map(summarizeGithub);
-  const socialMediaNetlify = netlifyRecords.find((record) => record.siteName === "ag-social-media-management-system-staging");
   const capabilities = capabilityRegistry.capabilities.map(summarizeCapability);
   const approvals = collectApprovals();
   const qualityReview = collectQualityReview();
   const costReadModel = collectCosts(costBudget);
   const skills = collectSkills();
+  const clientManagement = collectClientManagement();
+  const firstClientReadiness = collectFirstClientReadiness(clientManagement);
+  const socialMediaBuildRecord = githubRecords.find((record) => record.id === "connector-exec-20260704-social-media-system-v1-1-upgrade-live-result");
+  const socialMediaMergeRecord = githubRecords.find((record) => record.id === "connector-exec-20260704-target-pr-merge-social-media-system-v1-1-live-result");
+  const socialMediaStagingRecords = latestBy(
+    netlifyRecords.filter((record) => record.siteName === "ag-social-media-management-system-staging"),
+    "verifiedAt"
+  );
+  const latestSocialMediaStaging = socialMediaStagingRecords[0] ?? null;
   const systemBlockers = [
     ...approvals.blockedApprovals.map((approval) => `Blocked approval: ${approval.approvalId}`)
   ];
@@ -433,10 +527,23 @@ export function collectDashboardData() {
     aiReceptionist,
     socialMediaSystem: {
       ...socialMedia,
+      currentVersion: socialMediaMergeRecord ? "v1.1" : "v1",
+      lifecycleStatus: socialMediaMergeRecord ? "v1.1 merged and staged" : "starter staged",
       targetRepo: "gurnoorbassi/ag-social-media-management-system",
-      stagingUrl: socialMediaNetlify?.siteUrl ?? "Not recorded",
-      stagingStatus: socialMediaNetlify?.deployStatus ?? "Not recorded",
+      targetPullRequestUrl: socialMediaBuildRecord?.result?.pullRequestUrl ?? "Not recorded",
+      targetPullRequestMerged: socialMediaMergeRecord?.result?.pullRequestMerged ?? false,
+      targetMergeSha: socialMediaMergeRecord?.result?.mergeCommitSha ?? "Not recorded",
+      reviewedHeadSha: socialMediaMergeRecord?.result?.headSha ?? "Not recorded",
+      stagingUrl: latestSocialMediaStaging?.siteUrl ?? "Not recorded",
+      stagingStatus: latestSocialMediaStaging?.deployStatus ?? "Not recorded",
+      latestDeployId: latestSocialMediaStaging?.deployId ?? "Not recorded",
+      latestDeploySourceSha: latestSocialMediaStaging?.sourceSha ?? "Not recorded",
+      latestDeployVerifiedAt: latestSocialMediaStaging?.verifiedAt ?? "Not recorded",
+      latestDeployHttpStatus: latestSocialMediaStaging?.httpStatus ?? "Not recorded",
+      netlifyDeployContext: latestSocialMediaStaging?.deployContext ?? "Not recorded",
+      stagingInterpretation: latestSocialMediaStaging?.stagingInterpretation ?? "Not recorded",
       currentMode: "draft/staging only",
+      firstClientReadiness,
       safetyBlocks: {
         livePostingBlocked: true,
         socialOauthConnected: false,
@@ -447,8 +554,10 @@ export function collectDashboardData() {
       },
       sourceRecords: [
         ".codex/projects/social-media-management-system-v1.json",
-        ".codex/connectors/connector-exec-20260704-social-media-netlify-staging-live-result.json"
-      ]
+        socialMediaBuildRecord?.recordPath,
+        socialMediaMergeRecord?.recordPath,
+        latestSocialMediaStaging?.recordPath
+      ].filter(Boolean)
     },
     connectorRegistry: {
       status: connectorRegistry.status,
@@ -512,7 +621,9 @@ export function collectDashboardData() {
         securityPolicy.rules?.productionDataBlockedByDefault ? "Production data blocked by default" : "Production data block not recorded"
       ]
     },
-    clientManagement: collectClientManagement(),
+    clientManagement,
+    firstClientReadiness,
+    ownerAttention: collectOwnerAttention({ firstClientReadiness, approvals, qualityReview }),
     approvals,
     connectorProofs: {
       github: githubRecords,

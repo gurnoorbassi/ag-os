@@ -174,6 +174,19 @@ function renderOverview() {
   );
 }
 
+function renderOwnerAttention() {
+  const root = clear("#owner-attention-grid");
+  data.ownerAttention.forEach((item) => {
+    root.append(card({
+      title: item.title,
+      status: item.status,
+      metric: item.status,
+      detail: item.action,
+      meta: [item.detail, item.sourceRecord]
+    }));
+  });
+}
+
 function renderProjects() {
   const tbody = document.querySelector("#projects-table");
   tbody.replaceChildren();
@@ -349,18 +362,39 @@ function renderSocialMedia() {
   const system = data.socialMediaSystem;
   root.append(
     card({
-      title: "Social Media System v1",
+      title: "Social Media System",
       status: system.status,
-      metric: system.currentMode,
-      detail: system.targetRepo,
-      meta: [system.recordPath, `Staging: ${system.stagingUrl}`]
+      metric: system.currentVersion,
+      detail: `${system.lifecycleStatus}; ${system.currentMode}`,
+      meta: [
+        system.targetRepo,
+        `Target PR: ${system.targetPullRequestUrl}`,
+        `Target merge SHA: ${system.targetMergeSha}`
+      ]
     }),
     card({
-      title: "Staging",
+      title: "Latest Staging Deploy",
       status: system.stagingStatus,
-      metric: system.stagingStatus,
+      metric: system.latestDeployId,
       detail: system.stagingUrl,
-      meta: system.sourceRecords
+      meta: [
+        `status: ${system.stagingStatus}`,
+        `source: ${system.latestDeploySourceSha}`,
+        `HTTP: ${system.latestDeployHttpStatus}`,
+        `verified: ${system.latestDeployVerifiedAt}`,
+        system.stagingInterpretation
+      ]
+    }),
+    card({
+      title: "First Client Readiness",
+      status: system.firstClientReadiness.status,
+      metric: `${system.firstClientReadiness.missingRequiredFieldCount} fields needed`,
+      detail: system.firstClientReadiness.nextOwnerDecision,
+      meta: [
+        `activeClientRecordsCreated: ${boolText(system.firstClientReadiness.activeClientRecordsCreated, "true", "false")}`,
+        `canCreateActiveRecords: ${boolText(system.firstClientReadiness.canCreateActiveRecords, "true", "false")}`,
+        system.firstClientReadiness.sourceRecord
+      ]
     }),
     card({
       title: "Live Actions",
@@ -375,6 +409,13 @@ function renderSocialMedia() {
         `n8nLiveActivationBlocked: ${boolText(system.safetyBlocks.n8nLiveActivationBlocked, "true", "false")}`,
         `clientConfigAdded: ${boolText(system.safetyBlocks.clientConfigAdded, "true", "false")}`
       ]
+    }),
+    card({
+      title: "Safety Defaults",
+      status: "draft-only",
+      metric: system.currentMode,
+      detail: "Starter configs remain locked to draft/staging behavior.",
+      meta: system.firstClientReadiness.safetyDefaults
     })
   );
 }
@@ -526,6 +567,7 @@ function renderSafeMerge() {
 }
 
 renderOverview();
+renderOwnerAttention();
 renderProjects();
 renderRegistries();
 renderOperatingSystems();

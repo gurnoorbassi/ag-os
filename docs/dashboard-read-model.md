@@ -28,6 +28,7 @@ The generator may read:
 - `.codex/memory/lessons/candidates/*.json`
 - `.codex/skills/*.json`
 - `.codex/client-management/**`
+- `docs/first-client-intake-needed.md`
 
 ## Live-Service Boundary
 
@@ -54,6 +55,8 @@ If a value is not recorded in AG OS, the read model must show:
 
 It must not infer missing URLs, client names, active workflows, social accounts, analytics state, production status, or credentials.
 
+For first-client readiness, the read model may parse `docs/first-client-intake-needed.md` for `REQUIRED_*` placeholders. If placeholders remain, the dashboard must show `intake_needed`, zero active client records, and the exact missing field count instead of inventing client data.
+
 ## Permission Boundary
 
 The dashboard is not an execution surface. It may show approval records and safe-merge rules, but it cannot:
@@ -69,6 +72,8 @@ The dashboard is not an execution surface. It may show approval records and safe
 - promote lesson candidates
 
 Skills shown in the dashboard are advisory records. `skillsGrantPermission` must remain `false`.
+
+Owner-attention cards are read-only summaries. They do not grant owner approval, create approval locks, or authorize live action.
 
 ## Staleness Rule
 
