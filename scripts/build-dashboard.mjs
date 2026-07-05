@@ -309,17 +309,41 @@ function collectClientManagement() {
         recordPath: approvalPath
       };
     });
+  const contentSprintRecords = listDirectJson(".codex/client-management/content-sprints")
+    .map((recordPath) => {
+      const sprint = readJson(recordPath);
+      return {
+        sprintId: sprint.sprintId,
+        status: sprint.status,
+        mode: sprint.mode,
+        targetRepo: sprint.targetRepo,
+        targetBranch: sprint.targetBranch,
+        targetPullRequestUrl: sprint.targetPullRequestUrl,
+        targetPullRequestNumber: sprint.targetPullRequestNumber,
+        targetHeadSha: sprint.targetHeadSha,
+        calendarDays: sprint.calendarDays,
+        draftPostPackageCount: sprint.draftPostPackageCount,
+        weeklyReportDraftCount: sprint.weeklyReportDraftCount,
+        pendingDraftApprovalCount: sprint.pendingDraftApprovalCount,
+        platforms: sprint.platforms ?? [],
+        safety: sprint.safety ?? {},
+        updatedAt: sprint.updatedAt,
+        recordPath
+      };
+    });
   const hasClients = clientRecords.length > 0;
   return {
     directoryExists: existsSync(path.join(root, ".codex/client-management")),
     clientCount: clientRecords.length,
     engagementCount: engagementRecords.length,
     deliverableCount: deliverableRecords.length,
+    contentSprintCount: contentSprintRecords.length,
     accessRequestCount: accessRequestRecords.length,
     pendingApprovalCount: clientApprovalRecords.filter((approval) => approval.status === "pending").length,
     clients: clientRecords,
     engagements: engagementRecords,
     deliverables: deliverableRecords,
+    contentSprints: latestBy(contentSprintRecords, "updatedAt"),
     accessRequests: accessRequestRecords,
     pendingApprovals: clientApprovalRecords.filter((approval) => approval.status === "pending"),
     zeroState: hasClients ? "Owner-approved client records are registered." : "No real clients are registered yet."
@@ -571,6 +595,15 @@ export function collectDashboardData() {
     "verifiedAt"
   );
   const latestSocialMediaStaging = socialMediaStagingRecords[0] ?? null;
+  const socialMediaContentSprintBuildRecord = latestConnectorRecord(
+    githubRecords,
+    (record) => record.id === "connector-exec-20260704-ag-digitalz-first-content-sprint-build-live-result"
+  );
+  const socialMediaContentSprintMergeRecord = latestConnectorRecord(
+    githubRecords,
+    (record) => record.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-first-content-sprint-v1-live-result"
+  );
+  const firstContentSprint = clientManagement.contentSprints[0] ?? null;
   const systemBlockers = [
     ...approvals.blockedApprovals.map((approval) => `Blocked approval: ${approval.approvalId}`)
   ];
@@ -642,17 +675,21 @@ export function collectDashboardData() {
     aiReceptionist,
     socialMediaSystem: {
       ...socialMedia,
-      currentVersion: socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
+      currentVersion: socialMediaContentSprintMergeRecord ? "v1.3"
+        : socialMediaContentSprintBuildRecord ? "v1.3 draft PR"
+        : socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
         ? "v1.2"
         : socialMediaMergeRecord ? "v1.1" : "v1",
-      lifecycleStatus: socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
+      lifecycleStatus: socialMediaContentSprintMergeRecord ? "AG Digitalz first content sprint merged; staging redeploy pending"
+        : socialMediaContentSprintBuildRecord ? "AG Digitalz first content sprint target PR open; review required"
+        : socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
         ? "AG Digitalz draft config merged and staged"
         : socialMediaMergeRecord ? "v1.1 merged and staged" : "starter staged",
       targetRepo: "gurnoorbassi/ag-social-media-management-system",
-      targetPullRequestUrl: socialMediaBuildRecord?.result?.pullRequestUrl ?? "Not recorded",
-      targetPullRequestMerged: socialMediaMergeRecord?.result?.pullRequestMerged ?? false,
-      targetMergeSha: socialMediaMergeRecord?.result?.mergeCommitSha ?? "Not recorded",
-      reviewedHeadSha: socialMediaMergeRecord?.result?.headSha ?? "Not recorded",
+      targetPullRequestUrl: socialMediaContentSprintBuildRecord?.result?.pullRequestUrl ?? socialMediaBuildRecord?.result?.pullRequestUrl ?? "Not recorded",
+      targetPullRequestMerged: socialMediaContentSprintMergeRecord?.result?.pullRequestMerged ?? socialMediaMergeRecord?.result?.pullRequestMerged ?? false,
+      targetMergeSha: socialMediaContentSprintMergeRecord?.result?.mergeCommitSha ?? socialMediaMergeRecord?.result?.mergeCommitSha ?? "Not recorded",
+      reviewedHeadSha: socialMediaContentSprintMergeRecord?.result?.headSha ?? socialMediaMergeRecord?.result?.headSha ?? "Not recorded",
       stagingUrl: latestSocialMediaStaging?.siteUrl ?? "Not recorded",
       stagingStatus: latestSocialMediaStaging?.deployStatus ?? "Not recorded",
       latestDeployId: latestSocialMediaStaging?.deployId ?? "Not recorded",
@@ -671,12 +708,40 @@ export function collectDashboardData() {
         n8nLiveActivationBlocked: true,
         clientConfigAdded: clientManagement.clientCount > 0
       },
+      contentSprint: firstContentSprint ? {
+        ...firstContentSprint,
+        livePostingBlocked: firstContentSprint.safety?.postingTriggered === false,
+        schedulingBlocked: firstContentSprint.safety?.schedulingTriggered === false,
+        socialOauthConnected: firstContentSprint.safety?.socialOauthConnected ?? false,
+        credentialsStored: firstContentSprint.safety?.credentialsStored ?? false,
+        analyticsApiUsed: firstContentSprint.safety?.analyticsApiUsed ?? false,
+        n8nActivated: firstContentSprint.safety?.n8nActivated ?? false
+      } : {
+        sprintId: "not_recorded",
+        status: "not_recorded",
+        mode: "draft_only",
+        targetPullRequestUrl: "Not recorded",
+        calendarDays: 0,
+        draftPostPackageCount: 0,
+        weeklyReportDraftCount: 0,
+        pendingDraftApprovalCount: 0,
+        platforms: [],
+        livePostingBlocked: true,
+        schedulingBlocked: true,
+        socialOauthConnected: false,
+        credentialsStored: false,
+        analyticsApiUsed: false,
+        n8nActivated: false
+      },
       firstClient: clientManagement.clients[0] ?? null,
       sourceRecords: [
         ".codex/projects/social-media-management-system-v1.json",
         socialMediaBuildRecord?.recordPath,
+        socialMediaContentSprintBuildRecord?.recordPath,
+        socialMediaContentSprintMergeRecord?.recordPath,
         socialMediaMergeRecord?.recordPath,
-        latestSocialMediaStaging?.recordPath
+        latestSocialMediaStaging?.recordPath,
+        firstContentSprint?.recordPath
       ].filter(Boolean)
     },
     connectorRegistry: {

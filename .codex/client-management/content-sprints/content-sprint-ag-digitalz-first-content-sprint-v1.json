@@ -1,0 +1,103 @@
+{
+  "sprintId": "content-sprint-ag-digitalz-first-content-sprint-v1",
+  "clientId": "client-ag-digitalz-internal",
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "projectId": "project-social-media-management-system-v1",
+  "status": "target_pr_open",
+  "mode": "draft_only",
+  "targetRepo": "gurnoorbassi/ag-social-media-management-system",
+  "targetBranch": "ag-os/ag-digitalz-first-content-sprint-v1",
+  "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/4",
+  "targetPullRequestNumber": 4,
+  "targetHeadSha": "02a749ff3348be9c57f34726f104f381e228b1cd",
+  "calendarDays": 7,
+  "draftPostPackageCount": 21,
+  "weeklyReportDraftCount": 1,
+  "pendingDraftApprovalCount": 22,
+  "platforms": [
+    {
+      "platform": "Instagram",
+      "handle": "not_provided",
+      "handleStatus": "pending_owner_input",
+      "connectionStatus": "not_connected",
+      "postingMode": "draft_only",
+      "approvalRequired": true,
+      "livePostingBlocked": true,
+      "credentialsStored": false
+    },
+    {
+      "platform": "TikTok",
+      "handle": "not_provided",
+      "handleStatus": "pending_owner_input",
+      "connectionStatus": "not_connected",
+      "postingMode": "draft_only",
+      "approvalRequired": true,
+      "livePostingBlocked": true,
+      "credentialsStored": false
+    },
+    {
+      "platform": "YouTube Shorts",
+      "handle": "not_provided",
+      "handleStatus": "pending_owner_input",
+      "connectionStatus": "not_connected",
+      "postingMode": "draft_only",
+      "approvalRequired": true,
+      "livePostingBlocked": true,
+      "credentialsStored": false
+    },
+    {
+      "platform": "LinkedIn",
+      "handle": "not_provided",
+      "handleStatus": "pending_owner_input",
+      "connectionStatus": "not_connected",
+      "postingMode": "draft_only",
+      "approvalRequired": true,
+      "livePostingBlocked": true,
+      "credentialsStored": false
+    }
+  ],
+  "contentPillars": [
+    "AI systems built by AG Digitalz",
+    "behind-the-scenes AG OS builds",
+    "automation systems for local businesses",
+    "client acquisition and lead-generation systems",
+    "social media management systems",
+    "AI receptionist systems",
+    "business growth case studies only when proof exists",
+    "simple educational breakdowns"
+  ],
+  "brandVoice": [
+    "direct",
+    "confident",
+    "simple",
+    "practical",
+    "high-agency",
+    "no fluff",
+    "business-focused"
+  ],
+  "safety": {
+    "socialOauthConnected": false,
+    "credentialsStored": false,
+    "postingTriggered": false,
+    "schedulingTriggered": false,
+    "analyticsApiUsed": false,
+    "dmOrCommentUsed": false,
+    "n8nActivated": false,
+    "paidToolsUsed": false,
+    "productionDeployTriggered": false,
+    "domainOrDnsChanged": false,
+    "leadGenTouched": false,
+    "aiReceptionistTouched": false,
+    "constitutionChanged": false,
+    "acceptedLessonsCreated": false,
+    "permanentMemoryCreated": false
+  },
+  "sourceRecords": [
+    ".codex/approvals/approval-20260704-ag-digitalz-first-content-sprint-build.json",
+    ".codex/audit/audit-20260704-ag-digitalz-first-content-sprint-build-executed.json",
+    ".codex/connectors/connector-exec-20260704-ag-digitalz-first-content-sprint-build-live-result.json",
+    ".codex/costs/cost-ledger-20260704-ag-digitalz-first-content-sprint-build.json"
+  ],
+  "createdAt": "2026-07-05T04:36:18Z",
+  "updatedAt": "2026-07-05T04:36:18Z"
+}

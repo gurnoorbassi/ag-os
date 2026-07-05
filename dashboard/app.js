@@ -411,6 +411,22 @@ function renderSocialMedia() {
       ]
     }),
     card({
+      title: "First Content Sprint",
+      status: system.contentSprint.status,
+      metric: `${system.contentSprint.draftPostPackageCount} drafts`,
+      detail: `${system.contentSprint.calendarDays} days; ${system.contentSprint.weeklyReportDraftCount} weekly report draft; ${system.contentSprint.pendingDraftApprovalCount} pending approvals`,
+      meta: [
+        system.contentSprint.targetPullRequestUrl,
+        `mode: ${system.contentSprint.mode}`,
+        `livePostingBlocked: ${boolText(system.contentSprint.livePostingBlocked, "true", "false")}`,
+        `schedulingBlocked: ${boolText(system.contentSprint.schedulingBlocked, "true", "false")}`,
+        `socialOauthConnected: ${boolText(system.contentSprint.socialOauthConnected, "true", "false")}`,
+        `credentialsStored: ${boolText(system.contentSprint.credentialsStored, "true", "false")}`,
+        `analyticsApiUsed: ${boolText(system.contentSprint.analyticsApiUsed, "true", "false")}`,
+        `n8nActivated: ${boolText(system.contentSprint.n8nActivated, "true", "false")}`
+      ]
+    }),
+    card({
       title: "Safety Defaults",
       status: "draft-only",
       metric: system.currentMode,

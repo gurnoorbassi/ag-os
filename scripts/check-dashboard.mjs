@@ -140,11 +140,29 @@ if (data.firstClientReadiness.missingRequiredFieldCount !== 0) {
 if (data.socialMediaSystem.stagingUrl !== "https://ag-social-media-management-system-staging.netlify.app") {
   fail("dashboard control center must show the recorded Social Media staging URL");
 }
-if (data.socialMediaSystem.currentVersion !== "v1.2") {
-  fail("dashboard control center must show Social Media System v1.2 after the recorded AG Digitalz draft-config merge");
+if (!["v1.2", "v1.3 draft PR", "v1.3"].includes(data.socialMediaSystem.currentVersion)) {
+  fail("dashboard control center must show the recorded Social Media System version state");
 }
-if (data.socialMediaSystem.targetMergeSha !== "6f54d3b5b257c2662319f39c0b89f810e22289e5") {
+if (data.socialMediaSystem.currentVersion === "v1.2" && data.socialMediaSystem.targetMergeSha !== "6f54d3b5b257c2662319f39c0b89f810e22289e5") {
   fail("dashboard control center must show the recorded Social Media AG Digitalz target merge SHA");
+}
+if (data.socialMediaSystem.contentSprint.sprintId !== "content-sprint-ag-digitalz-first-content-sprint-v1") {
+  fail("dashboard control center must show AG Digitalz First Content Sprint v1");
+}
+if (data.socialMediaSystem.contentSprint.draftPostPackageCount !== 21) {
+  fail("dashboard control center must show 21 draft post packages");
+}
+if (data.socialMediaSystem.contentSprint.weeklyReportDraftCount !== 1) {
+  fail("dashboard control center must show one weekly report draft");
+}
+if (data.socialMediaSystem.contentSprint.pendingDraftApprovalCount !== 22) {
+  fail("dashboard control center must show pending approvals for 21 drafts plus the weekly report draft");
+}
+if (data.socialMediaSystem.contentSprint.socialOauthConnected !== false ||
+  data.socialMediaSystem.contentSprint.credentialsStored !== false ||
+  data.socialMediaSystem.contentSprint.analyticsApiUsed !== false ||
+  data.socialMediaSystem.contentSprint.n8nActivated !== false) {
+  fail("dashboard control center must show content sprint live integrations blocked");
 }
 const hasAgDigitalzRedeployRecord = data.socialMediaSystem.sourceRecords.includes(
   ".codex/connectors/connector-exec-20260704-ag-digitalz-netlify-staging-redeploy-live-result.json"
