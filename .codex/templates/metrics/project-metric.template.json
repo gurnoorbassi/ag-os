@@ -1,0 +1,22 @@
+{
+  "template": true,
+  "templateType": "project_metric",
+  "projectMetricId": "REQUIRED_PROJECT_METRIC_ID",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "periodStart": "REQUIRED_PERIOD_START",
+  "periodEnd": "REQUIRED_PERIOD_END",
+  "sourceRecords": [
+    "REQUIRED_SOURCE_RECORD"
+  ],
+  "status": "REQUIRED_PROJECT_STATUS",
+  "phase": "REQUIRED_PROJECT_PHASE",
+  "plansCreated": "REQUIRED_PLANS_CREATED",
+  "pullRequestsCreated": "REQUIRED_PULL_REQUESTS_CREATED",
+  "pullRequestsReviewed": "REQUIRED_PULL_REQUESTS_REVIEWED",
+  "pullRequestsMerged": "REQUIRED_PULL_REQUESTS_MERGED",
+  "stagingDeploys": "REQUIRED_STAGING_DEPLOYS",
+  "blockedActions": "REQUIRED_BLOCKED_ACTIONS",
+  "latestQualityScoreRef": "REQUIRED_LATEST_QUALITY_SCORE_REF",
+  "latestCostLedgerRef": "REQUIRED_LATEST_COST_LEDGER_REF",
+  "createdAt": "REQUIRED_CREATED_AT"
+}

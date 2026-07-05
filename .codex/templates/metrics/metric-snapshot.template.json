@@ -1,0 +1,32 @@
+{
+  "template": true,
+  "templateType": "metric_snapshot",
+  "snapshotId": "REQUIRED_METRIC_SNAPSHOT_ID",
+  "periodStart": "REQUIRED_PERIOD_START",
+  "periodEnd": "REQUIRED_PERIOD_END",
+  "generatedBy": "REQUIRED_GENERATED_BY",
+  "sourceRecords": [
+    "REQUIRED_SOURCE_RECORD"
+  ],
+  "counts": {
+    "commands": "REQUIRED_COMMAND_COUNT",
+    "plans": "REQUIRED_PLAN_COUNT",
+    "pullRequestsCreated": "REQUIRED_PR_CREATED_COUNT",
+    "pullRequestsReviewed": "REQUIRED_PR_REVIEWED_COUNT",
+    "pullRequestsMerged": "REQUIRED_PR_MERGED_COUNT",
+    "stagingDeploys": "REQUIRED_STAGING_DEPLOY_COUNT",
+    "n8nDrafts": "REQUIRED_N8N_DRAFT_COUNT",
+    "blockedActions": "REQUIRED_BLOCKED_ACTION_COUNT"
+  },
+  "costs": {
+    "recordedTotalUsd": "REQUIRED_RECORDED_TOTAL_USD",
+    "withinBudget": "REQUIRED_WITHIN_BUDGET"
+  },
+  "quality": {
+    "qualityScoreCount": "REQUIRED_QUALITY_SCORE_COUNT",
+    "critiquePassCount": "REQUIRED_CRITIQUE_PASS_COUNT",
+    "critiqueFailCount": "REQUIRED_CRITIQUE_FAIL_COUNT",
+    "critiqueReviewNeededCount": "REQUIRED_CRITIQUE_REVIEW_NEEDED_COUNT"
+  },
+  "createdAt": "REQUIRED_CREATED_AT"
+}

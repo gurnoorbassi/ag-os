@@ -1,0 +1,26 @@
+{
+  "template": true,
+  "templateType": "quality_trend",
+  "qualityTrendId": "REQUIRED_QUALITY_TREND_ID",
+  "scope": "REQUIRED_SCOPE",
+  "periodStart": "REQUIRED_PERIOD_START",
+  "periodEnd": "REQUIRED_PERIOD_END",
+  "sourceRecords": [
+    "REQUIRED_SOURCE_RECORD"
+  ],
+  "qualityScoreRefs": [
+    "REQUIRED_QUALITY_SCORE_REF"
+  ],
+  "critiqueRefs": [
+    "REQUIRED_CRITIQUE_REF"
+  ],
+  "trendDirection": "REQUIRED_TREND_DIRECTION",
+  "latestScore": "REQUIRED_LATEST_SCORE",
+  "previousScore": "REQUIRED_PREVIOUS_SCORE",
+  "lessonsCandidateCount": "REQUIRED_LESSON_CANDIDATE_COUNT",
+  "acceptedLessonCount": "REQUIRED_ACCEPTED_LESSON_COUNT",
+  "notes": [
+    "REQUIRED_TREND_NOTE"
+  ],
+  "createdAt": "REQUIRED_CREATED_AT"
+}
