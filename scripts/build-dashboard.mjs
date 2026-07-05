@@ -324,6 +324,12 @@ function collectClientManagement() {
         calendarDays: sprint.calendarDays,
         draftPostPackageCount: sprint.draftPostPackageCount,
         weeklyReportDraftCount: sprint.weeklyReportDraftCount,
+        postsReviewedCount: sprint.postsReviewedCount ?? 0,
+        postsRevisedCount: sprint.postsRevisedCount ?? 0,
+        approvedDraftCount: sprint.approvedDraftCount ?? 0,
+        needsRevisionCount: sprint.needsRevisionCount ?? 0,
+        blockedByMissingProofCount: sprint.blockedByMissingProofCount ?? 0,
+        blockedByMissingHandleCount: sprint.blockedByMissingHandleCount ?? 0,
         pendingDraftApprovalCount: sprint.pendingDraftApprovalCount,
         platforms: sprint.platforms ?? [],
         safety: sprint.safety ?? {},
@@ -607,6 +613,10 @@ export function collectDashboardData() {
     netlifyRecords,
     (record) => record.id === "connector-exec-20260704-ag-digitalz-first-content-sprint-netlify-staging-live-result"
   );
+  const socialMediaContentReviewBuildRecord = latestConnectorRecord(
+    githubRecords,
+    (record) => record.id === "connector-exec-20260704-ag-digitalz-content-review-build-live-result"
+  );
   const firstContentSprint = clientManagement.contentSprints[0] ?? null;
   const systemBlockers = [
     ...approvals.blockedApprovals.map((approval) => `Blocked approval: ${approval.approvalId}`)
@@ -679,20 +689,22 @@ export function collectDashboardData() {
     aiReceptionist,
     socialMediaSystem: {
       ...socialMedia,
-      currentVersion: socialMediaContentSprintMergeRecord ? "v1.3"
+      currentVersion: socialMediaContentReviewBuildRecord ? "v1.4 draft PR"
+        : socialMediaContentSprintMergeRecord ? "v1.3"
         : socialMediaContentSprintBuildRecord ? "v1.3 draft PR"
         : socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
         ? "v1.2"
         : socialMediaMergeRecord ? "v1.1" : "v1",
-      lifecycleStatus: socialMediaContentSprintStagingRecord ? "AG Digitalz first content sprint merged and staged"
+      lifecycleStatus: socialMediaContentReviewBuildRecord ? "AG Digitalz content review target PR open; review required"
+        : socialMediaContentSprintStagingRecord ? "AG Digitalz first content sprint merged and staged"
         : socialMediaContentSprintMergeRecord ? "AG Digitalz first content sprint merged; staging redeploy pending"
         : socialMediaContentSprintBuildRecord ? "AG Digitalz first content sprint target PR open; review required"
         : socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
         ? "AG Digitalz draft config merged and staged"
         : socialMediaMergeRecord ? "v1.1 merged and staged" : "starter staged",
       targetRepo: "gurnoorbassi/ag-social-media-management-system",
-      targetPullRequestUrl: socialMediaContentSprintBuildRecord?.result?.pullRequestUrl ?? socialMediaBuildRecord?.result?.pullRequestUrl ?? "Not recorded",
-      targetPullRequestMerged: socialMediaContentSprintMergeRecord?.result?.pullRequestMerged ?? socialMediaMergeRecord?.result?.pullRequestMerged ?? false,
+      targetPullRequestUrl: socialMediaContentReviewBuildRecord?.result?.pullRequestUrl ?? socialMediaContentSprintBuildRecord?.result?.pullRequestUrl ?? socialMediaBuildRecord?.result?.pullRequestUrl ?? "Not recorded",
+      targetPullRequestMerged: socialMediaContentReviewBuildRecord ? false : socialMediaContentSprintMergeRecord?.result?.pullRequestMerged ?? socialMediaMergeRecord?.result?.pullRequestMerged ?? false,
       targetMergeSha: socialMediaContentSprintMergeRecord?.result?.mergeCommitSha ?? socialMediaMergeRecord?.result?.mergeCommitSha ?? "Not recorded",
       reviewedHeadSha: socialMediaContentSprintMergeRecord?.result?.headSha ?? socialMediaMergeRecord?.result?.headSha ?? "Not recorded",
       stagingUrl: latestSocialMediaStaging?.siteUrl ?? "Not recorded",
@@ -745,6 +757,7 @@ export function collectDashboardData() {
         socialMediaContentSprintBuildRecord?.recordPath,
         socialMediaContentSprintMergeRecord?.recordPath,
         socialMediaContentSprintStagingRecord?.recordPath,
+        socialMediaContentReviewBuildRecord?.recordPath,
         socialMediaMergeRecord?.recordPath,
         latestSocialMediaStaging?.recordPath,
         firstContentSprint?.recordPath
