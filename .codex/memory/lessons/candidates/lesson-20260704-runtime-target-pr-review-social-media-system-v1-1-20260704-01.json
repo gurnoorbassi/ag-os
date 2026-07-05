@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01",
+  "title": "Draft social media upgrades should surface intake gaps before build complexity",
+  "lesson": "For a draft-only social media operations system, a useful v1.1 upgrade should make first-client intake gaps, account connection status, draft-only calendar lanes, post package variants, approval queue status, weekly report structure, and blocked live actions visible before adding backend services or live integrations.",
+  "sources": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/2",
+    ".codex/audit/audit-runtime-target-pr-review-social-media-system-v1-1-20260704.json",
+    ".codex/critiques/critique-runtime-target-pr-review-social-media-system-v1-1-20260704.json",
+    ".codex/quality-scores/quality-score-runtime-target-pr-review-social-media-system-v1-1-20260704.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "high",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "appliesTo": [
+    "social media operations system",
+    "draft-only upgrade review",
+    "first-client readiness",
+    "blocked live action review"
+  ],
+  "sourceScoreId": "quality-score-runtime-target-pr-review-social-media-system-v1-1-20260704",
+  "generatedBy": "ag-os-reviewer",
+  "whyThisMatters": "Visible intake gaps and blocked states help AG OS move toward real client work without accidentally crossing into OAuth, credential handling, posting, scheduling, analytics, or automation activation.",
+  "whenToUse": "Use when reviewing future draft/staging social media system upgrades before adding live connectors or client-specific records.",
+  "whenNotToUse": "Do not treat this candidate lesson as approval to merge, deploy, connect accounts, use credentials, schedule, post, activate automations, or create accepted memory.",
+  "notes": "Candidate only. Not accepted permanent truth until reviewed and promoted per docs/memory-learning-policy.md.",
+  "createdAt": "2026-07-05T00:51:42Z",
+  "updatedAt": "2026-07-05T00:51:42Z"
+}

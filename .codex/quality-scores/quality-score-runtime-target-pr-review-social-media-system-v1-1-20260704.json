@@ -1,0 +1,62 @@
+{
+  "$schema": "../../schemas/quality-score.schema.json",
+  "scoreId": "quality-score-runtime-target-pr-review-social-media-system-v1-1-20260704",
+  "status": "candidate",
+  "scoreType": "product_quality_score",
+  "projectId": "project-social-media-management-system-v1",
+  "planId": "runtime-target-pr-review-social-media-system-v1-1-20260704",
+  "sourcePlanPath": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/2",
+  "outputType": "social_media_system",
+  "archetypeId": "archetype-social-media-content-operations-system",
+  "archetypeFile": ".codex/archetypes/social-media-content-operations-system.json",
+  "checklistItemsEvaluated": [
+    "Approved file scope is exact and contains no extra files.",
+    "v1.1 includes first-client readiness and config checklist without creating active client records.",
+    "v1.1 includes client setup, account registry, content intake, content calendar, post package builder, approval queue, weekly report draft, config readiness, blocked live actions, and audit activity preview sections.",
+    "Default account state is not_connected and default posting mode is draft_only.",
+    "Approval is required and live posting is blocked by default.",
+    "Social OAuth, scheduling, analytics API use, n8n activation, paid tools, production deploy, and credential storage are blocked by default.",
+    "Only REQUIRED_ placeholders are used for client, brand, platform, handles, posting volume, approval owner, content pillars, brand voice, and reporting cadence.",
+    "No dependencies, paid services, tracking scripts, live form wiring, external calls, deployment config, credentials, or real client private data are present.",
+    "Safe local package checks pass."
+  ],
+  "dimensions": {
+    "completeness": 9,
+    "craft": 9,
+    "maintainability": 9,
+    "ux": 9,
+    "security": 10,
+    "performance": 9,
+    "ownerAcceptance": 9,
+    "archetypeFit": 9,
+    "costDiscipline": 10
+  },
+  "overallScore": 9.1,
+  "meetsBar": true,
+  "reviewStatus": "pass",
+  "improvementRecommendations": [
+    "Run a browser responsive and accessibility review before wider use.",
+    "Keep the local export feature limited to placeholder-only draft packages until real client data handling is approved.",
+    "Redeploy only the dedicated staging-only Netlify site after target PR merge."
+  ],
+  "lessonCandidates": [
+    "lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01"
+  ],
+  "evidence": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/2",
+    "GitHub changed-file list for PR #2",
+    "npm.cmd run check in target branch temp clone",
+    "npm.cmd test in target branch temp clone",
+    "npm.cmd run build in target branch temp clone",
+    "AG OS target PR safety and default-invariant review"
+  ],
+  "generatedBy": "ag-os-reviewer",
+  "limitations": [
+    "Candidate product score only. It does not authorize target PR merge, deployment, Netlify, n8n activation, social account connection, scheduling, posting, credential use, analytics API use, paid services, production data, customer data, accepted lessons, or permanent memory.",
+    "No browser visual regression, accessibility automation, or owner acceptance test was run.",
+    "No live connector or platform account was used."
+  ],
+  "notes": "Target PR #2 is ready for owner-approved merge from a scope, safety, technical, and starter-quality perspective, but merge still requires the separate target PR merge gate.",
+  "createdAt": "2026-07-05T00:51:42Z",
+  "updatedAt": "2026-07-05T00:51:42Z"
+}
