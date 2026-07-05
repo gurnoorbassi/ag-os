@@ -82,6 +82,14 @@ for (const requiredText of [
   "Connector Registry",
   "Command Registry",
   "Capability Registry",
+  "Capabilities",
+  "Client Management",
+  "Social Media System v1",
+  "Approvals",
+  "GitHub / Netlify / n8n",
+  "Quality and Review",
+  "Costs",
+  "Skills",
   "Cost OS",
   "Watchdog OS",
   "Memory OS",
@@ -90,6 +98,46 @@ for (const requiredText of [
   if (!dashboardSource.includes(requiredText)) {
     fail(`dashboard missing required visible section: ${requiredText}`);
   }
+}
+
+if (data.systemStatus.bootStatus !== "ready") {
+  fail("dashboard control center must show ready boot status from the read model");
+}
+if (data.systemStatus.safetyPosture !== "read_only_no_live_actions") {
+  fail("dashboard control center must show read-only no-live-action safety posture");
+}
+if (data.capabilityRegistry.provenCount < 1) {
+  fail("dashboard control center must show proven capabilities");
+}
+if (data.capabilityRegistry.blockedCount < 1) {
+  fail("dashboard control center must show blocked capabilities");
+}
+if (data.clientManagement.clientCount !== 0 || data.clientManagement.engagementCount !== 0) {
+  fail("dashboard control center must show zero client and engagement counts until real clients are registered");
+}
+if (data.clientManagement.pendingApprovalCount !== 0) {
+  fail("dashboard control center must show zero pending client approvals until client approvals exist");
+}
+if (data.socialMediaSystem.stagingUrl !== "https://ag-social-media-management-system-staging.netlify.app") {
+  fail("dashboard control center must show the recorded Social Media staging URL");
+}
+if (data.socialMediaSystem.safetyBlocks.livePostingBlocked !== true) {
+  fail("dashboard control center must show Social Media live posting blocked");
+}
+if (data.socialMediaSystem.safetyBlocks.socialOauthConnected !== false) {
+  fail("dashboard control center must show Social Media OAuth not connected");
+}
+if (data.connectorProofs.n8nActiveWorkflowCount !== 0) {
+  fail("dashboard control center must not infer active n8n workflows from source records");
+}
+if (data.qualityReview.candidatesLoadedAsTruth !== false) {
+  fail("dashboard control center must keep candidate lessons out of accepted truth");
+}
+if (data.skills.skillsGrantPermission !== false) {
+  fail("dashboard control center must show skillsGrantPermission false");
+}
+if (data.costs.totalRecordedActualUsd > data.costs.limits.monthlyMaxUsd) {
+  fail("dashboard control center must show recorded costs within the monthly budget");
 }
 
 if (failures.length > 0) {

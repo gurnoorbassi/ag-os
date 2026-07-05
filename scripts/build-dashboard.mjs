@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -8,8 +8,30 @@ function readJson(relativePath) {
   return JSON.parse(readFileSync(path.join(root, relativePath), "utf8"));
 }
 
+function readJsonIfExists(relativePath) {
+  const absolutePath = path.join(root, relativePath);
+  if (!existsSync(absolutePath)) {
+    return null;
+  }
+  return readJson(relativePath);
+}
+
 function readText(relativePath) {
   return readFileSync(path.join(root, relativePath), "utf8");
+}
+
+function listDirectJson(relativeDir, options = {}) {
+  const absoluteDir = path.join(root, relativeDir);
+  if (!existsSync(absoluteDir)) {
+    return [];
+  }
+
+  const excluded = new Set(options.exclude ?? []);
+  return readdirSync(absoluteDir)
+    .filter((name) => name.endsWith(".json"))
+    .filter((name) => !name.endsWith(".template.json"))
+    .filter((name) => !excluded.has(name))
+    .map((name) => path.join(relativeDir, name).replaceAll("\\", "/"));
 }
 
 function lineValue(content, label) {
@@ -53,6 +75,250 @@ function capabilityTypeLabel(type) {
   return `${type}: local-safe capability type`;
 }
 
+function latestBy(records, field) {
+  return [...records].sort((left, right) => String(right[field] ?? "").localeCompare(String(left[field] ?? "")));
+}
+
+function unique(values) {
+  return [...new Set(values.filter(Boolean))];
+}
+
+function countRecords(relativeDir) {
+  return listDirectJson(relativeDir).length;
+}
+
+function summarizeCapability(capability) {
+  return {
+    id: capability.id,
+    name: capability.name,
+    status: capability.status,
+    riskTier: capability.riskTier,
+    approvalRequired: capability.approvalRequired,
+    lastProvenDate: capability.lastProvenDate,
+    proofRecords: capability.proofRecords ?? [],
+    blockedCapabilities: capability.blockedCapabilities ?? [],
+    boundaries: capability.boundaries ?? []
+  };
+}
+
+function isDraftOnlyCapability(capability) {
+  const text = [
+    capability.name,
+    capability.notes,
+    ...(capability.boundaries ?? []),
+    ...(capability.blockedCapabilities ?? [])
+  ].join(" ").toLowerCase();
+  return text.includes("draft") || text.includes("candidate") || text.includes("advisory");
+}
+
+function summarizeApproval(approvalPath, archive = false) {
+  const approval = readJson(approvalPath);
+  return {
+    approvalId: approval.approvalId,
+    status: approval.status,
+    riskLevel: approval.riskLevel ?? approval.riskTier ?? "not_recorded",
+    expiresAt: approval.expiresAt ?? null,
+    approvedBy: approval.approvedBy ?? "not_recorded",
+    recordPath: approvalPath,
+    archived: archive
+  };
+}
+
+function collectApprovals() {
+  const active = listDirectJson(".codex/approvals")
+    .map((approvalPath) => summarizeApproval(approvalPath, false));
+  const archived = listDirectJson(".codex/approvals/archive")
+    .map((approvalPath) => summarizeApproval(approvalPath, true));
+  const all = [...active, ...archived];
+  const expired = all.filter((approval) => ["expired", "revoked", "cancelled", "closed", "archived"].includes(approval.status));
+  const blocked = all.filter((approval) => ["blocked", "failed"].includes(approval.status));
+  return {
+    activeCount: active.filter((approval) => approval.status === "approved").length,
+    expiredCount: expired.length,
+    blockedCount: blocked.length,
+    staleWarningCount: blocked.length,
+    activeApprovals: latestBy(active, "expiresAt"),
+    expiredApprovals: latestBy(expired, "expiresAt"),
+    blockedApprovals: latestBy(blocked, "expiresAt"),
+    recentApprovedActions: latestBy(active.filter((approval) => approval.status === "approved"), "expiresAt").slice(0, 6)
+  };
+}
+
+function collectConnectorExecutions() {
+  return listDirectJson(".codex/connectors")
+    .filter((recordPath) => path.basename(recordPath).startsWith("connector-exec-"))
+    .map((recordPath) => {
+      const record = readJson(recordPath);
+      return { ...record, recordPath };
+    });
+}
+
+function summarizeNetlify(record) {
+  return {
+    id: record.connectorExecutionId,
+    status: record.status,
+    siteName: record.result?.siteName ?? "Not recorded",
+    siteUrl: record.result?.siteUrl ?? "Not recorded",
+    deployStatus: record.result?.deployStatus ?? "Not recorded",
+    deployId: record.result?.deployId ?? "Not recorded",
+    sourceRepo: record.result?.repositoryFullName ?? "Not recorded",
+    sourceSha: record.result?.sourceCommitSha ?? "Not recorded",
+    stagingOnly: record.result?.customDomainConfigured === false && record.result?.dnsChanged === false,
+    recordPath: record.recordPath
+  };
+}
+
+function summarizeN8n(record) {
+  return {
+    id: record.connectorExecutionId,
+    status: record.status,
+    workflowName: record.result?.workflowName ?? "Not recorded",
+    workflowId: record.result?.workflowId ?? "Not recorded",
+    workflowActive: record.result?.workflowActive ?? false,
+    credentialConnected: record.result?.credentialConnected ?? false,
+    workflowExportPath: record.result?.workflowExportPath ?? "Not recorded",
+    recordPath: record.recordPath
+  };
+}
+
+function summarizeGithub(record) {
+  return {
+    id: record.connectorExecutionId,
+    status: record.status,
+    action: record.requestedAction,
+    projectId: record.projectId,
+    approvalId: record.approvalId ?? "not_required",
+    result: record.result ?? {},
+    recordPath: record.recordPath
+  };
+}
+
+function collectCosts(costBudget) {
+  const costRecords = listDirectJson(".codex/costs", { exclude: ["budget.json"] })
+    .filter((recordPath) => path.basename(recordPath).startsWith("cost-ledger-"))
+    .map((recordPath) => {
+      const record = readJson(recordPath);
+      const actual = record.summary?.actualTaskCostUsd ??
+        (record.entries ?? [])
+          .filter((entry) => entry.costType === "actual")
+          .reduce((sum, entry) => sum + Number(entry.amountUsd ?? 0), 0);
+      return {
+        costLedgerId: record.costLedgerId,
+        status: record.status,
+        actualTaskCostUsd: actual,
+        budgetStatus: record.summary?.budgetStatus ?? "not_recorded",
+        updatedAt: record.updatedAt ?? record.createdAt ?? "",
+        recordPath
+      };
+    });
+  const totalActualUsd = costRecords.reduce((sum, record) => sum + Number(record.actualTaskCostUsd ?? 0), 0);
+  return {
+    ledgerCount: costRecords.length,
+    latestCosts: latestBy(costRecords, "updatedAt").slice(0, 6),
+    totalRecordedActualUsd: totalActualUsd,
+    budgetStatus: totalActualUsd <= Number(costBudget.limits.monthlyMaxUsd) ? "within_limit" : "over_limit",
+    limits: {
+      monthlyMaxUsd: costBudget.limits.monthlyMaxUsd,
+      dailyMaxUsd: costBudget.limits.dailyMaxUsd,
+      perTaskMaxUsd: costBudget.limits.perTaskMaxUsd
+    }
+  };
+}
+
+function collectClientManagement() {
+  const clientApprovalRecords = listDirectJson(".codex/client-management/approvals")
+    .map((approvalPath) => readJson(approvalPath));
+  return {
+    directoryExists: existsSync(path.join(root, ".codex/client-management")),
+    clientCount: countRecords(".codex/client-management/clients"),
+    engagementCount: countRecords(".codex/client-management/engagements"),
+    deliverableCount: countRecords(".codex/client-management/deliverables"),
+    accessRequestCount: countRecords(".codex/client-management/access-requests"),
+    pendingApprovalCount: clientApprovalRecords.filter((approval) => approval.status === "pending").length,
+    zeroState: "No real clients are registered yet."
+  };
+}
+
+function collectQualityReview() {
+  const critiques = latestBy(listDirectJson(".codex/critiques")
+    .filter((recordPath) => path.basename(recordPath).startsWith("critique-"))
+    .map((recordPath) => {
+      const record = readJson(recordPath);
+      return {
+        critiqueId: record.critiqueId,
+        sourcePlanId: record.sourcePlanId,
+        archetypeId: record.archetypeId,
+        reviewStatus: record.reviewStatus,
+        blocksBuildMode: record.blocksBuildMode,
+        findingCount: record.findings?.length ?? 0,
+        requiredFixCount: record.requiredFixes?.length ?? 0,
+        createdAt: record.createdAt,
+        recordPath
+      };
+    }), "createdAt");
+  const qualityScores = latestBy(listDirectJson(".codex/quality-scores")
+    .filter((recordPath) => path.basename(recordPath).startsWith("quality-score-"))
+    .map((recordPath) => {
+      const record = readJson(recordPath);
+      return {
+        scoreId: record.scoreId,
+        scoreType: record.scoreType,
+        status: record.status,
+        projectId: record.projectId,
+        archetypeId: record.archetypeId,
+        overallScore: record.overallScore,
+        reviewStatus: record.reviewStatus,
+        updatedAt: record.updatedAt,
+        recordPath
+      };
+    }), "updatedAt");
+  const candidateLessons = latestBy(listDirectJson(".codex/memory/lessons/candidates")
+    .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"))
+    .map((recordPath) => {
+      const record = readJson(recordPath);
+      return {
+        lessonId: record.lessonId,
+        title: record.title,
+        status: record.status,
+        updatedAt: record.updatedAt,
+        recordPath
+      };
+    }), "updatedAt");
+  const acceptedLessons = listDirectJson(".codex/memory/lessons")
+    .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"));
+  return {
+    critiquesCount: critiques.length,
+    latestCritiques: critiques.slice(0, 5),
+    reviewRequiredCount: critiques.filter((critique) => critique.blocksBuildMode || critique.reviewStatus === "review").length,
+    failedCount: critiques.filter((critique) => critique.reviewStatus === "fail").length,
+    qualityScoreCount: qualityScores.length,
+    latestQualityScores: qualityScores.slice(0, 5),
+    candidateLessonCount: candidateLessons.length,
+    acceptedLessonCount: acceptedLessons.length,
+    candidatesLoadedAsTruth: false
+  };
+}
+
+function collectSkills() {
+  const skills = listDirectJson(".codex/skills")
+    .map((recordPath) => {
+      const record = readJson(recordPath);
+      return {
+        id: record.id,
+        name: record.name,
+        status: record.status,
+        category: record.category,
+        recordPath
+      };
+    });
+  return {
+    draftCount: skills.filter((skill) => skill.status === "draft").length,
+    activeCount: skills.filter((skill) => skill.status === "active").length,
+    skillsGrantPermission: false,
+    skills
+  };
+}
+
 export function collectDashboardData() {
   const constitution = readText("docs/ag-os-constitution-v1.md");
   const projectRegistry = readJson(".codex/projects/registry.json");
@@ -62,10 +328,13 @@ export function collectDashboardData() {
   const capabilityRegistry = readJson(".codex/capabilities/registry.json");
   const watchdogPolicy = readJson(".codex/watchdog/policy.json");
   const memoryPolicy = readJson(".codex/memory/policy.json");
+  const qualityPolicy = readJson(".codex/quality/policy.json");
+  const securityPolicy = readJson(".codex/security/policy.json");
 
   const projects = projectRegistry.projects.map(projectRecord);
   const leadGen = projects.find((project) => project.id === "project-lead-generation-system");
   const aiReceptionist = projects.find((project) => project.id === "project-ag-digitalz-ai-receptionist");
+  const socialMedia = projects.find((project) => project.id === "project-social-media-management-system-v1");
 
   if (!leadGen) {
     throw new Error("Dashboard data missing Lead Generation System project record.");
@@ -73,10 +342,38 @@ export function collectDashboardData() {
   if (!aiReceptionist) {
     throw new Error("Dashboard data missing AG Digitalz AI Receptionist project record.");
   }
+  if (!socialMedia) {
+    throw new Error("Dashboard data missing Social Media Management System v1 project record.");
+  }
+
+  const connectorExecutions = collectConnectorExecutions();
+  const netlifyRecords = connectorExecutions
+    .filter((record) => record.connectorId === "connector-netlify-mcp")
+    .map(summarizeNetlify);
+  const n8nRecords = connectorExecutions
+    .filter((record) => record.connectorId === "connector-n8n-mcp")
+    .map(summarizeN8n);
+  const githubRecords = connectorExecutions
+    .filter((record) => record.connectorId === "connector-github-mcp")
+    .map(summarizeGithub);
+  const socialMediaNetlify = netlifyRecords.find((record) => record.siteName === "ag-social-media-management-system-staging");
+  const capabilities = capabilityRegistry.capabilities.map(summarizeCapability);
+  const approvals = collectApprovals();
+  const qualityReview = collectQualityReview();
+  const costReadModel = collectCosts(costBudget);
+  const skills = collectSkills();
+  const systemBlockers = [
+    ...approvals.blockedApprovals.map((approval) => `Blocked approval: ${approval.approvalId}`)
+  ];
+  const activeWarnings = [
+    ...(approvals.staleWarningCount > 0 ? [`${approvals.staleWarningCount} stale or blocked approval warning(s)`] : []),
+    ...(qualityReview.reviewRequiredCount > 0 ? [`${qualityReview.reviewRequiredCount} critique(s) require review`] : []),
+    ...(qualityReview.candidatesLoadedAsTruth ? ["Candidate lessons are incorrectly loaded as truth"] : [])
+  ];
 
   return {
     meta: {
-      title: "AG OS Dashboard",
+      title: "AG OS Control Center",
       version: 1,
       mode: "read_only",
       dataSource: "source-controlled AG OS repository records",
@@ -88,14 +385,71 @@ export function collectDashboardData() {
       activationDate: lineValue(constitution, "Activation date").replace(".", ""),
       source: "docs/ag-os-constitution-v1.md"
     },
+    systemStatus: {
+      bootStatus: systemBlockers.length === 0 ? "ready" : "blocked",
+      validationStatus: "available via npm.cmd run validate",
+      safetyPosture: "read_only_no_live_actions",
+      blockedActions: [
+        "Production deployment",
+        "Domain or DNS changes",
+        "Custom domains",
+        "Paid services",
+        "Credentials or secrets in records",
+        "Production/customer/client data",
+        "Social posting or scheduling",
+        "Social OAuth/account connection",
+        "n8n workflow activation",
+        "Lead Gen production changes",
+        "AI Receptionist repo changes",
+        "Constitution changes"
+      ],
+      activeWarnings,
+      sourceRecords: [
+        "scripts/boot-check.mjs",
+        "scripts/validate-foundation.mjs",
+        "docs/ag-os-constitution-v1.md"
+      ]
+    },
     projectRegistry: {
       status: projectRegistry.status,
       count: projectRegistry.projects.length,
       source: ".codex/projects/registry.json",
-      projects
+      projects: [
+        {
+          id: "project-ag-os",
+          name: "AG OS",
+          status: "active",
+          managementMode: "core_operating_system",
+          projectType: "operating_system",
+          riskLevel: "medium",
+          owner: "owner-gurnoor-bassi",
+          recordPath: "README.md",
+          boundary: "Canonical AG OS source-of-truth repository and dashboard/control-plane records."
+        },
+        ...projects
+      ]
     },
     leadGenerationSystem: leadGen,
     aiReceptionist,
+    socialMediaSystem: {
+      ...socialMedia,
+      targetRepo: "gurnoorbassi/ag-social-media-management-system",
+      stagingUrl: socialMediaNetlify?.siteUrl ?? "Not recorded",
+      stagingStatus: socialMediaNetlify?.deployStatus ?? "Not recorded",
+      currentMode: "draft/staging only",
+      safetyBlocks: {
+        livePostingBlocked: true,
+        socialOauthConnected: false,
+        schedulingBlocked: true,
+        analyticsBlocked: true,
+        n8nLiveActivationBlocked: true,
+        clientConfigAdded: false
+      },
+      sourceRecords: [
+        ".codex/projects/social-media-management-system-v1.json",
+        ".codex/connectors/connector-exec-20260704-social-media-netlify-staging-live-result.json"
+      ]
+    },
     connectorRegistry: {
       status: connectorRegistry.status,
       connectedCount: connectorRegistry.connectors.filter((connector) => connector.connectionStatus === "connected").length,
@@ -120,7 +474,13 @@ export function collectDashboardData() {
     capabilityRegistry: {
       status: capabilityRegistry.status,
       count: capabilityRegistry.capabilities.length,
-      allowedTypes: capabilityRegistry.allowedCapabilityTypes.map(capabilityTypeLabel)
+      allowedTypes: capabilityRegistry.allowedCapabilityTypes.map(capabilityTypeLabel),
+      proven: capabilities.filter((capability) => capability.status === "proven"),
+      provenCount: capabilities.filter((capability) => capability.status === "proven").length,
+      draftOnly: capabilities.filter(isDraftOnlyCapability),
+      draftOnlyCount: capabilities.filter(isDraftOnlyCapability).length,
+      blocked: unique(capabilities.flatMap((capability) => capability.blockedCapabilities)),
+      blockedCount: unique(capabilities.flatMap((capability) => capability.blockedCapabilities)).length
     },
     watchdog: {
       status: watchdogPolicy.status,
@@ -136,6 +496,34 @@ export function collectDashboardData() {
         memoryPolicy.rules.productionDataAllowed ? "Production data allowed" : "Production data blocked"
       ]
     },
+    qualityOs: {
+      status: qualityPolicy.status,
+      rules: [
+        qualityPolicy.rules?.qualityOverQuantity ? "Quality over quantity" : "Quality rule not recorded",
+        qualityPolicy.rules?.ownerReviewRequiredBeforeProduction ? "Owner review before production" : "Owner production review not recorded",
+        qualityPolicy.rules?.validationRequiredBeforeMerge ? "Validation required before merge" : "Validation merge rule not recorded"
+      ]
+    },
+    securityOs: {
+      status: securityPolicy.status,
+      rules: [
+        securityPolicy.rules?.secretsFindingBlocksMerge ? "Secrets block merge" : "Secrets merge block not recorded",
+        securityPolicy.rules?.leastPrivilegeRequired ? "Least privilege required" : "Least privilege not recorded",
+        securityPolicy.rules?.productionDataBlockedByDefault ? "Production data blocked by default" : "Production data block not recorded"
+      ]
+    },
+    clientManagement: collectClientManagement(),
+    approvals,
+    connectorProofs: {
+      github: githubRecords,
+      netlify: netlifyRecords,
+      n8n: n8nRecords,
+      n8nActiveWorkflowCount: n8nRecords.filter((workflow) => workflow.workflowActive).length,
+      n8nActiveWorkflowSource: n8nRecords.length > 0 ? "source-controlled export/connector records only" : "not recorded; no live n8n call"
+    },
+    qualityReview,
+    costs: costReadModel,
+    skills,
     safeMerge: {
       status: "conditional",
       mode: "Policy-gated",
