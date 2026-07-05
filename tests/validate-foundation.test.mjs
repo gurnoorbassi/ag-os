@@ -30,6 +30,17 @@ function runBootCheck(cwd) {
   };
 }
 
+function runDashboardBuild(cwd) {
+  const result = spawnSync(process.execPath, ["scripts/build-dashboard.mjs"], {
+    cwd,
+    encoding: "utf8"
+  });
+  return {
+    status: result.status,
+    output: `${result.stdout || ""}${result.stderr || ""}`
+  };
+}
+
 function copyTrackedRepo() {
   const root = mkdtempSync(path.join(os.tmpdir(), "ag-os-validator-"));
   const tracked = execFileSync("git", ["ls-files", "-z"], {
@@ -437,6 +448,8 @@ test("validator accepts a generated lesson candidate with candidate-only metadat
 test("boot check remains ready when no quality-score records exist", () => withTempRepo((root) => {
   ensureQualityScoresFoundation(root);
   clearQualityScoreRecords(root);
+  const build = runDashboardBuild(root);
+  assert.equal(build.status, 0, build.output);
 
   const result = runBootCheck(root);
 
@@ -524,6 +537,8 @@ test("boot check surfaces quality scores and keeps candidate lessons out of acce
     createdAt: "2026-07-04T08:05:00.000Z",
     updatedAt: "2026-07-04T08:05:00.000Z"
   });
+  const build = runDashboardBuild(root);
+  assert.equal(build.status, 0, build.output);
 
   const result = runBootCheck(root);
 
@@ -579,6 +594,8 @@ test("boot check surfaces critique summaries without treating them as approval",
     ],
     createdAt: "2026-07-04T09:00:00.000Z"
   });
+  const build = runDashboardBuild(root);
+  assert.equal(build.status, 0, build.output);
 
   const result = runBootCheck(root);
 
