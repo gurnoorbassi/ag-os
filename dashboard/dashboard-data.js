@@ -1059,11 +1059,20 @@ window.AG_OS_DASHBOARD_DATA = {
     }
   ],
   "approvals": {
-    "activeCount": 21,
+    "activeCount": 22,
     "expiredCount": 1,
     "blockedCount": 0,
     "staleWarningCount": 0,
     "activeApprovals": [
+      {
+        "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-06T08:08:00Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/approval-20260705-ag-os-dashboard-netlify-staging.json",
+        "archived": false
+      },
       {
         "approvalId": "approval-20260705-social-media-interactive-draft-ui",
         "status": "approved",
@@ -1268,6 +1277,15 @@ window.AG_OS_DASHBOARD_DATA = {
     "blockedApprovals": [],
     "recentApprovedActions": [
       {
+        "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-06T08:08:00Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/approval-20260705-ag-os-dashboard-netlify-staging.json",
+        "archived": false
+      },
+      {
         "approvalId": "approval-20260705-social-media-interactive-draft-ui",
         "status": "approved",
         "riskLevel": "R4",
@@ -1310,15 +1328,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "expiresAt": "2026-07-06T05:26:42Z",
         "approvedBy": "owner-gurnoor-bassi",
         "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-content-review-build.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-ag-digitalz-first-content-sprint-netlify-staging",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-06T04:58:46Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-first-content-sprint-netlify-staging.json",
         "archived": false
       }
     ]
@@ -2158,6 +2167,22 @@ window.AG_OS_DASHBOARD_DATA = {
         "recordPath": ".codex/connectors/connector-exec-20260704-social-media-netlify-staging-v1-1-live-result.json"
       },
       {
+        "id": "connector-exec-20260705-ag-os-dashboard-netlify-staging-live-result",
+        "status": "done",
+        "siteName": "ag-os-dashboard-staging",
+        "siteUrl": "https://ag-os-dashboard-staging.netlify.app",
+        "deployStatus": "ready",
+        "deployId": "6a4a112f93f9181e0fad6193",
+        "deployContext": "Not recorded",
+        "stagingInterpretation": "This is the primary deploy context of the dedicated Netlify staging-only site, not a custom domain, DNS change, or AG Digitalz/customer production deployment.",
+        "httpStatus": 200,
+        "verifiedAt": "2026-07-05T08:12:00Z",
+        "sourceRepo": "Not recorded",
+        "sourceSha": "Not recorded",
+        "stagingOnly": true,
+        "recordPath": ".codex/connectors/connector-exec-20260705-ag-os-dashboard-netlify-staging-live-result.json"
+      },
+      {
         "id": "connector-exec-20260705-social-media-interactive-draft-ui-netlify-staging-live-result",
         "status": "done",
         "siteName": "ag-social-media-management-system-staging",
@@ -2349,8 +2374,16 @@ window.AG_OS_DASHBOARD_DATA = {
     "candidatesLoadedAsTruth": false
   },
   "costs": {
-    "ledgerCount": 37,
+    "ledgerCount": 38,
     "latestCosts": [
+      {
+        "costLedgerId": "cost-ledger-20260705-ag-os-dashboard-netlify-staging",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-05T08:12:00Z",
+        "recordPath": ".codex/costs/cost-ledger-20260705-ag-os-dashboard-netlify-staging.json"
+      },
       {
         "costLedgerId": "cost-ledger-20260705-social-media-interactive-draft-ui",
         "status": "active",
@@ -2390,14 +2423,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "budgetStatus": "within_limit",
         "updatedAt": "2026-07-05T06:37:48Z",
         "recordPath": ".codex/costs/cost-ledger-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-20260704-ag-digitalz-draft-content-owner-approval",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-05T06:32:26Z",
-        "recordPath": ".codex/costs/cost-ledger-20260704-ag-digitalz-draft-content-owner-approval.json"
       }
     ],
     "totalRecordedActualUsd": 0,

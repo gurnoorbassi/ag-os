@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260705-ag-os-dashboard-netlify-staging-executed",
+  "occurredAt": "2026-07-05T08:09:31Z",
+  "actor": "ag-os-runtime",
+  "eventType": "registry_change",
+  "summary": "Created and deployed the AG OS Dashboard to the dedicated Netlify staging-only site ag-os-dashboard-staging.",
+  "scope": "ag_os_dashboard_netlify_staging_deploy",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260705-ag-os-dashboard-netlify-staging"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-20260705-ag-os-dashboard-netlify-staging-live-result"
+    },
+    {
+      "type": "other",
+      "reference": "cost-ledger-20260705-ag-os-dashboard-netlify-staging"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Executed only the owner-approved creation/deploy of dedicated staging-only Netlify site ag-os-dashboard-staging from generated dashboard files. Netlify labels the deploy context as production because it is the primary context of the dedicated staging-only site; this is not a custom domain, DNS change, or AG Digitalz/customer production deployment. No paid feature, secret, credential, environment variable, private client data exposure, production customer data exposure, live connector write beyond Netlify deploy, social action, n8n activation, Lead Gen change, AI Receptionist change, or Constitution change occurred.",
+  "createdAt": "2026-07-05T08:12:00Z"
+}
