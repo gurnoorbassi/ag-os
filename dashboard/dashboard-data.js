@@ -640,11 +640,20 @@ window.AG_OS_DASHBOARD_DATA = {
     "zeroState": "No real clients are registered yet."
   },
   "approvals": {
-    "activeCount": 8,
+    "activeCount": 9,
     "expiredCount": 1,
     "blockedCount": 0,
     "staleWarningCount": 0,
     "activeApprovals": [
+      {
+        "approvalId": "approval-20260704-target-pr-merge-social-media-system-v1-1",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-06T00:56:29Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/approval-20260704-target-pr-merge-social-media-system-v1-1.json",
+        "archived": false
+      },
       {
         "approvalId": "approval-20260704-social-media-system-v1-1-upgrade",
         "status": "approved",
@@ -732,6 +741,15 @@ window.AG_OS_DASHBOARD_DATA = {
     "blockedApprovals": [],
     "recentApprovedActions": [
       {
+        "approvalId": "approval-20260704-target-pr-merge-social-media-system-v1-1",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-06T00:56:29Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/approval-20260704-target-pr-merge-social-media-system-v1-1.json",
+        "archived": false
+      },
+      {
         "approvalId": "approval-20260704-social-media-system-v1-1-upgrade",
         "status": "approved",
         "riskLevel": "R4",
@@ -774,15 +792,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "expiresAt": "2026-07-05T11:18:16Z",
         "approvedBy": "owner-gurnoor-bassi",
         "recordPath": ".codex/approvals/approval-20260704-n8n-draft-workflow-proof.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-netlify-staging-test-construction",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-05T10:50:47.913Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-netlify-staging-test-construction.json",
         "archived": false
       }
     ]
@@ -971,6 +980,41 @@ window.AG_OS_DASHBOARD_DATA = {
           "verifiedAt": "2026-07-04T10:18:46Z"
         },
         "recordPath": ".codex/connectors/connector-exec-20260704-target-pr-merge-live-result.json"
+      },
+      {
+        "id": "connector-exec-20260704-target-pr-merge-social-media-system-v1-1-live-result",
+        "status": "done",
+        "action": "merge_pr",
+        "projectId": "project-social-media-management-system-v1",
+        "approvalId": "approval-20260704-target-pr-merge-social-media-system-v1-1",
+        "result": {
+          "repositoryFullName": "gurnoorbassi/ag-social-media-management-system",
+          "repositoryUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system",
+          "pullRequestNumber": 2,
+          "pullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/2",
+          "pullRequestStateBeforeMerge": "open",
+          "pullRequestStateAfterMerge": "closed",
+          "pullRequestMerged": true,
+          "baseBranch": "main",
+          "headBranch": "ag-os/social-media-system-v1-1-upgrade",
+          "headSha": "e3ab56ec0649e928418acc807c6badee2132521c",
+          "mergeCommitSha": "7204846654ef448f6c0c78027a569b7707c618b8",
+          "mergedAt": "2026-07-05T00:56:09Z",
+          "filesChanged": [
+            "README.md",
+            "package.json",
+            "index.html",
+            "src/main.js",
+            "src/styles.css",
+            "src/data/templates.js",
+            "src/lib/safety.js",
+            "src/lib/status.js"
+          ],
+          "reviewRecordRef": ".codex/audit/audit-runtime-target-pr-review-social-media-system-v1-1-20260704.json",
+          "verifiedBy": "github_mcp",
+          "verifiedAt": "2026-07-05T00:56:29Z"
+        },
+        "recordPath": ".codex/connectors/connector-exec-20260704-target-pr-merge-social-media-system-v1-1-live-result.json"
       },
       {
         "id": "connector-exec-20260704-target-pr-merge-social-media-system-v1-live-result",
@@ -1266,8 +1310,16 @@ window.AG_OS_DASHBOARD_DATA = {
     "candidatesLoadedAsTruth": false
   },
   "costs": {
-    "ledgerCount": 17,
+    "ledgerCount": 18,
     "latestCosts": [
+      {
+        "costLedgerId": "cost-ledger-20260704-target-pr-merge-social-media-system-v1-1",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-05T00:56:29Z",
+        "recordPath": ".codex/costs/cost-ledger-20260704-target-pr-merge-social-media-system-v1-1.json"
+      },
       {
         "costLedgerId": "cost-ledger-runtime-target-pr-review-social-media-system-v1-1-20260704",
         "status": "active",
@@ -1307,14 +1359,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "budgetStatus": "within_limit",
         "updatedAt": "2026-07-04T21:52:00Z",
         "recordPath": ".codex/costs/cost-ledger-runtime-target-pr-review-social-media-system-v1-20260704.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-20260704-social-media-starter-build",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-04T21:35:09Z",
-        "recordPath": ".codex/costs/cost-ledger-20260704-social-media-starter-build.json"
       }
     ],
     "totalRecordedActualUsd": 0,

@@ -1,0 +1,46 @@
+{
+  "costLedgerId": "cost-ledger-20260704-target-pr-merge-social-media-system-v1-1",
+  "status": "active",
+  "budgetLimitsUsd": {
+    "perTaskMax": 5,
+    "dailyMax": 10,
+    "monthlyMax": 50
+  },
+  "entries": [
+    {
+      "costEntryId": "cost-entry-20260704-target-pr-merge-social-media-system-v1-1-estimated",
+      "jobId": "job-20260704-target-pr-merge-social-media-system-v1-1",
+      "projectId": "project-social-media-management-system-v1",
+      "costType": "estimated",
+      "amountUsd": 0,
+      "approvalRequired": true,
+      "approvalId": "approval-20260704-target-pr-merge-social-media-system-v1-1",
+      "status": "approved"
+    },
+    {
+      "costEntryId": "cost-entry-20260704-target-pr-merge-social-media-system-v1-1-actual",
+      "jobId": "job-20260704-target-pr-merge-social-media-system-v1-1",
+      "projectId": "project-social-media-management-system-v1",
+      "costType": "actual",
+      "amountUsd": 0,
+      "approvalRequired": true,
+      "approvalId": "approval-20260704-target-pr-merge-social-media-system-v1-1",
+      "status": "recorded"
+    }
+  ],
+  "summary": {
+    "estimatedTaskCostUsd": 0,
+    "actualTaskCostUsd": 0,
+    "dailyActualUsd": 0,
+    "monthlyActualUsd": 0,
+    "budgetStatus": "within_limit"
+  },
+  "safety": {
+    "createsBillingChange": false,
+    "usesPaidService": false,
+    "usesLiveApi": false,
+    "requiresOwnerApproval": true
+  },
+  "createdAt": "2026-07-05T00:56:29Z",
+  "updatedAt": "2026-07-05T00:56:29Z"
+}
