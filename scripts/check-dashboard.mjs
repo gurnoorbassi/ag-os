@@ -140,7 +140,7 @@ if (data.firstClientReadiness.missingRequiredFieldCount !== 0) {
 if (data.socialMediaSystem.stagingUrl !== "https://ag-social-media-management-system-staging.netlify.app") {
   fail("dashboard control center must show the recorded Social Media staging URL");
 }
-if (!["v1.2", "v1.3 draft PR", "v1.3", "v1.4 draft PR", "v1.4 reviewed PR", "v1.4", "v1.5 owner-approved drafts"].includes(data.socialMediaSystem.currentVersion)) {
+if (!["v1.2", "v1.3 draft PR", "v1.3", "v1.4 draft PR", "v1.4 reviewed PR", "v1.4", "v1.5 owner-approved drafts", "v1.6 interactive draft UI"].includes(data.socialMediaSystem.currentVersion)) {
   fail("dashboard control center must show the recorded Social Media System version state");
 }
 if (data.socialMediaSystem.currentVersion === "v1.2" && data.socialMediaSystem.targetMergeSha !== "6f54d3b5b257c2662319f39c0b89f810e22289e5") {
@@ -158,7 +158,7 @@ if (data.socialMediaSystem.contentSprint.weeklyReportDraftCount !== 1) {
 if (data.socialMediaSystem.contentSprint.pendingDraftApprovalCount !== 0) {
   fail("dashboard control center must show no pending draft approvals after owner draft approval");
 }
-if (["v1.4 draft PR", "v1.4 reviewed PR", "v1.4", "v1.5 owner-approved drafts"].includes(data.socialMediaSystem.currentVersion) &&
+if (["v1.4 draft PR", "v1.4 reviewed PR", "v1.4", "v1.5 owner-approved drafts", "v1.6 interactive draft UI"].includes(data.socialMediaSystem.currentVersion) &&
   (data.socialMediaSystem.contentSprint.postsReviewedCount !== 21 ||
     data.socialMediaSystem.contentSprint.postsRevisedCount !== 21 ||
     data.socialMediaSystem.contentSprint.approvedDraftCount !== 21 ||
@@ -194,7 +194,12 @@ const hasAgDigitalzContentReviewDeployRecord = data.socialMediaSystem.sourceReco
 const hasAgDigitalzDraftApprovalDeployRecord = data.socialMediaSystem.sourceRecords.includes(
   ".codex/connectors/connector-exec-20260704-ag-digitalz-draft-approval-netlify-staging-live-result.json"
 );
-const expectedSocialMediaDeployId = hasAgDigitalzDraftApprovalDeployRecord
+const hasInteractiveDraftUiDeployRecord = data.socialMediaSystem.sourceRecords.includes(
+  ".codex/connectors/connector-exec-20260705-social-media-interactive-draft-ui-netlify-staging-live-result.json"
+);
+const expectedSocialMediaDeployId = hasInteractiveDraftUiDeployRecord
+  ? "6a4a0caed37d0800a1f19a0d"
+  : hasAgDigitalzDraftApprovalDeployRecord
   ? "6a49fc6c75a309fb314ffb9d"
   : hasAgDigitalzContentReviewDeployRecord
   ? "6a49f1d33942a79f4190240c"

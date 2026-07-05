@@ -1,0 +1,61 @@
+{
+  "$schema": "../../schemas/quality-score.schema.json",
+  "scoreId": "quality-score-runtime-target-pr-review-social-media-interactive-draft-ui-v1-20260705",
+  "status": "candidate",
+  "scoreType": "product_quality_score",
+  "projectId": "project-social-media-management-system-v1",
+  "planId": "runtime-target-pr-review-social-media-interactive-draft-ui-v1-20260705",
+  "sourcePlanPath": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/7",
+  "outputType": "social_media_system",
+  "archetypeId": "archetype-social-media-content-operations-system",
+  "archetypeFile": ".codex/archetypes/social-media-content-operations-system.json",
+  "checklistItemsEvaluated": [
+    "Clickable draft-mode navigation exists for the requested sections.",
+    "Post packages expand and expose hook, caption, CTA, platform, pillar, proof note, risk note, owner_approved_draft status, and live-posting block.",
+    "Calendar supports day selection and platform/content-pillar filters while preserving 3-post-per-day source data.",
+    "Approval queue separates approved draft posts, approved weekly report, and remaining pending client-management approvals.",
+    "Weekly report supports local copy and static download only.",
+    "Blocked live actions panel explains why OAuth, credentials, posting, scheduling, analytics, n8n, and live social actions are blocked.",
+    "Settings show handles not_provided, accounts not_connected, credentialsStored false, and draft_only mode.",
+    "No backend, external API call, tracking script, credential, social connector, n8n activation, or paid service was added.",
+    "Safe local checks pass."
+  ],
+  "dimensions": {
+    "completeness": 9,
+    "craft": 8,
+    "maintainability": 8,
+    "ux": 9,
+    "security": 10,
+    "performance": 9,
+    "ownerAcceptance": 10,
+    "archetypeFit": 10,
+    "costDiscipline": 10
+  },
+  "overallScore": 9.2,
+  "meetsBar": true,
+  "reviewStatus": "pass",
+  "improvementRecommendations": [
+    "Add lightweight browser interaction tests later if the target repo adopts Playwright or another test runner.",
+    "Keep any future persistent source-of-truth updates inside AG OS PRs rather than browser state.",
+    "Keep OAuth, scheduling, posting, analytics, DMs/comments, and n8n activation separate and approval gated."
+  ],
+  "lessonCandidates": [],
+  "evidence": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/7",
+    "GitHub changed-file list for PR #7",
+    "npm.cmd run check",
+    "npm.cmd test",
+    "npm.cmd run build",
+    "git diff --check",
+    ".codex/critiques/critique-runtime-target-pr-review-social-media-interactive-draft-ui-v1-20260705.json"
+  ],
+  "generatedBy": "ag-os-reviewer",
+  "limitations": [
+    "Candidate product score only. It does not authorize OAuth, account connection, posting, scheduling, analytics API use, DMs/comments, n8n activation, credentials, paid services, production deployment, domain/DNS, accepted lessons, or permanent memory.",
+    "Playwright was unavailable in the target repo, so browser automation was not run.",
+    "No live social platform account was used."
+  ],
+  "notes": "Target PR #7 was clean for the approved draft/staging interaction milestone and was merged under owner approval.",
+  "createdAt": "2026-07-05T07:52:00Z",
+  "updatedAt": "2026-07-05T07:52:00Z"
+}

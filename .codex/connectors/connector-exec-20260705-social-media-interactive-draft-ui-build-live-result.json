@@ -1,0 +1,101 @@
+{
+  "connectorExecutionId": "connector-exec-20260705-social-media-interactive-draft-ui-build-live-result",
+  "status": "done",
+  "connectorId": "connector-github-mcp",
+  "requestedAction": "create_branch_update_files_open_pr_review_merge_pr",
+  "riskLevel": "R4",
+  "projectId": "project-social-media-management-system-v1",
+  "approvalRequired": true,
+  "approvalId": "approval-20260705-social-media-interactive-draft-ui",
+  "requiredPermissions": [
+    "owner_approval",
+    "active_approval_lock",
+    "target_repo_main_verified",
+    "target_checks_passed",
+    "no_live_social_actions"
+  ],
+  "evidenceRequired": [
+    "target_repo_main_commit_392a582a7193412e39b264ce442e0f4949f08c0b",
+    "target_check_passed",
+    "target_test_passed",
+    "target_build_passed",
+    "pull_request_opened",
+    "pull_request_reviewed",
+    "pull_request_merged"
+  ],
+  "safety": {
+    "executesLiveAction": true,
+    "usesCredentials": false,
+    "triggersDeployment": false,
+    "changesDomain": false,
+    "usesPaidAction": false,
+    "accessesProductionData": false
+  },
+  "result": {
+    "repositoryFullName": "gurnoorbassi/ag-social-media-management-system",
+    "repositoryUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system",
+    "baseBranch": "main",
+    "baseSha": "392a582a7193412e39b264ce442e0f4949f08c0b",
+    "headBranch": "ag-os/social-media-interactive-draft-ui-v1",
+    "headSha": "87f5d13dc47daaa1eca42e13326a55c2b38813d1",
+    "pullRequestNumber": 7,
+    "pullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/7",
+    "pullRequestMerged": true,
+    "mergeCommitSha": "daeb7c4f6e0aaaced7b55eb8fa50978320eff15e",
+    "filesChanged": [
+      "README.md",
+      "index.html",
+      "package.json",
+      "src/data/templates.js",
+      "src/main.js",
+      "src/styles.css"
+    ],
+    "targetChecks": {
+      "npmRunCheck": "passed",
+      "npmTest": "passed",
+      "npmRunBuild": "passed",
+      "gitDiffCheck": "passed",
+      "credentialPatternScan": "passed"
+    },
+    "interactionsAdded": [
+      "clickable_navigation_tabs",
+      "post_package_expansion",
+      "copy_hook_caption_cta",
+      "calendar_day_selection",
+      "platform_filter",
+      "content_pillar_filter",
+      "approval_queue_local_viewed_state",
+      "weekly_report_copy",
+      "weekly_report_download",
+      "blocked_action_explanations"
+    ],
+    "verifiedBy": "local_git_and_github_mcp",
+    "verifiedAt": "2026-07-05T07:52:00Z"
+  },
+  "prohibitedActionsConfirmedFalse": [
+    "deploy_production",
+    "connect_netlify_new_site",
+    "activate_n8n",
+    "connect_social_accounts",
+    "start_oauth",
+    "use_credentials",
+    "post_content",
+    "schedule_content",
+    "use_dm_or_comments",
+    "use_analytics_api",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "access_private_client_data",
+    "access_customer_data",
+    "access_production_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution",
+    "create_accepted_lesson",
+    "create_permanent_memory"
+  ],
+  "notes": "This connector result records target branch creation, approved static frontend file updates, target PR #7 review, and target PR #7 merge only. Netlify staging redeploy is recorded separately.",
+  "createdAt": "2026-07-05T07:52:00Z",
+  "updatedAt": "2026-07-05T07:52:00Z"
+}
