@@ -1,0 +1,30 @@
+{
+  "template": true,
+  "templateType": "first_client_intake",
+  "clientId": "REQUIRED_CLIENT_ID",
+  "clientName": "REQUIRED_CLIENT_NAME",
+  "privacyLevel": "REQUIRED_PRIVACY_LEVEL",
+  "primaryOwner": "REQUIRED_OWNER",
+  "approvalOwner": "REQUIRED_APPROVAL_OWNER",
+  "brandNames": [
+    "REQUIRED_BRAND_NAME"
+  ],
+  "platforms": [
+    "REQUIRED_PLATFORMS"
+  ],
+  "handles": [
+    "REQUIRED_HANDLES"
+  ],
+  "postingVolume": "REQUIRED_POSTING_VOLUME",
+  "contentPillars": [
+    "REQUIRED_CONTENT_PILLARS"
+  ],
+  "brandVoice": "REQUIRED_BRAND_VOICE",
+  "reportingCadence": "REQUIRED_REPORTING_CADENCE",
+  "mode": "draft_only",
+  "approvalRequired": true,
+  "liveActionsBlocked": true,
+  "credentialsStored": false,
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

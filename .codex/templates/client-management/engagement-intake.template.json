@@ -1,0 +1,27 @@
+{
+  "template": true,
+  "templateType": "engagement_intake",
+  "engagementId": "REQUIRED_ENGAGEMENT_ID",
+  "clientId": "REQUIRED_CLIENT_ID",
+  "projectId": "REQUIRED_PROJECT_ID",
+  "systemType": "REQUIRED_SYSTEM_TYPE",
+  "serviceScope": [
+    "REQUIRED_SERVICE_SCOPE"
+  ],
+  "currentPhase": "draft_intake",
+  "approvalOwner": "REQUIRED_APPROVAL_OWNER",
+  "paymentStatus": "REQUIRED_PAYMENT_STATUS",
+  "startDate": "REQUIRED_START_DATE",
+  "targetMilestones": [
+    "REQUIRED_TARGET_MILESTONE"
+  ],
+  "linkedRecords": {
+    "targetRepo": "REQUIRED_TARGET_REPO",
+    "stagingUrl": "REQUIRED_STAGING_URL",
+    "qualityScoreRef": "REQUIRED_QUALITY_SCORE_REF",
+    "critiqueRef": "REQUIRED_CRITIQUE_REF"
+  },
+  "liveActionsBlocked": true,
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
