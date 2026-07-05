@@ -1247,28 +1247,28 @@ window.AG_OS_DASHBOARD_DATA = {
     }
   },
   "skills": {
-    "draftCount": 3,
-    "activeCount": 0,
+    "draftCount": 0,
+    "activeCount": 3,
     "skillsGrantPermission": false,
     "skills": [
       {
         "id": "skill-github-branch-pr-flow",
         "name": "GitHub branch and PR creation under approval gate",
-        "status": "draft",
+        "status": "active",
         "category": "build",
         "recordPath": ".codex/skills/skill-github-branch-pr-flow.json"
       },
       {
         "id": "skill-netlify-staging-deploy-flow",
         "name": "Netlify staging deploy on staging-only site",
-        "status": "draft",
+        "status": "active",
         "category": "delivery",
         "recordPath": ".codex/skills/skill-netlify-staging-deploy-flow.json"
       },
       {
         "id": "skill-target-pr-review-quality-score",
         "name": "Target repository PR review with quality score",
-        "status": "draft",
+        "status": "active",
         "category": "review",
         "recordPath": ".codex/skills/skill-target-pr-review-quality-score.json"
       }

@@ -3,7 +3,7 @@
   "recordType": "skill",
   "id": "skill-github-branch-pr-flow",
   "name": "GitHub branch and PR creation under approval gate",
-  "status": "draft",
+  "status": "active",
   "category": "build",
   "appliesTo": ["any"],
   "procedure": [
@@ -32,14 +32,17 @@
     ],
     "proofRecords": [
       ".codex/github/github-plan-runtime-github-construction-website-repo-20260703.json",
-      ".codex/github/github-mcp-gate-runtime-github-construction-website-repo-20260703.json"
+      ".codex/github/github-mcp-gate-runtime-github-construction-website-repo-20260703.json",
+      ".codex/connectors/connector-exec-20260704-github-builder-pr-live-result.json",
+      ".codex/connectors/connector-exec-20260704-social-media-starter-build-live-result.json"
     ],
-    "timesApplied": 1,
-    "lastAppliedDate": "2026-07-03"
+    "timesApplied": 2,
+    "lastAppliedDate": "2026-07-04"
   },
   "riskNotes": "Gated connector execution. Requires a passing GitHub MCP execution gate and a valid scoped approval lock per capability-github-branch-pr-creation-approved. This skill describes how, never whether.",
+  "notes": "Active as a procedural memory only. Use when AG OS has an owner-approved GitHub branch/file/PR package and an unexpired approval lock. Do not use for repo creation, target PR merge, deployment, credentials, production data, protected project changes, or any action outside the exact approved file and branch scope. Rollback is to close the created PR, delete the created branch if safe, and record an audit event; rollback never deletes source-of-truth history.",
   "owner": "gurnoorbassi",
   "version": 1,
   "createdAt": "2026-07-04T00:00:00Z",
-  "updatedAt": "2026-07-04T00:00:00Z"
+  "updatedAt": "2026-07-04T23:59:00Z"
 }
