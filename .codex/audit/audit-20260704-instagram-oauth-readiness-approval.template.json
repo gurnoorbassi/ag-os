@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260704-instagram-oauth-readiness-approval",
+  "occurredAt": "REQUIRED_OCCURRED_AT",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for a future Instagram OAuth readiness package for @agdigitalz in connected_draft_only mode. This audit template does not execute OAuth, connect Instagram, store credentials, post, schedule, pull analytics, use DMs/comments, or activate n8n.",
+  "scope": "approval-20260704-instagram-oauth-readiness",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-instagram-oauth-readiness"
+    },
+    {
+      "type": "document",
+      "reference": "docs/instagram-oauth-readiness-package.md"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/social/instagram-oauth-plan-20260704-agdigitalz.json"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "confidential",
+  "liveServiceTouched": false,
+  "notes": "Future Instagram OAuth execution remains blocked until exact owner approval, an active approval lock, secure credential storage, least-privilege permission confirmation, and passing validation/boot checks exist. This template does not authorize posting, scheduling, analytics API access, DMs/comments, outbound messaging, n8n activation, paid tools, customer data, production data, domain/DNS changes, Lead Gen changes, AI Receptionist changes, or Constitution changes.",
+  "createdAt": "REQUIRED_CREATED_AT"
+}
