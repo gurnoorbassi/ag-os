@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01",
+  "title": "Draft content sprints need evidence and risk notes before live-channel approval",
+  "lesson": "For AG Digitalz social content workflows, every draft post package should include a source/evidence note and a risk note so unproven revenue, client outcome, live workflow, or case-study claims are caught before owner review or any future live-channel approval.",
+  "sources": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/4",
+    ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704.json",
+    ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "high",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "appliesTo": [
+    "social_media_content_operations_system",
+    "content_sprint_review",
+    "claim_safety_review"
+  ],
+  "sourceScoreId": "quality-score-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704",
+  "generatedBy": "ag-os-reviewer",
+  "whyThisMatters": "It preserves trust and avoids unsupported-proof drift before social content can move toward approval, scheduling, or posting.",
+  "whenToUse": "Use during draft content sprint creation, target PR review, and pre-live social content approval package preparation.",
+  "whenNotToUse": "Do not treat this candidate as accepted memory or permission to post, schedule, connect accounts, use analytics APIs, or activate automations.",
+  "notes": "Candidate-only lesson. It must not be loaded as accepted truth unless owner-approved in a future promotion workflow.",
+  "createdAt": "2026-07-05T04:43:00Z",
+  "updatedAt": "2026-07-05T04:43:00Z"
+}

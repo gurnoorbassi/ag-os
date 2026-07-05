@@ -1,0 +1,62 @@
+{
+  "$schema": "../../schemas/quality-score.schema.json",
+  "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704",
+  "status": "candidate",
+  "scoreType": "product_quality_score",
+  "projectId": "project-social-media-management-system-v1",
+  "planId": "runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704",
+  "sourcePlanPath": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/4",
+  "outputType": "social_media_system",
+  "archetypeId": "archetype-social-media-content-operations-system",
+  "archetypeFile": ".codex/archetypes/social-media-content-operations-system.json",
+  "checklistItemsEvaluated": [
+    "Approved file scope is exact and contains no extra files.",
+    "AG Digitalz First Content Sprint v1 includes seven days, 21 draft post packages, and one weekly report draft.",
+    "Each draft package includes day, platform target, content pillar, hook, caption draft, video idea, carousel/story angle, CTA, approval status, live posting block, evidence note, and risk note.",
+    "Instagram, TikTok, YouTube Shorts, and LinkedIn account state remains not_connected, draft_only, approvalRequired true, livePostingBlocked true, and credentialsStored false.",
+    "Handles remain not_provided and pending_owner_input.",
+    "Draft claims use AG OS source-controlled proof context or educational/build-in-public framing instead of unverified client outcomes.",
+    "No dependencies, paid services, tracking scripts, live form wiring, external calls, deployment config, credentials, social connector, analytics API, n8n activation, production data, or private customer data are present.",
+    "Safe local package checks and direct safety assertion pass."
+  ],
+  "dimensions": {
+    "completeness": 10,
+    "craft": 9,
+    "maintainability": 9,
+    "ux": 9,
+    "security": 10,
+    "performance": 9,
+    "ownerAcceptance": 9,
+    "archetypeFit": 10,
+    "costDiscipline": 10
+  },
+  "overallScore": 9.4,
+  "meetsBar": true,
+  "reviewStatus": "pass",
+  "improvementRecommendations": [
+    "Run browser responsive and accessibility checks before external presentation.",
+    "Keep future handle entry and account connection behind owner-approved social OAuth gates.",
+    "Redeploy only the dedicated staging-only Netlify site after target PR merge."
+  ],
+  "lessonCandidates": [
+    "lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01"
+  ],
+  "evidence": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/4",
+    "GitHub changed-file list for PR #4",
+    "npm.cmd run check in target branch checkout",
+    "npm.cmd test in target branch checkout",
+    "npm.cmd run build in target branch checkout",
+    "Direct draft-only safety assertion for AG Digitalz First Content Sprint v1",
+    "AG OS target PR safety and content sprint review"
+  ],
+  "generatedBy": "ag-os-reviewer",
+  "limitations": [
+    "Candidate product score only. It does not authorize target PR merge, deployment, Netlify, n8n activation, social account connection, scheduling, posting, credential use, analytics API use, paid services, production data, customer data, accepted lessons, or permanent memory.",
+    "No browser visual regression, accessibility automation, or owner acceptance test was run.",
+    "No live connector or social platform account was used."
+  ],
+  "notes": "Target PR #4 is ready for owner-approved merge from a scope, safety, technical, and draft content quality perspective, but merge still requires the separate target PR merge gate.",
+  "createdAt": "2026-07-05T04:43:00Z",
+  "updatedAt": "2026-07-05T04:43:00Z"
+}
