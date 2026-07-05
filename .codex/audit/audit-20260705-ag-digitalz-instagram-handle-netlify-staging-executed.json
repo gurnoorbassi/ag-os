@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260705-ag-digitalz-instagram-handle-netlify-staging-executed",
+  "occurredAt": "2026-07-05T19:09:45Z",
+  "actor": "ag-os-runtime",
+  "eventType": "registry_change",
+  "summary": "Redeployed the existing Social Media Management System staging-only Netlify site after the Instagram public handle update.",
+  "scope": "ag_digitalz_instagram_handle_netlify_staging_redeploy",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260705-ag-digitalz-instagram-handle-live-update"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-20260705-ag-digitalz-instagram-handle-netlify-staging-live-result"
+    },
+    {
+      "type": "other",
+      "reference": "cost-ledger-20260705-ag-digitalz-instagram-handle-live-update"
+    },
+    {
+      "type": "other",
+      "reference": "https://ag-social-media-management-system-staging.netlify.app"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "public",
+  "liveServiceTouched": true,
+  "notes": "Executed only the owner-approved redeploy of the existing dedicated staging-only site ag-social-media-management-system-staging from target repo main SHA 5e6e74f9e90ddfd1c44cc025ead53179f7868b3a. Netlify labels the deploy context as production because it is the primary context of the dedicated staging-only site; this is not an AG Digitalz production domain, customer production domain, or production customer system. No custom domain, DNS change, paid feature, secret, social account connection, credential use, posting, scheduling, analytics API use, n8n activation, real client private data, target repo edit beyond the merged PR, Lead Gen change, AI Receptionist change, Constitution change, accepted lesson, or permanent memory occurred.",
+  "createdAt": "2026-07-05T19:10:50Z"
+}

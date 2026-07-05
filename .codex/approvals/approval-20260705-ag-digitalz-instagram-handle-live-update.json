@@ -1,0 +1,93 @@
+{
+  "approvalId": "approval-20260705-ag-digitalz-instagram-handle-live-update",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "build",
+  "requestedAction": "Add the official AG Digitalz public Instagram handle to AG OS records and the Social Media Management System staging app, review and merge the target PR if clean, redeploy the dedicated Netlify staging-only site, and record proof.",
+  "target": "ag-os:client-management-dashboard-records; github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging",
+  "scope": "This approval allows recording Instagram public business metadata @agdigitalz, keeping TikTok, YouTube Shorts, and LinkedIn not_provided, updating static target app files, opening and merging one clean target PR, redeploying the existing dedicated Netlify staging-only site, and recording source-of-truth proof. It does not authorize OAuth, social account connection, credentials, posting, scheduling, analytics API pulls, DMs/comments, n8n activation, paid tools, domain/DNS changes, Lead Gen changes, AI Receptionist changes, Constitution changes, accepted lessons, or permanent memory.",
+  "riskLevel": "R4",
+  "dataClass": "public",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260705-ag-digitalz-instagram-handle-live-update.json"
+  },
+  "approvalRequiredFor": [
+    "update_ag_os_records",
+    "update_target_app",
+    "merge_pr",
+    "deploy_staging",
+    "record_proof"
+  ],
+  "approvedActions": [
+    "record_public_handle",
+    "create_branch",
+    "update_files",
+    "open_pr",
+    "review_pr",
+    "merge_pr",
+    "redeploy_netlify_staging",
+    "record_proof"
+  ],
+  "prohibitedActions": [
+    "start_oauth",
+    "connect_social_accounts",
+    "store_credentials",
+    "post_content",
+    "schedule_content",
+    "use_analytics_api",
+    "send_dm",
+    "send_comment",
+    "activate_n8n",
+    "deploy_production",
+    "change_domain",
+    "change_dns",
+    "add_custom_domain",
+    "use_paid_service",
+    "access_private_client_data",
+    "access_customer_data",
+    "access_production_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution",
+    "create_accepted_lesson",
+    "create_permanent_memory"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, target PR #8 head SHA changes from 5b1e91a53790e5e00fcf167ed68749e574082025 before merge, target repo main SHA changes from 5e6e74f9e90ddfd1c44cc025ead53179f7868b3a before staging redeploy, the Netlify site ID or site name changes, OAuth would start, credentials are required, a social account connection is requested, posting, scheduling, analytics, DMs/comments, n8n activation, paid tools, domain/DNS, custom domain, production deploy, customer data, production data, Lead Gen, AI Receptionist, Constitution, accepted lesson, or permanent memory scope appears, validation or boot check fails, target checks fail, or the action expands beyond this exact Instagram public handle metadata milestone.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner-approved task to add official AG Digitalz Instagram handle @agdigitalz only.",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/120",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/8",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "Netlify deploy 6a4aabf08e52adba086014c2 ready and staging URL HTTP 200.",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "AG OS dashboard build/check, validation, boot check, runtime tests, and target repo local checks must pass before final report.",
+      "verified": false
+    }
+  ],
+  "approvalText": "Owner-approved task: add official AG Digitalz Instagram handle only. Instagram: @agdigitalz. TikTok, YouTube Shorts, and LinkedIn remain not_provided. Do not execute OAuth, connect accounts, store credentials, post, schedule, pull analytics, activate n8n, use paid tools, change domain/DNS, touch Lead Gen, touch AI Receptionist, or change Constitution.",
+  "approvedAt": "2026-07-05T19:00:00Z",
+  "expiresAt": "2026-07-06T19:00:00Z",
+  "createdAt": "2026-07-05T19:00:00Z",
+  "updatedAt": "2026-07-05T19:10:50Z"
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "../../schemas/quality-score.schema.json",
+  "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705",
+  "status": "candidate",
+  "scoreType": "product_quality_score",
+  "projectId": "project-social-media-management-system-v1",
+  "planId": "runtime-target-pr-review-ag-digitalz-instagram-handle-20260705",
+  "sourcePlanPath": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/8",
+  "outputType": "social_media_system",
+  "archetypeId": "archetype-social-media-content-operations-system",
+  "archetypeFile": ".codex/archetypes/social-media-content-operations-system.json",
+  "checklistItemsEvaluated": [
+    "Instagram public handle is recorded as @agdigitalz.",
+    "TikTok, YouTube Shorts, and LinkedIn remain not_provided and pending_owner_input.",
+    "All platform accounts remain not_connected and draft_only.",
+    "Approval remains required before any live social action.",
+    "Live posting, scheduling, analytics API, social OAuth, n8n activation, and credential storage remain blocked.",
+    "Target app README and visible UI copy match the source data.",
+    "Safety assertions allow only the owner-provided Instagram public handle and continue to reject unsafe account state changes.",
+    "Safe local target checks pass."
+  ],
+  "dimensions": {
+    "completeness": 10,
+    "craft": 8,
+    "maintainability": 9,
+    "ux": 8,
+    "security": 10,
+    "performance": 10,
+    "ownerAcceptance": 10,
+    "archetypeFit": 9,
+    "costDiscipline": 10
+  },
+  "overallScore": 9.3,
+  "meetsBar": true,
+  "reviewStatus": "pass",
+  "improvementRecommendations": [
+    "Record remaining public handles only when the owner provides exact values.",
+    "Keep OAuth, scheduling, posting, analytics, DMs/comments, and n8n activation separate and approval gated.",
+    "Consider browser-based smoke tests later if the target repo adopts a browser test runner."
+  ],
+  "lessonCandidates": [],
+  "evidence": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/8",
+    "npm.cmd run check",
+    "npm.cmd run build",
+    "npm.cmd test",
+    "Runtime safety assertion",
+    "git diff --check",
+    ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705.json"
+  ],
+  "generatedBy": "ag-os-reviewer",
+  "limitations": [
+    "Candidate product score only. It does not authorize OAuth, account connection, posting, scheduling, analytics API use, DMs/comments, n8n activation, credentials, paid services, production deployment, domain/DNS, accepted lessons, or permanent memory.",
+    "No live social platform account was used."
+  ],
+  "notes": "Target PR #8 was clean for the approved Instagram public handle metadata milestone and was merged under owner approval.",
+  "createdAt": "2026-07-05T19:10:50Z",
+  "updatedAt": "2026-07-05T19:10:50Z"
+}
