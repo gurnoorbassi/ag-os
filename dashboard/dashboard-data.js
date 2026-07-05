@@ -120,20 +120,20 @@ window.AG_OS_DASHBOARD_DATA = {
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/social-media-management-system-v1.json",
     "boundary": "Do not create a GitHub repository.",
-    "currentVersion": "v1.6 interactive draft UI",
-    "lifecycleStatus": "Interactive draft UI merged and staged; live social actions remain blocked",
+    "currentVersion": "v1.7 Instagram handle",
+    "lifecycleStatus": "Instagram public handle recorded and staged; live social actions remain blocked",
     "targetRepo": "gurnoorbassi/ag-social-media-management-system",
-    "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/7",
+    "targetPullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/8",
     "targetPullRequestMerged": true,
-    "targetMergeSha": "daeb7c4f6e0aaaced7b55eb8fa50978320eff15e",
-    "reviewedHeadSha": "87f5d13dc47daaa1eca42e13326a55c2b38813d1",
+    "targetMergeSha": "5e6e74f9e90ddfd1c44cc025ead53179f7868b3a",
+    "reviewedHeadSha": "5b1e91a53790e5e00fcf167ed68749e574082025",
     "stagingUrl": "https://ag-social-media-management-system-staging.netlify.app",
     "stagingStatus": "ready",
-    "latestDeployId": "6a4a0caed37d0800a1f19a0d",
-    "latestDeploySourceSha": "Not recorded",
-    "latestDeployVerifiedAt": "2026-07-05T07:52:00Z",
+    "latestDeployId": "6a4aabf08e52adba086014c2",
+    "latestDeploySourceSha": "5e6e74f9e90ddfd1c44cc025ead53179f7868b3a",
+    "latestDeployVerifiedAt": "2026-07-05T19:10:50Z",
     "latestDeployHttpStatus": 200,
-    "netlifyDeployContext": "Not recorded",
+    "netlifyDeployContext": "production",
     "stagingInterpretation": "This is the primary deploy context of the dedicated Netlify staging-only site, not an AG Digitalz production domain, customer production domain, or production customer system.",
     "currentMode": "draft/staging only",
     "firstClientReadiness": {
@@ -292,8 +292,10 @@ window.AG_OS_DASHBOARD_DATA = {
       ".codex/connectors/connector-exec-20260704-ag-digitalz-content-review-netlify-staging-live-result.json",
       ".codex/connectors/connector-exec-20260705-social-media-interactive-draft-ui-build-live-result.json",
       ".codex/connectors/connector-exec-20260705-social-media-interactive-draft-ui-netlify-staging-live-result.json",
+      ".codex/connectors/connector-exec-20260705-ag-digitalz-instagram-handle-build-live-result.json",
+      ".codex/connectors/connector-exec-20260705-ag-digitalz-instagram-handle-netlify-staging-live-result.json",
       ".codex/connectors/connector-exec-20260704-target-pr-merge-ag-digitalz-draft-approval-v1-live-result.json",
-      ".codex/connectors/connector-exec-20260705-social-media-interactive-draft-ui-netlify-staging-live-result.json",
+      ".codex/connectors/connector-exec-20260705-ag-digitalz-instagram-handle-netlify-staging-live-result.json",
       ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
     ]
   },
@@ -1059,11 +1061,20 @@ window.AG_OS_DASHBOARD_DATA = {
     }
   ],
   "approvals": {
-    "activeCount": 18,
+    "activeCount": 19,
     "expiredCount": 5,
     "blockedCount": 0,
     "staleWarningCount": 0,
     "activeApprovals": [
+      {
+        "approvalId": "approval-20260705-ag-digitalz-instagram-handle-live-update",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-06T19:00:00Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/approval-20260705-ag-digitalz-instagram-handle-live-update.json",
+        "archived": false
+      },
       {
         "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
         "status": "approved",
@@ -1277,6 +1288,15 @@ window.AG_OS_DASHBOARD_DATA = {
     "blockedApprovals": [],
     "recentApprovedActions": [
       {
+        "approvalId": "approval-20260705-ag-digitalz-instagram-handle-live-update",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-06T19:00:00Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/approval-20260705-ag-digitalz-instagram-handle-live-update.json",
+        "archived": false
+      },
+      {
         "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
         "status": "approved",
         "riskLevel": "R4",
@@ -1319,15 +1339,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "expiresAt": "2026-07-06T05:48:00Z",
         "approvedBy": "owner-gurnoor-bassi",
         "recordPath": ".codex/approvals/approval-20260704-target-pr-merge-ag-digitalz-content-review-v1.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-ag-digitalz-content-review-build",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-06T05:26:42Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-content-review-build.json",
         "archived": false
       }
     ]
@@ -1932,6 +1943,54 @@ window.AG_OS_DASHBOARD_DATA = {
         "recordPath": ".codex/connectors/connector-exec-20260704-target-pr-merge-social-media-system-v1-live-result.json"
       },
       {
+        "id": "connector-exec-20260705-ag-digitalz-instagram-handle-build-live-result",
+        "status": "done",
+        "action": "create_branch_update_files_open_pr_review_merge_pr",
+        "projectId": "project-social-media-management-system-v1",
+        "approvalId": "approval-20260705-ag-digitalz-instagram-handle-live-update",
+        "result": {
+          "repositoryFullName": "gurnoorbassi/ag-social-media-management-system",
+          "repositoryUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system",
+          "baseBranch": "main",
+          "baseSha": "daeb7c4f6e0aaaced7b55eb8fa50978320eff15e",
+          "headBranch": "ag-os/ag-digitalz-instagram-handle",
+          "headSha": "5b1e91a53790e5e00fcf167ed68749e574082025",
+          "pullRequestNumber": 8,
+          "pullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/8",
+          "pullRequestMerged": true,
+          "mergeCommitSha": "5e6e74f9e90ddfd1c44cc025ead53179f7868b3a",
+          "filesChanged": [
+            "README.md",
+            "package.json",
+            "src/data/templates.js",
+            "src/lib/safety.js",
+            "src/main.js"
+          ],
+          "targetChecks": {
+            "npmRunCheck": "passed",
+            "npmTest": "passed",
+            "npmRunBuild": "passed",
+            "runtimeSafetyAssertion": "passed",
+            "gitDiffCheck": "passed",
+            "credentialPatternScan": "passed"
+          },
+          "handleState": {
+            "Instagram": "@agdigitalz",
+            "TikTok": "not_provided",
+            "YouTube Shorts": "not_provided",
+            "LinkedIn": "not_provided",
+            "connectionStatus": "not_connected",
+            "postingMode": "draft_only",
+            "approvalRequired": true,
+            "livePostingBlocked": true,
+            "credentialsStored": false
+          },
+          "verifiedBy": "local_git_and_github_mcp",
+          "verifiedAt": "2026-07-05T19:10:50Z"
+        },
+        "recordPath": ".codex/connectors/connector-exec-20260705-ag-digitalz-instagram-handle-build-live-result.json"
+      },
+      {
         "id": "connector-exec-20260705-social-media-interactive-draft-ui-build-live-result",
         "status": "done",
         "action": "create_branch_update_files_open_pr_review_merge_pr",
@@ -2167,18 +2226,34 @@ window.AG_OS_DASHBOARD_DATA = {
         "recordPath": ".codex/connectors/connector-exec-20260704-social-media-netlify-staging-v1-1-live-result.json"
       },
       {
+        "id": "connector-exec-20260705-ag-digitalz-instagram-handle-netlify-staging-live-result",
+        "status": "done",
+        "siteName": "ag-social-media-management-system-staging",
+        "siteUrl": "https://ag-social-media-management-system-staging.netlify.app",
+        "deployStatus": "ready",
+        "deployId": "6a4aabf08e52adba086014c2",
+        "deployContext": "production",
+        "stagingInterpretation": "This is the primary deploy context of the dedicated Netlify staging-only site, not an AG Digitalz production domain, customer production domain, or production customer system.",
+        "httpStatus": 200,
+        "verifiedAt": "2026-07-05T19:10:50Z",
+        "sourceRepo": "Not recorded",
+        "sourceSha": "5e6e74f9e90ddfd1c44cc025ead53179f7868b3a",
+        "stagingOnly": true,
+        "recordPath": ".codex/connectors/connector-exec-20260705-ag-digitalz-instagram-handle-netlify-staging-live-result.json"
+      },
+      {
         "id": "connector-exec-20260705-ag-os-dashboard-netlify-staging-live-result",
         "status": "done",
         "siteName": "ag-os-dashboard-staging",
         "siteUrl": "https://ag-os-dashboard-staging.netlify.app",
         "deployStatus": "ready",
         "deployId": "6a4a112f93f9181e0fad6193",
-        "deployContext": "Not recorded",
+        "deployContext": "production",
         "stagingInterpretation": "This is the primary deploy context of the dedicated Netlify staging-only site, not a custom domain, DNS change, or AG Digitalz/customer production deployment.",
         "httpStatus": 200,
         "verifiedAt": "2026-07-05T08:12:00Z",
         "sourceRepo": "Not recorded",
-        "sourceSha": "Not recorded",
+        "sourceSha": "a7cbe9b56c57754b3628c7e51a3d42c0747d0472",
         "stagingOnly": true,
         "recordPath": ".codex/connectors/connector-exec-20260705-ag-os-dashboard-netlify-staging-live-result.json"
       },
@@ -2189,12 +2264,12 @@ window.AG_OS_DASHBOARD_DATA = {
         "siteUrl": "https://ag-social-media-management-system-staging.netlify.app",
         "deployStatus": "ready",
         "deployId": "6a4a0caed37d0800a1f19a0d",
-        "deployContext": "Not recorded",
+        "deployContext": "production",
         "stagingInterpretation": "This is the primary deploy context of the dedicated Netlify staging-only site, not an AG Digitalz production domain, customer production domain, or production customer system.",
         "httpStatus": 200,
         "verifiedAt": "2026-07-05T07:52:00Z",
         "sourceRepo": "Not recorded",
-        "sourceSha": "Not recorded",
+        "sourceSha": "daeb7c4f6e0aaaced7b55eb8fa50978320eff15e",
         "stagingOnly": true,
         "recordPath": ".codex/connectors/connector-exec-20260705-social-media-interactive-draft-ui-netlify-staging-live-result.json"
       },
@@ -2251,8 +2326,19 @@ window.AG_OS_DASHBOARD_DATA = {
     "n8nActiveWorkflowSource": "source-controlled export/connector records only"
   },
   "qualityReview": {
-    "critiquesCount": 9,
+    "critiquesCount": 10,
     "latestCritiques": [
+      {
+        "critiqueId": "critique-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705",
+        "sourcePlanId": "runtime-target-pr-review-ag-digitalz-instagram-handle-20260705",
+        "archetypeId": "archetype-social-media-content-operations-system",
+        "reviewStatus": "pass",
+        "blocksBuildMode": false,
+        "findingCount": 3,
+        "requiredFixCount": 0,
+        "createdAt": "2026-07-05T19:10:50Z",
+        "recordPath": ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705.json"
+      },
       {
         "critiqueId": "critique-runtime-target-pr-review-social-media-interactive-draft-ui-v1-20260705",
         "sourcePlanId": "runtime-target-pr-review-social-media-interactive-draft-ui-v1-20260705",
@@ -2296,23 +2382,23 @@ window.AG_OS_DASHBOARD_DATA = {
         "requiredFixCount": 0,
         "createdAt": "2026-07-05T04:43:00Z",
         "recordPath": ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704.json"
-      },
-      {
-        "critiqueId": "critique-runtime-target-pr-review-ag-digitalz-draft-config-20260704",
-        "sourcePlanId": "runtime-target-pr-review-ag-digitalz-draft-config-20260704",
-        "archetypeId": "archetype-social-media-content-operations-system",
-        "reviewStatus": "pass",
-        "blocksBuildMode": false,
-        "findingCount": 6,
-        "requiredFixCount": 0,
-        "createdAt": "2026-07-05T01:59:30Z",
-        "recordPath": ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-draft-config-20260704.json"
       }
     ],
     "reviewRequiredCount": 0,
     "failedCount": 0,
-    "qualityScoreCount": 10,
+    "qualityScoreCount": 11,
     "latestQualityScores": [
+      {
+        "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705",
+        "scoreType": "product_quality_score",
+        "status": "candidate",
+        "projectId": "project-social-media-management-system-v1",
+        "archetypeId": "archetype-social-media-content-operations-system",
+        "overallScore": 9.3,
+        "reviewStatus": "pass",
+        "updatedAt": "2026-07-05T19:10:50Z",
+        "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705.json"
+      },
       {
         "scoreId": "quality-score-runtime-target-pr-review-social-media-interactive-draft-ui-v1-20260705",
         "scoreType": "product_quality_score",
@@ -2356,17 +2442,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "reviewStatus": "pass",
         "updatedAt": "2026-07-05T04:43:00Z",
         "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704.json"
-      },
-      {
-        "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-draft-config-20260704",
-        "scoreType": "product_quality_score",
-        "status": "candidate",
-        "projectId": "project-social-media-management-system-v1",
-        "archetypeId": "archetype-social-media-content-operations-system",
-        "overallScore": 9.3,
-        "reviewStatus": "pass",
-        "updatedAt": "2026-07-05T01:59:30Z",
-        "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-draft-config-20260704.json"
       }
     ],
     "candidateLessonCount": 14,
@@ -2374,8 +2449,16 @@ window.AG_OS_DASHBOARD_DATA = {
     "candidatesLoadedAsTruth": false
   },
   "costs": {
-    "ledgerCount": 39,
+    "ledgerCount": 40,
     "latestCosts": [
+      {
+        "costLedgerId": "cost-ledger-20260705-ag-digitalz-instagram-handle-live-update",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-05T19:10:50Z",
+        "recordPath": ".codex/costs/cost-ledger-20260705-ag-digitalz-instagram-handle-live-update.json"
+      },
       {
         "costLedgerId": "cost-ledger-20260705-ag-digitalz-instagram-handle-update",
         "status": "active",
@@ -2415,14 +2498,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "budgetStatus": "within_limit",
         "updatedAt": "2026-07-05T06:39:49Z",
         "recordPath": ".codex/costs/cost-ledger-20260704-target-pr-merge-ag-digitalz-draft-approval-v1.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-20260704-ag-digitalz-draft-approval-build",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-05T06:37:48Z",
-        "recordPath": ".codex/costs/cost-ledger-20260704-ag-digitalz-draft-approval-build.json"
       }
     ],
     "totalRecordedActualUsd": 0,

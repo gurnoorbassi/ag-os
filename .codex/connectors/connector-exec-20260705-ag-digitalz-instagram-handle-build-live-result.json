@@ -1,0 +1,101 @@
+{
+  "connectorExecutionId": "connector-exec-20260705-ag-digitalz-instagram-handle-build-live-result",
+  "status": "done",
+  "connectorId": "connector-github-mcp",
+  "requestedAction": "create_branch_update_files_open_pr_review_merge_pr",
+  "riskLevel": "R4",
+  "projectId": "project-social-media-management-system-v1",
+  "approvalRequired": true,
+  "approvalId": "approval-20260705-ag-digitalz-instagram-handle-live-update",
+  "requiredPermissions": [
+    "owner_approval",
+    "active_approval_lock",
+    "target_repo_main_verified",
+    "target_checks_passed",
+    "no_live_social_actions"
+  ],
+  "evidenceRequired": [
+    "target_repo_main_commit_daeb7c4f6e0aaaced7b55eb8fa50978320eff15e",
+    "target_check_passed",
+    "target_test_passed",
+    "target_build_passed",
+    "runtime_safety_assertion_passed",
+    "pull_request_opened",
+    "pull_request_reviewed",
+    "pull_request_merged"
+  ],
+  "safety": {
+    "executesLiveAction": true,
+    "usesCredentials": false,
+    "triggersDeployment": false,
+    "changesDomain": false,
+    "usesPaidAction": false,
+    "accessesProductionData": false
+  },
+  "result": {
+    "repositoryFullName": "gurnoorbassi/ag-social-media-management-system",
+    "repositoryUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system",
+    "baseBranch": "main",
+    "baseSha": "daeb7c4f6e0aaaced7b55eb8fa50978320eff15e",
+    "headBranch": "ag-os/ag-digitalz-instagram-handle",
+    "headSha": "5b1e91a53790e5e00fcf167ed68749e574082025",
+    "pullRequestNumber": 8,
+    "pullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/8",
+    "pullRequestMerged": true,
+    "mergeCommitSha": "5e6e74f9e90ddfd1c44cc025ead53179f7868b3a",
+    "filesChanged": [
+      "README.md",
+      "package.json",
+      "src/data/templates.js",
+      "src/lib/safety.js",
+      "src/main.js"
+    ],
+    "targetChecks": {
+      "npmRunCheck": "passed",
+      "npmTest": "passed",
+      "npmRunBuild": "passed",
+      "runtimeSafetyAssertion": "passed",
+      "gitDiffCheck": "passed",
+      "credentialPatternScan": "passed"
+    },
+    "handleState": {
+      "Instagram": "@agdigitalz",
+      "TikTok": "not_provided",
+      "YouTube Shorts": "not_provided",
+      "LinkedIn": "not_provided",
+      "connectionStatus": "not_connected",
+      "postingMode": "draft_only",
+      "approvalRequired": true,
+      "livePostingBlocked": true,
+      "credentialsStored": false
+    },
+    "verifiedBy": "local_git_and_github_mcp",
+    "verifiedAt": "2026-07-05T19:10:50Z"
+  },
+  "prohibitedActionsConfirmedFalse": [
+    "start_oauth",
+    "connect_social_accounts",
+    "use_credentials",
+    "store_credentials",
+    "post_content",
+    "schedule_content",
+    "use_dm_or_comments",
+    "use_analytics_api",
+    "activate_n8n",
+    "deploy_production",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "access_private_client_data",
+    "access_customer_data",
+    "access_production_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution",
+    "create_accepted_lesson",
+    "create_permanent_memory"
+  ],
+  "notes": "This connector result records target branch creation, public Instagram handle static app updates, target PR #8 review, and target PR #8 merge only. Netlify staging redeploy is recorded separately.",
+  "createdAt": "2026-07-05T19:10:50Z",
+  "updatedAt": "2026-07-05T19:10:50Z"
+}

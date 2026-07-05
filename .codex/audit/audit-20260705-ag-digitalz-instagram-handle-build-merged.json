@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260705-ag-digitalz-instagram-handle-build-merged",
+  "occurredAt": "2026-07-05T19:08:50Z",
+  "actor": "ag-os-runtime",
+  "eventType": "registry_change",
+  "summary": "Merged the approved Social Media Management System target PR #8 for the AG Digitalz Instagram public handle update.",
+  "scope": "ag_digitalz_instagram_handle_target_app_update",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260705-ag-digitalz-instagram-handle-live-update"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/8"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-20260705-ag-digitalz-instagram-handle-build-live-result"
+    },
+    {
+      "type": "other",
+      "reference": "quality-score-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "public",
+  "liveServiceTouched": true,
+  "notes": "Merged only target PR #8 in gurnoorbassi/ag-social-media-management-system. The merge commit is 5e6e74f9e90ddfd1c44cc025ead53179f7868b3a. The reviewed head SHA was 5b1e91a53790e5e00fcf167ed68749e574082025. No OAuth, social account connection, credential, posting, scheduling, analytics API, DMs/comments, n8n activation, paid tool, production deploy, domain/DNS, real client private data, Lead Gen, AI Receptionist, Constitution, accepted lesson, or permanent memory action occurred.",
+  "createdAt": "2026-07-05T19:10:50Z"
+}

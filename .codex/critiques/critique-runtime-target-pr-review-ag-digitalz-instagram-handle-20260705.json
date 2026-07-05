@@ -1,0 +1,75 @@
+{
+  "$schema": "../../schemas/plan-critique.schema.json",
+  "critiqueId": "critique-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705",
+  "sourcePlanId": "runtime-target-pr-review-ag-digitalz-instagram-handle-20260705",
+  "sourcePlanPath": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/8",
+  "sourceCommandIntakePath": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
+  "qualityScoreId": "quality-score-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705",
+  "qualityScorePath": ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705.json",
+  "archetypeId": "archetype-social-media-content-operations-system",
+  "archetypeFile": ".codex/archetypes/social-media-content-operations-system.json",
+  "reviewerType": "critic_worker",
+  "authority": "advisory_only",
+  "reviewStatus": "pass",
+  "blocksBuildMode": false,
+  "findings": [
+    {
+      "findingId": "finding-instagram-handle-scope",
+      "severity": "info",
+      "category": "approval_gates",
+      "message": "Target PR #8 stays inside the owner-approved Instagram public handle scope.",
+      "evidence": [
+        "Instagram handle is @agdigitalz.",
+        "TikTok, YouTube Shorts, and LinkedIn remain not_provided and pending_owner_input.",
+        "Changed files are README.md, package.json, src/data/templates.js, src/lib/safety.js, and src/main.js."
+      ]
+    },
+    {
+      "findingId": "finding-instagram-handle-safety",
+      "severity": "info",
+      "category": "stop_conditions",
+      "message": "Mandatory live social action blocks remain present after the handle update.",
+      "evidence": [
+        "All accounts remain not_connected.",
+        "All accounts remain draft_only.",
+        "approvalRequired remains true.",
+        "livePostingBlocked remains true.",
+        "credentialsStored remains false.",
+        "socialOauthConnected remains false."
+      ]
+    },
+    {
+      "findingId": "finding-instagram-handle-technical-checks",
+      "severity": "info",
+      "category": "quality_score",
+      "message": "Safe target checks passed before target merge.",
+      "evidence": [
+        "npm.cmd run check passed.",
+        "npm.cmd run build passed.",
+        "npm.cmd test passed.",
+        "Runtime safety assertion passed.",
+        "git diff --check passed."
+      ]
+    }
+  ],
+  "requiredFixes": [],
+  "optionalImprovements": [
+    "Add TikTok, YouTube Shorts, and LinkedIn public handles only after the owner provides exact public metadata.",
+    "Keep social OAuth, posting, scheduling, analytics, DMs/comments, and n8n activation as separate approval-gated milestones."
+  ],
+  "evidence": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/8",
+    "npm.cmd run check",
+    "npm.cmd run build",
+    "npm.cmd test",
+    "Runtime safety assertion for starterConfig",
+    "git diff --check"
+  ],
+  "generatedBy": "ag-os-reviewer",
+  "limitations": [
+    "Critique is advisory only and cannot approve, merge, deploy, connect accounts, schedule, post, use credentials, call analytics APIs, activate automations, or create accepted lessons.",
+    "No browser automation was run; review relied on static source inspection and safe local checks.",
+    "Review did not alter target repository settings, sensitive values, live social accounts, production deployment, or domain/DNS."
+  ],
+  "createdAt": "2026-07-05T19:10:50Z"
+}
