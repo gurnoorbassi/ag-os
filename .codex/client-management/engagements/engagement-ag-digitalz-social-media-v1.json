@@ -27,7 +27,8 @@
     "future LinkedIn social OAuth approval required"
   ],
   "blockers": [
-    "platform handles are not_provided and pending_owner_input",
+    "TikTok, YouTube Shorts, and LinkedIn handles are not_provided and pending_owner_input",
+    "Instagram public handle is provided as @agdigitalz but OAuth is not connected",
     "social OAuth is not connected",
     "live posting is blocked",
     "scheduling is blocked",
@@ -40,5 +41,5 @@
     "content claims must be limited to proof that exists"
   ],
   "createdAt": "2026-07-05T01:45:00Z",
-  "updatedAt": "2026-07-05T01:45:00Z"
+  "updatedAt": "2026-07-05T08:30:00Z"
 }

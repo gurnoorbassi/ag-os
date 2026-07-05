@@ -14,7 +14,8 @@
     "Client type: internal_owned_brand.",
     "Owner privacy intent: internal_business_config; stored with schema-supported privacyLevel internal.",
     "Platforms: Instagram, TikTok, YouTube Shorts, LinkedIn.",
-    "Handles are not_provided and pending_owner_input for every platform.",
+    "Instagram public handle is @agdigitalz.",
+    "TikTok, YouTube Shorts, and LinkedIn handles are not_provided and pending_owner_input.",
     "Posting target is 3 draft post packages per day and 1 weekly report.",
     "Content pillars: AI systems built by AG Digitalz; behind-the-scenes AG OS builds; automation systems for local businesses; client acquisition and lead-generation systems; social media management systems; AI receptionist systems; business growth case studies when proof exists; simple educational breakdowns.",
     "Brand voice: direct, confident, simple, practical, high-agency, no fluff, business-focused.",
@@ -23,5 +24,5 @@
   ],
   "privacyLevel": "internal",
   "createdAt": "2026-07-05T01:45:00Z",
-  "updatedAt": "2026-07-05T01:45:00Z"
+  "updatedAt": "2026-07-05T08:30:00Z"
 }

@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260705-ag-digitalz-instagram-handle-updated",
+  "occurredAt": "2026-07-05T08:30:00Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "registry_change",
+  "summary": "Recorded the official public AG Digitalz Instagram handle as @agdigitalz while keeping all social accounts disconnected and blocked for live actions.",
+  "scope": "ag_digitalz_public_social_handle_metadata_only",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "other",
+      "reference": ".codex/client-management/clients/client-ag-digitalz-internal.json"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/client-management/access-requests/access-request-ag-digitalz-instagram.json"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/client-management/engagements/engagement-ag-digitalz-social-media-v1.json"
+    }
+  ],
+  "riskLevel": "low",
+  "dataClassification": "public",
+  "liveServiceTouched": false,
+  "notes": "Only public business metadata was recorded. TikTok, YouTube Shorts, and LinkedIn remain not_provided and pending_owner_input. Instagram remains not_connected, draft_only, approval_required true, live_posting_blocked true, and credentials_stored false. This does not authorize OAuth, account connection, posting, scheduling, analytics, n8n activation, paid tools, domain/DNS changes, Lead Gen changes, AI Receptionist changes, or Constitution changes.",
+  "createdAt": "2026-07-05T08:30:00Z"
+}

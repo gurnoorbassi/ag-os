@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260705-expire-stale-approvals",
+  "occurredAt": "2026-07-05T19:00:00Z",
+  "actor": "ag-os-runtime",
+  "eventType": "registry_change",
+  "summary": "Marked four stale expired approval locks as expired and moved them to the approval archive so they no longer authorize gated actions or block boot.",
+  "scope": "approval-lock-expiration-cleanup-20260705",
+  "source": "local_validation",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": ".codex/approvals/archive/approval-20260704-github-builder-pr.json"
+    },
+    {
+      "type": "approval",
+      "reference": ".codex/approvals/archive/approval-20260704-n8n-draft-workflow-proof.json"
+    },
+    {
+      "type": "approval",
+      "reference": ".codex/approvals/archive/approval-20260704-netlify-staging-test-construction.json"
+    },
+    {
+      "type": "approval",
+      "reference": ".codex/approvals/archive/approval-20260704-target-pr-merge-construction-website.json"
+    }
+  ],
+  "riskLevel": "low",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "No historical proof was deleted. The prior actions had already completed and were already recorded. This cleanup only changes approval locks whose expiresAt timestamps passed from approved to expired and moves them out of the active approvals directory. No live GitHub, Netlify, n8n, deployment, domain, DNS, credential, paid, production data, customer data, Lead Gen, AI Receptionist, or Constitution action occurred.",
+  "createdAt": "2026-07-05T19:00:00Z"
+}

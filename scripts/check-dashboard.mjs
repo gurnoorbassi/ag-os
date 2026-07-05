@@ -173,8 +173,15 @@ if (data.socialMediaSystem.contentSprint.ownerApprovedDraftCount !== 21) {
 if (data.socialMediaSystem.contentSprint.weeklyReportApprovalStatus !== "owner_approved_draft") {
   fail("dashboard control center must show the weekly report approved as draft content");
 }
-if (data.socialMediaSystem.contentSprint.platforms.some((platform) => platform.handle !== "not_provided" || platform.handleStatus !== "pending_owner_input")) {
-  fail("dashboard control center must keep official social handles pending owner input");
+const platformStates = Object.fromEntries(data.socialMediaSystem.contentSprint.platforms.map((platform) => [platform.platform, platform]));
+if (platformStates.Instagram?.handle !== "@agdigitalz" || platformStates.Instagram?.handleStatus !== "public_handle_provided") {
+  fail("dashboard control center must show the official AG Digitalz Instagram handle");
+}
+for (const platformName of ["TikTok", "YouTube Shorts", "LinkedIn"]) {
+  const platform = platformStates[platformName];
+  if (platform?.handle !== "not_provided" || platform?.handleStatus !== "pending_owner_input") {
+    fail("dashboard control center must keep TikTok, YouTube Shorts, and LinkedIn handles pending owner input");
+  }
 }
 if (data.socialMediaSystem.contentSprint.socialOauthConnected !== false ||
   data.socialMediaSystem.contentSprint.credentialsStored !== false ||

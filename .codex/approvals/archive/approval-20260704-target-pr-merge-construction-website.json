@@ -1,6 +1,6 @@
 {
   "approvalId": "approval-20260704-target-pr-merge-construction-website",
-  "status": "approved",
+  "status": "expired",
   "ownerId": "owner-gurnoor-bassi",
   "requestedBy": "ag-os-runtime",
   "approvedBy": "owner-gurnoor-bassi",
@@ -45,7 +45,7 @@
     "change_ai_receptionist",
     "change_constitution"
   ],
-  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, AG OS PR #71 is not merged into main, local AG OS main does not match origin/main, the AG OS review records are missing from main, target PR #1 is closed, already merged, not mergeable, has a different target repository, has a different head SHA than the reviewed head, changes files outside README.md, package.json, index.html, src/styles.css, and src/main.js, validation or boot check fails, runtime tests fail, GitHub reports a conflict, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond merging exactly target PR #1.",
+  "revocationPath": "This approval expired at 2026-07-05T10:16:16.617Z and is no longer valid for gated actions. Historical proof remains preserved in approval, audit, connector execution, cost, and target repository merge records. Any future target repository merge requires a new scoped owner approval lock.",
   "evidence": [
     {
       "type": "owner_instruction",
@@ -77,5 +77,5 @@
   "approvedAt": "2026-07-04T10:16:16.617Z",
   "expiresAt": "2026-07-05T10:16:16.617Z",
   "createdAt": "2026-07-04T10:16:16.617Z",
-  "updatedAt": "2026-07-04T10:16:16.617Z"
+  "updatedAt": "2026-07-05T19:00:00Z"
 }

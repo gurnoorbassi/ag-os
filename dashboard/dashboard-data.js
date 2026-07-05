@@ -203,8 +203,8 @@ window.AG_OS_DASHBOARD_DATA = {
       "platforms": [
         {
           "platform": "Instagram",
-          "handle": "not_provided",
-          "handleStatus": "pending_owner_input",
+          "handle": "@agdigitalz",
+          "handleStatus": "public_handle_provided",
           "connectionStatus": "not_connected",
           "postingMode": "draft_only",
           "approvalRequired": true,
@@ -259,7 +259,7 @@ window.AG_OS_DASHBOARD_DATA = {
         "acceptedLessonsCreated": false,
         "permanentMemoryCreated": false
       },
-      "updatedAt": "2026-07-05T06:40:50Z",
+      "updatedAt": "2026-07-05T08:30:00Z",
       "recordPath": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
       "livePostingBlocked": true,
       "schedulingBlocked": true,
@@ -915,8 +915,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "platforms": [
           {
             "platform": "Instagram",
-            "handle": "not_provided",
-            "handleStatus": "pending_owner_input",
+            "handle": "@agdigitalz",
+            "handleStatus": "public_handle_provided",
             "connectionStatus": "not_connected",
             "postingMode": "draft_only",
             "approvalRequired": true,
@@ -971,7 +971,7 @@ window.AG_OS_DASHBOARD_DATA = {
           "acceptedLessonsCreated": false,
           "permanentMemoryCreated": false
         },
-        "updatedAt": "2026-07-05T06:40:50Z",
+        "updatedAt": "2026-07-05T08:30:00Z",
         "recordPath": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
       }
     ],
@@ -1059,8 +1059,8 @@ window.AG_OS_DASHBOARD_DATA = {
     }
   ],
   "approvals": {
-    "activeCount": 22,
-    "expiredCount": 1,
+    "activeCount": 18,
+    "expiredCount": 5,
     "blockedCount": 0,
     "staleWarningCount": 0,
     "activeApprovals": [
@@ -1225,45 +1225,45 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvedBy": "owner-gurnoor-bassi",
         "recordPath": ".codex/approvals/approval-20260704-social-media-starter-build.json",
         "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-n8n-draft-workflow-proof",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-05T11:18:16Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-n8n-draft-workflow-proof.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-netlify-staging-test-construction",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-05T10:50:47.913Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-netlify-staging-test-construction.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-target-pr-merge-construction-website",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-05T10:16:16.617Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-target-pr-merge-construction-website.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-github-builder-pr",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-05T08:55:58.002Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-github-builder-pr.json",
-        "archived": false
       }
     ],
     "expiredApprovals": [
+      {
+        "approvalId": "approval-20260704-n8n-draft-workflow-proof",
+        "status": "expired",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-05T11:18:16Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/archive/approval-20260704-n8n-draft-workflow-proof.json",
+        "archived": true
+      },
+      {
+        "approvalId": "approval-20260704-netlify-staging-test-construction",
+        "status": "expired",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-05T10:50:47.913Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/archive/approval-20260704-netlify-staging-test-construction.json",
+        "archived": true
+      },
+      {
+        "approvalId": "approval-20260704-target-pr-merge-construction-website",
+        "status": "expired",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-05T10:16:16.617Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-construction-website.json",
+        "archived": true
+      },
+      {
+        "approvalId": "approval-20260704-github-builder-pr",
+        "status": "expired",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-05T08:55:58.002Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/archive/approval-20260704-github-builder-pr.json",
+        "archived": true
+      },
       {
         "approvalId": "approval-20260703-github-repo-create",
         "status": "expired",
@@ -2374,8 +2374,16 @@ window.AG_OS_DASHBOARD_DATA = {
     "candidatesLoadedAsTruth": false
   },
   "costs": {
-    "ledgerCount": 38,
+    "ledgerCount": 39,
     "latestCosts": [
+      {
+        "costLedgerId": "cost-ledger-20260705-ag-digitalz-instagram-handle-update",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-05T08:30:00Z",
+        "recordPath": ".codex/costs/cost-ledger-20260705-ag-digitalz-instagram-handle-update.json"
+      },
       {
         "costLedgerId": "cost-ledger-20260705-ag-os-dashboard-netlify-staging",
         "status": "active",
@@ -2415,14 +2423,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "budgetStatus": "within_limit",
         "updatedAt": "2026-07-05T06:37:48Z",
         "recordPath": ".codex/costs/cost-ledger-20260704-ag-digitalz-draft-approval-build.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-05T06:37:48Z",
-        "recordPath": ".codex/costs/cost-ledger-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704.json"
       }
     ],
     "totalRecordedActualUsd": 0,
