@@ -1,0 +1,32 @@
+{
+  "id": "audit-20260704-social-media-netlify-staging-v1-1-executed",
+  "occurredAt": "2026-07-05T01:02:54Z",
+  "actor": "ag-os-runtime",
+  "eventType": "registry_change",
+  "summary": "Redeployed the dedicated Netlify staging-only site for Social Media Management System v1.1 from target repo main.",
+  "scope": "live_netlify_staging_redeploy_social_media_management_system_v1_1",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-social-media-netlify-staging-v1-1"
+    },
+    {
+      "type": "other",
+      "reference": "connector-exec-20260704-social-media-netlify-staging-v1-1-live-result"
+    },
+    {
+      "type": "other",
+      "reference": "cost-ledger-20260704-social-media-netlify-staging-v1-1"
+    },
+    {
+      "type": "other",
+      "reference": "https://ag-social-media-management-system-staging.netlify.app"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Executed only the owner-approved Netlify staging redeploy for the existing dedicated staging-only site ag-social-media-management-system-staging from local target repo main at SHA 7204846654ef448f6c0c78027a569b7707c618b8. Netlify labels the deploy context as production because it is the primary context of the dedicated staging-only site; this is not an AG Digitalz production domain, customer production domain, or production customer system. No custom domain, DNS change, paid feature, secret, social account connection, credential use, posting, scheduling, analytics API use, n8n activation, real client data, target repo edit, target PR merge, Lead Gen change, AI Receptionist change, or Constitution change occurred.",
+  "createdAt": "2026-07-05T01:02:54Z"
+}

@@ -640,11 +640,20 @@ window.AG_OS_DASHBOARD_DATA = {
     "zeroState": "No real clients are registered yet."
   },
   "approvals": {
-    "activeCount": 9,
+    "activeCount": 10,
     "expiredCount": 1,
     "blockedCount": 0,
     "staleWarningCount": 0,
     "activeApprovals": [
+      {
+        "approvalId": "approval-20260704-social-media-netlify-staging-v1-1",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-06T00:59:30Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/approval-20260704-social-media-netlify-staging-v1-1.json",
+        "archived": false
+      },
       {
         "approvalId": "approval-20260704-target-pr-merge-social-media-system-v1-1",
         "status": "approved",
@@ -741,6 +750,15 @@ window.AG_OS_DASHBOARD_DATA = {
     "blockedApprovals": [],
     "recentApprovedActions": [
       {
+        "approvalId": "approval-20260704-social-media-netlify-staging-v1-1",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-07-06T00:59:30Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "recordPath": ".codex/approvals/approval-20260704-social-media-netlify-staging-v1-1.json",
+        "archived": false
+      },
+      {
         "approvalId": "approval-20260704-target-pr-merge-social-media-system-v1-1",
         "status": "approved",
         "riskLevel": "R4",
@@ -783,15 +801,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "expiresAt": "2026-07-05T21:35:09Z",
         "approvedBy": "owner-gurnoor-bassi",
         "recordPath": ".codex/approvals/approval-20260704-social-media-starter-build.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-n8n-draft-workflow-proof",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-05T11:18:16Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-n8n-draft-workflow-proof.json",
         "archived": false
       }
     ]
@@ -1150,6 +1159,18 @@ window.AG_OS_DASHBOARD_DATA = {
         "recordPath": ".codex/connectors/connector-exec-20260704-social-media-netlify-staging-live-result.json"
       },
       {
+        "id": "connector-exec-20260704-social-media-netlify-staging-v1-1-live-result",
+        "status": "done",
+        "siteName": "ag-social-media-management-system-staging",
+        "siteUrl": "https://ag-social-media-management-system-staging.netlify.app",
+        "deployStatus": "ready",
+        "deployId": "6a49ad36a73303e2fa05755f",
+        "sourceRepo": "gurnoorbassi/ag-social-media-management-system",
+        "sourceSha": "7204846654ef448f6c0c78027a569b7707c618b8",
+        "stagingOnly": true,
+        "recordPath": ".codex/connectors/connector-exec-20260704-social-media-netlify-staging-v1-1-live-result.json"
+      },
+      {
         "id": "connector-exec-runtime-construction-website-automated-20260703-netlify",
         "status": "waiting_approval",
         "siteName": "Not recorded",
@@ -1310,8 +1331,16 @@ window.AG_OS_DASHBOARD_DATA = {
     "candidatesLoadedAsTruth": false
   },
   "costs": {
-    "ledgerCount": 18,
+    "ledgerCount": 19,
     "latestCosts": [
+      {
+        "costLedgerId": "cost-ledger-20260704-social-media-netlify-staging-v1-1",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-05T01:02:54Z",
+        "recordPath": ".codex/costs/cost-ledger-20260704-social-media-netlify-staging-v1-1.json"
+      },
       {
         "costLedgerId": "cost-ledger-20260704-target-pr-merge-social-media-system-v1-1",
         "status": "active",
@@ -1351,14 +1380,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "budgetStatus": "within_limit",
         "updatedAt": "2026-07-04T22:31:45.718Z",
         "recordPath": ".codex/costs/cost-ledger-20260704-target-pr-merge-social-media-system-v1.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-runtime-target-pr-review-social-media-system-v1-20260704",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-04T21:52:00Z",
-        "recordPath": ".codex/costs/cost-ledger-runtime-target-pr-review-social-media-system-v1-20260704.json"
       }
     ],
     "totalRecordedActualUsd": 0,
