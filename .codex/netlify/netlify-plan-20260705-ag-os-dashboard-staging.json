@@ -1,0 +1,110 @@
+{
+  "netlifyPlanId": "netlify-plan-20260705-ag-os-dashboard-staging",
+  "status": "planned",
+  "mode": "approval_package_only",
+  "connectorId": "connector-netlify-mcp",
+  "projectId": "project-ag-os",
+  "targetRepository": "gurnoorbassi/ag-os",
+  "targetBranch": "main",
+  "targetMainSha": "e536a018dacb87e20904d29854b078cda4907815",
+  "riskLevel": "R4",
+  "proposedAction": "Create or connect one dedicated Netlify staging-only site for the AG OS Dashboard and deploy the generated dashboard directory.",
+  "stagingScope": {
+    "siteName": "ag-os-dashboard-staging",
+    "productionDeployAllowed": false,
+    "customDomainAllowed": false,
+    "dnsChangeAllowed": false,
+    "paidFeaturesAllowed": false,
+    "netlifyFormsAllowed": false,
+    "analyticsAllowed": false,
+    "deployHooksAllowed": false,
+    "liveConnectorWritesAllowed": false,
+    "socialActionsAllowed": false,
+    "n8nActivationAllowed": false
+  },
+  "buildSettings": {
+    "baseDirectory": ".",
+    "localBuildCommand": "npm.cmd run dashboard:build",
+    "netlifyBuildCommand": "npm run dashboard:build",
+    "publishDirectory": "dashboard",
+    "entryFile": "dashboard/index.html",
+    "environmentVariablesRequired": []
+  },
+  "securityCheck": {
+    "requiredBeforeDeploy": true,
+    "scope": [
+      "dashboard/dashboard-data.js",
+      "dashboard/app.js",
+      "dashboard/index.html",
+      "dashboard/styles.css"
+    ],
+    "mustNotContain": [
+      "secrets",
+      "tokens",
+      "credentials",
+      "private client data",
+      "production customer data",
+      "passwords",
+      "private keys"
+    ],
+    "stopIfUnsafe": true
+  },
+  "preExecutionChecks": [
+    "Confirm active approval lock approval-20260705-ag-os-dashboard-netlify-staging exists and is unexpired.",
+    "Run npm.cmd run dashboard:build.",
+    "Run npm.cmd run dashboard:check.",
+    "Run npm.cmd run validate.",
+    "Run npm.cmd run boot:check.",
+    "Run node --test tests/*.test.mjs.",
+    "Run git diff --check.",
+    "Scan dashboard output for secrets, tokens, credentials, private client data, and production customer data.",
+    "Confirm no environment variables are required.",
+    "Confirm Netlify action is staging-only and no custom domain or DNS change is requested."
+  ],
+  "validationPlan": [
+    "Use generated static dashboard files from the dashboard directory.",
+    "Do not add Netlify Forms, tracking scripts, analytics, social OAuth, posting, scheduling, n8n activation, environment variables, or live connector writes.",
+    "After approved deploy, verify the staging URL returns HTTP 200.",
+    "After approved deploy, record Netlify deploy result, URL, deploy id if available, and cost ledger entry in AG OS."
+  ],
+  "costEstimate": {
+    "estimatedTaskCostUsd": 0,
+    "paidToolsAllowed": false,
+    "budgetStatus": "within_limit",
+    "stopIfPaidFeatureRequired": true
+  },
+  "rollbackPlan": [
+    "If the staging deploy exposes unsafe data, stop all further action, record an incident/audit event, and ask the owner before disabling or deleting the site unless immediate exposure risk exists.",
+    "If the wrong repository, branch, commit, or directory is deployed, stop all further action, record an audit event, and do not redeploy until owner approval.",
+    "If a custom domain, DNS, paid feature, credential, secret, private client data exposure, production customer data exposure, live connector write, social action, n8n activation, Lead Gen change, AI Receptionist change, or Constitution change becomes necessary, stop before action.",
+    "If rollback is approved, use the Netlify rollback or site disable/delete path appropriate to the actual result and record the action in AG OS."
+  ],
+  "stopConditions": [
+    "No active approval lock for this exact Netlify staging action.",
+    "Target repository, branch, or main SHA differs from this plan.",
+    "Netlify asks for a paid feature, custom domain, production deploy, DNS change, credential, secret, or environment variable.",
+    "Security scan finds secrets, tokens, credentials, private client data, production customer data, passwords, or private keys in dashboard output.",
+    "Validation, boot check, dashboard check, runtime tests, or diff check fail.",
+    "Any action would perform a live connector write beyond Netlify deploy, activate n8n, perform social action, or touch Lead Gen, AI Receptionist, or the Constitution."
+  ],
+  "safety": {
+    "executesNetlifyAction": false,
+    "createsSite": false,
+    "deploysStaging": false,
+    "deploysProduction": false,
+    "changesDomain": false,
+    "changesDns": false,
+    "usesPaidAction": false,
+    "usesCredentialsInRepo": false,
+    "exposesPrivateClientData": false,
+    "exposesProductionCustomerData": false,
+    "performsLiveConnectorWrites": false,
+    "performsSocialActions": false,
+    "activatesN8n": false,
+    "touchesLeadGen": false,
+    "touchesAiReceptionist": false,
+    "changesConstitution": false
+  },
+  "createdAt": "2026-07-05T00:00:00Z",
+  "updatedAt": "2026-07-05T00:00:00Z"
+}

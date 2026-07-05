@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260705-ag-os-dashboard-netlify-staging-approval",
+  "occurredAt": "REQUIRED_OCCURRED_AT",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted scoped approval for AG OS to create or connect one dedicated Netlify staging-only site and deploy the AG OS dashboard. This audit template does not execute the deployment.",
+  "scope": "approval-20260705-ag-os-dashboard-netlify-staging",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260705-ag-os-dashboard-netlify-staging"
+    },
+    {
+      "type": "document",
+      "reference": "docs/ag-os-dashboard-netlify-staging-approval-package.md"
+    },
+    {
+      "type": "other",
+      "reference": ".codex/netlify/netlify-plan-20260705-ag-os-dashboard-staging.json"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Future live execution remains blocked until the approval lock is converted from template to active approved record with exact owner approval text, approval timestamp, expiration, current validation evidence, and the same staging-only Netlify scope. This template does not authorize production deployment, custom domain, DNS, paid feature, secrets, credentials, private client data exposure, live connector writes, social actions, n8n activation, Lead Gen changes, AI Receptionist changes, or Constitution changes.",
+  "createdAt": "REQUIRED_CREATED_AT"
+}

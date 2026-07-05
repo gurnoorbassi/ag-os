@@ -1,0 +1,75 @@
+{
+  "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
+  "status": "revoked",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "REQUIRED_APPROVER_ID",
+  "projectId": "project-ag-os",
+  "commandCategory": "deploy_staging",
+  "requestedAction": "Create or connect one dedicated Netlify staging-only site named ag-os-dashboard-staging and deploy the AG OS dashboard from gurnoorbassi/ag-os.",
+  "target": "netlify:ag-os-dashboard-staging",
+  "scope": "This approval package, if converted into an active approved lock, allows AG OS to create or connect exactly one dedicated Netlify staging-only site named ag-os-dashboard-staging, build the AG OS dashboard locally with npm.cmd run dashboard:build, publish the dashboard directory, verify the staging URL returns HTTP 200, record the Netlify deployment result, and stop before custom domain, DNS, paid features, secrets, credentials, production deployment, private client data exposure, live connector writes, social actions, n8n activation, Lead Gen changes, AI Receptionist changes, or Constitution changes.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/budget.json"
+  },
+  "approvalRequiredFor": [
+    "connect_netlify",
+    "deploy_staging"
+  ],
+  "approvedActions": [
+    "connect_netlify",
+    "deploy_staging"
+  ],
+  "prohibitedActions": [
+    "deploy_production",
+    "change_domain",
+    "change_dns",
+    "add_custom_domain",
+    "use_paid_service",
+    "add_secrets",
+    "use_credentials",
+    "expose_private_client_data",
+    "expose_production_customer_data",
+    "perform_live_connector_write",
+    "connect_social_accounts",
+    "post_content",
+    "schedule_content",
+    "use_analytics_api",
+    "activate_n8n",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target branch changes, the target commit changes without renewed approval, the Netlify site name changes, a custom domain or DNS change is needed, a paid Netlify feature is required, credentials or secrets would need to be stored, private client data or production customer data is found in dashboard output, validation or boot check fails, Netlify reports a configuration or billing blocker, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond one dedicated staging-only dashboard deployment.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner instruction requested the full AG OS Dashboard private/staging control center sprint.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/netlify/netlify-plan-20260705-ag-os-dashboard-staging.json",
+      "verified": false
+    },
+    {
+      "type": "other",
+      "reference": "docs/ag-os-dashboard-netlify-staging-approval-package.md",
+      "verified": false
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run dashboard:build, npm.cmd run dashboard:check, npm.cmd run validate, npm.cmd run boot:check, node --test tests/*.test.mjs, and git diff --check must pass before execution.",
+      "verified": false
+    }
+  ],
+  "approvalText": "REQUIRED_EXACT_OWNER_APPROVAL_TEXT",
+  "approvedAt": "REQUIRED_APPROVED_AT",
+  "expiresAt": "REQUIRED_EXPIRES_AT",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
