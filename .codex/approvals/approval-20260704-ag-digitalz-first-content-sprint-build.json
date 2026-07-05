@@ -1,0 +1,82 @@
+{
+  "approvalId": "approval-20260704-ag-digitalz-first-content-sprint-build",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "build",
+  "requestedAction": "Create one branch, update approved Social Media Management System files with AG Digitalz First Content Sprint v1, and open one pull request in gurnoorbassi/ag-social-media-management-system.",
+  "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/ag-digitalz-first-content-sprint-v1",
+  "scope": "This approval allows AG OS to use GitHub for exactly one live builder milestone in the existing private repository gurnoorbassi/ag-social-media-management-system. The allowed live actions are limited to creating branch ag-os/ag-digitalz-first-content-sprint-v1 from main SHA 6f54d3b5b257c2662319f39c0b89f810e22289e5, updating README.md, package.json, index.html, src/main.js, src/styles.css, src/data/templates.js, src/lib/safety.js, and src/lib/status.js with AG Digitalz First Content Sprint v1 draft/staging content, and opening exactly one pull request to main. This approval does not allow repository creation, merging, deployments, Netlify, n8n activation, domain or DNS changes, paid actions, credentials, social account connections, posting, scheduling, DMs, comments, analytics API usage, production data, customer private data, Lead Gen changes, AI Receptionist changes, Constitution changes, additional repositories, additional branches, or additional pull requests.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260704-ag-digitalz-first-content-sprint-build.json"
+  },
+  "approvalRequiredFor": [
+    "create_branch",
+    "update_files",
+    "open_pr"
+  ],
+  "approvedActions": [
+    "create_branch",
+    "update_files",
+    "open_pr"
+  ],
+  "prohibitedActions": [
+    "create_repo",
+    "create_more_than_one_branch",
+    "open_more_than_one_pr",
+    "merge_pr",
+    "deploy_staging",
+    "deploy_production",
+    "connect_netlify",
+    "connect_n8n",
+    "activate_n8n",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "use_credentials",
+    "add_secrets",
+    "connect_social_account",
+    "post_content",
+    "schedule_content",
+    "send_dm",
+    "send_comment",
+    "use_analytics_api",
+    "access_production_data",
+    "access_customer_data",
+    "use_private_client_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution",
+    "create_accepted_lesson",
+    "create_permanent_memory"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target branch changes, more than one pull request is needed, merge or deployment is requested, validation or boot check fails, GitHub reports a conflict, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond creating one branch, updating the eight approved starter files, and opening one pull request.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Owner-approved orchestrated task: Run AG Digitalz First Content Sprint v1 in draft/staging mode.",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "AG OS npm.cmd run validate, npm.cmd run boot:check, node --test tests/*.test.mjs, and target repo npm.cmd run check/test/build passed before execution.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
+      "verified": true
+    }
+  ],
+  "approvalText": "Owner-approved orchestrated task: update gurnoorbassi/ag-social-media-management-system with AG Digitalz First Content Sprint v1. Allowed live GitHub action for Phase 2: create branch ag-os/ag-digitalz-first-content-sprint-v1, update approved starter app files, and open one PR to main. Do not merge until review passes.",
+  "approvedAt": "2026-07-05T04:36:18Z",
+  "expiresAt": "2026-07-06T04:36:18Z",
+  "createdAt": "2026-07-05T04:36:18Z",
+  "updatedAt": "2026-07-05T04:36:18Z"
+}
