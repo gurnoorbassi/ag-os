@@ -1,0 +1,74 @@
+{
+  "approvalId": "approval-20260704-social-oauth-readiness",
+  "status": "revoked",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "REQUIRED_APPROVER_ID",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "connect_service",
+  "requestedAction": "Prepare future per-platform OAuth connection readiness for Instagram, TikTok, YouTube Shorts, and LinkedIn in connected_draft_only mode.",
+  "target": "social-oauth:ag-digitalz-social-media-management-system-v1",
+  "scope": "This template is a readiness package only. If converted into an active approved lock later, it may allow AG OS to prepare per-platform social OAuth connection metadata for Instagram, TikTok, YouTube Shorts, and LinkedIn in connected_draft_only mode only, after exact official handles are provided and each platform receives separate owner approval. This template does not start OAuth, connect accounts, store credentials, post, schedule, pull analytics, use DMs/comments, activate n8n, call social APIs, use paid tools, change domain/DNS, touch Lead Gen, touch AI Receptionist, or change the Constitution.",
+  "riskLevel": "R4",
+  "dataClass": "confidential",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/budget.json"
+  },
+  "approvalRequiredFor": [
+    "prepare_social_oauth_readiness",
+    "connect_service"
+  ],
+  "approvedActions": [
+    "prepare_social_oauth_readiness"
+  ],
+  "prohibitedActions": [
+    "start_oauth",
+    "connect_social_accounts",
+    "store_credentials",
+    "post_content",
+    "schedule_content",
+    "use_analytics_api",
+    "send_dm",
+    "send_comment",
+    "activate_n8n",
+    "call_social_api",
+    "use_paid_service",
+    "change_domain",
+    "change_dns",
+    "access_customer_data",
+    "access_production_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This readiness package is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, handles remain not_provided for a requested platform, any platform asks for broader permissions than approved, credential storage is required without a separate approved secure storage path, live posting, scheduling, analytics, DMs/comments, n8n activation, social API calls, paid tools, domain/DNS changes, customer data, production data, Lead Gen, AI Receptionist, or Constitution scope appears, validation or boot check fails, or the action expands beyond readiness planning.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner instruction requested Social OAuth Readiness Package only and explicitly forbids OAuth execution, account connection, credential storage, posting, scheduling, analytics, DMs/comments, and n8n activation.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "docs/social-oauth-readiness-package.md",
+      "verified": false
+    },
+    {
+      "type": "other",
+      "reference": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run dashboard:build, npm.cmd run dashboard:check, npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs must pass before any future execution package can be considered.",
+      "verified": false
+    }
+  ],
+  "approvalText": "REQUIRED_EXACT_OWNER_APPROVAL_TEXT",
+  "approvedAt": "REQUIRED_APPROVED_AT",
+  "expiresAt": "REQUIRED_EXPIRES_AT",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

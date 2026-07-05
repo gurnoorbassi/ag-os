@@ -122,8 +122,8 @@ if (data.clientManagement.deliverableCount !== 6) {
 if (data.clientManagement.accessRequestCount !== 4) {
   fail("dashboard control center must show four AG Digitalz social access requests");
 }
-if (data.clientManagement.pendingApprovalCount !== 4) {
-  fail("dashboard control center must show four pending AG Digitalz client approvals");
+if (data.clientManagement.pendingApprovalCount !== 2) {
+  fail("dashboard control center must show two remaining pending AG Digitalz client approvals");
 }
 if (data.clientManagement.clients[0]?.clientName !== "AG Digitalz") {
   fail("dashboard control center must show AG Digitalz as the first registered client");
@@ -140,7 +140,7 @@ if (data.firstClientReadiness.missingRequiredFieldCount !== 0) {
 if (data.socialMediaSystem.stagingUrl !== "https://ag-social-media-management-system-staging.netlify.app") {
   fail("dashboard control center must show the recorded Social Media staging URL");
 }
-if (!["v1.2", "v1.3 draft PR", "v1.3", "v1.4 draft PR", "v1.4 reviewed PR", "v1.4"].includes(data.socialMediaSystem.currentVersion)) {
+if (!["v1.2", "v1.3 draft PR", "v1.3", "v1.4 draft PR", "v1.4 reviewed PR", "v1.4", "v1.5 owner-approved drafts"].includes(data.socialMediaSystem.currentVersion)) {
   fail("dashboard control center must show the recorded Social Media System version state");
 }
 if (data.socialMediaSystem.currentVersion === "v1.2" && data.socialMediaSystem.targetMergeSha !== "6f54d3b5b257c2662319f39c0b89f810e22289e5") {
@@ -155,10 +155,10 @@ if (data.socialMediaSystem.contentSprint.draftPostPackageCount !== 21) {
 if (data.socialMediaSystem.contentSprint.weeklyReportDraftCount !== 1) {
   fail("dashboard control center must show one weekly report draft");
 }
-if (data.socialMediaSystem.contentSprint.pendingDraftApprovalCount !== 22) {
-  fail("dashboard control center must show pending approvals for 21 drafts plus the weekly report draft");
+if (data.socialMediaSystem.contentSprint.pendingDraftApprovalCount !== 0) {
+  fail("dashboard control center must show no pending draft approvals after owner draft approval");
 }
-if (["v1.4 draft PR", "v1.4 reviewed PR", "v1.4"].includes(data.socialMediaSystem.currentVersion) &&
+if (["v1.4 draft PR", "v1.4 reviewed PR", "v1.4", "v1.5 owner-approved drafts"].includes(data.socialMediaSystem.currentVersion) &&
   (data.socialMediaSystem.contentSprint.postsReviewedCount !== 21 ||
     data.socialMediaSystem.contentSprint.postsRevisedCount !== 21 ||
     data.socialMediaSystem.contentSprint.approvedDraftCount !== 21 ||
@@ -166,6 +166,15 @@ if (["v1.4 draft PR", "v1.4 reviewed PR", "v1.4"].includes(data.socialMediaSyste
     data.socialMediaSystem.contentSprint.blockedByMissingProofCount !== 0 ||
     data.socialMediaSystem.contentSprint.blockedByMissingHandleCount !== 0)) {
   fail("dashboard control center must show content review counts for the v1.4 draft PR");
+}
+if (data.socialMediaSystem.contentSprint.ownerApprovedDraftCount !== 21) {
+  fail("dashboard control center must show 21 owner-approved draft post packages");
+}
+if (data.socialMediaSystem.contentSprint.weeklyReportApprovalStatus !== "owner_approved_draft") {
+  fail("dashboard control center must show the weekly report approved as draft content");
+}
+if (data.socialMediaSystem.contentSprint.platforms.some((platform) => platform.handle !== "not_provided" || platform.handleStatus !== "pending_owner_input")) {
+  fail("dashboard control center must keep official social handles pending owner input");
 }
 if (data.socialMediaSystem.contentSprint.socialOauthConnected !== false ||
   data.socialMediaSystem.contentSprint.credentialsStored !== false ||
@@ -182,7 +191,12 @@ const hasAgDigitalzFirstContentSprintDeployRecord = data.socialMediaSystem.sourc
 const hasAgDigitalzContentReviewDeployRecord = data.socialMediaSystem.sourceRecords.includes(
   ".codex/connectors/connector-exec-20260704-ag-digitalz-content-review-netlify-staging-live-result.json"
 );
-const expectedSocialMediaDeployId = hasAgDigitalzContentReviewDeployRecord
+const hasAgDigitalzDraftApprovalDeployRecord = data.socialMediaSystem.sourceRecords.includes(
+  ".codex/connectors/connector-exec-20260704-ag-digitalz-draft-approval-netlify-staging-live-result.json"
+);
+const expectedSocialMediaDeployId = hasAgDigitalzDraftApprovalDeployRecord
+  ? "6a49fc6c75a309fb314ffb9d"
+  : hasAgDigitalzContentReviewDeployRecord
   ? "6a49f1d33942a79f4190240c"
   : hasAgDigitalzFirstContentSprintDeployRecord
   ? "6a49e480fbe8fbbb83b933dc"

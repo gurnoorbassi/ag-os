@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01",
+  "title": "Owner draft approval is not social execution approval",
+  "lesson": "For Social Media Management System content sprints, owner_approved_draft can approve post packages and weekly reports for draft use only. It must not be interpreted as permission to start OAuth, connect social accounts, store credentials, schedule, post, pull analytics, use DMs/comments, or activate n8n.",
+  "sources": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/6",
+    ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704.json",
+    ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "high",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "appliesTo": [
+    "social_media_content_operations_system",
+    "owner_draft_approval",
+    "social_oauth_gate",
+    "social_live_action_gates"
+  ],
+  "sourceScoreId": "quality-score-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704",
+  "generatedBy": "ag-os-reviewer",
+  "whyThisMatters": "It prevents an owner-approved draft package from being mistaken for permission to execute live platform actions.",
+  "whenToUse": "Use during dashboard status updates, content approval reviews, OAuth readiness planning, and live social connector gate checks.",
+  "whenNotToUse": "Do not treat this candidate as accepted memory or permission to post, schedule, connect accounts, use analytics APIs, store credentials, or activate automations.",
+  "notes": "Candidate-only lesson. It must not be loaded as accepted truth unless owner-approved in a future promotion workflow.",
+  "createdAt": "2026-07-05T06:37:48Z",
+  "updatedAt": "2026-07-05T06:37:48Z"
+}

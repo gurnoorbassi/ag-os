@@ -327,10 +327,13 @@ function collectClientManagement() {
         postsReviewedCount: sprint.postsReviewedCount ?? 0,
         postsRevisedCount: sprint.postsRevisedCount ?? 0,
         approvedDraftCount: sprint.approvedDraftCount ?? 0,
+        ownerApprovedDraftCount: sprint.ownerApprovedDraftCount ?? 0,
+        weeklyReportApprovalStatus: sprint.weeklyReportApprovalStatus ?? "not_recorded",
         needsRevisionCount: sprint.needsRevisionCount ?? 0,
         blockedByMissingProofCount: sprint.blockedByMissingProofCount ?? 0,
         blockedByMissingHandleCount: sprint.blockedByMissingHandleCount ?? 0,
         pendingDraftApprovalCount: sprint.pendingDraftApprovalCount,
+        ownerDraftApproval: sprint.ownerDraftApproval ?? null,
         platforms: sprint.platforms ?? [],
         safety: sprint.safety ?? {},
         updatedAt: sprint.updatedAt,
@@ -378,7 +381,7 @@ function collectFirstClientReadiness(clientManagement) {
       missingRequiredFields: [],
       canCreateActiveRecords: true,
       currentMode: "draft/staging only",
-      nextOwnerDecision: "Review the target app PR and staging state before any future live social connector work. OAuth, posting, scheduling, analytics, and n8n activation remain blocked.",
+      nextOwnerDecision: "Provide official platform handles or approve a separate Social OAuth readiness package. OAuth, posting, scheduling, analytics, and n8n activation remain blocked.",
       safetyDefaults: [
         "platform accounts remain not_connected",
         "posting mode remains draft_only",
@@ -698,14 +701,14 @@ export function collectDashboardData() {
     socialMediaSystem: {
       ...socialMedia,
       currentVersion: socialMediaContentReviewBuildRecord
-        ? (socialMediaContentReviewMergeRecord ? "v1.4" : firstContentSprint?.status === "content_review_target_pr_reviewed_pending_merge" ? "v1.4 reviewed PR" : "v1.4 draft PR")
+        ? (socialMediaContentReviewMergeRecord ? (firstContentSprint?.status === "owner_approved_draft_content_staged_oauth_readiness_prepared" ? "v1.5 owner-approved drafts" : "v1.4") : firstContentSprint?.status === "content_review_target_pr_reviewed_pending_merge" ? "v1.4 reviewed PR" : "v1.4 draft PR")
         : socialMediaContentSprintMergeRecord ? "v1.3"
         : socialMediaContentSprintBuildRecord ? "v1.3 draft PR"
         : socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
         ? "v1.2"
         : socialMediaMergeRecord ? "v1.1" : "v1",
       lifecycleStatus: socialMediaContentReviewBuildRecord
-        ? (socialMediaContentReviewStagingRecord ? "AG Digitalz content review merged and staged; owner content approval pending" : socialMediaContentReviewMergeRecord ? "AG Digitalz content review merged; staging redeploy pending" : firstContentSprint?.status === "content_review_target_pr_reviewed_pending_merge" ? "AG Digitalz content review target PR reviewed; merge pending" : "AG Digitalz content review target PR open; review required")
+        ? (socialMediaContentReviewStagingRecord ? (firstContentSprint?.status === "owner_approved_draft_content_staged_oauth_readiness_prepared" ? "AG Digitalz draft content approved and staged; handles pending and OAuth readiness package prepared" : "AG Digitalz content review merged and staged; owner content approval pending") : socialMediaContentReviewMergeRecord ? "AG Digitalz content review merged; staging redeploy pending" : firstContentSprint?.status === "content_review_target_pr_reviewed_pending_merge" ? "AG Digitalz content review target PR reviewed; merge pending" : "AG Digitalz content review target PR open; review required")
         : socialMediaContentSprintStagingRecord ? "AG Digitalz first content sprint merged and staged"
         : socialMediaContentSprintMergeRecord ? "AG Digitalz first content sprint merged; staging redeploy pending"
         : socialMediaContentSprintBuildRecord ? "AG Digitalz first content sprint target PR open; review required"
@@ -751,7 +754,10 @@ export function collectDashboardData() {
         calendarDays: 0,
         draftPostPackageCount: 0,
         weeklyReportDraftCount: 0,
+        ownerApprovedDraftCount: 0,
+        weeklyReportApprovalStatus: "not_recorded",
         pendingDraftApprovalCount: 0,
+        ownerDraftApproval: null,
         platforms: [],
         livePostingBlocked: true,
         schedulingBlocked: true,

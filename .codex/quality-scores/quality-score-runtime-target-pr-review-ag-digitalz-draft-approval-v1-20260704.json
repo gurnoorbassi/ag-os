@@ -1,0 +1,61 @@
+{
+  "$schema": "../../schemas/quality-score.schema.json",
+  "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704",
+  "status": "candidate",
+  "scoreType": "product_quality_score",
+  "projectId": "project-social-media-management-system-v1",
+  "planId": "runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704",
+  "sourcePlanPath": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/6",
+  "outputType": "social_media_system",
+  "archetypeId": "archetype-social-media-content-operations-system",
+  "archetypeFile": ".codex/archetypes/social-media-content-operations-system.json",
+  "checklistItemsEvaluated": [
+    "Owner draft-content approval is visible in the app as owner_approved_draft.",
+    "The 21 draft post packages remain reviewed as approved_draft and are now owner_approved_draft for draft use only.",
+    "The weekly report draft is owner_approved_draft.",
+    "Pending draft approvals are reduced to 0.",
+    "Official social handles remain not_provided and pending_owner_input.",
+    "Live posting, scheduling, OAuth/account connection, analytics, DMs/comments, n8n activation, credential storage, paid tools, and real client private data remain blocked.",
+    "Safe local checks pass."
+  ],
+  "dimensions": {
+    "completeness": 9,
+    "craft": 9,
+    "maintainability": 9,
+    "ux": 9,
+    "security": 10,
+    "performance": 9,
+    "ownerAcceptance": 10,
+    "archetypeFit": 10,
+    "costDiscipline": 10
+  },
+  "overallScore": 9.4,
+  "meetsBar": true,
+  "reviewStatus": "pass",
+  "improvementRecommendations": [
+    "Redeploy the dedicated staging-only Netlify site after target PR merge.",
+    "Add owner-provided official handles before any OAuth package is executed.",
+    "Keep future OAuth, scheduling, posting, analytics, DMs/comments, and n8n activation as separate approval-gated milestones."
+  ],
+  "lessonCandidates": [
+    "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01"
+  ],
+  "evidence": [
+    "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/6",
+    "GitHub changed-file list for PR #6",
+    "npm.cmd run check",
+    "npm.cmd test",
+    "npm.cmd run build",
+    "direct owner-approved draft data assertion",
+    ".codex/critiques/critique-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704.json"
+  ],
+  "generatedBy": "ag-os-reviewer",
+  "limitations": [
+    "Candidate product score only. It does not authorize target PR merge, deployment, Netlify, n8n activation, social account connection, scheduling, posting, credential use, analytics API use, paid services, production data, private client data, accepted lessons, or permanent memory.",
+    "No browser visual regression, accessibility automation, or owner acceptance test beyond the explicit owner approval was run.",
+    "No live social platform account was used."
+  ],
+  "notes": "Target PR #6 is ready for owner-approved merge from a scope, safety, technical, and draft approval visibility perspective. Merge and staging redeploy remain separate recorded actions.",
+  "createdAt": "2026-07-05T06:37:48Z",
+  "updatedAt": "2026-07-05T06:37:48Z"
+}

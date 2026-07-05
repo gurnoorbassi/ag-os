@@ -4,13 +4,15 @@
   "engagementId": "engagement-ag-digitalz-social-media-v1",
   "itemType": "weekly_report",
   "itemRef": "deliverable-ag-digitalz-weekly-report",
-  "decisionNeeded": "Approve weekly reporting setup for AG Digitalz internal social media operations. This does not authorize analytics API access.",
-  "status": "pending",
+  "decisionNeeded": "Owner approved the weekly report draft for AG Digitalz internal social media operations as draft content only. This does not authorize analytics API access, OAuth, posting, scheduling, DMs/comments, or n8n activation.",
+  "status": "approved",
   "requestedAt": "2026-07-05T01:45:00Z",
-  "decidedAt": "pending_owner_decision",
+  "decidedAt": "2026-07-05T06:32:26Z",
   "notes": [
     "Weekly report structure may use source-controlled status fields only.",
-    "Analytics API access remains blocked until separate approval."
+    "Owner approved the weekly report draft as draft content only.",
+    "Analytics API access remains blocked until separate approval.",
+    "This approval does not authorize live posting, scheduling, social OAuth, account connection, analytics API, DMs/comments, n8n activation, or credential storage."
   ],
-  "blockerLevel": "medium"
+  "blockerLevel": "none"
 }

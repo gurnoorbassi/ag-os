@@ -1,0 +1,89 @@
+{
+  "connectorExecutionId": "connector-exec-20260704-ag-digitalz-draft-approval-build-live-result",
+  "status": "done",
+  "connectorId": "connector-github-mcp",
+  "requestedAction": "create_branch_update_files_open_pr",
+  "riskLevel": "R4",
+  "projectId": "project-social-media-management-system-v1",
+  "approvalRequired": true,
+  "approvalId": "approval-20260704-ag-digitalz-draft-approval-oauth-readiness",
+  "requiredPermissions": [
+    "owner_approval",
+    "active_approval_lock",
+    "target_repo_main_verified",
+    "target_checks_passed",
+    "no_live_social_actions"
+  ],
+  "evidenceRequired": [
+    "target_repo_main_commit_68fee78ecf97c2f84a1bf76ff82658b99ee5f8ce",
+    "target_check_passed",
+    "target_test_passed",
+    "target_build_passed",
+    "target_data_assertion_passed",
+    "pull_request_opened"
+  ],
+  "safety": {
+    "executesLiveAction": true,
+    "usesCredentials": false,
+    "triggersDeployment": false,
+    "changesDomain": false,
+    "usesPaidAction": false,
+    "accessesProductionData": false
+  },
+  "result": {
+    "repositoryFullName": "gurnoorbassi/ag-social-media-management-system",
+    "repositoryUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system",
+    "baseBranch": "main",
+    "baseSha": "68fee78ecf97c2f84a1bf76ff82658b99ee5f8ce",
+    "headBranch": "ag-os/ag-digitalz-draft-approval-v1",
+    "headSha": "4a8b28972ae5f5ddf733d149fcd8048ddbba83a9",
+    "pullRequestNumber": 6,
+    "pullRequestUrl": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/6",
+    "pullRequestStateAfterOpen": "open",
+    "filesChanged": [
+      "README.md",
+      "package.json",
+      "src/data/templates.js",
+      "src/lib/safety.js",
+      "src/lib/status.js",
+      "src/main.js",
+      "src/styles.css"
+    ],
+    "targetChecks": {
+      "npmRunCheck": "passed",
+      "npmTest": "passed",
+      "npmRunBuild": "passed",
+      "gitDiffCheck": "passed",
+      "dataAssertion": "passed"
+    },
+    "verifiedBy": "local_git_and_github_mcp",
+    "verifiedAt": "2026-07-05T06:37:48Z"
+  },
+  "prohibitedActionsConfirmedFalse": [
+    "deploy_staging",
+    "deploy_production",
+    "connect_netlify",
+    "activate_n8n",
+    "connect_social_accounts",
+    "start_oauth",
+    "use_credentials",
+    "post_content",
+    "schedule_content",
+    "use_dm_or_comments",
+    "use_analytics_api",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "access_private_client_data",
+    "access_customer_data",
+    "access_production_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution",
+    "create_accepted_lesson",
+    "create_permanent_memory"
+  ],
+  "notes": "This connector result records target branch creation, approved file updates, and PR #6 opening only. It does not record a target PR merge or staging deploy; those are separate records.",
+  "createdAt": "2026-07-05T06:37:48Z",
+  "updatedAt": "2026-07-05T06:37:48Z"
+}
