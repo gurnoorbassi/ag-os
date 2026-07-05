@@ -1,0 +1,22 @@
+{
+  "template": true,
+  "templateType": "incident",
+  "incidentId": "REQUIRED_INCIDENT_ID",
+  "title": "REQUIRED_INCIDENT_TITLE",
+  "level": "REQUIRED_INCIDENT_LEVEL",
+  "status": "draft",
+  "sourceRecords": [
+    "REQUIRED_SOURCE_RECORD"
+  ],
+  "detectedBy": "REQUIRED_DETECTED_BY",
+  "impact": "REQUIRED_IMPACT",
+  "systemsAffected": [
+    "REQUIRED_SYSTEM_AFFECTED"
+  ],
+  "ownerAttentionRequired": true,
+  "liveActionAllowed": false,
+  "rollbackPlanRef": "REQUIRED_ROLLBACK_PLAN_REF",
+  "postmortemRequired": true,
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
