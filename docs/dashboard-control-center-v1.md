@@ -88,17 +88,19 @@ Dashboard Control Center v1.1 adds an owner-attention read model. It should surf
 
 Owner-attention items are not commands, approvals, or write actions. They are visibility-only prompts showing what is needed before AG OS can move to the next gated step.
 
-## Client Management Zero State
+## Client Management State
 
-Until real owner-approved client records exist, client management must show zero counts:
+Before real owner-approved client records exist, client management must show zero counts. After the owner approves active records, the dashboard must switch from zero state to source-of-truth client state without inventing metrics.
 
-- clients: 0
-- engagements: 0
-- deliverables: 0
-- access requests: 0
-- pending client approvals: 0
+The first registered client is AG Digitalz as an internal owned brand in draft/staging mode:
 
-The zero state is intentional. It proves the structure is ready without creating fake or demo client data.
+- clients: 1
+- engagements: 1
+- deliverables: 6
+- access requests: 4
+- pending client approvals: 4
+
+This does not authorize social OAuth, credentials, posting, scheduling, analytics API access, n8n activation, paid tools, production data, or customer private data. It only shows the owner-approved internal client configuration already present in `.codex/client-management/`.
 
 ## Validation
 
@@ -109,4 +111,4 @@ Dashboard Control Center v1 is validated by:
 - `npm.cmd run boot:check`
 - `node --test tests/*.test.mjs`
 
-`scripts/check-dashboard.mjs` must fail if the generated data is stale, the dashboard is not read-only, required sections are missing, Social Media blocked defaults are missing, client counts are no longer zero without records, n8n active workflows are inferred from live systems, or skills appear to grant permission.
+`scripts/check-dashboard.mjs` must fail if the generated data is stale, the dashboard is not read-only, required sections are missing, Social Media blocked defaults are missing, AG Digitalz client-management counts drift from the active source records, n8n active workflows are inferred from live systems, or skills appear to grant permission.

@@ -137,25 +137,15 @@ window.AG_OS_DASHBOARD_DATA = {
     "stagingInterpretation": "This is the primary deploy context of the dedicated Netlify staging-only site, not an AG Digitalz production domain, customer production domain, or production customer system.",
     "currentMode": "draft/staging only",
     "firstClientReadiness": {
-      "status": "intake_needed",
-      "sourceRecord": "docs/first-client-intake-needed.md",
-      "activeClientRecordsCreated": false,
-      "activeRecordCount": 0,
-      "missingRequiredFieldCount": 9,
-      "missingRequiredFields": [
-        "CLIENT_NAME",
-        "BRAND_NAME",
-        "PLATFORMS",
-        "HANDLES",
-        "POSTING_VOLUME",
-        "APPROVAL_OWNER",
-        "CONTENT_PILLARS",
-        "BRAND_VOICE",
-        "REPORTING_CADENCE"
-      ],
-      "canCreateActiveRecords": false,
+      "status": "active_draft_configured",
+      "sourceRecord": ".codex/client-management/clients/client-ag-digitalz-internal.json",
+      "activeClientRecordsCreated": true,
+      "activeRecordCount": 16,
+      "missingRequiredFieldCount": 0,
+      "missingRequiredFields": [],
+      "canCreateActiveRecords": true,
       "currentMode": "draft/staging only",
-      "nextOwnerDecision": "Provide owner-approved real values for every required first-client field before AG OS creates active client records.",
+      "nextOwnerDecision": "Review the target app PR and staging state before any future live social connector work. OAuth, posting, scheduling, analytics, and n8n activation remain blocked.",
       "safetyDefaults": [
         "platform accounts remain not_connected",
         "posting mode remains draft_only",
@@ -171,7 +161,20 @@ window.AG_OS_DASHBOARD_DATA = {
       "schedulingBlocked": true,
       "analyticsBlocked": true,
       "n8nLiveActivationBlocked": true,
-      "clientConfigAdded": false
+      "clientConfigAdded": true
+    },
+    "firstClient": {
+      "clientId": "client-ag-digitalz-internal",
+      "clientName": "AG Digitalz",
+      "status": "active_draft",
+      "brandNames": [
+        "AG Digitalz"
+      ],
+      "systemsPurchased": [
+        "Social Media Management System v1"
+      ],
+      "privacyLevel": "internal",
+      "recordPath": ".codex/client-management/clients/client-ag-digitalz-internal.json"
     },
     "sourceRecords": [
       ".codex/projects/social-media-management-system-v1.json",
@@ -675,33 +678,167 @@ window.AG_OS_DASHBOARD_DATA = {
   },
   "clientManagement": {
     "directoryExists": true,
-    "clientCount": 0,
-    "engagementCount": 0,
-    "deliverableCount": 0,
-    "accessRequestCount": 0,
-    "pendingApprovalCount": 0,
-    "zeroState": "No real clients are registered yet."
+    "clientCount": 1,
+    "engagementCount": 1,
+    "deliverableCount": 6,
+    "accessRequestCount": 4,
+    "pendingApprovalCount": 4,
+    "clients": [
+      {
+        "clientId": "client-ag-digitalz-internal",
+        "clientName": "AG Digitalz",
+        "status": "active_draft",
+        "brandNames": [
+          "AG Digitalz"
+        ],
+        "systemsPurchased": [
+          "Social Media Management System v1"
+        ],
+        "privacyLevel": "internal",
+        "recordPath": ".codex/client-management/clients/client-ag-digitalz-internal.json"
+      }
+    ],
+    "engagements": [
+      {
+        "engagementId": "engagement-ag-digitalz-social-media-v1",
+        "clientId": "client-ag-digitalz-internal",
+        "projectId": "project-social-media-management-system-v1",
+        "systemType": "social_media_management_system",
+        "currentPhase": "staging",
+        "paymentStatus": "internal",
+        "recordPath": ".codex/client-management/engagements/engagement-ag-digitalz-social-media-v1.json"
+      }
+    ],
+    "deliverables": [
+      {
+        "deliverableId": "deliverable-ag-digitalz-approval-record",
+        "engagementId": "engagement-ag-digitalz-social-media-v1",
+        "deliverableType": "approval_record",
+        "status": "draft",
+        "reviewStatus": "not_reviewed",
+        "recordPath": ".codex/client-management/deliverables/deliverable-ag-digitalz-approval-record.json"
+      },
+      {
+        "deliverableId": "deliverable-ag-digitalz-client-config",
+        "engagementId": "engagement-ag-digitalz-social-media-v1",
+        "deliverableType": "client_config",
+        "status": "draft",
+        "reviewStatus": "not_reviewed",
+        "recordPath": ".codex/client-management/deliverables/deliverable-ag-digitalz-client-config.json"
+      },
+      {
+        "deliverableId": "deliverable-ag-digitalz-content-calendar",
+        "engagementId": "engagement-ag-digitalz-social-media-v1",
+        "deliverableType": "content_calendar",
+        "status": "planned",
+        "reviewStatus": "not_reviewed",
+        "recordPath": ".codex/client-management/deliverables/deliverable-ag-digitalz-content-calendar.json"
+      },
+      {
+        "deliverableId": "deliverable-ag-digitalz-post-package",
+        "engagementId": "engagement-ag-digitalz-social-media-v1",
+        "deliverableType": "post_package",
+        "status": "planned",
+        "reviewStatus": "not_reviewed",
+        "recordPath": ".codex/client-management/deliverables/deliverable-ag-digitalz-post-package.json"
+      },
+      {
+        "deliverableId": "deliverable-ag-digitalz-staging-site",
+        "engagementId": "engagement-ag-digitalz-social-media-v1",
+        "deliverableType": "staging_site",
+        "status": "planned",
+        "reviewStatus": "not_reviewed",
+        "recordPath": ".codex/client-management/deliverables/deliverable-ag-digitalz-staging-site.json"
+      },
+      {
+        "deliverableId": "deliverable-ag-digitalz-weekly-report",
+        "engagementId": "engagement-ag-digitalz-social-media-v1",
+        "deliverableType": "weekly_report",
+        "status": "planned",
+        "reviewStatus": "not_reviewed",
+        "recordPath": ".codex/client-management/deliverables/deliverable-ag-digitalz-weekly-report.json"
+      }
+    ],
+    "accessRequests": [
+      {
+        "accessRequestId": "access-request-ag-digitalz-instagram",
+        "clientId": "client-ag-digitalz-internal",
+        "platform": "Instagram",
+        "accessType": "social_oauth",
+        "status": "not_requested",
+        "recordPath": ".codex/client-management/access-requests/access-request-ag-digitalz-instagram.json"
+      },
+      {
+        "accessRequestId": "access-request-ag-digitalz-linkedin",
+        "clientId": "client-ag-digitalz-internal",
+        "platform": "LinkedIn",
+        "accessType": "social_oauth",
+        "status": "not_requested",
+        "recordPath": ".codex/client-management/access-requests/access-request-ag-digitalz-linkedin.json"
+      },
+      {
+        "accessRequestId": "access-request-ag-digitalz-tiktok",
+        "clientId": "client-ag-digitalz-internal",
+        "platform": "TikTok",
+        "accessType": "social_oauth",
+        "status": "not_requested",
+        "recordPath": ".codex/client-management/access-requests/access-request-ag-digitalz-tiktok.json"
+      },
+      {
+        "accessRequestId": "access-request-ag-digitalz-youtube-shorts",
+        "clientId": "client-ag-digitalz-internal",
+        "platform": "YouTube Shorts",
+        "accessType": "social_oauth",
+        "status": "not_requested",
+        "recordPath": ".codex/client-management/access-requests/access-request-ag-digitalz-youtube-shorts.json"
+      }
+    ],
+    "pendingApprovals": [
+      {
+        "approvalId": "client-approval-ag-digitalz-draft-workflow-setup",
+        "clientId": "client-ag-digitalz-internal",
+        "itemType": "other",
+        "status": "pending",
+        "blockerLevel": "medium",
+        "recordPath": ".codex/client-management/approvals/client-approval-ag-digitalz-draft-workflow-setup.json"
+      },
+      {
+        "approvalId": "client-approval-ag-digitalz-first-content-calendar-draft",
+        "clientId": "client-ag-digitalz-internal",
+        "itemType": "content_calendar",
+        "status": "pending",
+        "blockerLevel": "medium",
+        "recordPath": ".codex/client-management/approvals/client-approval-ag-digitalz-first-content-calendar-draft.json"
+      },
+      {
+        "approvalId": "client-approval-ag-digitalz-first-post-package-draft",
+        "clientId": "client-ag-digitalz-internal",
+        "itemType": "post_package",
+        "status": "pending",
+        "blockerLevel": "medium",
+        "recordPath": ".codex/client-management/approvals/client-approval-ag-digitalz-first-post-package-draft.json"
+      },
+      {
+        "approvalId": "client-approval-ag-digitalz-weekly-reporting-setup",
+        "clientId": "client-ag-digitalz-internal",
+        "itemType": "weekly_report",
+        "status": "pending",
+        "blockerLevel": "medium",
+        "recordPath": ".codex/client-management/approvals/client-approval-ag-digitalz-weekly-reporting-setup.json"
+      }
+    ],
+    "zeroState": "Owner-approved client records are registered."
   },
   "firstClientReadiness": {
-    "status": "intake_needed",
-    "sourceRecord": "docs/first-client-intake-needed.md",
-    "activeClientRecordsCreated": false,
-    "activeRecordCount": 0,
-    "missingRequiredFieldCount": 9,
-    "missingRequiredFields": [
-      "CLIENT_NAME",
-      "BRAND_NAME",
-      "PLATFORMS",
-      "HANDLES",
-      "POSTING_VOLUME",
-      "APPROVAL_OWNER",
-      "CONTENT_PILLARS",
-      "BRAND_VOICE",
-      "REPORTING_CADENCE"
-    ],
-    "canCreateActiveRecords": false,
+    "status": "active_draft_configured",
+    "sourceRecord": ".codex/client-management/clients/client-ag-digitalz-internal.json",
+    "activeClientRecordsCreated": true,
+    "activeRecordCount": 16,
+    "missingRequiredFieldCount": 0,
+    "missingRequiredFields": [],
+    "canCreateActiveRecords": true,
     "currentMode": "draft/staging only",
-    "nextOwnerDecision": "Provide owner-approved real values for every required first-client field before AG OS creates active client records.",
+    "nextOwnerDecision": "Review the target app PR and staging state before any future live social connector work. OAuth, posting, scheduling, analytics, and n8n activation remain blocked.",
     "safetyDefaults": [
       "platform accounts remain not_connected",
       "posting mode remains draft_only",
@@ -712,14 +849,6 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "ownerAttention": [
-    {
-      "id": "first-client-intake-needed",
-      "status": "blocked",
-      "title": "First client intake",
-      "detail": "9 required field(s) still use REQUIRED_ placeholders.",
-      "action": "Provide owner-approved real values for every required first-client field before AG OS creates active client records.",
-      "sourceRecord": "docs/first-client-intake-needed.md"
-    },
     {
       "id": "live-social-integrations-blocked",
       "status": "blocked",

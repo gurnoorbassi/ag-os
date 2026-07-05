@@ -1,0 +1,16 @@
+{
+  "approvalId": "client-approval-ag-digitalz-weekly-reporting-setup",
+  "clientId": "client-ag-digitalz-internal",
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "itemType": "weekly_report",
+  "itemRef": "deliverable-ag-digitalz-weekly-report",
+  "decisionNeeded": "Approve weekly reporting setup for AG Digitalz internal social media operations. This does not authorize analytics API access.",
+  "status": "pending",
+  "requestedAt": "2026-07-05T01:45:00Z",
+  "decidedAt": "pending_owner_decision",
+  "notes": [
+    "Weekly report structure may use source-controlled status fields only.",
+    "Analytics API access remains blocked until separate approval."
+  ],
+  "blockerLevel": "medium"
+}

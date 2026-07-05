@@ -230,16 +230,82 @@ function collectCosts(costBudget) {
 }
 
 function collectClientManagement() {
+  const clientRecords = listDirectJson(".codex/client-management/clients")
+    .map((recordPath) => {
+      const client = readJson(recordPath);
+      return {
+        clientId: client.clientId,
+        clientName: client.clientName,
+        status: client.status,
+        brandNames: client.brandNames ?? [],
+        systemsPurchased: client.systemsPurchased ?? [],
+        privacyLevel: client.privacyLevel,
+        recordPath
+      };
+    });
+  const engagementRecords = listDirectJson(".codex/client-management/engagements")
+    .map((recordPath) => {
+      const engagement = readJson(recordPath);
+      return {
+        engagementId: engagement.engagementId,
+        clientId: engagement.clientId,
+        projectId: engagement.projectId,
+        systemType: engagement.systemType,
+        currentPhase: engagement.currentPhase,
+        paymentStatus: engagement.paymentStatus,
+        recordPath
+      };
+    });
+  const deliverableRecords = listDirectJson(".codex/client-management/deliverables")
+    .map((recordPath) => {
+      const deliverable = readJson(recordPath);
+      return {
+        deliverableId: deliverable.deliverableId,
+        engagementId: deliverable.engagementId,
+        deliverableType: deliverable.deliverableType,
+        status: deliverable.status,
+        reviewStatus: deliverable.reviewStatus,
+        recordPath
+      };
+    });
+  const accessRequestRecords = listDirectJson(".codex/client-management/access-requests")
+    .map((recordPath) => {
+      const accessRequest = readJson(recordPath);
+      return {
+        accessRequestId: accessRequest.accessRequestId,
+        clientId: accessRequest.clientId,
+        platform: accessRequest.platform,
+        accessType: accessRequest.accessType,
+        status: accessRequest.status,
+        recordPath
+      };
+    });
   const clientApprovalRecords = listDirectJson(".codex/client-management/approvals")
-    .map((approvalPath) => readJson(approvalPath));
+    .map((approvalPath) => {
+      const approval = readJson(approvalPath);
+      return {
+        approvalId: approval.approvalId,
+        clientId: approval.clientId,
+        itemType: approval.itemType,
+        status: approval.status,
+        blockerLevel: approval.blockerLevel,
+        recordPath: approvalPath
+      };
+    });
+  const hasClients = clientRecords.length > 0;
   return {
     directoryExists: existsSync(path.join(root, ".codex/client-management")),
-    clientCount: countRecords(".codex/client-management/clients"),
-    engagementCount: countRecords(".codex/client-management/engagements"),
-    deliverableCount: countRecords(".codex/client-management/deliverables"),
-    accessRequestCount: countRecords(".codex/client-management/access-requests"),
+    clientCount: clientRecords.length,
+    engagementCount: engagementRecords.length,
+    deliverableCount: deliverableRecords.length,
+    accessRequestCount: accessRequestRecords.length,
     pendingApprovalCount: clientApprovalRecords.filter((approval) => approval.status === "pending").length,
-    zeroState: "No real clients are registered yet."
+    clients: clientRecords,
+    engagements: engagementRecords,
+    deliverables: deliverableRecords,
+    accessRequests: accessRequestRecords,
+    pendingApprovals: clientApprovalRecords.filter((approval) => approval.status === "pending"),
+    zeroState: hasClients ? "Owner-approved client records are registered." : "No real clients are registered yet."
   };
 }
 
@@ -253,6 +319,29 @@ function collectFirstClientReadiness(clientManagement) {
     clientManagement.deliverableCount +
     clientManagement.accessRequestCount +
     clientManagement.pendingApprovalCount;
+
+  if (activeRecordCount > 0) {
+    const firstClient = clientManagement.clients[0];
+    return {
+      status: "active_draft_configured",
+      sourceRecord: firstClient?.recordPath ?? ".codex/client-management/clients",
+      activeClientRecordsCreated: true,
+      activeRecordCount,
+      missingRequiredFieldCount: 0,
+      missingRequiredFields: [],
+      canCreateActiveRecords: true,
+      currentMode: "draft/staging only",
+      nextOwnerDecision: "Review the target app PR and staging state before any future live social connector work. OAuth, posting, scheduling, analytics, and n8n activation remain blocked.",
+      safetyDefaults: [
+        "platform accounts remain not_connected",
+        "posting mode remains draft_only",
+        "approval_required remains true",
+        "live_posting_blocked remains true",
+        "no credentials or social OAuth",
+        "no posting, scheduling, analytics API, or n8n activation"
+      ]
+    };
+  }
 
   return {
     status: missingRequiredFields.length > 0 ? "intake_needed" : "ready_for_owner_review",
@@ -550,8 +639,9 @@ export function collectDashboardData() {
         schedulingBlocked: true,
         analyticsBlocked: true,
         n8nLiveActivationBlocked: true,
-        clientConfigAdded: false
+        clientConfigAdded: clientManagement.clientCount > 0
       },
+      firstClient: clientManagement.clients[0] ?? null,
       sourceRecords: [
         ".codex/projects/social-media-management-system-v1.json",
         socialMediaBuildRecord?.recordPath,

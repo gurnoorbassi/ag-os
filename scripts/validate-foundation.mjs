@@ -308,6 +308,31 @@ const engineRecordDirectories = [
 ];
 const runtimeRecordDirectories = [
   {
+    name: "client",
+    recordDir: ".codex/client-management/clients",
+    schemaPath: "schemas/client.schema.json"
+  },
+  {
+    name: "engagement",
+    recordDir: ".codex/client-management/engagements",
+    schemaPath: "schemas/engagement.schema.json"
+  },
+  {
+    name: "deliverable",
+    recordDir: ".codex/client-management/deliverables",
+    schemaPath: "schemas/deliverable.schema.json"
+  },
+  {
+    name: "access request",
+    recordDir: ".codex/client-management/access-requests",
+    schemaPath: "schemas/access-request.schema.json"
+  },
+  {
+    name: "client approval",
+    recordDir: ".codex/client-management/approvals",
+    schemaPath: "schemas/client-approval.schema.json"
+  },
+  {
     name: "cost ledger",
     recordDir: ".codex/costs",
     schemaPath: "schemas/cost-ledger.schema.json",

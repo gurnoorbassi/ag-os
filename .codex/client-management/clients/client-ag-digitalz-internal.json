@@ -1,0 +1,27 @@
+{
+  "clientId": "client-ag-digitalz-internal",
+  "clientName": "AG Digitalz",
+  "status": "active_draft",
+  "contactOwner": "AG Digitalz Owner",
+  "brandNames": [
+    "AG Digitalz"
+  ],
+  "industry": "AI automation / digital systems / client acquisition",
+  "systemsPurchased": [
+    "Social Media Management System v1"
+  ],
+  "notes": [
+    "Client type: internal_owned_brand.",
+    "Owner privacy intent: internal_business_config; stored with schema-supported privacyLevel internal.",
+    "Platforms: Instagram, TikTok, YouTube Shorts, LinkedIn.",
+    "Handles are not_provided and pending_owner_input for every platform.",
+    "Posting target is 3 draft post packages per day and 1 weekly report.",
+    "Content pillars: AI systems built by AG Digitalz; behind-the-scenes AG OS builds; automation systems for local businesses; client acquisition and lead-generation systems; social media management systems; AI receptionist systems; business growth case studies when proof exists; simple educational breakdowns.",
+    "Brand voice: direct, confident, simple, practical, high-agency, no fluff, business-focused.",
+    "Reporting cadence: weekly.",
+    "No social OAuth, credentials, posting, scheduling, analytics API, or n8n activation is authorized by this record."
+  ],
+  "privacyLevel": "internal",
+  "createdAt": "2026-07-05T01:45:00Z",
+  "updatedAt": "2026-07-05T01:45:00Z"
+}
