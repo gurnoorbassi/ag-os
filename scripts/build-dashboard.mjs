@@ -603,6 +603,10 @@ export function collectDashboardData() {
     githubRecords,
     (record) => record.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-first-content-sprint-v1-live-result"
   );
+  const socialMediaContentSprintStagingRecord = latestConnectorRecord(
+    netlifyRecords,
+    (record) => record.id === "connector-exec-20260704-ag-digitalz-first-content-sprint-netlify-staging-live-result"
+  );
   const firstContentSprint = clientManagement.contentSprints[0] ?? null;
   const systemBlockers = [
     ...approvals.blockedApprovals.map((approval) => `Blocked approval: ${approval.approvalId}`)
@@ -680,7 +684,8 @@ export function collectDashboardData() {
         : socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
         ? "v1.2"
         : socialMediaMergeRecord ? "v1.1" : "v1",
-      lifecycleStatus: socialMediaContentSprintMergeRecord ? "AG Digitalz first content sprint merged; staging redeploy pending"
+      lifecycleStatus: socialMediaContentSprintStagingRecord ? "AG Digitalz first content sprint merged and staged"
+        : socialMediaContentSprintMergeRecord ? "AG Digitalz first content sprint merged; staging redeploy pending"
         : socialMediaContentSprintBuildRecord ? "AG Digitalz first content sprint target PR open; review required"
         : socialMediaMergeRecord?.id === "connector-exec-20260704-target-pr-merge-ag-digitalz-draft-config-live-result"
         ? "AG Digitalz draft config merged and staged"
@@ -739,6 +744,7 @@ export function collectDashboardData() {
         socialMediaBuildRecord?.recordPath,
         socialMediaContentSprintBuildRecord?.recordPath,
         socialMediaContentSprintMergeRecord?.recordPath,
+        socialMediaContentSprintStagingRecord?.recordPath,
         socialMediaMergeRecord?.recordPath,
         latestSocialMediaStaging?.recordPath,
         firstContentSprint?.recordPath
