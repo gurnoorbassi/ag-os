@@ -1,0 +1,21 @@
+{
+  "template": true,
+  "templateType": "monitoring_check",
+  "checkId": "REQUIRED_MONITORING_CHECK_ID",
+  "name": "REQUIRED_MONITORING_CHECK_NAME",
+  "scope": "source_records_only",
+  "targetType": "REQUIRED_TARGET_TYPE",
+  "targetRef": "REQUIRED_TARGET_REF",
+  "sourceRecords": [
+    "REQUIRED_SOURCE_RECORD"
+  ],
+  "expectedState": "REQUIRED_EXPECTED_STATE",
+  "observedState": "REQUIRED_OBSERVED_STATE",
+  "status": "not_run",
+  "severityIfFailed": "REQUIRED_SEVERITY",
+  "ownerAttentionRequired": true,
+  "liveConnectorCallsAllowed": false,
+  "autoFixAllowed": false,
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

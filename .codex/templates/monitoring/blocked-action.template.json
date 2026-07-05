@@ -1,0 +1,19 @@
+{
+  "template": true,
+  "templateType": "blocked_action",
+  "blockedActionId": "REQUIRED_BLOCKED_ACTION_ID",
+  "actionType": "REQUIRED_ACTION_TYPE",
+  "requestedBy": "REQUIRED_REQUESTED_BY",
+  "blockedReason": "REQUIRED_BLOCKED_REASON",
+  "riskTier": "REQUIRED_RISK_TIER",
+  "requiredApproval": "REQUIRED_APPROVAL",
+  "sourceRecords": [
+    "REQUIRED_SOURCE_RECORD"
+  ],
+  "status": "blocked",
+  "ownerAttentionRequired": true,
+  "liveActionAllowed": false,
+  "autoFixAllowed": false,
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
