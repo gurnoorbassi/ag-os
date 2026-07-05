@@ -1,0 +1,80 @@
+{
+  "approvalId": "approval-20260704-instagram-oauth-readiness",
+  "status": "revoked",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "REQUIRED_APPROVER_ID",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "connect_service",
+  "requestedAction": "Prepare future Instagram OAuth connection readiness for @agdigitalz in connected_draft_only mode.",
+  "target": "instagram:@agdigitalz",
+  "scope": "This template is a readiness package only. If converted into an active approved lock later, it may allow AG OS to prepare for one future Instagram OAuth connection for @agdigitalz in connected_draft_only mode only. It does not start OAuth, connect Instagram, store credentials, post, schedule, pull analytics, use DMs/comments, activate n8n, call social APIs, use paid tools, change domain/DNS, touch Lead Gen, touch AI Receptionist, or change the Constitution.",
+  "riskLevel": "R4",
+  "dataClass": "confidential",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/budget.json"
+  },
+  "approvalRequiredFor": [
+    "prepare_instagram_oauth_readiness",
+    "connect_service"
+  ],
+  "approvedActions": [
+    "prepare_instagram_oauth_readiness"
+  ],
+  "prohibitedActions": [
+    "start_oauth",
+    "connect_instagram_account",
+    "connect_social_accounts",
+    "store_credentials",
+    "post_content",
+    "schedule_content",
+    "use_analytics_api",
+    "send_dm",
+    "send_comment",
+    "activate_n8n",
+    "call_social_api",
+    "use_paid_service",
+    "change_domain",
+    "change_dns",
+    "access_customer_data",
+    "access_production_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This readiness package is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, target handle differs from @agdigitalz, target platform differs from Instagram, connection mode differs from connected_draft_only, OAuth would start, credentials are required without a separate approved secure storage path, broader permissions are requested, live posting, scheduling, analytics, DMs/comments, n8n activation, social API calls, paid tools, domain/DNS changes, customer data, production data, Lead Gen, AI Receptionist, or Constitution scope appears, validation or boot check fails, or the action expands beyond readiness planning.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current thread owner instruction requested Instagram OAuth Readiness Package v1 for @agdigitalz and explicitly forbids OAuth execution, account connection, credential storage, posting, scheduling, analytics, DMs/comments, and n8n activation.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "docs/instagram-oauth-readiness-package.md",
+      "verified": false
+    },
+    {
+      "type": "other",
+      "reference": ".codex/social/instagram-oauth-plan-20260704-agdigitalz.json",
+      "verified": false
+    },
+    {
+      "type": "other",
+      "reference": ".codex/client-management/access-requests/access-request-ag-digitalz-instagram.json",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run dashboard:build, npm.cmd run dashboard:check, npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs must pass before any future execution package can be considered.",
+      "verified": false
+    }
+  ],
+  "approvalText": "REQUIRED_EXACT_OWNER_APPROVAL_TEXT",
+  "approvedAt": "REQUIRED_APPROVED_AT",
+  "expiresAt": "REQUIRED_EXPIRES_AT",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}

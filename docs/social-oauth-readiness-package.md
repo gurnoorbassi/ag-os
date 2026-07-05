@@ -18,7 +18,7 @@ This approval does not authorize:
 - DMs or comments
 - n8n activation
 
-Official public handles are still `not_provided` for Instagram, TikTok, YouTube Shorts, and LinkedIn. AG OS must keep each platform in `pending_owner_input` until the owner provides exact public handles.
+The official public Instagram handle is now recorded as `@agdigitalz`. TikTok, YouTube Shorts, and LinkedIn remain `not_provided`, and AG OS must keep those platforms in `pending_owner_input` until the owner provides exact public handles.
 
 ## Platforms
 

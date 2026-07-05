@@ -1,0 +1,128 @@
+{
+  "planId": "instagram-oauth-plan-20260704-agdigitalz",
+  "status": "readiness_only",
+  "projectId": "project-social-media-management-system-v1",
+  "clientId": "client-ag-digitalz-internal",
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "targetPlatform": "Instagram",
+  "targetHandle": "@agdigitalz",
+  "desiredConnectionMode": "connected_draft_only",
+  "oauthPurpose": "Prepare for a future owner-approved Instagram OAuth connection that can verify account identity and connection metadata for draft-mode workflow readiness only.",
+  "requestedPermissions": [
+    {
+      "permission": "instagram_business_basic",
+      "status": "preferred_minimum",
+      "purpose": "Verify Instagram professional account identity and basic account metadata when using Instagram API with Instagram Login.",
+      "mustConfirmBeforeExecution": true
+    }
+  ],
+  "fallbackPermissionPath": [
+    {
+      "permission": "instagram_basic",
+      "status": "fallback_if_facebook_login_for_business_is_required",
+      "purpose": "Read basic Instagram professional account metadata.",
+      "mustConfirmBeforeExecution": true
+    },
+    {
+      "permission": "pages_show_list",
+      "status": "fallback_if_facebook_login_for_business_is_required",
+      "purpose": "Find the Facebook Page relationship required to locate the connected Instagram professional account.",
+      "mustConfirmBeforeExecution": true
+    }
+  ],
+  "excludedPermissions": [
+    "instagram_business_content_publish",
+    "instagram_content_publish",
+    "instagram_business_manage_insights",
+    "pages_read_engagement",
+    "instagram_business_manage_comments",
+    "instagram_manage_comments",
+    "instagram_business_manage_messages",
+    "instagram_manage_messages",
+    "ads_management",
+    "webhook_subscription"
+  ],
+  "credentialStoragePolicy": {
+    "credentialsInRepo": false,
+    "tokensInRepo": false,
+    "oauthCodesInRepo": false,
+    "approvedStorageRequiredBeforeExecution": true,
+    "allowedSourceControlledMetadata": [
+      "platform",
+      "handle",
+      "connectionMode",
+      "connectionStatus",
+      "approvalId",
+      "nonSecretConnectorResultId",
+      "revocationInstructions",
+      "timestamp"
+    ]
+  },
+  "blockedAfterConnection": {
+    "posting": true,
+    "scheduling": true,
+    "analytics": true,
+    "dms": true,
+    "comments": true,
+    "n8nActivation": true,
+    "paidTools": true
+  },
+  "currentRequiredAccountState": {
+    "connectionStatus": "not_connected",
+    "postingMode": "draft_only",
+    "approvalRequired": true,
+    "livePostingBlocked": true,
+    "credentialsStored": false
+  },
+  "rollbackPlan": [
+    "Mark Instagram connection status as revoked or disconnected in AG OS records.",
+    "Revert Social Media Management System UI state to not_connected and draft_only.",
+    "Revoke app access in owner-controlled Meta or Instagram settings where available.",
+    "Remove or rotate any credential from the approved secure credential store.",
+    "Write audit and connector result records.",
+    "Keep posting, scheduling, analytics, DMs/comments, and n8n activation blocked unless separately approved."
+  ],
+  "stopConditions": [
+    "Owner approval is missing.",
+    "Approval lock is missing, expired, revoked, or scope-mismatched.",
+    "OAuth would start during readiness work.",
+    "A credential or token would be copied into AG OS or GitHub.",
+    "Meta requests publishing, scheduling, analytics, comments, messages, ads, webhooks, or broader permissions without a new approval.",
+    "Instagram handle differs from @agdigitalz.",
+    "Target platform is not Instagram.",
+    "Connection mode is not connected_draft_only.",
+    "Paid tools are required.",
+    "Domain/DNS, Lead Gen, AI Receptionist, or Constitution scope appears.",
+    "Validation, dashboard check, boot check, tests, or security scan fails."
+  ],
+  "auditRequirements": [
+    "owner approval",
+    "active approval lock",
+    "audit event for approval",
+    "cost ledger entry",
+    "connector execution result for any future attempt",
+    "post-attempt audit event",
+    "proof that prohibited actions remained blocked"
+  ],
+  "costEstimate": {
+    "readinessPlanningUsd": 0,
+    "futureExecutionDirectCostUsd": 0,
+    "paidFeaturesAllowed": false,
+    "budgetStatus": "within_limits"
+  },
+  "sourceRecords": [
+    "docs/instagram-oauth-readiness-package.md",
+    ".codex/approvals/approval-20260704-instagram-oauth-readiness.template.json",
+    ".codex/audit/audit-20260704-instagram-oauth-readiness-approval.template.json",
+    ".codex/client-management/access-requests/access-request-ag-digitalz-instagram.json",
+    ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
+  ],
+  "references": [
+    "https://developers.facebook.com/documentation/instagram-platform",
+    "https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-instagram-login",
+    "https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-instagram-login/business-login",
+    "https://developers.facebook.com/docs/permissions/"
+  ],
+  "createdAt": "2026-07-05T20:00:00Z",
+  "updatedAt": "2026-07-05T20:00:00Z"
+}
