@@ -1,0 +1,87 @@
+{
+  "approvalId": "approval-20260704-target-pr-merge-ag-digitalz-draft-config",
+  "status": "approved",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "build",
+  "requestedAction": "Merge exactly one reviewed pull request: gurnoorbassi/ag-social-media-management-system#3 into main.",
+  "target": "github:gurnoorbassi/ag-social-media-management-system#3",
+  "scope": "This approval allows AG OS to use GitHub for exactly one live target repository merge: merge pull request #3 in gurnoorbassi/ag-social-media-management-system into main. The merge is allowed only if the AG OS review records for runtime-target-pr-review-ag-digitalz-draft-config-20260704 are already merged into AG OS main, AG OS main matches origin/main, target PR #3 is still open and mergeable, the target PR head SHA matches the reviewed head SHA 8b5fb0d006dae82fbf41b1064b8325424a447853, the changed file set remains exactly README.md, package.json, index.html, src/main.js, src/styles.css, src/data/templates.js, src/lib/safety.js, and src/lib/status.js, and AG OS validation, boot check, and runtime tests pass immediately before execution. This approval does not allow deployment, Netlify, n8n activation, social account connection, credential use, posting, scheduling, analytics API use, paid tools, private client data, production data, customer data, Lead Gen changes, AI Receptionist changes, Constitution changes, additional repositories, additional branches, additional pull requests, or any target repo action other than merging PR #3.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/cost-ledger-20260704-target-pr-merge-ag-digitalz-draft-config.json"
+  },
+  "approvalRequiredFor": [
+    "merge_pr"
+  ],
+  "approvedActions": [
+    "merge_pr"
+  ],
+  "prohibitedActions": [
+    "create_repo",
+    "create_branch",
+    "create_files",
+    "update_files",
+    "open_pr",
+    "open_more_than_one_pr",
+    "deploy_staging",
+    "deploy_production",
+    "connect_netlify",
+    "activate_n8n",
+    "connect_social_accounts",
+    "use_social_credentials",
+    "post_content",
+    "schedule_content",
+    "use_dm_or_comments",
+    "use_analytics_api",
+    "change_domain",
+    "change_dns",
+    "use_paid_service",
+    "use_credentials",
+    "add_sensitive_values",
+    "access_private_client_data",
+    "access_production_data",
+    "access_customer_data",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, AG OS review records are missing from main, target PR #3 is closed before this action, already merged before this action, not mergeable, has a different target repository, has a different head SHA than 8b5fb0d006dae82fbf41b1064b8325424a447853, changes files outside README.md, package.json, index.html, src/main.js, src/styles.css, src/data/templates.js, src/lib/safety.js, and src/lib/status.js, validation or boot check fails, runtime tests fail, GitHub reports a conflict, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond merging exactly target PR #3.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Owner-approved orchestrated task granted scoped approval to merge the AG Digitalz target app PR after review passes and review records are merged.",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/105",
+      "verified": true
+    },
+    {
+      "type": "pr_link",
+      "reference": "https://github.com/gurnoorbassi/ag-social-media-management-system/pull/3",
+      "verified": true
+    },
+    {
+      "type": "review_note",
+      "reference": ".codex/audit/audit-runtime-target-pr-review-ag-digitalz-draft-config-20260704.json",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "npm.cmd run validate, npm.cmd run boot:check, and node --test tests/*.test.mjs passed immediately before execution.",
+      "verified": true
+    }
+  ],
+  "approvalText": "Owner-approved orchestrated task: after AG Digitalz target app PR review passes and review records are merged, merge the target PR and record merge records. Allowed live action: merge PR #3 into main in gurnoorbassi/ag-social-media-management-system. Do not deploy, connect Netlify, activate n8n, connect social accounts, use credentials, post, schedule, use analytics APIs, use paid tools, use private client data, touch Lead Gen, touch AI Receptionist, or change Constitution.",
+  "approvedAt": "2026-07-05T02:05:01Z",
+  "expiresAt": "2026-07-06T02:05:01Z",
+  "createdAt": "2026-07-05T02:05:01Z",
+  "updatedAt": "2026-07-05T02:05:01Z"
+}
