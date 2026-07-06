@@ -34,6 +34,17 @@ function listDirectJson(relativeDir, options = {}) {
     .map((name) => path.join(relativeDir, name).replaceAll("\\", "/"));
 }
 
+function listTemplateJson(relativeDir) {
+  const absoluteDir = path.join(root, relativeDir);
+  if (!existsSync(absoluteDir)) {
+    return [];
+  }
+
+  return readdirSync(absoluteDir)
+    .filter((name) => name.endsWith(".template.json"))
+    .map((name) => path.join(relativeDir, name).replaceAll("\\", "/"));
+}
+
 function lineValue(content, label) {
   const match = content.match(new RegExp(`^${label}:\\s*(.+)$`, "m"));
   return match?.[1]?.trim() ?? "Not recorded";
@@ -167,6 +178,23 @@ function collectApprovals({ now = new Date() } = {}) {
     staleApprovals: latestBy(stale, "expiresAt"),
     recentApprovedActions: latestBy(active.filter((approval) => approval.status === "approved"), "expiresAt").slice(0, 6)
   };
+}
+
+function collectApprovalPackageTemplates() {
+  return listTemplateJson(".codex/approvals")
+    .map((recordPath) => {
+      const approval = readJson(recordPath);
+      return {
+        approvalId: approval.approvalId ?? path.basename(recordPath, ".template.json"),
+        status: "template_ready",
+        commandCategory: approval.commandCategory ?? "not_recorded",
+        requestedAction: approval.requestedAction ?? "not_recorded",
+        target: approval.target ?? "not_recorded",
+        riskLevel: approval.riskLevel ?? "not_recorded",
+        recordPath
+      };
+    })
+    .sort((left, right) => left.approvalId.localeCompare(right.approvalId));
 }
 
 function collectConnectorExecutions() {
@@ -561,6 +589,150 @@ function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview 
   return attention;
 }
 
+function collectDashboardActionQueue({
+  approvals,
+  firstClientReadiness,
+  firstContentSprint,
+  qualityReview,
+  latestSocialMediaStaging
+}) {
+  const approvalPackagesReady = collectApprovalPackageTemplates();
+  const missingHandles = (firstContentSprint?.platforms ?? [])
+    .filter((platform) => platform.handleStatus === "pending_owner_input")
+    .map((platform) => platform.platform);
+  const ownerDecisionsNeeded = [];
+
+  if (firstClientReadiness.status === "intake_needed") {
+    ownerDecisionsNeeded.push({
+      id: "first-client-intake",
+      status: "blocked",
+      decision: "Provide required first-client fields",
+      detail: `${firstClientReadiness.missingRequiredFieldCount} required field(s) remain unresolved.`,
+      sourceRecord: firstClientReadiness.sourceRecord
+    });
+  }
+
+  if (missingHandles.length > 0) {
+    ownerDecisionsNeeded.push({
+      id: "missing-social-handles",
+      status: "waiting_owner",
+      decision: "Provide remaining public platform handles",
+      detail: `${missingHandles.join(", ")} remain not_provided / pending_owner_input.`,
+      sourceRecord: firstContentSprint.recordPath
+    });
+  }
+
+  if (approvals.staleWarningCount > 0) {
+    ownerDecisionsNeeded.push({
+      id: "stale-approval-review",
+      status: "review",
+      decision: "Review stale or blocked approvals",
+      detail: `${approvals.staleWarningCount} stale/blocking approval warning(s) are present.`,
+      sourceRecord: ".codex/approvals/"
+    });
+  }
+
+  if (qualityReview.reviewRequiredCount > 0 || qualityReview.failedCount > 0) {
+    ownerDecisionsNeeded.push({
+      id: "quality-review",
+      status: "review",
+      decision: "Resolve review-required critiques",
+      detail: `${qualityReview.reviewRequiredCount} critique(s) require review; ${qualityReview.failedCount} failed.`,
+      sourceRecord: ".codex/critiques/"
+    });
+  }
+
+  ownerDecisionsNeeded.push({
+    id: "credential-store-decision",
+    status: "blocked",
+    decision: "Choose secure credential store before OAuth",
+    detail: "Instagram OAuth remains blocked until a secure credential store and connector path are approved.",
+    sourceRecord: "docs/instagram-oauth-readiness-package.md"
+  });
+
+  const blockedActions = [
+    {
+      id: "social-oauth",
+      status: "blocked",
+      reason: "No approved secure credential store or OAuth execution connector.",
+      sourceRecord: "docs/instagram-oauth-readiness-package.md"
+    },
+    {
+      id: "automated-posting",
+      status: "blocked",
+      reason: "Posting and scheduling are outside current approval scope.",
+      sourceRecord: firstContentSprint?.recordPath ?? ".codex/client-management/content-sprints/"
+    },
+    {
+      id: "analytics-api",
+      status: "blocked",
+      reason: "Analytics API use needs separate connector, credential, and owner approval gates.",
+      sourceRecord: "docs/social-oauth-readiness-package.md"
+    },
+    {
+      id: "n8n-live-activation",
+      status: "blocked",
+      reason: "n8n proof is inactive draft only; activation requires separate approval.",
+      sourceRecord: "docs/n8n-draft-workflow-approval-package.md"
+    },
+    {
+      id: "production-domain",
+      status: "blocked",
+      reason: "Production deployment, custom domain, and DNS changes require separate owner approval.",
+      sourceRecord: "docs/action-matrix.md"
+    }
+  ];
+
+  const manualPostingAvailable = Boolean(
+    firstContentSprint?.ownerApprovedDraftCount > 0 &&
+    firstContentSprint?.safety?.postingTriggered === false
+  );
+
+  return {
+    status: ownerDecisionsNeeded.some((item) => item.status === "blocked") ? "blocked" : "ready",
+    mode: "read_only",
+    ownerDecisionCount: ownerDecisionsNeeded.length,
+    blockedActionCount: blockedActions.length,
+    approvalPackageCount: approvalPackagesReady.length,
+    staleApprovalCount: approvals.staleApprovals.length,
+    manualPostingAvailable,
+    manualPostingDetail: manualPostingAvailable
+      ? `${firstContentSprint.ownerApprovedDraftCount} owner-approved draft post package(s) can be used manually while automation remains blocked.`
+      : "Manual posting pack is not available from current records.",
+    oauthBlockedReason: "OAuth is blocked until secure credential storage and an approved connector path exist.",
+    credentialStoreMissingReason: "No approved credential store record is active; tokens remain forbidden in repo, chat, and source-controlled files.",
+    nextSafeCommand: "Run Connector Preflight Runtime v1 locally after source PRs merge and GitHub connector auth is restored.",
+    latestStagingUrl: latestSocialMediaStaging?.siteUrl ?? "Not recorded",
+    ownerDecisionsNeeded,
+    blockedActions,
+    approvalPackagesReady,
+    staleApprovals: approvals.staleApprovals,
+    safeNextMilestones: [
+      {
+        id: "connector-preflight-runtime-v1",
+        status: "safe_local_next",
+        detail: "Add read-only preflight checks for connector availability, exact approval scope, cost, rollback, and stop conditions."
+      },
+      {
+        id: "business-loop-v1",
+        status: "safe_source_next",
+        detail: "Formalize the AG Digitalz content loop from idea through manual posting pack and weekly report without live social actions."
+      },
+      {
+        id: "secure-credential-store-readiness",
+        status: "planning_only",
+        detail: "Prepare credential-store policy before OAuth or token handling."
+      }
+    ],
+    sourceRecords: [
+      ".codex/approvals/",
+      firstContentSprint?.recordPath,
+      latestSocialMediaStaging?.recordPath,
+      "docs/dashboard-action-queue.md"
+    ].filter(Boolean)
+  };
+}
+
 export function collectDashboardData() {
   const constitution = readText("docs/ag-os-constitution-v1.md");
   const projectRegistry = readJson(".codex/projects/registry.json");
@@ -905,6 +1077,13 @@ export function collectDashboardData() {
     clientManagement,
     firstClientReadiness,
     ownerAttention: collectOwnerAttention({ firstClientReadiness, approvals, qualityReview }),
+    dashboardActionQueue: collectDashboardActionQueue({
+      approvals,
+      firstClientReadiness,
+      firstContentSprint,
+      qualityReview,
+      latestSocialMediaStaging
+    }),
     approvals,
     connectorProofs: {
       github: githubRecords,

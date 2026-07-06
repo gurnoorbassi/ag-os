@@ -78,6 +78,7 @@ for (const forbiddenPattern of [
 for (const requiredText of [
   "Constitution",
   "Owner Attention",
+  "Dashboard Action Queue",
   "Project Registry",
   "Projects",
   "Connector Registry",
@@ -106,6 +107,24 @@ if (data.systemStatus.bootStatus !== "ready") {
 }
 if (data.systemStatus.safetyPosture !== "read_only_no_live_actions") {
   fail("dashboard control center must show read-only no-live-action safety posture");
+}
+if (data.dashboardActionQueue.mode !== "read_only") {
+  fail("dashboard action queue must remain read_only");
+}
+if (data.dashboardActionQueue.blockedActionCount < 1) {
+  fail("dashboard action queue must surface blocked live actions");
+}
+if (data.dashboardActionQueue.approvalPackageCount < 1) {
+  fail("dashboard action queue must surface approval package templates");
+}
+if (data.dashboardActionQueue.manualPostingAvailable !== true) {
+  fail("dashboard action queue must show manual posting availability from approved draft records");
+}
+if (!data.dashboardActionQueue.oauthBlockedReason.includes("secure credential")) {
+  fail("dashboard action queue must explain OAuth is blocked by missing secure credential storage");
+}
+if (!data.dashboardActionQueue.credentialStoreMissingReason.includes("No approved credential store")) {
+  fail("dashboard action queue must explain the missing credential-store decision");
 }
 if (data.capabilityRegistry.provenCount < 1) {
   fail("dashboard control center must show proven capabilities");

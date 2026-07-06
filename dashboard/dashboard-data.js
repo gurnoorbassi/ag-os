@@ -1070,6 +1070,184 @@ window.AG_OS_DASHBOARD_DATA = {
       "sourceRecord": ".codex/connectors/connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result.json"
     }
   ],
+  "dashboardActionQueue": {
+    "status": "blocked",
+    "mode": "read_only",
+    "ownerDecisionCount": 2,
+    "blockedActionCount": 5,
+    "approvalPackageCount": 10,
+    "staleApprovalCount": 0,
+    "manualPostingAvailable": true,
+    "manualPostingDetail": "21 owner-approved draft post package(s) can be used manually while automation remains blocked.",
+    "oauthBlockedReason": "OAuth is blocked until secure credential storage and an approved connector path exist.",
+    "credentialStoreMissingReason": "No approved credential store record is active; tokens remain forbidden in repo, chat, and source-controlled files.",
+    "nextSafeCommand": "Run Connector Preflight Runtime v1 locally after source PRs merge and GitHub connector auth is restored.",
+    "latestStagingUrl": "https://ag-social-media-management-system-staging.netlify.app",
+    "ownerDecisionsNeeded": [
+      {
+        "id": "missing-social-handles",
+        "status": "waiting_owner",
+        "decision": "Provide remaining public platform handles",
+        "detail": "TikTok, YouTube Shorts, LinkedIn remain not_provided / pending_owner_input.",
+        "sourceRecord": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
+      },
+      {
+        "id": "credential-store-decision",
+        "status": "blocked",
+        "decision": "Choose secure credential store before OAuth",
+        "detail": "Instagram OAuth remains blocked until a secure credential store and connector path are approved.",
+        "sourceRecord": "docs/instagram-oauth-readiness-package.md"
+      }
+    ],
+    "blockedActions": [
+      {
+        "id": "social-oauth",
+        "status": "blocked",
+        "reason": "No approved secure credential store or OAuth execution connector.",
+        "sourceRecord": "docs/instagram-oauth-readiness-package.md"
+      },
+      {
+        "id": "automated-posting",
+        "status": "blocked",
+        "reason": "Posting and scheduling are outside current approval scope.",
+        "sourceRecord": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
+      },
+      {
+        "id": "analytics-api",
+        "status": "blocked",
+        "reason": "Analytics API use needs separate connector, credential, and owner approval gates.",
+        "sourceRecord": "docs/social-oauth-readiness-package.md"
+      },
+      {
+        "id": "n8n-live-activation",
+        "status": "blocked",
+        "reason": "n8n proof is inactive draft only; activation requires separate approval.",
+        "sourceRecord": "docs/n8n-draft-workflow-approval-package.md"
+      },
+      {
+        "id": "production-domain",
+        "status": "blocked",
+        "reason": "Production deployment, custom domain, and DNS changes require separate owner approval.",
+        "sourceRecord": "docs/action-matrix.md"
+      }
+    ],
+    "approvalPackagesReady": [
+      {
+        "approvalId": "approval-20260703-github-repo-create",
+        "status": "template_ready",
+        "commandCategory": "connect_service",
+        "requestedAction": "Create one private GitHub repository only.",
+        "target": "REQUIRED_OWNER_APPROVED_REPOSITORY_NAME",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-20260703-github-repo-create.template.json"
+      },
+      {
+        "approvalId": "approval-20260704-github-builder-pr",
+        "status": "template_ready",
+        "commandCategory": "build",
+        "requestedAction": "Create one branch, add starter construction website files, and open one pull request in gurnoorbassi/ag-test-construction-website.",
+        "target": "github:gurnoorbassi/ag-test-construction-website#ag-os/starter-construction-website-v1",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-20260704-github-builder-pr.template.json"
+      },
+      {
+        "approvalId": "approval-20260704-instagram-oauth-readiness",
+        "status": "template_ready",
+        "commandCategory": "connect_service",
+        "requestedAction": "Prepare future Instagram OAuth connection readiness for @agdigitalz in connected_draft_only mode.",
+        "target": "instagram:@agdigitalz",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-20260704-instagram-oauth-readiness.template.json"
+      },
+      {
+        "approvalId": "approval-20260704-n8n-draft-workflow-proof",
+        "status": "template_ready",
+        "commandCategory": "connect_service",
+        "requestedAction": "Create one inactive n8n draft workflow for construction website lead intake follow-up proof, export its workflow JSON, validate the exported JSON, record the result, and stop before activation or outbound messaging.",
+        "target": "n8n:REQUIRED_OWNER_APPROVED_DRAFT_WORKFLOW_NAME",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-20260704-n8n-draft-workflow-proof.template.json"
+      },
+      {
+        "approvalId": "approval-20260704-netlify-staging-test-construction",
+        "status": "template_ready",
+        "commandCategory": "deploy_staging",
+        "requestedAction": "Create or connect one Netlify staging site for gurnoorbassi/ag-test-construction-website and deploy staging from main.",
+        "target": "netlify:REQUIRED_OWNER_APPROVED_NETLIFY_STAGING_SITE_NAME",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-20260704-netlify-staging-test-construction.template.json"
+      },
+      {
+        "approvalId": "approval-20260704-social-media-netlify-staging",
+        "status": "template_ready",
+        "commandCategory": "deploy_staging",
+        "requestedAction": "Create or connect one dedicated Netlify staging-only site for gurnoorbassi/ag-social-media-management-system and deploy from main.",
+        "target": "netlify:ag-social-media-management-system-staging",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-20260704-social-media-netlify-staging.template.json"
+      },
+      {
+        "approvalId": "approval-20260704-social-media-system-v1-1-upgrade",
+        "status": "template_ready",
+        "commandCategory": "build",
+        "requestedAction": "Create one branch, update approved Social Media Management System v1.1 starter files, and open one pull request in gurnoorbassi/ag-social-media-management-system.",
+        "target": "github:gurnoorbassi/ag-social-media-management-system#REQUIRED_BRANCH_NAME",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-social-media-system-v1-1-upgrade.template.json"
+      },
+      {
+        "approvalId": "approval-20260704-social-media-system-v1-package",
+        "status": "template_ready",
+        "commandCategory": "plan_only",
+        "requestedAction": "Approve merging the Social Media Management System v1 draft/staging approval and build package into AG OS source of truth.",
+        "target": "ag-os:project-social-media-management-system-v1",
+        "riskLevel": "R2",
+        "recordPath": ".codex/approvals/approval-20260704-social-media-system-v1-package.template.json"
+      },
+      {
+        "approvalId": "approval-20260704-social-oauth-readiness",
+        "status": "template_ready",
+        "commandCategory": "connect_service",
+        "requestedAction": "Prepare future per-platform OAuth connection readiness for Instagram, TikTok, YouTube Shorts, and LinkedIn in connected_draft_only mode.",
+        "target": "social-oauth:ag-digitalz-social-media-management-system-v1",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-social-oauth-readiness.template.json"
+      },
+      {
+        "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
+        "status": "template_ready",
+        "commandCategory": "deploy_staging",
+        "requestedAction": "Create or connect one dedicated Netlify staging-only site named ag-os-dashboard-staging and deploy the AG OS dashboard from gurnoorbassi/ag-os.",
+        "target": "netlify:ag-os-dashboard-staging",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-20260705-ag-os-dashboard-netlify-staging.template.json"
+      }
+    ],
+    "staleApprovals": [],
+    "safeNextMilestones": [
+      {
+        "id": "connector-preflight-runtime-v1",
+        "status": "safe_local_next",
+        "detail": "Add read-only preflight checks for connector availability, exact approval scope, cost, rollback, and stop conditions."
+      },
+      {
+        "id": "business-loop-v1",
+        "status": "safe_source_next",
+        "detail": "Formalize the AG Digitalz content loop from idea through manual posting pack and weekly report without live social actions."
+      },
+      {
+        "id": "secure-credential-store-readiness",
+        "status": "planning_only",
+        "detail": "Prepare credential-store policy before OAuth or token handling."
+      }
+    ],
+    "sourceRecords": [
+      ".codex/approvals/",
+      ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
+      ".codex/connectors/connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result.json",
+      "docs/dashboard-action-queue.md"
+    ]
+  },
   "approvals": {
     "activeCount": 0,
     "expiredCount": 25,
