@@ -1,6 +1,6 @@
 {
   "approvalId": "approval-20260705-social-media-interactive-draft-ui",
-  "status": "approved",
+  "status": "expired",
   "ownerId": "owner-gurnoor-bassi",
   "requestedBy": "ag-os-runtime",
   "approvedBy": "owner-gurnoor-bassi",
@@ -55,7 +55,7 @@
     "create_accepted_lesson",
     "create_permanent_memory"
   ],
-  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repo changes outside PR #7, PR #7 head SHA changes from 87f5d13dc47daaa1eca42e13326a55c2b38813d1 before merge, target repo main SHA changes from daeb7c4f6e0aaaced7b55eb8fa50978320eff15e before staging redeploy, the Netlify site ID or site name changes, OAuth would start, credentials are required, a social account connection is requested, posting, scheduling, analytics, DMs/comments, n8n activation, paid tools, domain/DNS, custom domain, production deploy, customer data, production data, Lead Gen, AI Receptionist, Constitution, accepted lesson, or permanent memory scope appears, validation or boot check fails, target checks fail, or the action expands beyond this exact draft UI milestone.",
+  "revocationPath": "Expired approval lock blocked or would block the mandatory boot sequence. Original expiration: 2026-07-06T07:25:00Z. This approval is no longer valid for gated actions. Historical proof remains preserved; any future action requires a new scoped owner approval lock.",
   "evidence": [
     {
       "type": "owner_instruction",
@@ -87,5 +87,5 @@
   "approvedAt": "2026-07-05T07:25:00Z",
   "expiresAt": "2026-07-06T07:25:00Z",
   "createdAt": "2026-07-05T07:25:00Z",
-  "updatedAt": "2026-07-05T07:52:00Z"
+  "updatedAt": "2026-07-06T20:28:06.762Z"
 }

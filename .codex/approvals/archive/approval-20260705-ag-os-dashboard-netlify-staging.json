@@ -1,6 +1,6 @@
 {
   "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
-  "status": "approved",
+  "status": "expired",
   "ownerId": "owner-gurnoor-bassi",
   "requestedBy": "ag-os-runtime",
   "approvedBy": "owner-gurnoor-bassi",
@@ -47,7 +47,7 @@
     "change_ai_receptionist",
     "change_constitution"
   ],
-  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target main SHA changes from a7cbe9b56c57754b3628c7e51a3d42c0747d0472 before deployment, the Netlify site name changes, a custom domain or DNS change is needed, a paid Netlify feature is required, credentials or secrets would need to be stored, private client data or production customer data is found in dashboard output, validation or boot check fails, Netlify reports a configuration or billing blocker, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond one dedicated staging-only dashboard deployment.",
+  "revocationPath": "Expired approval lock blocked or would block the mandatory boot sequence. Original expiration: 2026-07-06T08:08:00Z. This approval is no longer valid for gated actions. Historical proof remains preserved; any future action requires a new scoped owner approval lock.",
   "evidence": [
     {
       "type": "owner_instruction",
@@ -74,5 +74,5 @@
   "approvedAt": "2026-07-05T08:08:00Z",
   "expiresAt": "2026-07-06T08:08:00Z",
   "createdAt": "2026-07-05T08:08:00Z",
-  "updatedAt": "2026-07-05T08:12:00Z"
+  "updatedAt": "2026-07-06T20:28:06.762Z"
 }

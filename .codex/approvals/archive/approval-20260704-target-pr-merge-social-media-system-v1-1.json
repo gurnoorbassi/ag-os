@@ -1,6 +1,6 @@
 {
   "approvalId": "approval-20260704-target-pr-merge-social-media-system-v1-1",
-  "status": "approved",
+  "status": "expired",
   "ownerId": "owner-gurnoor-bassi",
   "requestedBy": "ag-os-runtime",
   "approvedBy": "owner-gurnoor-bassi",
@@ -51,7 +51,7 @@
     "change_ai_receptionist",
     "change_constitution"
   ],
-  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, AG OS review records are missing from main, target PR #2 is closed before this action, already merged before this action, not mergeable, has a different target repository, has a different head SHA than e3ab56ec0649e928418acc807c6badee2132521c, changes files outside README.md, package.json, index.html, src/main.js, src/styles.css, src/data/templates.js, src/lib/safety.js, and src/lib/status.js, validation or boot check fails, runtime tests fail, GitHub reports a conflict, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond merging exactly target PR #2.",
+  "revocationPath": "Expired approval lock blocked or would block the mandatory boot sequence. Original expiration: 2026-07-06T00:56:29Z. This approval is no longer valid for gated actions. Historical proof remains preserved; any future action requires a new scoped owner approval lock.",
   "evidence": [
     {
       "type": "owner_instruction",
@@ -83,5 +83,5 @@
   "approvedAt": "2026-07-05T00:56:29Z",
   "expiresAt": "2026-07-06T00:56:29Z",
   "createdAt": "2026-07-05T00:56:29Z",
-  "updatedAt": "2026-07-05T00:56:29Z"
+  "updatedAt": "2026-07-06T20:28:06.762Z"
 }

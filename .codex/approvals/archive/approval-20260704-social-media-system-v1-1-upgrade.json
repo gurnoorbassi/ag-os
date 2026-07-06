@@ -1,6 +1,6 @@
 {
   "approvalId": "approval-20260704-social-media-system-v1-1-upgrade",
-  "status": "approved",
+  "status": "expired",
   "ownerId": "owner-gurnoor-bassi",
   "requestedBy": "ag-os-runtime",
   "approvedBy": "owner-gurnoor-bassi",
@@ -54,7 +54,7 @@
     "change_ai_receptionist",
     "change_constitution"
   ],
-  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner says stop or revoke, the expiration passes, the target repository changes, the target branch changes, more than one pull request is needed, merge or deployment is requested, validation or boot check fails, GitHub reports a conflict, an incident opens for this scope, any prohibited action becomes necessary, or the action expands beyond creating one branch, updating the eight approved starter files, and opening one pull request.",
+  "revocationPath": "Expired approval lock blocked or would block the mandatory boot sequence. Original expiration: 2026-07-06T00:47:02Z. This approval is no longer valid for gated actions. Historical proof remains preserved; any future action requires a new scoped owner approval lock.",
   "evidence": [
     {
       "type": "owner_instruction",
@@ -81,5 +81,5 @@
   "approvedAt": "2026-07-05T00:47:02Z",
   "expiresAt": "2026-07-06T00:47:02Z",
   "createdAt": "2026-07-05T00:47:02Z",
-  "updatedAt": "2026-07-05T00:47:02Z"
+  "updatedAt": "2026-07-06T20:28:06.762Z"
 }

@@ -1071,193 +1071,192 @@ window.AG_OS_DASHBOARD_DATA = {
     }
   ],
   "approvals": {
-    "activeCount": 20,
-    "expiredCount": 5,
+    "activeCount": 0,
+    "expiredCount": 25,
     "blockedCount": 0,
     "staleWarningCount": 0,
-    "activeApprovals": [
+    "activeApprovals": [],
+    "expiredApprovals": [
       {
         "approvalId": "approval-20260705-ag-digitalz-manual-posting-pack-v1",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T20:55:00Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260705-ag-digitalz-manual-posting-pack-v1.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260705-ag-digitalz-manual-posting-pack-v1.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260705-ag-digitalz-instagram-handle-live-update",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T19:00:00Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260705-ag-digitalz-instagram-handle-live-update.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260705-ag-digitalz-instagram-handle-live-update.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T08:08:00Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260705-ag-os-dashboard-netlify-staging.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260705-ag-os-dashboard-netlify-staging.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260705-social-media-interactive-draft-ui",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T07:25:00Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260705-social-media-interactive-draft-ui.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260705-social-media-interactive-draft-ui.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-ag-digitalz-draft-approval-oauth-readiness",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T06:32:26Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-draft-approval-oauth-readiness.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-draft-approval-oauth-readiness.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-ag-digitalz-content-review-netlify-staging",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T05:55:37Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-content-review-netlify-staging.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-content-review-netlify-staging.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-target-pr-merge-ag-digitalz-content-review-v1",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T05:48:00Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-target-pr-merge-ag-digitalz-content-review-v1.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-ag-digitalz-content-review-v1.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-ag-digitalz-content-review-build",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T05:26:42Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-content-review-build.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-content-review-build.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-ag-digitalz-first-content-sprint-netlify-staging",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T04:58:46Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-first-content-sprint-netlify-staging.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-first-content-sprint-netlify-staging.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-target-pr-merge-ag-digitalz-first-content-sprint-v1",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T04:52:30Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-target-pr-merge-ag-digitalz-first-content-sprint-v1.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-ag-digitalz-first-content-sprint-v1.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-ag-digitalz-first-content-sprint-build",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T04:36:18Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-first-content-sprint-build.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-first-content-sprint-build.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-ag-digitalz-netlify-staging-redeploy",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T02:10:39Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-netlify-staging-redeploy.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-netlify-staging-redeploy.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-target-pr-merge-ag-digitalz-draft-config",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T02:05:01Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-target-pr-merge-ag-digitalz-draft-config.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-ag-digitalz-draft-config.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-ag-digitalz-draft-config-build",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T01:52:50Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-draft-config-build.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-draft-config-build.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-social-media-netlify-staging-v1-1",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T00:59:30Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-social-media-netlify-staging-v1-1.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-social-media-netlify-staging-v1-1.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-target-pr-merge-social-media-system-v1-1",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T00:56:29Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-target-pr-merge-social-media-system-v1-1.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-social-media-system-v1-1.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-social-media-system-v1-1-upgrade",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T00:47:02Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-social-media-system-v1-1-upgrade.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-social-media-system-v1-1-upgrade.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-social-media-netlify-staging",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-05T23:17:35.591Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-social-media-netlify-staging.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-social-media-netlify-staging.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-target-pr-merge-social-media-system-v1",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-05T22:31:45.718Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-target-pr-merge-social-media-system-v1.json",
-        "archived": false
+        "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-social-media-system-v1.json",
+        "archived": true
       },
       {
         "approvalId": "approval-20260704-social-media-starter-build",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R4",
         "expiresAt": "2026-07-05T21:35:09Z",
         "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-social-media-starter-build.json",
-        "archived": false
-      }
-    ],
-    "expiredApprovals": [
+        "recordPath": ".codex/approvals/archive/approval-20260704-social-media-starter-build.json",
+        "archived": true
+      },
       {
         "approvalId": "approval-20260704-n8n-draft-workflow-proof",
         "status": "expired",
@@ -1305,62 +1304,8 @@ window.AG_OS_DASHBOARD_DATA = {
       }
     ],
     "blockedApprovals": [],
-    "recentApprovedActions": [
-      {
-        "approvalId": "approval-20260705-ag-digitalz-manual-posting-pack-v1",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-06T20:55:00Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260705-ag-digitalz-manual-posting-pack-v1.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260705-ag-digitalz-instagram-handle-live-update",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-06T19:00:00Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260705-ag-digitalz-instagram-handle-live-update.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-06T08:08:00Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260705-ag-os-dashboard-netlify-staging.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260705-social-media-interactive-draft-ui",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-06T07:25:00Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260705-social-media-interactive-draft-ui.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-ag-digitalz-draft-approval-oauth-readiness",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-06T06:32:26Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-draft-approval-oauth-readiness.json",
-        "archived": false
-      },
-      {
-        "approvalId": "approval-20260704-ag-digitalz-content-review-netlify-staging",
-        "status": "approved",
-        "riskLevel": "R4",
-        "expiresAt": "2026-07-06T05:55:37Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "recordPath": ".codex/approvals/approval-20260704-ag-digitalz-content-review-netlify-staging.json",
-        "archived": false
-      }
-    ]
+    "staleApprovals": [],
+    "recentApprovedActions": []
   },
   "connectorProofs": {
     "github": [

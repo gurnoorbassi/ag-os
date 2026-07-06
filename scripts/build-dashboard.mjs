@@ -141,7 +141,7 @@ function summarizeApproval(approvalPath, archive = false) {
   };
 }
 
-function collectApprovals() {
+function collectApprovals({ now = new Date() } = {}) {
   const active = listDirectJson(".codex/approvals")
     .map((approvalPath) => summarizeApproval(approvalPath, false));
   const archived = listDirectJson(".codex/approvals/archive")
@@ -149,14 +149,22 @@ function collectApprovals() {
   const all = [...active, ...archived];
   const expired = all.filter((approval) => ["expired", "revoked", "cancelled", "closed", "archived"].includes(approval.status));
   const blocked = all.filter((approval) => ["blocked", "failed"].includes(approval.status));
+  const stale = active.filter((approval) => {
+    if (approval.status !== "approved" || !approval.expiresAt) {
+      return false;
+    }
+
+    return new Date(approval.expiresAt) < now;
+  });
   return {
     activeCount: active.filter((approval) => approval.status === "approved").length,
     expiredCount: expired.length,
     blockedCount: blocked.length,
-    staleWarningCount: blocked.length,
+    staleWarningCount: blocked.length + stale.length,
     activeApprovals: latestBy(active, "expiresAt"),
     expiredApprovals: latestBy(expired, "expiresAt"),
     blockedApprovals: latestBy(blocked, "expiresAt"),
+    staleApprovals: latestBy(stale, "expiresAt"),
     recentApprovedActions: latestBy(active.filter((approval) => approval.status === "approved"), "expiresAt").slice(0, 6)
   };
 }
