@@ -1,0 +1,21 @@
+{
+  "clientId": "client-surrey-links",
+  "clientName": "Surrey Links",
+  "status": "prospect",
+  "contactOwner": "AG Digitalz Owner",
+  "brandNames": [
+    "Surrey Links"
+  ],
+  "industry": "pending_owner_input",
+  "systemsPurchased": [],
+  "notes": [
+    "Client type: external_paying_client_candidate.",
+    "First external client prospect for AG Digitalz, reported by owner on 2026-07-06 as ready to pay for a service.",
+    "Service scope, pricing, and start date are pending_owner_input; no engagement record exists until the owner confirms the agreed terms.",
+    "Owner privacy intent: business identity only; no contact details, credentials, or customer data are stored in AG OS records.",
+    "No social OAuth, credentials, posting, scheduling, analytics API, or n8n activation is authorized by this record."
+  ],
+  "privacyLevel": "confidential",
+  "createdAt": "2026-07-06T00:00:00Z",
+  "updatedAt": "2026-07-06T00:00:00Z"
+}

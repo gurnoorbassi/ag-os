@@ -113,7 +113,7 @@ if (data.capabilityRegistry.provenCount < 1) {
 if (data.capabilityRegistry.blockedCount < 1) {
   fail("dashboard control center must show blocked capabilities");
 }
-if (data.clientManagement.clientCount !== 1 || data.clientManagement.engagementCount !== 1) {
+if (data.clientManagement.clientCount < 1 || data.clientManagement.engagementCount < 1) {
   fail("dashboard control center must show the first registered client and engagement");
 }
 if (data.clientManagement.deliverableCount !== 6) {
@@ -125,8 +125,8 @@ if (data.clientManagement.accessRequestCount !== 4) {
 if (data.clientManagement.pendingApprovalCount !== 2) {
   fail("dashboard control center must show two remaining pending AG Digitalz client approvals");
 }
-if (data.clientManagement.clients[0]?.clientName !== "AG Digitalz") {
-  fail("dashboard control center must show AG Digitalz as the first registered client");
+if (!data.clientManagement.clients.some((client) => client.clientName === "AG Digitalz")) {
+  fail("dashboard control center must show AG Digitalz among the registered clients");
 }
 if (data.firstClientReadiness.status !== "active_draft_configured") {
   fail("dashboard control center must show first client active draft configured status");

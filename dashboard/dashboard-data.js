@@ -140,7 +140,7 @@ window.AG_OS_DASHBOARD_DATA = {
       "status": "active_draft_configured",
       "sourceRecord": ".codex/client-management/clients/client-ag-digitalz-internal.json",
       "activeClientRecordsCreated": true,
-      "activeRecordCount": 14,
+      "activeRecordCount": 15,
       "missingRequiredFieldCount": 0,
       "missingRequiredFields": [],
       "canCreateActiveRecords": true,
@@ -796,7 +796,7 @@ window.AG_OS_DASHBOARD_DATA = {
   },
   "clientManagement": {
     "directoryExists": true,
-    "clientCount": 1,
+    "clientCount": 2,
     "engagementCount": 1,
     "deliverableCount": 6,
     "contentSprintCount": 1,
@@ -815,6 +815,17 @@ window.AG_OS_DASHBOARD_DATA = {
         ],
         "privacyLevel": "internal",
         "recordPath": ".codex/client-management/clients/client-ag-digitalz-internal.json"
+      },
+      {
+        "clientId": "client-surrey-links",
+        "clientName": "Surrey Links",
+        "status": "prospect",
+        "brandNames": [
+          "Surrey Links"
+        ],
+        "systemsPurchased": [],
+        "privacyLevel": "confidential",
+        "recordPath": ".codex/client-management/clients/client-surrey-links.json"
       }
     ],
     "engagements": [
@@ -1037,7 +1048,7 @@ window.AG_OS_DASHBOARD_DATA = {
     "status": "active_draft_configured",
     "sourceRecord": ".codex/client-management/clients/client-ag-digitalz-internal.json",
     "activeClientRecordsCreated": true,
-    "activeRecordCount": 14,
+    "activeRecordCount": 15,
     "missingRequiredFieldCount": 0,
     "missingRequiredFields": [],
     "canCreateActiveRecords": true,
