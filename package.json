@@ -11,6 +11,7 @@
     "approvals:stale": "node scripts/manage-stale-approvals.mjs --list",
     "proof:write": "node scripts/process-runtime-proof-writer.mjs",
     "connector:preflight": "node scripts/process-connector-preflight.mjs",
+    "security:scan": "node scripts/scan-secrets.mjs",
     "validate": "node scripts/validate-foundation.mjs && node scripts/check-dashboard.mjs"
   },
   "engines": {
