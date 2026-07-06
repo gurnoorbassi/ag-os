@@ -189,6 +189,31 @@ test("validator fails on an invalid owner preference record", () => withTempRepo
   assert.match(result.output, /owner-preferences\.json\.preferences\[0\]\.category must use a schema enum value/);
 }));
 
+test("validator fails when a credential reference tries to store a secret in repo", () => withTempRepo((root) => {
+  const recordPath = ".codex/credentials/credential-ref-instagram-oauth.json";
+  mkdirSync(path.dirname(path.join(root, recordPath)), { recursive: true });
+  writeJson(root, recordPath, {
+    "$schema": "../../schemas/credential-reference.schema.json",
+    credentialRefId: "credential-ref-instagram-oauth",
+    provider: "instagram",
+    purpose: "future_connected_draft_only_oauth",
+    storageBackend: "future_secure_connector_credential_store",
+    secretValueStoredInRepo: true,
+    repoSafe: true,
+    ownerApprovalRequired: true,
+    rotationPolicy: "Rotate immediately on suspected exposure and at owner-approved cadence.",
+    revocationPolicy: "Owner can revoke by disconnecting the provider credential and marking the reference revoked.",
+    auditRequirement: "Audit event required for create, use, rotation, and revocation.",
+    allowedConnectors: ["connector-future-social-oauth"],
+    prohibitedUses: ["post_content", "schedule_content", "use_analytics_api"]
+  });
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /credential-ref-instagram-oauth\.json\.secretValueStoredInRepo must be false/);
+}));
+
 test("validator fails when a lesson candidate uses an invalid candidate status", () => withTempRepo((root) => {
   const recordPath = ".codex/memory/lessons/candidates/lesson-20260703-github-repo-creation-gates.json";
   const lesson = readJson(root, recordPath);

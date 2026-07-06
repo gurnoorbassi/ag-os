@@ -34,6 +34,8 @@ const requiredPaths = [
   "docs/watchdog-alert-policy.md",
   "docs/product-project-policy.md",
   "docs/critic-worker.md",
+  "docs/secure-credential-store.md",
+  "docs/secret-redaction-policy.md",
   ".codex/agents/README.md",
   ".codex/tasks/README.md",
   ".codex/locks/README.md",
@@ -48,6 +50,8 @@ const requiredPaths = [
   ".codex/critiques/README.md",
   ".codex/security/README.md",
   ".codex/security/policy.json",
+  ".codex/security/credential-store-policy.json",
+  ".codex/credentials/README.md",
   ".codex/watchdog/README.md",
   ".codex/watchdog/policy.json",
   ".codex/approvals/README.md",
@@ -109,7 +113,8 @@ const requiredPaths = [
   "schemas/engagement.schema.json",
   "schemas/deliverable.schema.json",
   "schemas/access-request.schema.json",
-  "schemas/client-approval.schema.json"
+  "schemas/client-approval.schema.json",
+  "schemas/credential-reference.schema.json"
 ];
 
 const forbiddenPatterns = [
@@ -367,6 +372,12 @@ const runtimeRecordDirectories = [
     recordDir: ".codex/critiques",
     schemaPath: "schemas/plan-critique.schema.json",
     includePrefixes: ["critique-"]
+  },
+  {
+    name: "credential reference",
+    recordDir: ".codex/credentials",
+    schemaPath: "schemas/credential-reference.schema.json",
+    includePrefixes: ["credential-ref-"]
   }
 ];
 let failures = 0;
@@ -862,6 +873,60 @@ function validateSecurityPolicy(record) {
   }
 }
 
+function validateCredentialStorePolicy(record) {
+  const approvedOptions = new Set((record.approvedStorageOptions ?? []).map((option) => option.id));
+  for (const requiredOption of [
+    "future_secure_connector_credential_store",
+    "future_local_encrypted_secret_store",
+    "future_platform_environment_variables_owner_approved"
+  ]) {
+    if (!approvedOptions.has(requiredOption)) {
+      fail(`credential store policy missing planned storage option: ${requiredOption}`);
+    }
+  }
+
+  for (const forbiddenLocation of [
+    "git_repository_files",
+    "github_commits",
+    "pull_request_bodies",
+    "chat_messages",
+    "dashboard-data.js",
+    "logs"
+  ]) {
+    if (!(record.forbiddenStorageLocations ?? []).includes(forbiddenLocation)) {
+      fail(`credential store policy missing forbidden storage location: ${forbiddenLocation}`);
+    }
+  }
+
+  if (record.rules?.secretValuesAllowedInRepo !== false) {
+    fail("credential store policy must forbid secret values in repo");
+  }
+
+  if (record.rules?.credentialReferencesOnly !== true) {
+    fail("credential store policy must allow credential references only");
+  }
+
+  if (record.rules?.ownerApprovalRequiredBeforeUse !== true) {
+    fail("credential store policy must require owner approval before credential use");
+  }
+
+  if (record.rules?.tokensMayBePrinted !== false) {
+    fail("credential store policy must forbid printing tokens");
+  }
+
+  if (record.rules?.tokensMayBeLogged !== false) {
+    fail("credential store policy must forbid logging tokens");
+  }
+
+  if (record.rules?.tokensMayBeStoredInDashboardData !== false) {
+    fail("credential store policy must forbid tokens in dashboard data");
+  }
+
+  if (record.firstCandidateUseCase?.status !== "blocked_until_secure_storage_and_final_owner_approval") {
+    fail("credential store policy first candidate use case must remain blocked until secure storage and final owner approval");
+  }
+}
+
 function validateWatchdogPolicy(record) {
   if (record.defaults?.monitoringEnabled !== false) {
     fail("watchdog policy must disable monitoring by default");
@@ -1197,6 +1262,13 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
   } catch (error) {
     fail(`${schemaValidatedRecord.name} could not be validated: ${error.message}`);
   }
+}
+
+try {
+  validateCredentialStorePolicy(readJson(".codex/security/credential-store-policy.json"));
+  pass("credential store policy safety rules valid");
+} catch (error) {
+  fail(`credential store policy could not be validated: ${error.message}`);
 }
 
 for (const engineRecordDirectory of engineRecordDirectories) {

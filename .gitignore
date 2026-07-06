@@ -13,6 +13,9 @@ Thumbs.db
 *.pfx
 secrets/
 credentials/
+!.codex/credentials/
+!.codex/credentials/README.md
+!.codex/credentials/credential-ref-*.json
 local/
 .codex/**/local-*
 .codex/**/runtime-*-scratch-*.json
