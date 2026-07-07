@@ -187,6 +187,72 @@ function renderOwnerAttention() {
   });
 }
 
+function renderActionQueue() {
+  const queue = data.dashboardActionQueue;
+  const grid = clear("#action-queue-grid");
+  grid.append(
+    card({
+      title: "Owner Decisions",
+      status: queue.status,
+      metric: queue.ownerDecisionCount,
+      detail: "Decision queue from AG OS records. This dashboard cannot execute actions.",
+      meta: queue.ownerDecisionsNeeded.map((item) => `${item.decision}: ${item.status}`)
+    }),
+    card({
+      title: "Blocked Actions",
+      status: queue.blockedActionCount === 0 ? "ready" : "blocked",
+      metric: queue.blockedActionCount,
+      detail: "Live social, credentials, production, and domain actions remain blocked.",
+      meta: queue.blockedActions.map((item) => `${item.id}: ${item.reason}`)
+    }),
+    card({
+      title: "Approval Packages",
+      status: queue.approvalPackageCount === 0 ? "zero" : "draft",
+      metric: `${queue.approvalPackageCount} ready`,
+      detail: "Templates are readiness packages only; they do not grant execution permission.",
+      meta: queue.approvalPackagesReady.slice(0, 6).map((item) => `${item.approvalId}: ${item.commandCategory}`)
+    }),
+    card({
+      title: "Manual Posting",
+      status: queue.manualPostingAvailable ? "ready" : "blocked",
+      metric: boolText(queue.manualPostingAvailable, "available", "not available"),
+      detail: queue.manualPostingDetail,
+      meta: [queue.latestStagingUrl, "AG OS automated posting remains blocked."]
+    })
+  );
+
+  const panel = clear("#action-queue-panel");
+  panel.append(
+    table(
+      ["Decision", "Status", "Detail", "Source"],
+      queue.ownerDecisionsNeeded.map((item) => [
+        labelStack(item.decision, item.id),
+        pill(item.status),
+        item.detail,
+        item.sourceRecord
+      ])
+    ),
+    table(
+      ["Approval package", "Category", "Target", "Risk", "Record"],
+      queue.approvalPackagesReady.map((item) => [
+        labelStack(item.approvalId, item.requestedAction),
+        item.commandCategory,
+        item.target,
+        item.riskLevel,
+        item.recordPath
+      ])
+    ),
+    table(
+      ["Safe next milestone", "Status", "Detail"],
+      queue.safeNextMilestones.map((item) => [
+        labelStack(item.id, "read-only roadmap"),
+        pill(item.status),
+        item.detail
+      ])
+    )
+  );
+}
+
 function renderProjects() {
   const tbody = document.querySelector("#projects-table");
   tbody.replaceChildren();
@@ -585,6 +651,7 @@ function renderSafeMerge() {
 
 renderOverview();
 renderOwnerAttention();
+renderActionQueue();
 renderProjects();
 renderRegistries();
 renderOperatingSystems();
