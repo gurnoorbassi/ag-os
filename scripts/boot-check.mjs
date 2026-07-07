@@ -81,6 +81,35 @@ function checkConnectorRegistry() {
   );
 }
 
+function listConnectorAuthStatuses() {
+  return listDirectJson(".codex/connectors")
+    .filter((recordPath) => path.basename(recordPath).startsWith("connector-auth-"))
+    .map((recordPath) => {
+      const record = readJson(recordPath);
+      return {
+        connectorId: record.connectorId,
+        authStatus: record.authStatus,
+        lastObservedAt: record.lastObservedAt,
+        observationSource: record.observationSource
+      };
+    });
+}
+
+function checkConnectorAuth() {
+  const authStatuses = listConnectorAuthStatuses();
+  const notAuthenticated = authStatuses.filter((record) => record.authStatus !== "authenticated");
+  // Advisory only: an expired or unknown auth status warns but never blocks
+  // boot, because no offline record can prove or disprove live auth state.
+  addCheck(
+    "connector-auth",
+    notAuthenticated.length === 0 ? "pass" : "warning",
+    notAuthenticated.length === 0
+      ? `${authStatuses.length} connector auth record(s) report authenticated.`
+      : `${notAuthenticated.map((record) => `${record.connectorId}: ${record.authStatus}`).join(", ")}. Verify auth before gated connector work.`,
+    false
+  );
+}
+
 function checkCommandRegistry() {
   const registry = readJson(".codex/commands/registry.json");
   const categories = new Set((registry.categories ?? []).map((category) => category.id));
@@ -244,6 +273,7 @@ function checkStaleLocks() {
 checkConstitution();
 checkProjectRegistry();
 checkConnectorRegistry();
+checkConnectorAuth();
 checkCommandRegistry();
 checkCapabilityRegistry();
 checkOwnerRecord();
@@ -311,6 +341,11 @@ function buildWorkerBriefing() {
     id: connector.id,
     connectionStatus: connector.connectionStatus
   }));
+
+  const connectorAuth = {
+    records: listConnectorAuthStatuses(),
+    authStatusGrantsPermission: false
+  };
 
   const qualityScorePaths = listQualityScorePaths();
   const qualityScoreSummaries = qualityScorePaths
@@ -403,6 +438,7 @@ function buildWorkerBriefing() {
     skillLibrary,
     activeApprovals,
     connectorStatus,
+    connectorAuth,
     qualityScores,
     critiques,
     clientManagement,
