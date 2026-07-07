@@ -24,3 +24,9 @@ jobs:
 
       - name: Validate foundation
         run: npm run validate
+
+      - name: Run tests
+        run: node --test tests/*.test.mjs
+
+      - name: Security scan
+        run: npm run security:scan
