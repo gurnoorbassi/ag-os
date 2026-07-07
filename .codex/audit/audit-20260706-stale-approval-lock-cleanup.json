@@ -1,0 +1,96 @@
+{
+  "id": "audit-20260706-stale-approval-lock-cleanup",
+  "occurredAt": "2026-07-06T20:28:20Z",
+  "actor": "ag-os-runtime",
+  "eventType": "validation_run",
+  "summary": "Archived expired and completed one-time approval locks so the mandatory boot sequence no longer blocks on stale approvals.",
+  "scope": "stale_approval_lock_cleanup",
+  "source": "local_validation",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260704-ag-digitalz-content-review-build"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-ag-digitalz-content-review-netlify-staging"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-ag-digitalz-draft-approval-oauth-readiness"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-ag-digitalz-draft-config-build"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-ag-digitalz-first-content-sprint-build"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-ag-digitalz-first-content-sprint-netlify-staging"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-ag-digitalz-netlify-staging-redeploy"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-social-media-netlify-staging-v1-1"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-social-media-netlify-staging"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-social-media-starter-build"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-social-media-system-v1-1-upgrade"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-target-pr-merge-ag-digitalz-content-review-v1"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-target-pr-merge-ag-digitalz-draft-config"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-target-pr-merge-ag-digitalz-first-content-sprint-v1"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-target-pr-merge-social-media-system-v1-1"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260704-target-pr-merge-social-media-system-v1"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260705-ag-digitalz-instagram-handle-live-update"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260705-ag-digitalz-manual-posting-pack-v1"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260705-ag-os-dashboard-netlify-staging"
+    },
+    {
+      "type": "approval",
+      "reference": "approval-20260705-social-media-interactive-draft-ui"
+    }
+  ],
+  "riskLevel": "low",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Moved 20 direct approval lock records into .codex/approvals/archive and marked them expired/inactive. This preserves history while preventing expired or completed one-time approvals from authorizing future gated work or blocking boot. No live service, connector action, credential handling, deployment, domain/DNS, paid action, production/customer data access, social action, n8n activation, Lead Gen change, AI Receptionist change, or Constitution change occurred.",
+  "createdAt": "2026-07-06T20:28:20Z"
+}
