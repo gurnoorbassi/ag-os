@@ -1,0 +1,19 @@
+{
+  "connectorAuthId": "connector-auth-github-mcp",
+  "recordType": "connector-auth-status",
+  "connectorId": "connector-github-mcp",
+  "authStatus": "expired",
+  "lastObservedAt": "2026-07-06T00:00:00Z",
+  "lastAuthenticatedAt": "2026-07-05T00:00:00Z",
+  "observationSource": "owner_report",
+  "observationEvidence": "Owner reported on 2026-07-06 that GitHub MCP/API auth was expired, preventing PRs for the stacked codex/*-v1 branches from being opened through the governed path.",
+  "grantsPermission": false,
+  "liveCallsUsed": false,
+  "notes": [
+    "This record stores the last known auth observation only. It grants no permission and triggers no live calls.",
+    "Workers update this record only after a real observation: an owner report or a gated execution result.",
+    "While authStatus is expired or unknown, treat GitHub MCP execution as blocked and surface the re-auth decision to the owner."
+  ],
+  "createdAt": "2026-07-07T00:00:00Z",
+  "updatedAt": "2026-07-07T00:00:00Z"
+}

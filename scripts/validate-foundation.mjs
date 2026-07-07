@@ -350,6 +350,12 @@ const runtimeRecordDirectories = [
     includePrefixes: ["connector-exec-"]
   },
   {
+    name: "connector auth status",
+    recordDir: ".codex/connectors",
+    schemaPath: "schemas/connector-auth-status.schema.json",
+    includePrefixes: ["connector-auth-"]
+  },
+  {
     name: "GitHub execution plan",
     recordDir: ".codex/github",
     schemaPath: "schemas/github-execution-plan.schema.json",

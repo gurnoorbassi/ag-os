@@ -206,6 +206,27 @@ function collectConnectorExecutions() {
     });
 }
 
+function collectConnectorAuth() {
+  const records = listDirectJson(".codex/connectors")
+    .filter((recordPath) => path.basename(recordPath).startsWith("connector-auth-"))
+    .map((recordPath) => {
+      const record = readJson(recordPath);
+      return {
+        connectorId: record.connectorId,
+        authStatus: record.authStatus,
+        lastObservedAt: record.lastObservedAt,
+        observationSource: record.observationSource,
+        recordPath
+      };
+    })
+    .sort((left, right) => left.connectorId.localeCompare(right.connectorId));
+  return {
+    records,
+    notAuthenticatedCount: records.filter((record) => record.authStatus !== "authenticated").length,
+    authStatusGrantsPermission: false
+  };
+}
+
 function summarizeNetlify(record) {
   return {
     id: record.connectorExecutionId,
@@ -532,8 +553,21 @@ function collectSkills() {
   };
 }
 
-function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview }) {
+function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview, connectorAuth }) {
   const attention = [];
+
+  for (const record of connectorAuth?.records ?? []) {
+    if (record.authStatus !== "authenticated") {
+      attention.push({
+        id: `connector-auth-${record.connectorId}`,
+        status: "review",
+        title: `Connector auth: ${record.connectorId}`,
+        detail: `Last known auth status is ${record.authStatus} (observed ${record.lastObservedAt} via ${record.observationSource}).`,
+        action: "Re-authenticate or verify this connector before gated execution work.",
+        sourceRecord: record.recordPath
+      });
+    }
+  }
 
   if (firstClientReadiness.status === "intake_needed") {
     attention.push({
@@ -773,6 +807,7 @@ export function collectDashboardData() {
   const capabilities = capabilityRegistry.capabilities.map(summarizeCapability);
   const approvals = collectApprovals();
   const qualityReview = collectQualityReview();
+  const connectorAuth = collectConnectorAuth();
   const costReadModel = collectCosts(costBudget);
   const skills = collectSkills();
   const clientManagement = collectClientManagement();
@@ -1076,7 +1111,8 @@ export function collectDashboardData() {
     },
     clientManagement,
     firstClientReadiness,
-    ownerAttention: collectOwnerAttention({ firstClientReadiness, approvals, qualityReview }),
+    ownerAttention: collectOwnerAttention({ firstClientReadiness, approvals, qualityReview, connectorAuth }),
+    connectorAuth,
     dashboardActionQueue: collectDashboardActionQueue({
       approvals,
       firstClientReadiness,

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/connector-auth-status.schema.json",
+  "title": "AG OS Connector Auth Status",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "connectorAuthId",
+    "recordType",
+    "connectorId",
+    "authStatus",
+    "lastObservedAt",
+    "observationSource",
+    "grantsPermission",
+    "liveCallsUsed",
+    "notes",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "connectorAuthId": {
+      "type": "string",
+      "pattern": "^connector-auth-[a-z0-9-]+$"
+    },
+    "recordType": {
+      "const": "connector-auth-status"
+    },
+    "connectorId": {
+      "type": "string",
+      "pattern": "^connector-[a-z0-9-]+$"
+    },
+    "authStatus": {
+      "type": "string",
+      "enum": [
+        "authenticated",
+        "expired",
+        "unknown"
+      ]
+    },
+    "lastObservedAt": {
+      "type": "string"
+    },
+    "lastAuthenticatedAt": {
+      "type": "string"
+    },
+    "observationSource": {
+      "type": "string",
+      "enum": [
+        "owner_report",
+        "gated_execution_record",
+        "no_recent_observation"
+      ]
+    },
+    "observationEvidence": {
+      "type": "string"
+    },
+    "grantsPermission": {
+      "const": false
+    },
+    "liveCallsUsed": {
+      "const": false
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string"
+    }
+  }
+}

@@ -1054,6 +1054,30 @@ window.AG_OS_DASHBOARD_DATA = {
   },
   "ownerAttention": [
     {
+      "id": "connector-auth-connector-github-mcp",
+      "status": "review",
+      "title": "Connector auth: connector-github-mcp",
+      "detail": "Last known auth status is expired (observed 2026-07-06T00:00:00Z via owner_report).",
+      "action": "Re-authenticate or verify this connector before gated execution work.",
+      "sourceRecord": ".codex/connectors/connector-auth-github-mcp.json"
+    },
+    {
+      "id": "connector-auth-connector-n8n-mcp",
+      "status": "review",
+      "title": "Connector auth: connector-n8n-mcp",
+      "detail": "Last known auth status is unknown (observed 2026-07-04T00:00:00Z via gated_execution_record).",
+      "action": "Re-authenticate or verify this connector before gated execution work.",
+      "sourceRecord": ".codex/connectors/connector-auth-n8n-mcp.json"
+    },
+    {
+      "id": "connector-auth-connector-netlify-mcp",
+      "status": "review",
+      "title": "Connector auth: connector-netlify-mcp",
+      "detail": "Last known auth status is unknown (observed 2026-07-05T00:00:00Z via gated_execution_record).",
+      "action": "Re-authenticate or verify this connector before gated execution work.",
+      "sourceRecord": ".codex/connectors/connector-auth-netlify-mcp.json"
+    },
+    {
       "id": "live-social-integrations-blocked",
       "status": "blocked",
       "title": "Live social integrations",
@@ -1070,6 +1094,33 @@ window.AG_OS_DASHBOARD_DATA = {
       "sourceRecord": ".codex/connectors/connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result.json"
     }
   ],
+  "connectorAuth": {
+    "records": [
+      {
+        "connectorId": "connector-github-mcp",
+        "authStatus": "expired",
+        "lastObservedAt": "2026-07-06T00:00:00Z",
+        "observationSource": "owner_report",
+        "recordPath": ".codex/connectors/connector-auth-github-mcp.json"
+      },
+      {
+        "connectorId": "connector-n8n-mcp",
+        "authStatus": "unknown",
+        "lastObservedAt": "2026-07-04T00:00:00Z",
+        "observationSource": "gated_execution_record",
+        "recordPath": ".codex/connectors/connector-auth-n8n-mcp.json"
+      },
+      {
+        "connectorId": "connector-netlify-mcp",
+        "authStatus": "unknown",
+        "lastObservedAt": "2026-07-05T00:00:00Z",
+        "observationSource": "gated_execution_record",
+        "recordPath": ".codex/connectors/connector-auth-netlify-mcp.json"
+      }
+    ],
+    "notAuthenticatedCount": 3,
+    "authStatusGrantsPermission": false
+  },
   "dashboardActionQueue": {
     "status": "blocked",
     "mode": "read_only",

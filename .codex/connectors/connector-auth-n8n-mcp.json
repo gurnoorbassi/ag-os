@@ -1,0 +1,19 @@
+{
+  "connectorAuthId": "connector-auth-n8n-mcp",
+  "recordType": "connector-auth-status",
+  "connectorId": "connector-n8n-mcp",
+  "authStatus": "unknown",
+  "lastObservedAt": "2026-07-04T00:00:00Z",
+  "lastAuthenticatedAt": "2026-07-04T00:00:00Z",
+  "observationSource": "gated_execution_record",
+  "observationEvidence": "The successful n8n inactive draft workflow proof recorded on 2026-07-04 was the last authenticated n8n observation. No auth observation has been made since.",
+  "grantsPermission": false,
+  "liveCallsUsed": false,
+  "notes": [
+    "This record stores the last known auth observation only. It grants no permission and triggers no live calls.",
+    "Workers update this record only after a real observation: an owner report or a gated execution result.",
+    "n8n activation remains blocked regardless of auth status; this record never authorizes workflow activation."
+  ],
+  "createdAt": "2026-07-07T00:00:00Z",
+  "updatedAt": "2026-07-07T00:00:00Z"
+}

@@ -1,0 +1,19 @@
+{
+  "connectorAuthId": "connector-auth-netlify-mcp",
+  "recordType": "connector-auth-status",
+  "connectorId": "connector-netlify-mcp",
+  "authStatus": "unknown",
+  "lastObservedAt": "2026-07-05T00:00:00Z",
+  "lastAuthenticatedAt": "2026-07-05T00:00:00Z",
+  "observationSource": "gated_execution_record",
+  "observationEvidence": ".codex/connectors/connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result.json recorded the last successful authenticated Netlify staging deploy on 2026-07-05. No auth observation has been made since.",
+  "grantsPermission": false,
+  "liveCallsUsed": false,
+  "notes": [
+    "This record stores the last known auth observation only. It grants no permission and triggers no live calls.",
+    "Workers update this record only after a real observation: an owner report or a gated execution result.",
+    "authStatus is unknown because no observation has occurred since the last authenticated execution; verify before relying on this connector."
+  ],
+  "createdAt": "2026-07-07T00:00:00Z",
+  "updatedAt": "2026-07-07T00:00:00Z"
+}
