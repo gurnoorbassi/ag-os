@@ -169,6 +169,24 @@ function listLessonCandidatePaths() {
     .filter((lessonPath) => path.basename(lessonPath).startsWith("lesson-"));
 }
 
+function listAcceptedLessonPaths() {
+  return [
+    ...listDirectJson(".codex/memory/accepted"),
+    ...listDirectJson(".codex/memory/lessons")
+  ]
+    .filter((lessonPath) => path.basename(lessonPath).startsWith("lesson-"));
+}
+
+function listRejectedLessonPaths() {
+  return listDirectJson(".codex/memory/rejected")
+    .filter((lessonPath) => path.basename(lessonPath).startsWith("lesson-"));
+}
+
+function listLessonConflictPaths() {
+  return listDirectJson(".codex/memory/conflicts")
+    .filter((conflictPath) => path.basename(conflictPath).startsWith("lesson-"));
+}
+
 function checkQualityScores() {
   const qualityScoreDir = ".codex/quality-scores";
   const directoryExists = existsSync(path.join(root, qualityScoreDir));
@@ -283,9 +301,38 @@ function buildWorkerBriefing() {
     return { archetypeId: archetype.archetypeId, name: archetype.name, category: archetype.category, status: archetype.status };
   });
 
-  const acceptedLessons = listDirectJson(".codex/memory/lessons").map((lessonPath) => {
+  const acceptedLessons = listAcceptedLessonPaths()
+    .map((lessonPath) => ({ lessonPath, lesson: readJson(lessonPath) }))
+    .filter(({ lesson }) => lesson.status === "accepted")
+    .map(({ lessonPath, lesson }) => ({
+      lessonId: lesson.lessonId,
+      title: lesson.title,
+      scope: lesson.scope,
+      status: lesson.status,
+      lessonPath,
+      runtimeUse: {
+        allowedForPlanning: lesson.runtimeUse?.allowedForPlanning !== false,
+        allowedForCritic: lesson.runtimeUse?.allowedForCritic !== false,
+        allowedForBuilder: lesson.runtimeUse?.allowedForBuilder !== false,
+        allowedForWorkers: lesson.runtimeUse?.allowedForWorkers !== false,
+        grantsPermission: false,
+        liveActionsAllowed: false,
+        approvalBypassAllowed: false
+      }
+    }));
+  const rejectedLessons = listRejectedLessonPaths().map((lessonPath) => {
     const lesson = readJson(lessonPath);
-    return { lessonId: lesson.lessonId, title: lesson.title, scope: lesson.scope, status: lesson.status };
+    return { lessonId: lesson.lessonId, title: lesson.title, scope: lesson.scope, status: lesson.status, lessonPath };
+  });
+  const lessonConflicts = listLessonConflictPaths().map((conflictPath) => {
+    const conflict = readJson(conflictPath);
+    return {
+      promotionId: conflict.promotionId,
+      candidateLessonId: conflict.candidateLessonId,
+      existingLessonId: conflict.existingLessonId,
+      status: conflict.status,
+      conflictPath
+    };
   });
 
   const lessonCandidateSummaries = listLessonCandidatePaths()
@@ -384,8 +431,12 @@ function buildWorkerBriefing() {
   const lessonMemory = {
     acceptedCount: acceptedLessons.length,
     candidateCount: lessonCandidateSummaries.length,
+    rejectedCount: rejectedLessons.length,
+    conflictCount: lessonConflicts.length,
     latestCandidate: lessonCandidateSummaries[0] ?? null,
-    candidatesLoadedAsTruth: false
+    candidatesLoadedAsTruth: false,
+    rejectedLoadedAsTruth: false,
+    memoryGrantsPermission: false
   };
 
   const countActive = (relativeDir) => listDirectJson(relativeDir).length;
@@ -417,6 +468,8 @@ function buildWorkerBriefing() {
     archetypes,
     acceptedLessons,
     lessonMemory,
+    rejectedLessons,
+    lessonConflicts,
     activeSkills,
     skillLibrary,
     activeApprovals,

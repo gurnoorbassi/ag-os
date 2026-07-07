@@ -501,7 +501,10 @@ function collectQualityReview() {
         recordPath
       };
     }), "updatedAt");
-  const acceptedLessons = listDirectJson(".codex/memory/lessons")
+  const acceptedLessons = [
+    ...listDirectJson(".codex/memory/accepted"),
+    ...listDirectJson(".codex/memory/lessons")
+  ]
     .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"));
   return {
     critiquesCount: critiques.length,
@@ -513,6 +516,108 @@ function collectQualityReview() {
     candidateLessonCount: candidateLessons.length,
     acceptedLessonCount: acceptedLessons.length,
     candidatesLoadedAsTruth: false
+  };
+}
+
+function lessonSummary(recordPath) {
+  const record = readJson(recordPath);
+  return {
+    lessonId: record.lessonId,
+    title: record.title,
+    scope: record.scope,
+    status: record.status,
+    confidence: record.confidence,
+    updatedAt: record.updatedAt,
+    recordPath
+  };
+}
+
+function collectUnifiedMemory() {
+  const registry = readJsonIfExists(".codex/memory/registry.json");
+  const acceptedLessons = latestBy([
+    ...listDirectJson(".codex/memory/accepted"),
+    ...listDirectJson(".codex/memory/lessons")
+  ]
+    .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"))
+    .map(lessonSummary)
+    .filter((lesson) => lesson.status === "accepted"), "updatedAt");
+  const candidateLessons = latestBy(listDirectJson(".codex/memory/lessons/candidates")
+    .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"))
+    .map(lessonSummary)
+    .filter((lesson) => lesson.status === "candidate"), "updatedAt");
+  const rejectedLessons = latestBy(listDirectJson(".codex/memory/rejected")
+    .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"))
+    .map(lessonSummary), "updatedAt");
+  const conflicts = latestBy(listDirectJson(".codex/memory/conflicts")
+    .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"))
+    .map((recordPath) => {
+      const record = readJson(recordPath);
+      return {
+        promotionId: record.promotionId,
+        candidateLessonId: record.candidateLessonId,
+        existingLessonId: record.existingLessonId ?? "not_recorded",
+        status: record.status,
+        updatedAt: record.updatedAt,
+        recordPath
+      };
+    }), "updatedAt");
+  const staleLessons = candidateLessons.filter((lesson) => lesson.status === "stale_needs_review");
+  const decisionQueue = [
+    ...candidateLessons.map((lesson) => ({
+      id: `review-${lesson.lessonId}`,
+      decisionType: "candidate_lesson_review",
+      status: "review_needed",
+      lessonId: lesson.lessonId,
+      detail: "Owner can promote, reject, or leave candidate advisory.",
+      recordPath: lesson.recordPath
+    })),
+    ...conflicts.map((conflict) => ({
+      id: `resolve-${conflict.promotionId}`,
+      decisionType: "lesson_conflict_resolution",
+      status: "blocked",
+      lessonId: conflict.candidateLessonId,
+      detail: `Conflict with ${conflict.existingLessonId}; resolve before promotion.`,
+      recordPath: conflict.recordPath
+    })),
+    ...staleLessons.map((lesson) => ({
+      id: `stale-${lesson.lessonId}`,
+      decisionType: "stale_lesson_review",
+      status: "review_needed",
+      lessonId: lesson.lessonId,
+      detail: "Candidate has aged past the review window and should be refreshed, rejected, or kept advisory.",
+      recordPath: lesson.recordPath
+    }))
+  ];
+
+  return {
+    status: registry?.status ?? "missing",
+    registryPath: ".codex/memory/registry.json",
+    acceptedCount: acceptedLessons.length,
+    candidateCount: candidateLessons.length,
+    rejectedCount: rejectedLessons.length,
+    conflictCount: conflicts.length,
+    staleCount: staleLessons.length,
+    decisionQueueCount: decisionQueue.length,
+    candidatesLoadedAsTruth: false,
+    rejectedLoadedAsTruth: false,
+    acceptedLessonsLoadedByRuntime: registry?.runtimeLoading?.acceptedLessonsLoadedByRuntime === true,
+    memoryGrantsPermission: false,
+    skillsGrantPermission: false,
+    latestAcceptedLessons: acceptedLessons.slice(0, 5),
+    latestCandidateLessons: candidateLessons.slice(0, 5),
+    latestRejectedLessons: rejectedLessons.slice(0, 5),
+    conflicts: conflicts.slice(0, 5),
+    decisionQueue: decisionQueue.slice(0, 10),
+    scopes: Object.keys(registry?.scopeDefinitions ?? {}),
+    sourceRecords: [
+      ".codex/memory/registry.json",
+      ".codex/memory/accepted",
+      ".codex/memory/lessons/candidates",
+      ".codex/memory/rejected",
+      ".codex/memory/conflicts",
+      "scripts/load-accepted-lessons.mjs",
+      "scripts/process-lesson-promotion.mjs"
+    ]
   };
 }
 
@@ -791,6 +896,7 @@ export function collectDashboardData() {
   const approvals = collectApprovals();
   const qualityReview = collectQualityReview();
   const connectorAuth = collectConnectorAuth();
+  const unifiedMemory = collectUnifiedMemory();
   const costReadModel = collectCosts(costBudget);
   const skills = collectSkills();
   const clientManagement = collectClientManagement();
@@ -1112,6 +1218,7 @@ export function collectDashboardData() {
       n8nActiveWorkflowSource: n8nRecords.length > 0 ? "source-controlled export/connector records only" : "not recorded; no live n8n call"
     },
     qualityReview,
+    unifiedMemory,
     costs: costReadModel,
     skills,
     safeMerge: {
