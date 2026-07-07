@@ -593,6 +593,80 @@ function renderQualityReview() {
   );
 }
 
+function renderUnifiedMemory() {
+  const memory = data.unifiedMemory;
+  const root = clear("#unified-memory-grid");
+  root.append(
+    card({
+      title: "Accepted Lessons",
+      status: memory.acceptedLessonsLoadedByRuntime ? "ready" : "blocked",
+      metric: memory.acceptedCount,
+      detail: "Accepted lessons may be loaded as advisory runtime guidance.",
+      meta: memory.latestAcceptedLessons.length > 0
+        ? memory.latestAcceptedLessons.map((lesson) => `${lesson.lessonId}: ${lesson.scope}`)
+        : ["No accepted lessons recorded yet."]
+    }),
+    card({
+      title: "Candidate Lessons",
+      status: memory.candidatesLoadedAsTruth ? "blocked" : "review",
+      metric: memory.candidateCount,
+      detail: `candidatesLoadedAsTruth is ${memory.candidatesLoadedAsTruth}`,
+      meta: memory.latestCandidateLessons.map((lesson) => `${lesson.lessonId}: ${lesson.status}`)
+    }),
+    card({
+      title: "Rejected Lessons",
+      status: memory.rejectedLoadedAsTruth ? "blocked" : "ready",
+      metric: memory.rejectedCount,
+      detail: `rejectedLoadedAsTruth is ${memory.rejectedLoadedAsTruth}`,
+      meta: memory.latestRejectedLessons.map((lesson) => `${lesson.lessonId}: ${lesson.status}`)
+    }),
+    card({
+      title: "Conflicts",
+      status: memory.conflictCount > 0 ? "blocked" : "ready",
+      metric: memory.conflictCount,
+      detail: "Conflicts block promotion until resolved.",
+      meta: memory.conflicts.map((conflict) => `${conflict.candidateLessonId} vs ${conflict.existingLessonId}`)
+    }),
+    card({
+      title: "Permission Boundary",
+      status: memory.memoryGrantsPermission || memory.skillsGrantPermission ? "blocked" : "ready",
+      metric: "No permission grant",
+      detail: `memoryGrantsPermission=${memory.memoryGrantsPermission}; skillsGrantPermission=${memory.skillsGrantPermission}`,
+      meta: ["Memory never approves live actions.", "Skills remain procedural guidance only."]
+    }),
+    card({
+      title: "Decision Queue",
+      status: memory.decisionQueueCount > 0 ? "review" : "ready",
+      metric: memory.decisionQueueCount,
+      detail: "Read-only queue for promote, reject, stale review, and conflict decisions.",
+      meta: memory.decisionQueue.slice(0, 5).map((item) => `${item.decisionType}: ${item.status}`)
+    })
+  );
+
+  const panel = clear("#unified-memory-panel");
+  panel.append(
+    table(
+      ["Lesson decision", "Status", "Lesson", "Detail", "Record"],
+      memory.decisionQueue.map((item) => [
+        labelStack(item.decisionType, item.id),
+        pill(item.status),
+        item.lessonId,
+        item.detail,
+        item.recordPath
+      ])
+    ),
+    table(
+      ["Scope", "Registry", "Runtime loading", "Sources"],
+      memory.scopes.map((scope) => [
+        scope,
+        memory.status,
+        memory.acceptedLessonsLoadedByRuntime ? "accepted lessons loaded" : "accepted lesson loading blocked",
+        memory.sourceRecords.join("; ")
+      ])
+    )
+  );
+}
+
 function renderCosts() {
   const root = clear("#costs-panel");
   root.append(
@@ -661,6 +735,7 @@ renderSocialMedia();
 renderApprovals();
 renderConnectors();
 renderQualityReview();
+renderUnifiedMemory();
 renderCosts();
 renderSkills();
 renderSafeMerge();

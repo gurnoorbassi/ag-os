@@ -90,6 +90,7 @@ for (const requiredText of [
   "Approvals",
   "GitHub / Netlify / n8n",
   "Quality and Review",
+  "Unified Memory Learning",
   "Costs",
   "Skills",
   "Cost OS",
@@ -265,6 +266,27 @@ if (data.connectorProofs.n8nActiveWorkflowCount !== 0) {
 }
 if (data.qualityReview.candidatesLoadedAsTruth !== false) {
   fail("dashboard control center must keep candidate lessons out of accepted truth");
+}
+if (!data.unifiedMemory || data.unifiedMemory.status !== "active") {
+  fail("dashboard control center must show active unified memory registry status");
+}
+if (data.unifiedMemory.candidatesLoadedAsTruth !== false) {
+  fail("dashboard control center must keep unified memory candidatesLoadedAsTruth false");
+}
+if (data.unifiedMemory.rejectedLoadedAsTruth !== false) {
+  fail("dashboard control center must keep rejected lessons out of runtime truth");
+}
+if (data.unifiedMemory.memoryGrantsPermission !== false) {
+  fail("dashboard control center must show memoryGrantsPermission false");
+}
+if (data.unifiedMemory.skillsGrantPermission !== false) {
+  fail("dashboard control center must show unified memory skillsGrantPermission false");
+}
+if (data.unifiedMemory.acceptedLessonsLoadedByRuntime !== true) {
+  fail("dashboard control center must show accepted lessons are runtime-loadable");
+}
+if (data.unifiedMemory.candidateCount < data.qualityReview.candidateLessonCount) {
+  fail("dashboard control center unified memory must include candidate lesson count");
 }
 if (data.skills.skillsGrantPermission !== false) {
   fail("dashboard control center must show skillsGrantPermission false");

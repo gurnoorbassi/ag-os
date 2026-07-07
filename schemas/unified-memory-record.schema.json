@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/unified-memory-record.schema.json",
+  "title": "AG OS Unified Memory Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "recordType",
+    "registryId",
+    "status",
+    "sourceOfTruth",
+    "scopeDefinitions",
+    "rules",
+    "runtimeLoading",
+    "dashboard",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../schemas/unified-memory-record.schema.json" },
+    "recordType": { "type": "string", "const": "unified_memory_registry" },
+    "registryId": { "type": "string", "const": "unified-memory-registry" },
+    "status": { "type": "string", "enum": ["active", "archived"] },
+    "sourceOfTruth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptedLessonsDir", "candidateLessonsDir", "rejectedLessonsDir", "conflictsDir", "skillsDir"],
+      "properties": {
+        "acceptedLessonsDir": { "type": "string", "const": ".codex/memory/accepted" },
+        "legacyAcceptedLessonsDir": { "type": "string" },
+        "candidateLessonsDir": { "type": "string", "const": ".codex/memory/lessons/candidates" },
+        "rejectedLessonsDir": { "type": "string", "const": ".codex/memory/rejected" },
+        "conflictsDir": { "type": "string", "const": ".codex/memory/conflicts" },
+        "skillsDir": { "type": "string", "const": ".codex/skills" }
+      }
+    },
+    "scopeDefinitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["personal", "project", "client", "company", "agent_shared", "worker_specific"],
+      "properties": {
+        "personal": { "type": "string", "minLength": 1 },
+        "project": { "type": "string", "minLength": 1 },
+        "client": { "type": "string", "minLength": 1 },
+        "company": { "type": "string", "minLength": 1 },
+        "agent_shared": { "type": "string", "minLength": 1 },
+        "worker_specific": { "type": "string", "minLength": 1 }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidateLessonsAdvisoryOnly",
+        "ownerApprovalRequiredForPromotion",
+        "rejectedLessonsLoadedAsTruth",
+        "skillsRequireAcceptedLessons",
+        "skillsGrantPermission",
+        "memoryGrantsPermission",
+        "secretsAllowed",
+        "customerDataAllowed",
+        "productionDataAllowed",
+        "conflictsBlockPromotion"
+      ],
+      "properties": {
+        "candidateLessonsAdvisoryOnly": { "type": "boolean", "const": true },
+        "ownerApprovalRequiredForPromotion": { "type": "boolean", "const": true },
+        "rejectedLessonsLoadedAsTruth": { "type": "boolean", "const": false },
+        "skillsRequireAcceptedLessons": { "type": "boolean", "const": true },
+        "skillsGrantPermission": { "type": "boolean", "const": false },
+        "memoryGrantsPermission": { "type": "boolean", "const": false },
+        "secretsAllowed": { "type": "boolean", "const": false },
+        "customerDataAllowed": { "type": "boolean", "const": false },
+        "productionDataAllowed": { "type": "boolean", "const": false },
+        "conflictsBlockPromotion": { "type": "boolean", "const": true }
+      }
+    },
+    "runtimeLoading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptedLessonsLoadedByRuntime", "candidateLessonsLoadedAsTruth", "rejectedLessonsLoadedAsTruth"],
+      "properties": {
+        "acceptedLessonsLoadedByRuntime": { "type": "boolean" },
+        "candidateLessonsLoadedAsTruth": { "type": "boolean", "const": false },
+        "rejectedLessonsLoadedAsTruth": { "type": "boolean", "const": false },
+        "loaderScript": { "type": "string" }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lessonDecisionQueueVisible", "candidatesLoadedAsTruthVisible", "skillsGrantPermissionVisible"],
+      "properties": {
+        "lessonDecisionQueueVisible": { "type": "boolean", "const": true },
+        "candidatesLoadedAsTruthVisible": { "type": "boolean", "const": true },
+        "skillsGrantPermissionVisible": { "type": "boolean", "const": true }
+      }
+    },
+    "notes": { "type": "string" },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string", "minLength": 1 }
+  }
+}
