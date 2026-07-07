@@ -2704,6 +2704,170 @@ window.AG_OS_DASHBOARD_DATA = {
     "acceptedLessonCount": 0,
     "candidatesLoadedAsTruth": false
   },
+  "unifiedMemory": {
+    "status": "active",
+    "registryPath": ".codex/memory/registry.json",
+    "acceptedCount": 0,
+    "candidateCount": 14,
+    "rejectedCount": 0,
+    "conflictCount": 0,
+    "staleCount": 0,
+    "decisionQueueCount": 14,
+    "candidatesLoadedAsTruth": false,
+    "rejectedLoadedAsTruth": false,
+    "acceptedLessonsLoadedByRuntime": true,
+    "memoryGrantsPermission": false,
+    "skillsGrantPermission": false,
+    "latestAcceptedLessons": [],
+    "latestCandidateLessons": [
+      {
+        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01",
+        "title": "Owner draft approval is not social execution approval",
+        "scope": "agent_shared",
+        "status": "candidate",
+        "confidence": "high",
+        "updatedAt": "2026-07-05T06:37:48Z",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01.json"
+      },
+      {
+        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01",
+        "title": "Draft approval must remain separate from live social approval",
+        "scope": "agent_shared",
+        "status": "candidate",
+        "confidence": "high",
+        "updatedAt": "2026-07-05T05:39:30Z",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01.json"
+      },
+      {
+        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01",
+        "title": "Draft content sprints need evidence and risk notes before live-channel approval",
+        "scope": "agent_shared",
+        "status": "candidate",
+        "confidence": "high",
+        "updatedAt": "2026-07-05T04:43:00Z",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01.json"
+      },
+      {
+        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01",
+        "title": "Internal social client configs must keep account access pending until owner input exists",
+        "scope": "agent_shared",
+        "status": "candidate",
+        "confidence": "high",
+        "updatedAt": "2026-07-05T01:59:30Z",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01.json"
+      },
+      {
+        "lessonId": "lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01",
+        "title": "Draft social media upgrades should surface intake gaps before build complexity",
+        "scope": "agent_shared",
+        "status": "candidate",
+        "confidence": "high",
+        "updatedAt": "2026-07-05T00:51:42Z",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01.json"
+      }
+    ],
+    "latestRejectedLessons": [],
+    "conflicts": [],
+    "decisionQueue": [
+      {
+        "id": "review-lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01.json"
+      },
+      {
+        "id": "review-lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01.json"
+      },
+      {
+        "id": "review-lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01.json"
+      },
+      {
+        "id": "review-lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01.json"
+      },
+      {
+        "id": "review-lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01.json"
+      },
+      {
+        "id": "review-lesson-20260704-runtime-target-pr-review-social-media-system-v1-20260704-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-target-pr-review-social-media-system-v1-20260704-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-social-media-system-v1-20260704-01.json"
+      },
+      {
+        "id": "review-lesson-20260704-runtime-target-pr-review-construction-website-20260704-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-target-pr-review-construction-website-20260704-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-construction-website-20260704-01.json"
+      },
+      {
+        "id": "review-lesson-20260704-runtime-closed-loop-crm-proof-20260704-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-closed-loop-crm-proof-20260704-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-closed-loop-crm-proof-20260704-01.json"
+      },
+      {
+        "id": "review-lesson-20260704-runtime-closed-loop-crm-proof-20260704-02",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-closed-loop-crm-proof-20260704-02",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-closed-loop-crm-proof-20260704-02.json"
+      },
+      {
+        "id": "review-lesson-20260704-runtime-closed-loop-crm-proof-20260704-03",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-closed-loop-crm-proof-20260704-03",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-closed-loop-crm-proof-20260704-03.json"
+      }
+    ],
+    "scopes": [
+      "personal",
+      "project",
+      "client",
+      "company",
+      "agent_shared",
+      "worker_specific"
+    ],
+    "sourceRecords": [
+      ".codex/memory/registry.json",
+      ".codex/memory/accepted",
+      ".codex/memory/lessons/candidates",
+      ".codex/memory/rejected",
+      ".codex/memory/conflicts",
+      "scripts/load-accepted-lessons.mjs",
+      "scripts/process-lesson-promotion.mjs"
+    ]
+  },
   "costs": {
     "ledgerCount": 41,
     "latestCosts": [

@@ -13,6 +13,8 @@ AG OS should learn from repeated work without letting unreviewed observations be
 5. Applied Guidance: The accepted lesson may update docs, archetypes, templates, validation, or planner behavior through a separate reviewed PR when needed.
 6. Governance Change: If the lesson changes Constitution, authority, approvals, safe-merge rules, or owner model, it requires owner approval and the governance amendment path.
 
+The local promotion helper is `scripts/process-lesson-promotion.mjs`. It supports promotion, rejection, and conflict checks, but it does not remove the requirement for owner approval and reviewed source-control changes.
+
 ## Evidence Requirements
 
 A lesson candidate should include:
@@ -32,6 +34,8 @@ A lesson candidate should include:
 - Lessons do not authorize live services, credentials, deployment, domain or DNS changes, paid actions, production data, customer data, outreach, posting, or phone and voice actions.
 - Lessons that touch protected projects must keep Lead Gen read-only and AI Receptionist separate unless separately approved.
 - Lessons must not turn a one-off preference into a global rule unless the owner explicitly states it.
+- Accepted lessons are loaded through `scripts/load-accepted-lessons.mjs` as advisory runtime context only.
+- Candidate and rejected lessons must not be loaded as runtime truth.
 
 ## Quality Checks
 

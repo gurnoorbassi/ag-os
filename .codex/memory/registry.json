@@ -1,0 +1,48 @@
+{
+  "$schema": "../../schemas/unified-memory-record.schema.json",
+  "recordType": "unified_memory_registry",
+  "registryId": "unified-memory-registry",
+  "status": "active",
+  "sourceOfTruth": {
+    "acceptedLessonsDir": ".codex/memory/accepted",
+    "legacyAcceptedLessonsDir": ".codex/memory/lessons",
+    "candidateLessonsDir": ".codex/memory/lessons/candidates",
+    "rejectedLessonsDir": ".codex/memory/rejected",
+    "conflictsDir": ".codex/memory/conflicts",
+    "skillsDir": ".codex/skills"
+  },
+  "scopeDefinitions": {
+    "personal": "Owner preference or learning style that applies to the owner only.",
+    "project": "Project-specific operating lesson tied to a named AG OS project.",
+    "client": "Client-specific operating lesson that must not be generalized without owner approval.",
+    "company": "AG Digitalz-wide operating lesson or rule.",
+    "agent_shared": "Reusable lesson available to approved AG OS workers.",
+    "worker_specific": "Guidance for one worker type or tool path only."
+  },
+  "rules": {
+    "candidateLessonsAdvisoryOnly": true,
+    "ownerApprovalRequiredForPromotion": true,
+    "rejectedLessonsLoadedAsTruth": false,
+    "skillsRequireAcceptedLessons": true,
+    "skillsGrantPermission": false,
+    "memoryGrantsPermission": false,
+    "secretsAllowed": false,
+    "customerDataAllowed": false,
+    "productionDataAllowed": false,
+    "conflictsBlockPromotion": true
+  },
+  "runtimeLoading": {
+    "acceptedLessonsLoadedByRuntime": true,
+    "candidateLessonsLoadedAsTruth": false,
+    "rejectedLessonsLoadedAsTruth": false,
+    "loaderScript": "scripts/load-accepted-lessons.mjs"
+  },
+  "dashboard": {
+    "lessonDecisionQueueVisible": true,
+    "candidatesLoadedAsTruthVisible": true,
+    "skillsGrantPermissionVisible": true
+  },
+  "notes": "Unified Memory + Learning OS v1 registry. This is governance metadata only; it does not promote candidates, create accepted lessons, or grant live-action permission.",
+  "createdAt": "2026-07-06T00:00:00Z",
+  "updatedAt": "2026-07-06T00:00:00Z"
+}

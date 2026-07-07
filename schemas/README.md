@@ -20,6 +20,9 @@ Current validation checks schema metadata plus selected template, registry, poli
 - `task.schema.json`
 - `memory.schema.json`
 - `memory-policy.schema.json`
+- `unified-memory-record.schema.json`
+- `lesson.schema.json`
+- `lesson-promotion.schema.json`
 - `cost.schema.json`
 - `quality-check.schema.json`
 - `security-review.schema.json`

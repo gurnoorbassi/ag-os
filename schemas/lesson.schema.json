@@ -28,7 +28,7 @@
     },
     "scope": {
       "type": "string",
-      "enum": ["personal", "project", "company", "agent_shared"]
+      "enum": ["personal", "project", "client", "company", "agent_shared", "worker_specific"]
     },
     "confidence": {
       "type": "string",
@@ -53,13 +53,50 @@
     "promotion": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["approvalId", "approvedBy", "approvedAt", "evidence", "sourceCandidatePath"],
       "properties": {
+        "approvalId": { "type": "string", "pattern": "^approval-[0-9]{8}-[a-z0-9]+(?:-[a-z0-9]+)*$" },
         "approvedBy": { "type": "string" },
         "approvedAt": { "type": "string" },
         "evidence": {
           "type": "array",
+          "minItems": 1,
           "items": { "type": "string", "minLength": 1 }
-        }
+        },
+        "sourceCandidatePath": { "type": "string", "minLength": 1 }
+      }
+    },
+    "rejection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rejectedBy", "rejectedAt", "reason", "sourceCandidatePath"],
+      "properties": {
+        "rejectedBy": { "type": "string", "minLength": 1 },
+        "rejectedAt": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "sourceCandidatePath": { "type": "string", "minLength": 1 }
+      }
+    },
+    "runtimeUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowedForPlanning",
+        "allowedForCritic",
+        "allowedForBuilder",
+        "allowedForWorkers",
+        "grantsPermission",
+        "liveActionsAllowed",
+        "approvalBypassAllowed"
+      ],
+      "properties": {
+        "allowedForPlanning": { "type": "boolean" },
+        "allowedForCritic": { "type": "boolean" },
+        "allowedForBuilder": { "type": "boolean" },
+        "allowedForWorkers": { "type": "boolean" },
+        "grantsPermission": { "type": "boolean", "const": false },
+        "liveActionsAllowed": { "type": "boolean", "const": false },
+        "approvalBypassAllowed": { "type": "boolean", "const": false }
       }
     },
     "notes": { "type": "string" },

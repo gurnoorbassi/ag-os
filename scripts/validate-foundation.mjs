@@ -37,12 +37,19 @@ const requiredPaths = [
   "docs/critic-worker.md",
   "docs/secure-credential-store.md",
   "docs/secret-redaction-policy.md",
+  "docs/unified-memory-learning-os.md",
+  "docs/lesson-promotion-policy.md",
+  "docs/cross-worker-memory-sync.md",
   ".codex/agents/README.md",
   ".codex/tasks/README.md",
   ".codex/locks/README.md",
   ".codex/ideas/README.md",
   ".codex/memory/README.md",
   ".codex/memory/policy.json",
+  ".codex/memory/registry.json",
+  ".codex/memory/accepted/README.md",
+  ".codex/memory/rejected/README.md",
+  ".codex/memory/conflicts/README.md",
   ".codex/costs/README.md",
   ".codex/costs/budget.json",
   ".codex/quality/README.md",
@@ -115,7 +122,9 @@ const requiredPaths = [
   "schemas/deliverable.schema.json",
   "schemas/access-request.schema.json",
   "schemas/client-approval.schema.json",
-  "schemas/credential-reference.schema.json"
+  "schemas/credential-reference.schema.json",
+  "schemas/unified-memory-record.schema.json",
+  "schemas/lesson-promotion.schema.json"
 ];
 
 const forbiddenPatterns = [
@@ -211,6 +220,11 @@ const schemaValidatedRecords = [
     schemaPath: "schemas/memory-policy.schema.json"
   },
   {
+    name: "unified memory registry",
+    recordPath: ".codex/memory/registry.json",
+    schemaPath: "schemas/unified-memory-record.schema.json"
+  },
+  {
     name: "capability registry",
     recordPath: ".codex/capabilities/registry.json",
     schemaPath: "schemas/capability-registry.schema.json"
@@ -251,10 +265,28 @@ const knowledgeRecordDirectories = [
     allowedStatuses: ["accepted", "archived"]
   },
   {
+    name: "accepted unified lesson",
+    recordDir: ".codex/memory/accepted",
+    schemaPath: "schemas/lesson.schema.json",
+    allowedStatuses: ["accepted", "archived"]
+  },
+  {
     name: "lesson candidate",
     recordDir: ".codex/memory/lessons/candidates",
     schemaPath: "schemas/lesson.schema.json",
     allowedStatuses: ["candidate", "rejected"]
+  },
+  {
+    name: "rejected lesson",
+    recordDir: ".codex/memory/rejected",
+    schemaPath: "schemas/lesson.schema.json",
+    allowedStatuses: ["rejected", "archived"]
+  },
+  {
+    name: "lesson conflict",
+    recordDir: ".codex/memory/conflicts",
+    schemaPath: "schemas/lesson-promotion.schema.json",
+    allowedStatuses: ["blocked", "archived"]
   },
   {
     name: "skill",
@@ -982,6 +1014,55 @@ function validateMemoryPolicy(record) {
   }
 }
 
+function validateUnifiedMemoryRegistry(record) {
+  const requiredDirs = [
+    record.sourceOfTruth?.acceptedLessonsDir,
+    record.sourceOfTruth?.candidateLessonsDir,
+    record.sourceOfTruth?.rejectedLessonsDir,
+    record.sourceOfTruth?.conflictsDir,
+    record.sourceOfTruth?.skillsDir
+  ];
+  for (const requiredDir of requiredDirs) {
+    if (!requiredDir || !existsSync(path.join(root, requiredDir))) {
+      fail(`unified memory registry points to missing directory: ${requiredDir}`);
+    }
+  }
+
+  for (const requiredScope of ["personal", "project", "client", "company", "agent_shared", "worker_specific"]) {
+    if (!record.scopeDefinitions?.[requiredScope]) {
+      fail(`unified memory registry missing scope definition: ${requiredScope}`);
+    }
+  }
+
+  if (record.rules?.candidateLessonsAdvisoryOnly !== true) {
+    fail("unified memory registry must keep candidate lessons advisory only");
+  }
+  if (record.rules?.ownerApprovalRequiredForPromotion !== true) {
+    fail("unified memory registry must require owner approval for lesson promotion");
+  }
+  if (record.rules?.memoryGrantsPermission !== false) {
+    fail("unified memory registry must not allow memory to grant permission");
+  }
+  if (record.rules?.skillsGrantPermission !== false) {
+    fail("unified memory registry must not allow skills to grant permission");
+  }
+  if (record.rules?.secretsAllowed !== false || record.rules?.customerDataAllowed !== false || record.rules?.productionDataAllowed !== false) {
+    fail("unified memory registry must block secrets, customer data, and production data");
+  }
+  if (record.rules?.conflictsBlockPromotion !== true) {
+    fail("unified memory registry must block promotion on lesson conflicts");
+  }
+  if (record.runtimeLoading?.candidateLessonsLoadedAsTruth !== false) {
+    fail("unified memory registry must keep candidatesLoadedAsTruth false");
+  }
+  if (record.runtimeLoading?.rejectedLessonsLoadedAsTruth !== false) {
+    fail("unified memory registry must keep rejectedLessonsLoadedAsTruth false");
+  }
+  if (!record.runtimeLoading?.loaderScript || !existsSync(path.join(root, record.runtimeLoading.loaderScript))) {
+    fail("unified memory registry loaderScript must point to an existing loader");
+  }
+}
+
 function validateCapabilityRegistry(record) {
   if (record.status === "foundation" && record.capabilities?.length !== 0) {
     fail("capability registry foundation must not include capability records yet");
@@ -1249,6 +1330,10 @@ for (const schemaValidatedRecord of schemaValidatedRecords) {
 
     if (schemaValidatedRecord.recordPath === ".codex/memory/policy.json") {
       validateMemoryPolicy(record);
+    }
+
+    if (schemaValidatedRecord.recordPath === ".codex/memory/registry.json") {
+      validateUnifiedMemoryRegistry(record);
     }
 
     if (schemaValidatedRecord.recordPath === ".codex/capabilities/registry.json") {
