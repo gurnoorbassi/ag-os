@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { readJson } from "./lib/runtime/common.mjs";
 
 const root = process.cwd();
 
@@ -498,10 +499,6 @@ for (const schemaName of readdirSync(path.join(root, "schemas")).filter((name) =
   } catch (error) {
     fail(`${schemaName} is not valid JSON: ${error.message}`);
   }
-}
-
-function readJson(relativePath) {
-  return JSON.parse(readFileSync(path.join(root, relativePath), "utf8"));
 }
 
 function listJsonRecords(relativeDir) {

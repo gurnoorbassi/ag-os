@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
@@ -35,6 +35,21 @@ export function resolveWorkspacePath(relativePath, root = process.cwd()) {
 
 export function readJson(relativePath, root = process.cwd()) {
   return JSON.parse(readFileSync(resolveWorkspacePath(relativePath, root), "utf8"));
+}
+
+export function listDirectJson(relativeDir, options = {}) {
+  const root = options.root ?? process.cwd();
+  const absoluteDir = path.join(root, relativeDir);
+  if (!existsSync(absoluteDir)) {
+    return [];
+  }
+
+  const excluded = new Set(options.exclude ?? []);
+  return readdirSync(absoluteDir)
+    .filter((name) => name.endsWith(".json"))
+    .filter((name) => !name.endsWith(".template.json"))
+    .filter((name) => !excluded.has(name))
+    .map((name) => path.join(relativeDir, name).replaceAll("\\", "/"));
 }
 
 export function writeJson(relativePath, record, root = process.cwd()) {

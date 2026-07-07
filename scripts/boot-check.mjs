@@ -1,7 +1,8 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
+import { listDirectJson, readJson } from "./lib/runtime/common.mjs";
 
 const root = process.cwd();
 const now = new Date();
@@ -13,24 +14,6 @@ function addCheck(checkId, status, evidence, required = true) {
 
 function readText(relativePath) {
   return readFileSync(path.join(root, relativePath), "utf8");
-}
-
-function readJson(relativePath) {
-  return JSON.parse(readText(relativePath));
-}
-
-function listDirectJson(relativeDir, options = {}) {
-  const absoluteDir = path.join(root, relativeDir);
-  if (!existsSync(absoluteDir)) {
-    return [];
-  }
-
-  const excluded = new Set(options.exclude ?? []);
-  return readdirSync(absoluteDir)
-    .filter((name) => name.endsWith(".json"))
-    .filter((name) => !name.endsWith(".template.json"))
-    .filter((name) => !excluded.has(name))
-    .map((name) => path.join(relativeDir, name).replaceAll("\\", "/"));
 }
 
 function runLocalNodeScript(relativePath) {
