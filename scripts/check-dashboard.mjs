@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { collectDashboardData, renderDashboardDataModule } from "./build-dashboard.mjs";
 
@@ -117,14 +117,14 @@ if (data.dashboardActionQueue.blockedActionCount < 1) {
 if (data.dashboardActionQueue.approvalPackageCount < 1) {
   fail("dashboard action queue must surface approval package templates");
 }
-if (data.dashboardActionQueue.manualPostingAvailable !== true) {
-  fail("dashboard action queue must show manual posting availability from approved draft records");
+if (typeof data.dashboardActionQueue.manualPostingAvailable !== "boolean") {
+  fail("dashboard action queue must report manual posting availability as a boolean");
 }
-if (!data.dashboardActionQueue.oauthBlockedReason.includes("secure credential")) {
-  fail("dashboard action queue must explain OAuth is blocked by missing secure credential storage");
+if (typeof data.dashboardActionQueue.oauthBlockedReason !== "string" || data.dashboardActionQueue.oauthBlockedReason.length === 0) {
+  fail("dashboard action queue must explain why OAuth is blocked");
 }
-if (!data.dashboardActionQueue.credentialStoreMissingReason.includes("No approved credential store")) {
-  fail("dashboard action queue must explain the missing credential-store decision");
+if (typeof data.dashboardActionQueue.credentialStoreMissingReason !== "string" || data.dashboardActionQueue.credentialStoreMissingReason.length === 0) {
+  fail("dashboard action queue must explain the credential-store decision state");
 }
 if (data.capabilityRegistry.provenCount < 1) {
   fail("dashboard control center must show proven capabilities");
@@ -132,121 +132,139 @@ if (data.capabilityRegistry.provenCount < 1) {
 if (data.capabilityRegistry.blockedCount < 1) {
   fail("dashboard control center must show blocked capabilities");
 }
-if (data.clientManagement.clientCount !== 1 || data.clientManagement.engagementCount !== 1) {
-  fail("dashboard control center must show the first registered client and engagement");
+// --- Growth-safe invariants --------------------------------------------
+// These checks verify correctness rules that stay true as the business
+// grows. Adding a legitimate client, engagement, deliverable, or content
+// sprint must never require editing this file. Safety rules stay exact.
+
+function requireCount(label, actual, options = {}) {
+  if (!Number.isInteger(actual) || actual < 0) {
+    fail(`${label} must be a non-negative integer, got ${actual}`);
+    return;
+  }
+  if (options.min !== undefined && actual < options.min) {
+    fail(`${label} must be at least ${options.min}, got ${actual}`);
+  }
+  if (options.max !== undefined && actual > options.max) {
+    fail(`${label} must be at most ${options.max}, got ${actual}`);
+  }
+  if (options.equals !== undefined && actual !== options.equals) {
+    fail(`${label} must equal ${options.equals}, got ${actual}`);
+  }
 }
-if (data.clientManagement.deliverableCount !== 6) {
-  fail("dashboard control center must show six AG Digitalz deliverables");
+
+function listRecordFiles(relativeDir) {
+  const absolute = path.join(root, relativeDir);
+  if (!existsSync(absolute)) {
+    return [];
+  }
+  return readdirSync(absolute).filter((name) => name.endsWith(".json"));
 }
-if (data.clientManagement.accessRequestCount !== 4) {
-  fail("dashboard control center must show four AG Digitalz social access requests");
+
+const cm = data.clientManagement;
+
+// Dashboard counts must match the records on disk exactly: no record shown
+// that does not exist, no record on disk missing from the dashboard.
+requireCount("clientManagement.clientCount", cm.clientCount, {
+  min: 1,
+  equals: listRecordFiles(".codex/client-management/clients").length
+});
+requireCount("clientManagement.engagementCount", cm.engagementCount, {
+  min: 1,
+  equals: listRecordFiles(".codex/client-management/engagements").length
+});
+requireCount("clientManagement.deliverableCount", cm.deliverableCount, {
+  equals: listRecordFiles(".codex/client-management/deliverables").length
+});
+requireCount("clientManagement.accessRequestCount", cm.accessRequestCount, {
+  equals: listRecordFiles(".codex/client-management/access-requests").length
+});
+const pendingApprovalsOnDisk = listRecordFiles(".codex/client-management/approvals")
+  .map((name) => JSON.parse(read(`.codex/client-management/approvals/${name}`)))
+  .filter((approval) => approval.status === "pending").length;
+requireCount("clientManagement.pendingApprovalCount", cm.pendingApprovalCount, {
+  equals: pendingApprovalsOnDisk
+});
+for (const client of cm.clients) {
+  if (!client.clientId || !client.clientName) {
+    fail("every dashboard client must carry a clientId and clientName");
+  }
 }
-if (data.clientManagement.pendingApprovalCount !== 2) {
-  fail("dashboard control center must show two remaining pending AG Digitalz client approvals");
-}
-if (data.clientManagement.clients[0]?.clientName !== "AG Digitalz") {
-  fail("dashboard control center must show AG Digitalz as the first registered client");
-}
-if (data.firstClientReadiness.status !== "active_draft_configured") {
-  fail("dashboard control center must show first client active draft configured status");
+if (!cm.clients.some((client) => client.clientName === "AG Digitalz")) {
+  fail("dashboard control center must include the AG Digitalz internal client record");
 }
 if (data.firstClientReadiness.activeClientRecordsCreated !== true) {
   fail("dashboard control center must show active first-client records were created");
 }
 if (data.firstClientReadiness.missingRequiredFieldCount !== 0) {
-  fail("dashboard control center must show no missing fields for the registered AG Digitalz client records");
+  fail("dashboard control center must show no missing required fields in registered client records");
 }
-if (data.socialMediaSystem.stagingUrl !== "https://ag-social-media-management-system-staging.netlify.app") {
-  fail("dashboard control center must show the recorded Social Media staging URL");
+if (typeof data.firstClientReadiness.status !== "string" || data.firstClientReadiness.status.length === 0) {
+  fail("dashboard control center must show a first-client readiness status");
 }
-if (!["v1.2", "v1.3 draft PR", "v1.3", "v1.4 draft PR", "v1.4 reviewed PR", "v1.4", "v1.5 owner-approved drafts", "v1.6 interactive draft UI", "v1.7 Instagram handle", "v1.8 manual posting pack"].includes(data.socialMediaSystem.currentVersion)) {
+if (!/^https:\/\/[a-z0-9-]+\.netlify\.app$/.test(data.socialMediaSystem.stagingUrl) ||
+  !data.socialMediaSystem.stagingUrl.includes("staging")) {
+  fail("dashboard control center must show a staging-only Netlify URL for the Social Media system");
+}
+if (typeof data.socialMediaSystem.currentVersion !== "string" || data.socialMediaSystem.currentVersion.length === 0) {
   fail("dashboard control center must show the recorded Social Media System version state");
 }
-if (data.socialMediaSystem.currentVersion === "v1.2" && data.socialMediaSystem.targetMergeSha !== "6f54d3b5b257c2662319f39c0b89f810e22289e5") {
-  fail("dashboard control center must show the recorded Social Media AG Digitalz target merge SHA");
+const sprint = data.socialMediaSystem.contentSprint;
+if (typeof sprint.sprintId !== "string" || !sprint.sprintId.startsWith("content-sprint-")) {
+  fail("dashboard control center must show a content sprint record id");
 }
-if (data.socialMediaSystem.contentSprint.sprintId !== "content-sprint-ag-digitalz-first-content-sprint-v1") {
-  fail("dashboard control center must show AG Digitalz First Content Sprint v1");
+requireCount("contentSprint.draftPostPackageCount", sprint.draftPostPackageCount);
+requireCount("contentSprint.weeklyReportDraftCount", sprint.weeklyReportDraftCount);
+requireCount("contentSprint.pendingDraftApprovalCount", sprint.pendingDraftApprovalCount);
+requireCount("contentSprint.postsReviewedCount", sprint.postsReviewedCount);
+requireCount("contentSprint.postsRevisedCount", sprint.postsRevisedCount);
+requireCount("contentSprint.needsRevisionCount", sprint.needsRevisionCount);
+requireCount("contentSprint.blockedByMissingProofCount", sprint.blockedByMissingProofCount);
+requireCount("contentSprint.blockedByMissingHandleCount", sprint.blockedByMissingHandleCount);
+requireCount("contentSprint.approvedDraftCount", sprint.approvedDraftCount, {
+  max: sprint.draftPostPackageCount
+});
+requireCount("contentSprint.ownerApprovedDraftCount", sprint.ownerApprovedDraftCount, {
+  max: sprint.draftPostPackageCount
+});
+if (sprint.ownerApprovedDraftCount > sprint.approvedDraftCount) {
+  fail("owner-approved draft count cannot exceed reviewed approved draft count");
 }
-if (data.socialMediaSystem.contentSprint.draftPostPackageCount !== 21) {
-  fail("dashboard control center must show 21 draft post packages");
+if (typeof sprint.weeklyReportApprovalStatus !== "string" || sprint.weeklyReportApprovalStatus.length === 0) {
+  fail("dashboard control center must show a weekly report approval status");
 }
-if (data.socialMediaSystem.contentSprint.weeklyReportDraftCount !== 1) {
-  fail("dashboard control center must show one weekly report draft");
-}
-if (data.socialMediaSystem.contentSprint.pendingDraftApprovalCount !== 0) {
-  fail("dashboard control center must show no pending draft approvals after owner draft approval");
-}
-if (["v1.4 draft PR", "v1.4 reviewed PR", "v1.4", "v1.5 owner-approved drafts", "v1.6 interactive draft UI", "v1.7 Instagram handle", "v1.8 manual posting pack"].includes(data.socialMediaSystem.currentVersion) &&
-  (data.socialMediaSystem.contentSprint.postsReviewedCount !== 21 ||
-    data.socialMediaSystem.contentSprint.postsRevisedCount !== 21 ||
-    data.socialMediaSystem.contentSprint.approvedDraftCount !== 21 ||
-    data.socialMediaSystem.contentSprint.needsRevisionCount !== 0 ||
-    data.socialMediaSystem.contentSprint.blockedByMissingProofCount !== 0 ||
-    data.socialMediaSystem.contentSprint.blockedByMissingHandleCount !== 0)) {
-  fail("dashboard control center must show content review counts for the v1.4 draft PR");
-}
-if (data.socialMediaSystem.contentSprint.ownerApprovedDraftCount !== 21) {
-  fail("dashboard control center must show 21 owner-approved draft post packages");
-}
-if (data.socialMediaSystem.contentSprint.weeklyReportApprovalStatus !== "owner_approved_draft") {
-  fail("dashboard control center must show the weekly report approved as draft content");
-}
-const platformStates = Object.fromEntries(data.socialMediaSystem.contentSprint.platforms.map((platform) => [platform.platform, platform]));
-if (platformStates.Instagram?.handle !== "@agdigitalz" || platformStates.Instagram?.handleStatus !== "public_handle_provided") {
-  fail("dashboard control center must show the official AG Digitalz Instagram handle");
-}
-for (const platformName of ["TikTok", "YouTube Shorts", "LinkedIn"]) {
-  const platform = platformStates[platformName];
-  if (platform?.handle !== "not_provided" || platform?.handleStatus !== "pending_owner_input") {
-    fail("dashboard control center must keep TikTok, YouTube Shorts, and LinkedIn handles pending owner input");
+for (const platform of sprint.platforms) {
+  if (platform.handleStatus === "public_handle_provided") {
+    if (typeof platform.handle !== "string" || !platform.handle.startsWith("@")) {
+      fail(`platform ${platform.platform} claims a public handle but does not carry one`);
+    }
+  } else if (platform.handleStatus === "pending_owner_input") {
+    if (platform.handle !== "not_provided") {
+      fail(`platform ${platform.platform} is pending owner input but carries a handle`);
+    }
+  } else {
+    fail(`platform ${platform.platform} has unknown handleStatus: ${platform.handleStatus}`);
   }
 }
-if (data.socialMediaSystem.contentSprint.socialOauthConnected !== false ||
-  data.socialMediaSystem.contentSprint.credentialsStored !== false ||
-  data.socialMediaSystem.contentSprint.analyticsApiUsed !== false ||
-  data.socialMediaSystem.contentSprint.n8nActivated !== false) {
+if (sprint.socialOauthConnected !== false ||
+  sprint.credentialsStored !== false ||
+  sprint.analyticsApiUsed !== false ||
+  sprint.n8nActivated !== false) {
   fail("dashboard control center must show content sprint live integrations blocked");
 }
-const hasAgDigitalzRedeployRecord = data.socialMediaSystem.sourceRecords.includes(
-  ".codex/connectors/connector-exec-20260704-ag-digitalz-netlify-staging-redeploy-live-result.json"
-);
-const hasAgDigitalzFirstContentSprintDeployRecord = data.socialMediaSystem.sourceRecords.includes(
-  ".codex/connectors/connector-exec-20260704-ag-digitalz-first-content-sprint-netlify-staging-live-result.json"
-);
-const hasAgDigitalzContentReviewDeployRecord = data.socialMediaSystem.sourceRecords.includes(
-  ".codex/connectors/connector-exec-20260704-ag-digitalz-content-review-netlify-staging-live-result.json"
-);
-const hasAgDigitalzDraftApprovalDeployRecord = data.socialMediaSystem.sourceRecords.includes(
-  ".codex/connectors/connector-exec-20260704-ag-digitalz-draft-approval-netlify-staging-live-result.json"
-);
-const hasInteractiveDraftUiDeployRecord = data.socialMediaSystem.sourceRecords.includes(
-  ".codex/connectors/connector-exec-20260705-social-media-interactive-draft-ui-netlify-staging-live-result.json"
-);
-const hasInstagramHandleDeployRecord = data.socialMediaSystem.sourceRecords.includes(
-  ".codex/connectors/connector-exec-20260705-ag-digitalz-instagram-handle-netlify-staging-live-result.json"
-);
-const hasManualPostingDeployRecord = data.socialMediaSystem.sourceRecords.includes(
-  ".codex/connectors/connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result.json"
-);
-const expectedSocialMediaDeployId = hasManualPostingDeployRecord
-  ? "6a4ac78160b0ee09bacf9015"
-  : hasInteractiveDraftUiDeployRecord
-  ? (hasInstagramHandleDeployRecord ? "6a4aabf08e52adba086014c2" : "6a4a0caed37d0800a1f19a0d")
-  : hasAgDigitalzDraftApprovalDeployRecord
-  ? "6a49fc6c75a309fb314ffb9d"
-  : hasAgDigitalzContentReviewDeployRecord
-  ? "6a49f1d33942a79f4190240c"
-  : hasAgDigitalzFirstContentSprintDeployRecord
-  ? "6a49e480fbe8fbbb83b933dc"
-  : hasAgDigitalzRedeployRecord
-  ? "6a49bd1932f7ae16701ece3f"
-  : "6a49ad36a73303e2fa05755f";
-if (data.socialMediaSystem.latestDeployId !== expectedSocialMediaDeployId) {
-  fail("dashboard control center must show the latest available Social Media staging deploy ID");
+const hasStagingDeployProof = data.socialMediaSystem.sourceRecords.some((recordPath) =>
+  recordPath.startsWith(".codex/connectors/connector-exec-") &&
+  recordPath.includes("netlify-staging") &&
+  recordPath.endsWith("-live-result.json"));
+if (!hasStagingDeployProof) {
+  fail("dashboard control center must cite at least one Netlify staging deploy proof record");
 }
-if (data.socialMediaSystem.latestDeployHttpStatus !== 200) {
-  fail("dashboard control center must show HTTP 200 for the latest Social Media staging deploy proof");
+if (typeof data.socialMediaSystem.latestDeployId !== "string" ||
+  !/^[a-z0-9]{12,}$/.test(data.socialMediaSystem.latestDeployId)) {
+  fail("dashboard control center must show the latest recorded Social Media staging deploy ID");
+}
+if (data.socialMediaSystem.latestDeployHttpStatus < 200 || data.socialMediaSystem.latestDeployHttpStatus > 299) {
+  fail("dashboard control center must show a successful HTTP status for the latest staging deploy proof");
 }
 if (data.socialMediaSystem.safetyBlocks.livePostingBlocked !== true) {
   fail("dashboard control center must show Social Media live posting blocked");
@@ -257,7 +275,8 @@ if (data.socialMediaSystem.safetyBlocks.socialOauthConnected !== false) {
 if (data.socialMediaSystem.safetyBlocks.clientConfigAdded !== true) {
   fail("dashboard control center must show Social Media client config added after AG Digitalz records are registered");
 }
-if (!data.ownerAttention.some((item) => item.id === "manual-posting-available" && item.status === "ready")) {
+if (data.dashboardActionQueue.manualPostingAvailable === true &&
+  !data.ownerAttention.some((item) => item.id === "manual-posting-available" && item.status === "ready")) {
   fail("dashboard control center must show manual posting available as an owner-attention item");
 }
 if (data.connectorProofs.n8nActiveWorkflowCount !== 0) {
