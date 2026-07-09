@@ -76,6 +76,34 @@ test("validates required approval lock fields before gated execution", () => {
   assert.equal(invalid.errors.includes("revocationPath is required"), true);
 });
 
+test("validates standing approval class, usage limit, audit requirement, and revocation", () => {
+  const standing = buildApprovalLockRecord({
+    slug: "ag-os-draft-pr-standing",
+    approvalKind: "standing",
+    actionClass: "push_codex_branch_and_open_draft_pull_request",
+    inclusionCriteria: ["Exact repository and codex/* branch match."],
+    maxUses: 10,
+    usageAuditRequired: true,
+    revocableImmediately: true,
+    commandCategory: "build",
+    requestedAction: "push_codex_branch_and_open_draft_pull_request",
+    target: "github.com/gurnoorbassi/ag-os",
+    scope: "Draft PR only.",
+    riskLevel: "R4",
+    approvalRequiredFor: ["github_branch_push"],
+    approvedActions: ["push_codex_branch", "open_draft_pull_request"],
+    prohibitedActions: ["merge_pull_request"],
+    evidence: [{ type: "owner_instruction", reference: "Owner grant", verified: true }],
+    expiresAt: "2026-08-09T06:59:59Z",
+    now: fixedNow
+  });
+
+  assert.deepEqual(validateApprovalLockRecord(standing), { valid: true, errors: [] });
+  assert.equal(standing.maxUses, 10);
+  assert.equal(standing.usageAuditRequired, true);
+  assert.equal(standing.revocableImmediately, true);
+});
+
 test("supports revocation and expiration status updates", () => {
   const approval = buildValidApproval();
   const revoked = revokeApprovalLock({

@@ -633,6 +633,23 @@ function renderApprovals() {
       metric: data.approvals.blockedCount,
       detail: "Blocked approval records require owner attention.",
       meta: data.approvals.blockedApprovals.map((approval) => `${approval.approvalId}: ${approval.status}`)
+    }),
+    card({
+      title: "Standing Approvals",
+      status: data.approvals.standingCount > 0 ? "active" : "zero",
+      metric: data.approvals.standingCount,
+      detail: "Reusable locks remain exact-scope, expiring, usage-limited, audited, and immediately revocable.",
+      meta: data.approvals.standingApprovals.map((approval) => `${approval.approvalId}: ${approval.remainingUses}/${approval.maxUses} uses remain; expires ${approval.expiresAt}`)
+    }),
+    card({
+      title: "Batched Approval Review",
+      status: "read_only",
+      metric: `${data.dashboardActionQueue.approvalBatch.ownerDecisions.length} decisions`,
+      detail: `${data.dashboardActionQueue.approvalBatch.approvalPackages.length} approval package(s) ready. This surface cannot approve or execute actions.`,
+      meta: [
+        ...data.dashboardActionQueue.approvalBatch.ownerDecisions.slice(0, 4).map((item) => `${item.decision}: ${item.status}`),
+        ...data.dashboardActionQueue.approvalBatch.approvalPackages.slice(0, 4).map((item) => `${item.approvalId}: ${item.requestedAction}`)
+      ]
     })
   );
 }

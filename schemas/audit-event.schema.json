@@ -27,6 +27,7 @@
       "enum": [
         "approval_requested",
         "approval_granted",
+        "standing_approval_used",
         "approval_rejected",
         "safe_merge",
         "constitution_change",

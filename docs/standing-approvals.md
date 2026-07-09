@@ -4,7 +4,7 @@
 
 A standing approval is a reusable, scoped approval lock that covers a class of repeated safe actions instead of one single action. Standing approvals reduce owner micromanagement without weakening any Constitution v1.0 gate: they are ordinary approval locks under Constitution section 13, with a class-shaped scope.
 
-This document is policy only. No standing approval lock exists yet. Creating the first one requires explicit owner approval, an approval lock record, and an audit event, exactly like any gated action.
+The first standing approval is active at `.codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json`. It is limited to `gurnoorbassi/ag-os`, `codex/*` branch pushes, draft PR creation, 10 audited uses, and expiry at the end of August 8, 2026 in America/Vancouver. It does not authorize merge or any excluded action.
 
 ## What A Standing Approval Is
 
@@ -41,3 +41,7 @@ Every use must record: the `approvalId` used, the target, the deterministic incl
 5. `npm run validate` passes with the new lock.
 
 Revocation is one owner instruction plus a status change to `revoked` and an audit event.
+
+## Usage Enforcement
+
+`scripts/lib/runtime/standing-approval-guard.mjs` checks exact repository, branch prefix, action class, expiry, audit-derived remaining uses, local gates, secret scanning, and excluded file paths. A successful use is counted only by a `standing_approval_used` audit event written after both push and draft PR creation succeed.

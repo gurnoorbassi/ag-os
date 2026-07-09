@@ -112,7 +112,7 @@ Status values: `proven` (done under gates, evidence recorded), `ready` (mechanic
 | External messages / posting / outreach | blocked | owner approval, permanent per-action gate |
 | Paid tools / paid APIs | blocked | owner approval + Cost OS review, permanent gate |
 | Production / customer data | blocked | owner approval + data classification path |
-| Standing approval locks | planned | owner grants first class-scoped lock (H4) |
+| Standing approval locks | ready | first lock is active for exact AG OS codex-branch push + draft-PR class; every use is audited and revocable |
 | Relevance-retrieval boot briefing | planned | H3 backlog item |
 | Instagram OAuth for `@agdigitalz` in `connected_draft_only` mode | blocked | exact owner approval plus live connector path; no posting permissions |
 | Lead Gen managed staging | blocked | scoped migration approval, backups, rollback |
@@ -132,8 +132,8 @@ Status values: `proven` (done under gates, evidence recorded), `ready` (mechanic
 | 8 | Boot briefing relevance retrieval (similar projects, applicable lessons only) | H3 | M | complete | Workers can request deterministic project/archetype/output briefings; planners record selected accepted lessons and high-quality examples. |
 | 9 | Skills library foundation (schema, `.codex/skills/`, first proven pattern) | H3 | M | complete | Three active evidence-cited procedural skills exist. |
 | 10 | Archetype update path from accepted lessons (reviewed PRs) | H3 | S | complete | Accepted lessons can create safe draft proposals; archetypes never auto-mutate and application requires a separate reviewed PR. |
-| 11 | First standing approval lock (owner grant, class-scoped, expiring) | H4 | S | open | Biggest micromanagement reducer. |
-| 12 | Batched approval review surface | H4 | M | open | One place to approve queued gated work. |
+| 11 | First standing approval lock (owner grant, class-scoped, expiring) | H4 | S | complete | Ten-use AG OS codex-branch push + draft-PR lock is active through August 8, 2026 and remains immediately revocable. |
+| 12 | Batched approval review surface | H4 | M | complete | Dashboard groups owner decisions, approval packages, and standing-lock usage in one read-only, non-authorizing surface. |
 | 13 | Metrics instrumentation: cost variance, quality trend, rework, lesson application | H4 | M | open | Evidence the system improves. |
 | 14 | Doc consolidation pass (duplicate boot docs, restated gate lists) | H1–H4 | M | open | Own scoped PR; validator pins exact strings. |
 | 15 | AJV migration decision | H1 tail | M | open | Consider only if the hand-rolled subset blocks safe progress; requires supply-chain review. |

@@ -130,14 +130,40 @@ function summarizeApproval(approvalPath, archive = false) {
     riskLevel: approval.riskLevel ?? approval.riskTier ?? "not_recorded",
     expiresAt: approval.expiresAt ?? null,
     approvedBy: approval.approvedBy ?? "not_recorded",
+    approvalKind: approval.approvalKind ?? "single_action",
+    actionClass: approval.actionClass ?? null,
+    maxUses: approval.maxUses ?? null,
+    target: approval.target ?? "not_recorded",
+    approvedActions: approval.approvedActions ?? [],
+    revocableImmediately: approval.revocableImmediately === true,
     recordPath: approvalPath,
     archived: archive
   };
 }
 
 function collectApprovals({ now = new Date() } = {}) {
-  const active = listDirectJson(".codex/approvals")
+  const rawActive = listDirectJson(".codex/approvals")
     .map((approvalPath) => summarizeApproval(approvalPath, false));
+  const useCounts = new Map();
+  for (const auditPath of listDirectJson(".codex/audit")) {
+    const audit = readJson(auditPath);
+    if (audit.eventType !== "standing_approval_used") {
+      continue;
+    }
+    for (const artifact of audit.relatedArtifacts ?? []) {
+      if (artifact.type === "approval") {
+        useCounts.set(artifact.reference, (useCounts.get(artifact.reference) ?? 0) + 1);
+      }
+    }
+  }
+  const active = rawActive.map((approval) => {
+    const usesRecorded = useCounts.get(approval.approvalId) ?? 0;
+    return {
+      ...approval,
+      usesRecorded,
+      remainingUses: approval.maxUses === null ? null : Math.max(0, approval.maxUses - usesRecorded)
+    };
+  });
   const archived = listDirectJson(".codex/approvals/archive")
     .map((approvalPath) => summarizeApproval(approvalPath, true));
   const all = [...active, ...archived];
@@ -159,7 +185,9 @@ function collectApprovals({ now = new Date() } = {}) {
     expiredApprovals: latestBy(expired, "expiresAt"),
     blockedApprovals: latestBy(blocked, "expiresAt"),
     staleApprovals: latestBy(stale, "expiresAt"),
-    recentApprovedActions: latestBy(active.filter((approval) => approval.status === "approved"), "expiresAt").slice(0, 6)
+    recentApprovedActions: latestBy(active.filter((approval) => approval.status === "approved"), "expiresAt").slice(0, 6),
+    standingCount: active.filter((approval) => approval.status === "approved" && approval.approvalKind === "standing").length,
+    standingApprovals: latestBy(active.filter((approval) => approval.status === "approved" && approval.approvalKind === "standing"), "expiresAt")
   };
 }
 
@@ -953,6 +981,14 @@ function collectDashboardActionQueue({
     ownerDecisionsNeeded,
     blockedActions,
     approvalPackagesReady,
+    approvalBatch: {
+      mode: "read_only",
+      standingApprovals: approvals.standingApprovals,
+      ownerDecisions: ownerDecisionsNeeded,
+      approvalPackages: approvalPackagesReady,
+      writeActionsAllowed: false,
+      batchApprovalGrantsPermission: false
+    },
     staleApprovals: approvals.staleApprovals,
     safeNextMilestones: [
       {

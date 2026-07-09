@@ -30,6 +30,7 @@ The read model surfaces:
 - OAuth blocked reason
 - credential-store missing reason
 - safe next milestones
+- one read-only batched approval review containing owner decisions, ready approval packages, and active standing approval usage/expiry state
 
 ## Safety Rules
 
@@ -41,5 +42,6 @@ Dashboard Action Queue v1 is visibility only.
 - Browser state is not source of truth.
 - No dashboard element may execute a live action.
 - No button, form, input, localStorage, fetch, or connector call is allowed in this dashboard version.
+- The batched approval review cannot create, modify, or grant approvals. It only groups source-controlled records for owner review.
 
 Any future authenticated dashboard action requires a separate owner-approved authenticated dashboard actions plan and approval lock.

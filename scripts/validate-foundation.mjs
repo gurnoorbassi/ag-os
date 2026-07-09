@@ -1009,6 +1009,44 @@ function validateJobCompletionEvidence(record, recordPath) {
   }
 }
 
+function validateStandingApprovalRecord(record, recordPath) {
+  if (record.approvalKind !== "standing") {
+    return;
+  }
+
+  if (!record.actionClass) {
+    fail(`${recordPath} standing approval must define actionClass`);
+  }
+  if (!Array.isArray(record.inclusionCriteria) || record.inclusionCriteria.length === 0) {
+    fail(`${recordPath} standing approval must define deterministic inclusionCriteria`);
+  }
+  if (!Number.isInteger(record.maxUses) || record.maxUses < 1) {
+    fail(`${recordPath} standing approval maxUses must be a positive integer`);
+  }
+  if (record.usageAuditRequired !== true) {
+    fail(`${recordPath} standing approval must require a per-use audit event`);
+  }
+  if (record.revocableImmediately !== true) {
+    fail(`${recordPath} standing approval must be immediately revocable`);
+  }
+
+  const requiredPermanentExclusions = [
+    "merge_pull_request",
+    "credential_handling",
+    "customer_data_handling",
+    "message_send",
+    "social_posting",
+    "paid_action",
+    "dns_change",
+    "production_change"
+  ];
+  for (const exclusion of requiredPermanentExclusions) {
+    if (!(record.prohibitedActions ?? []).includes(exclusion)) {
+      fail(`${recordPath} standing approval missing permanent exclusion: ${exclusion}`);
+    }
+  }
+}
+
 function validateCredentialStorePolicy(record) {
   const approvedOptions = new Set((record.approvedStorageOptions ?? []).map((option) => option.id));
   for (const requiredOption of [
@@ -1694,6 +1732,9 @@ for (const schemaValidatedRecordDirectory of schemaValidatedRecordDirectories) {
       const record = readJson(recordPath);
       const failuresBeforeRecord = failures;
       validateSchemaObject(record, schema, recordPath);
+      if (schemaValidatedRecordDirectory.name === "approval lock") {
+        validateStandingApprovalRecord(record, recordPath);
+      }
       if (failures === failuresBeforeRecord) {
         pass(`${schemaValidatedRecordDirectory.name} record structurally valid: ${recordPath}`);
       }

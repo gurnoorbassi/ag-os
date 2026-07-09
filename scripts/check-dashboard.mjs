@@ -379,6 +379,17 @@ if (data.skills.skillsGrantPermission !== false) {
 if (data.costs.totalRecordedActualUsd > data.costs.limits.monthlyMaxUsd) {
   fail("dashboard control center must show recorded costs within the monthly budget");
 }
+if (data.approvals.standingCount !== 1 || data.approvals.standingApprovals.length !== 1) {
+  fail("dashboard control center must show the active scoped standing approval");
+}
+if (data.approvals.standingApprovals[0]?.remainingUses !== 10 || data.approvals.standingApprovals[0]?.revocableImmediately !== true) {
+  fail("dashboard control center standing approval must show ten remaining uses and immediate revocation");
+}
+if (data.dashboardActionQueue.approvalBatch?.mode !== "read_only" ||
+  data.dashboardActionQueue.approvalBatch?.writeActionsAllowed !== false ||
+  data.dashboardActionQueue.approvalBatch?.batchApprovalGrantsPermission !== false) {
+  fail("dashboard batched approval review must remain read-only and non-authorizing");
+}
 
 if (failures.length > 0) {
   for (const failure of failures) {

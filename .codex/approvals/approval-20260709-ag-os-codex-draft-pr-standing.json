@@ -1,0 +1,67 @@
+{
+  "approvalId": "approval-20260709-ag-os-codex-draft-pr-standing",
+  "status": "approved",
+  "approvalKind": "standing",
+  "actionClass": "push_codex_branch_and_open_draft_pull_request",
+  "inclusionCriteria": [
+    "Repository is exactly gurnoorbassi/ag-os.",
+    "Branch name starts with codex/.",
+    "All local validation, dashboard, boot, test, secret-scan, and diff gates pass for the exact commit being pushed.",
+    "Changed files do not touch any prohibited action or excluded file class.",
+    "The pull request is opened as draft and is not merged under this approval.",
+    "A standing_approval_used audit event is written after each successful push and draft PR creation."
+  ],
+  "maxUses": 10,
+  "usageAuditRequired": true,
+  "revocableImmediately": true,
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "agent-codex",
+  "approvedBy": "owner-gurnoor-bassi",
+  "commandCategory": "build",
+  "requestedAction": "Push codex/* branches and open draft pull requests after every required local gate passes.",
+  "target": "github.com/gurnoorbassi/ag-os",
+  "scope": "Revocable standing approval for at most 10 uses in gurnoorbassi/ag-os only. One use covers one successful codex/* branch push plus opening its draft pull request after all required local gates and secret scanning pass.",
+  "riskLevel": "R4",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0
+  },
+  "approvalRequiredFor": [
+    "github_branch_push",
+    "github_draft_pr_create"
+  ],
+  "approvedActions": [
+    "push_codex_branch",
+    "open_draft_pull_request"
+  ],
+  "prohibitedActions": [
+    "merge_pull_request",
+    "governance_change",
+    "constitution_change",
+    "validator_change",
+    "ci_change",
+    "dependency_change",
+    "deployment",
+    "credential_handling",
+    "customer_data_handling",
+    "message_send",
+    "social_posting",
+    "paid_action",
+    "dns_change",
+    "production_change"
+  ],
+  "revocationPath": "Owner may revoke this approval immediately by instruction. AG OS must set status to revoked, record an audit event, and stop every future use before any push or draft PR action.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Owner approval recorded in the 2026-07-09 AG OS task: exact repository, codex/* branches, draft PR only, 10-use limit, August 8 expiry, strict exclusions, secret scan every use, per-use audit, immediate revocation.",
+      "verified": true
+    }
+  ],
+  "approvalText": "Approved: grant Codex a revocable standing approval valid until August 8, 2026, limited to 10 uses, for gurnoorbassi/ag-os only. After all local gates pass, Codex may push codex/* branches and open draft PRs only. All named exclusions remain strict, secret scanning must pass on every use, every use must be audited, and approval is immediately revocable.",
+  "approvedAt": "2026-07-09T20:34:04.540Z",
+  "expiresAt": "2026-08-09T06:59:59.000Z",
+  "createdAt": "2026-07-09T20:34:04.540Z",
+  "updatedAt": "2026-07-09T20:34:04.540Z"
+}
