@@ -641,7 +641,93 @@ function collectSkills() {
   };
 }
 
-function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview, connectorAuth }) {
+function collectSocialPosting({ firstContentSprint }) {
+  const accounts = listDirectJson(".codex/social/accounts")
+    .map((recordPath) => ({ ...readJson(recordPath), recordPath }));
+  const posts = listDirectJson(".codex/social/posts")
+    .map((recordPath) => ({ ...readJson(recordPath), recordPath }));
+  const publishApprovals = listDirectJson(".codex/social/publish-approvals")
+    .map((recordPath) => ({ ...readJson(recordPath), recordPath }));
+  const preflightRecords = listDirectJson(".codex/social/preflight")
+    .map((recordPath) => ({ ...readJson(recordPath), recordPath }));
+  const policy = readJsonIfExists(".codex/social/policies/production-posting-policy.json");
+  const instagram = accounts.find((account) => account.platform === "Instagram") ?? null;
+  const sprintInstagram = firstContentSprint?.platforms?.find((platform) => platform.platform === "Instagram") ?? null;
+  const readyForPublishApproval = posts.filter((post) =>
+    ["ready_for_live_publish_approval", "owner_approved_for_single_publish"].includes(post.lifecycleState ?? post.status)
+  );
+  const exactPublishApprovals = publishApprovals.filter((approval) =>
+    ["approved", "active"].includes(approval.status) &&
+    approval.approvalType === "single_post_publish"
+  );
+  const approvedDraftPostsCount = firstContentSprint?.ownerApprovedDraftCount ?? firstContentSprint?.approvedDraftCount ?? 0;
+  const weeklyReportApprovalStatus = firstContentSprint?.weeklyReportApprovalStatus ?? "not_recorded";
+  const blockedPublishReasons = unique([
+    instagram?.accountState !== "connected_draft_only" ? "account_not_connected" : null,
+    instagram?.credentialStorageStatus !== "secure_store_reference" ? "secure_credential_store_missing" : null,
+    instagram?.oauthStatus !== "connected" ? "oauth_not_approved" : null,
+    exactPublishApprovals.length === 0 ? "exact_single_post_publish_approval_missing" : null,
+    instagram?.livePostingBlocked !== false ? "live_posting_blocked" : null,
+    instagram?.schedulingBlocked !== false ? "scheduling_blocked" : null,
+    instagram?.analyticsBlocked !== false ? "analytics_blocked" : null,
+    instagram?.n8nActivationBlocked !== false ? "n8n_activation_blocked" : null
+  ]);
+
+  return {
+    status: "foundation_active",
+    mode: "source_controlled_read_model",
+    targetPlatform: "Instagram",
+    targetHandle: instagram?.handle ?? sprintInstagram?.handle ?? "not_recorded",
+    handleStatus: instagram?.handleStatus ?? sprintInstagram?.handleStatus ?? "not_recorded",
+    accountId: instagram?.accountId ?? "not_recorded",
+    accountState: instagram?.accountState ?? "not_recorded",
+    connectionMode: instagram?.connectionMode ?? "not_recorded",
+    oauthStatus: instagram?.oauthStatus ?? "not_recorded",
+    credentialRefId: instagram?.credentialRefId ?? null,
+    credentialStorageStatus: instagram?.credentialStorageStatus ?? "not_recorded",
+    credentialsStoredInRepo: instagram?.credentialsStoredInRepo ?? false,
+    postingMode: instagram?.postingMode ?? "draft_only",
+    ownerApprovalRequired: instagram?.ownerApprovalRequired ?? true,
+    livePostingBlocked: instagram?.livePostingBlocked ?? true,
+    schedulingBlocked: instagram?.schedulingBlocked ?? true,
+    analyticsBlocked: instagram?.analyticsBlocked ?? true,
+    dmCommentsBlocked: instagram?.dmCommentsBlocked ?? true,
+    n8nActivationBlocked: instagram?.n8nActivationBlocked ?? true,
+    paidToolsAllowed: instagram?.paidToolsAllowed ?? false,
+    approvedDraftPostsCount,
+    weeklyReportApprovalStatus,
+    postsReadyForPublishApproval: readyForPublishApproval.length,
+    exactSinglePostApprovalCount: exactPublishApprovals.length,
+    connectorPreflightCount: preflightRecords.length,
+    blockedPublishReasons,
+    nextRequiredOwnerApproval: instagram?.nextRequiredApproval ??
+      "Approve Instagram OAuth execution first; separate exact single-post approval is still required before AG OS can post.",
+    permissionModel: {
+      oauthDoesNotAuthorizePosting: policy?.rules?.oauthImpliesPostingApproval === false,
+      connectedDraftOnlyDoesNotAuthorizePosting: policy?.rules?.connectedDraftOnlyImpliesPostingApproval === false,
+      draftApprovalDoesNotAuthorizePosting: policy?.rules?.draftApprovalImpliesPostingApproval === false,
+      singlePostRequiresExactOwnerApproval: policy?.rules?.singlePostRequiresExactOwnerApproval === true,
+      schedulingRequiresSeparateOwnerApproval: policy?.rules?.schedulingRequiresSeparateOwnerApproval === true,
+      analyticsRequiresSeparateOwnerApproval: policy?.rules?.analyticsRequiresSeparateOwnerApproval === true,
+      memoryCanGrantPermission: policy?.rules?.memoryCanGrantPermission === true,
+      skillsCanGrantPermission: policy?.rules?.skillsCanGrantPermission === true,
+      candidateLessonsCanGrantPermission: policy?.rules?.candidateLessonsCanGrantPermission === true
+    },
+    requestedPermissions: instagram?.permissions?.requested ?? [],
+    excludedPermissions: instagram?.permissions?.excluded ?? [],
+    blockedActions: instagram?.blockedActions ?? [],
+    sourceRecords: [
+      instagram?.recordPath,
+      ".codex/social/policies/production-posting-policy.json",
+      firstContentSprint?.recordPath,
+      "docs/social-posting-os.md",
+      "docs/social-posting-production-policy.md",
+      "docs/social-permission-matrix.md"
+    ].filter(Boolean)
+  };
+}
+
+function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview, connectorAuth, socialPosting }) {
   const attention = [];
 
   for (const record of connectorAuth?.records ?? []) {
@@ -698,6 +784,17 @@ function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview,
     action: "Use future approval packages before any live integration work.",
     sourceRecord: "docs/social-media-management-system-v1-future-connectors.md"
   });
+
+  if (socialPosting?.targetHandle === "@agdigitalz" && socialPosting?.oauthStatus !== "connected") {
+    attention.push({
+      id: "instagram-oauth-execution-needed",
+      status: "blocked",
+      title: "Instagram OAuth execution",
+      detail: `${socialPosting.targetHandle} remains ${socialPosting.accountState}; automated posting cannot start.`,
+      action: socialPosting.nextRequiredOwnerApproval,
+      sourceRecord: ".codex/social/accounts/ag-digitalz-instagram.json"
+    });
+  }
 
   attention.push({
     id: "manual-posting-available",
@@ -966,6 +1063,7 @@ export function collectDashboardData() {
     (record) => record.id === "connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result"
   );
   const firstContentSprint = clientManagement.contentSprints[0] ?? null;
+  const socialPosting = collectSocialPosting({ firstContentSprint });
   const systemBlockers = [
     ...approvals.blockedApprovals.map((approval) => `Blocked approval: ${approval.approvalId}`)
   ];
@@ -1200,7 +1298,8 @@ export function collectDashboardData() {
     },
     clientManagement,
     firstClientReadiness,
-    ownerAttention: collectOwnerAttention({ firstClientReadiness, approvals, qualityReview, connectorAuth }),
+    socialPosting,
+    ownerAttention: collectOwnerAttention({ firstClientReadiness, approvals, qualityReview, connectorAuth, socialPosting }),
     connectorAuth,
     dashboardActionQueue: collectDashboardActionQueue({
       approvals,

@@ -4,6 +4,8 @@ function statusClass(value) {
   const normalized = String(value).toLowerCase();
   if (normalized.includes("ready")) return "status-active";
   if (normalized.includes("pass")) return "status-active";
+  if (normalized.includes("not_connected")) return "status-disabled";
+  if (normalized.includes("not connected")) return "status-disabled";
   if (normalized.includes("inactive")) return "status-disabled";
   if (normalized.includes("zero")) return "status-zero";
   if (normalized.includes("active")) return "status-active";
@@ -503,6 +505,90 @@ function renderSocialMedia() {
   );
 }
 
+function renderProductionSocialPosting() {
+  const root = clear("#production-social-posting-grid");
+  const posting = data.socialPosting;
+  root.append(
+    card({
+      title: "Instagram Account",
+      status: posting.accountState,
+      metric: posting.targetHandle,
+      detail: `${posting.targetPlatform} is ${posting.accountState}; OAuth status is ${posting.oauthStatus}.`,
+      meta: [
+        `accountId: ${posting.accountId}`,
+        `connectionMode: ${posting.connectionMode}`,
+        `postingMode: ${posting.postingMode}`,
+        `credentialStorageStatus: ${posting.credentialStorageStatus}`,
+        `credentialsStoredInRepo: ${boolText(posting.credentialsStoredInRepo, "true", "false")}`
+      ]
+    }),
+    card({
+      title: "Draft Content",
+      status: posting.approvedDraftPostsCount > 0 ? "ready" : "zero",
+      metric: `${posting.approvedDraftPostsCount} approved drafts`,
+      detail: `Weekly report is ${posting.weeklyReportApprovalStatus}. Draft approval does not authorize AG OS posting.`,
+      meta: [
+        `postsReadyForPublishApproval: ${posting.postsReadyForPublishApproval}`,
+        `exactSinglePostApprovalCount: ${posting.exactSinglePostApprovalCount}`,
+        "Owner manual posting remains separate from AG OS automation."
+      ]
+    }),
+    card({
+      title: "Live Posting Gate",
+      status: "blocked",
+      metric: "No publish permission",
+      detail: posting.nextRequiredOwnerApproval,
+      meta: [
+        `livePostingBlocked: ${boolText(posting.livePostingBlocked, "true", "false")}`,
+        `schedulingBlocked: ${boolText(posting.schedulingBlocked, "true", "false")}`,
+        `analyticsBlocked: ${boolText(posting.analyticsBlocked, "true", "false")}`,
+        `dmCommentsBlocked: ${boolText(posting.dmCommentsBlocked, "true", "false")}`,
+        `n8nActivationBlocked: ${boolText(posting.n8nActivationBlocked, "true", "false")}`
+      ]
+    }),
+    card({
+      title: "Permission Model",
+      status: "blocked",
+      metric: "Approval gated",
+      detail: "OAuth, draft approval, memory, and skills cannot grant posting permission.",
+      meta: [
+        `oauthDoesNotAuthorizePosting: ${boolText(posting.permissionModel.oauthDoesNotAuthorizePosting, "true", "false")}`,
+        `connectedDraftOnlyDoesNotAuthorizePosting: ${boolText(posting.permissionModel.connectedDraftOnlyDoesNotAuthorizePosting, "true", "false")}`,
+        `draftApprovalDoesNotAuthorizePosting: ${boolText(posting.permissionModel.draftApprovalDoesNotAuthorizePosting, "true", "false")}`,
+        `memoryCanGrantPermission: ${boolText(posting.permissionModel.memoryCanGrantPermission, "true", "false")}`,
+        `skillsCanGrantPermission: ${boolText(posting.permissionModel.skillsCanGrantPermission, "true", "false")}`,
+        `candidateLessonsCanGrantPermission: ${boolText(posting.permissionModel.candidateLessonsCanGrantPermission, "true", "false")}`
+      ]
+    })
+  );
+
+  const panel = clear("#production-social-posting-panel");
+  panel.append(
+    table(
+      ["Blocked reason", "Status"],
+      posting.blockedPublishReasons.map((reason) => [
+        reason,
+        pill("blocked")
+      ])
+    ),
+    table(
+      ["Permission set", "Requested", "Excluded"],
+      [[
+        labelStack(posting.targetPlatform, posting.targetHandle),
+        posting.requestedPermissions.join(", ") || "none",
+        posting.excludedPermissions.join(", ") || "none"
+      ]]
+    ),
+    table(
+      ["Source record", "Type"],
+      posting.sourceRecords.map((recordPath) => [
+        recordPath,
+        recordPath.includes("docs/") ? "documentation" : "source record"
+      ])
+    )
+  );
+}
+
 function renderApprovals() {
   const root = clear("#approvals-panel");
   root.append(
@@ -732,6 +818,7 @@ renderOperatingSystems();
 renderCapabilities();
 renderClientManagement();
 renderSocialMedia();
+renderProductionSocialPosting();
 renderApprovals();
 renderConnectors();
 renderQualityReview();

@@ -23,6 +23,10 @@ Current validation checks schema metadata plus selected template, registry, poli
 - `unified-memory-record.schema.json`
 - `lesson.schema.json`
 - `lesson-promotion.schema.json`
+- `social-account.schema.json`
+- `social-post.schema.json`
+- `social-publish-approval.schema.json`
+- `social-connector-preflight.schema.json`
 - `cost.schema.json`
 - `quality-check.schema.json`
 - `security-review.schema.json`

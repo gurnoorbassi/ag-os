@@ -1,0 +1,60 @@
+{
+  "policyId": "social-production-posting-policy-v1",
+  "recordType": "social_posting_policy",
+  "status": "active",
+  "projectId": "project-social-media-management-system-v1",
+  "clientId": "client-ag-digitalz-internal",
+  "defaultMode": "draft_only",
+  "rules": {
+    "credentialsInRepoAllowed": false,
+    "tokensPrintedAllowed": false,
+    "oauthImpliesPostingApproval": false,
+    "connectedDraftOnlyImpliesPostingApproval": false,
+    "draftApprovalImpliesPostingApproval": false,
+    "singlePostRequiresExactOwnerApproval": true,
+    "schedulingRequiresSeparateOwnerApproval": true,
+    "analyticsRequiresSeparateOwnerApproval": true,
+    "dmCommentsBlockedByDefault": true,
+    "n8nActivationBlockedByDefault": true,
+    "paidToolsRequireOwnerApproval": true,
+    "memoryCanGrantPermission": false,
+    "skillsCanGrantPermission": false,
+    "candidateLessonsCanGrantPermission": false
+  },
+  "allowedStates": {
+    "postLifecycle": [
+      "draft",
+      "owner_approved_draft",
+      "ready_for_oauth",
+      "connected_draft_only",
+      "ready_for_live_publish_approval",
+      "owner_approved_for_single_publish",
+      "publish_in_progress",
+      "published",
+      "publish_failed",
+      "scheduled_pending_approval",
+      "scheduled",
+      "cancelled",
+      "blocked"
+    ],
+    "accountState": [
+      "not_connected",
+      "access_requested",
+      "oauth_ready",
+      "connected_draft_only",
+      "approved_for_single_publish",
+      "approved_for_scheduling",
+      "approved_for_live_posting",
+      "revoked",
+      "expired",
+      "blocked"
+    ]
+  },
+  "sourceRecords": [
+    "docs/social-posting-production-policy.md",
+    "docs/social-post-lifecycle.md",
+    "docs/social-permission-matrix.md"
+  ],
+  "createdAt": "2026-07-08T00:00:00Z",
+  "updatedAt": "2026-07-08T00:00:00Z"
+}

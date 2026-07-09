@@ -40,6 +40,11 @@ const requiredPaths = [
   "docs/unified-memory-learning-os.md",
   "docs/lesson-promotion-policy.md",
   "docs/cross-worker-memory-sync.md",
+  "docs/social-posting-os.md",
+  "docs/social-posting-production-policy.md",
+  "docs/instagram-production-readiness.md",
+  "docs/social-post-lifecycle.md",
+  "docs/social-permission-matrix.md",
   ".codex/agents/README.md",
   ".codex/tasks/README.md",
   ".codex/locks/README.md",
@@ -66,6 +71,11 @@ const requiredPaths = [
   ".codex/audit/README.md",
   ".codex/owners/README.md",
   ".codex/client-management/README.md",
+  ".codex/social/accounts/ag-digitalz-instagram.json",
+  ".codex/social/posts/README.md",
+  ".codex/social/publish-approvals/README.md",
+  ".codex/social/preflight/README.md",
+  ".codex/social/policies/production-posting-policy.json",
   ".codex/capabilities/README.md",
   ".codex/capabilities/registry.json",
   ".codex/commands/registry.json",
@@ -124,7 +134,11 @@ const requiredPaths = [
   "schemas/client-approval.schema.json",
   "schemas/credential-reference.schema.json",
   "schemas/unified-memory-record.schema.json",
-  "schemas/lesson-promotion.schema.json"
+  "schemas/lesson-promotion.schema.json",
+  "schemas/social-account.schema.json",
+  "schemas/social-post.schema.json",
+  "schemas/social-publish-approval.schema.json",
+  "schemas/social-connector-preflight.schema.json"
 ];
 
 const forbiddenPatterns = [
@@ -417,6 +431,26 @@ const runtimeRecordDirectories = [
     recordDir: ".codex/credentials",
     schemaPath: "schemas/credential-reference.schema.json",
     includePrefixes: ["credential-ref-"]
+  },
+  {
+    name: "social account",
+    recordDir: ".codex/social/accounts",
+    schemaPath: "schemas/social-account.schema.json"
+  },
+  {
+    name: "social post",
+    recordDir: ".codex/social/posts",
+    schemaPath: "schemas/social-post.schema.json"
+  },
+  {
+    name: "social publish approval",
+    recordDir: ".codex/social/publish-approvals",
+    schemaPath: "schemas/social-publish-approval.schema.json"
+  },
+  {
+    name: "social connector preflight",
+    recordDir: ".codex/social/preflight",
+    schemaPath: "schemas/social-connector-preflight.schema.json"
   }
 ];
 let failures = 0;
@@ -962,6 +996,54 @@ function validateCredentialStorePolicy(record) {
   }
 }
 
+function validateSocialPostingPolicy(record) {
+  if (record.status !== "active") {
+    fail("social posting policy must be active");
+  }
+
+  const rules = record.rules ?? {};
+  const falseRules = [
+    "credentialsInRepoAllowed",
+    "tokensPrintedAllowed",
+    "oauthImpliesPostingApproval",
+    "connectedDraftOnlyImpliesPostingApproval",
+    "draftApprovalImpliesPostingApproval",
+    "memoryCanGrantPermission",
+    "skillsCanGrantPermission",
+    "candidateLessonsCanGrantPermission"
+  ];
+  for (const ruleName of falseRules) {
+    if (rules[ruleName] !== false) {
+      fail(`social posting policy must set ${ruleName} to false`);
+    }
+  }
+
+  for (const ruleName of [
+    "singlePostRequiresExactOwnerApproval",
+    "schedulingRequiresSeparateOwnerApproval",
+    "analyticsRequiresSeparateOwnerApproval",
+    "dmCommentsBlockedByDefault",
+    "n8nActivationBlockedByDefault",
+    "paidToolsRequireOwnerApproval"
+  ]) {
+    if (rules[ruleName] !== true) {
+      fail(`social posting policy must set ${ruleName} to true`);
+    }
+  }
+
+  for (const requiredState of ["owner_approved_draft", "owner_approved_for_single_publish", "published", "scheduled", "blocked"]) {
+    if (!(record.allowedStates?.postLifecycle ?? []).includes(requiredState)) {
+      fail(`social posting policy missing post lifecycle state: ${requiredState}`);
+    }
+  }
+
+  for (const requiredState of ["not_connected", "connected_draft_only", "approved_for_single_publish", "approved_for_scheduling", "revoked", "expired", "blocked"]) {
+    if (!(record.allowedStates?.accountState ?? []).includes(requiredState)) {
+      fail(`social posting policy missing account state: ${requiredState}`);
+    }
+  }
+}
+
 function validateWatchdogPolicy(record) {
   if (record.defaults?.monitoringEnabled !== false) {
     fail("watchdog policy must disable monitoring by default");
@@ -1357,6 +1439,13 @@ try {
   pass("credential store policy safety rules valid");
 } catch (error) {
   fail(`credential store policy could not be validated: ${error.message}`);
+}
+
+try {
+  validateSocialPostingPolicy(readJson(".codex/social/policies/production-posting-policy.json"));
+  pass("social posting policy safety rules valid");
+} catch (error) {
+  fail(`social posting policy could not be validated: ${error.message}`);
 }
 
 for (const engineRecordDirectory of engineRecordDirectories) {
