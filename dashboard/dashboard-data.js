@@ -1052,6 +1052,89 @@ window.AG_OS_DASHBOARD_DATA = {
       "no posting, scheduling, analytics API, or n8n activation"
     ]
   },
+  "socialPosting": {
+    "status": "foundation_active",
+    "mode": "source_controlled_read_model",
+    "targetPlatform": "Instagram",
+    "targetHandle": "@agdigitalz",
+    "handleStatus": "public_handle_provided",
+    "accountId": "social-account-ag-digitalz-instagram",
+    "accountState": "not_connected",
+    "connectionMode": "draft_only",
+    "oauthStatus": "blocked",
+    "credentialRefId": null,
+    "credentialStorageStatus": "none",
+    "credentialsStoredInRepo": false,
+    "postingMode": "draft_only",
+    "ownerApprovalRequired": true,
+    "livePostingBlocked": true,
+    "schedulingBlocked": true,
+    "analyticsBlocked": true,
+    "dmCommentsBlocked": true,
+    "n8nActivationBlocked": true,
+    "paidToolsAllowed": false,
+    "approvedDraftPostsCount": 21,
+    "weeklyReportApprovalStatus": "owner_approved_draft",
+    "postsReadyForPublishApproval": 0,
+    "exactSinglePostApprovalCount": 0,
+    "connectorPreflightCount": 0,
+    "blockedPublishReasons": [
+      "account_not_connected",
+      "secure_credential_store_missing",
+      "oauth_not_approved",
+      "exact_single_post_publish_approval_missing",
+      "live_posting_blocked",
+      "scheduling_blocked",
+      "analytics_blocked",
+      "n8n_activation_blocked"
+    ],
+    "nextRequiredOwnerApproval": "Owner must approve approval-instagram-oauth-execution before any Instagram OAuth flow can start. OAuth approval still does not authorize posting, scheduling, analytics, DMs/comments, or n8n activation.",
+    "permissionModel": {
+      "oauthDoesNotAuthorizePosting": true,
+      "connectedDraftOnlyDoesNotAuthorizePosting": true,
+      "draftApprovalDoesNotAuthorizePosting": true,
+      "singlePostRequiresExactOwnerApproval": true,
+      "schedulingRequiresSeparateOwnerApproval": true,
+      "analyticsRequiresSeparateOwnerApproval": true,
+      "memoryCanGrantPermission": false,
+      "skillsCanGrantPermission": false,
+      "candidateLessonsCanGrantPermission": false
+    },
+    "requestedPermissions": [
+      "instagram_business_basic"
+    ],
+    "excludedPermissions": [
+      "instagram_business_content_publish",
+      "instagram_content_publish",
+      "instagram_business_manage_insights",
+      "instagram_business_manage_comments",
+      "instagram_manage_comments",
+      "instagram_business_manage_messages",
+      "instagram_manage_messages",
+      "ads_management",
+      "webhook_subscription"
+    ],
+    "blockedActions": [
+      "execute_oauth",
+      "connect_account",
+      "post_content",
+      "schedule_content",
+      "pull_analytics",
+      "read_dms",
+      "read_comments",
+      "activate_n8n",
+      "store_credentials_in_repo",
+      "use_paid_tools"
+    ],
+    "sourceRecords": [
+      ".codex/social/accounts/ag-digitalz-instagram.json",
+      ".codex/social/policies/production-posting-policy.json",
+      ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
+      "docs/social-posting-os.md",
+      "docs/social-posting-production-policy.md",
+      "docs/social-permission-matrix.md"
+    ]
+  },
   "ownerAttention": [
     {
       "id": "connector-auth-connector-github-mcp",
@@ -1084,6 +1167,14 @@ window.AG_OS_DASHBOARD_DATA = {
       "detail": "OAuth, credentials, posting, scheduling, analytics API, and n8n activation remain blocked.",
       "action": "Use future approval packages before any live integration work.",
       "sourceRecord": "docs/social-media-management-system-v1-future-connectors.md"
+    },
+    {
+      "id": "instagram-oauth-execution-needed",
+      "status": "blocked",
+      "title": "Instagram OAuth execution",
+      "detail": "@agdigitalz remains not_connected; automated posting cannot start.",
+      "action": "Owner must approve approval-instagram-oauth-execution before any Instagram OAuth flow can start. OAuth approval still does not authorize posting, scheduling, analytics, DMs/comments, or n8n activation.",
+      "sourceRecord": ".codex/social/accounts/ag-digitalz-instagram.json"
     },
     {
       "id": "manual-posting-available",
@@ -1126,7 +1217,7 @@ window.AG_OS_DASHBOARD_DATA = {
     "mode": "read_only",
     "ownerDecisionCount": 2,
     "blockedActionCount": 5,
-    "approvalPackageCount": 10,
+    "approvalPackageCount": 14,
     "staleApprovalCount": 0,
     "manualPostingAvailable": true,
     "manualPostingDetail": "21 owner-approved draft post package(s) can be used manually while automation remains blocked.",
@@ -1272,6 +1363,42 @@ window.AG_OS_DASHBOARD_DATA = {
         "target": "netlify:ag-os-dashboard-staging",
         "riskLevel": "R4",
         "recordPath": ".codex/approvals/approval-20260705-ag-os-dashboard-netlify-staging.template.json"
+      },
+      {
+        "approvalId": "approval-20260708-instagram-analytics-readonly",
+        "status": "template_ready",
+        "commandCategory": "audit",
+        "requestedAction": "Read Instagram analytics for @agdigitalz in read-only mode.",
+        "target": "instagram:@agdigitalz:analytics-readonly",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-instagram-analytics-readonly.template.json"
+      },
+      {
+        "approvalId": "approval-20260708-instagram-oauth-execution",
+        "status": "template_ready",
+        "commandCategory": "connect_service",
+        "requestedAction": "Execute owner-controlled Instagram OAuth for @agdigitalz in connected_draft_only mode only.",
+        "target": "instagram:@agdigitalz",
+        "riskLevel": "R4",
+        "recordPath": ".codex/approvals/approval-instagram-oauth-execution.template.json"
+      },
+      {
+        "approvalId": "approval-20260708-instagram-scheduling",
+        "status": "template_ready",
+        "commandCategory": "send_message",
+        "requestedAction": "Schedule owner-approved Instagram posts for @agdigitalz within an exact approved schedule.",
+        "target": "instagram:@agdigitalz:REQUIRED_SCHEDULE_ID",
+        "riskLevel": "R5",
+        "recordPath": ".codex/approvals/approval-instagram-scheduling.template.json"
+      },
+      {
+        "approvalId": "approval-20260708-instagram-single-post-publish",
+        "status": "template_ready",
+        "commandCategory": "send_message",
+        "requestedAction": "Publish one exact owner-approved Instagram post for @agdigitalz.",
+        "target": "instagram:@agdigitalz:REQUIRED_SOCIAL_POST_ID",
+        "riskLevel": "R5",
+        "recordPath": ".codex/approvals/approval-instagram-single-post-publish.template.json"
       }
     ],
     "staleApprovals": [],

@@ -1,0 +1,61 @@
+{
+  "$schema": "../../../schemas/social-account.schema.json",
+  "accountId": "social-account-ag-digitalz-instagram",
+  "recordType": "social_account",
+  "projectId": "project-social-media-management-system-v1",
+  "clientId": "client-ag-digitalz-internal",
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "platform": "Instagram",
+  "handle": "@agdigitalz",
+  "handleStatus": "public_handle_provided",
+  "accountState": "not_connected",
+  "connectionMode": "draft_only",
+  "oauthStatus": "blocked",
+  "credentialRefId": null,
+  "credentialStorageStatus": "none",
+  "credentialsStoredInRepo": false,
+  "postingMode": "draft_only",
+  "ownerApprovalRequired": true,
+  "livePostingBlocked": true,
+  "schedulingBlocked": true,
+  "analyticsBlocked": true,
+  "dmCommentsBlocked": true,
+  "n8nActivationBlocked": true,
+  "paidToolsAllowed": false,
+  "permissions": {
+    "requested": [
+      "instagram_business_basic"
+    ],
+    "excluded": [
+      "instagram_business_content_publish",
+      "instagram_content_publish",
+      "instagram_business_manage_insights",
+      "instagram_business_manage_comments",
+      "instagram_manage_comments",
+      "instagram_business_manage_messages",
+      "instagram_manage_messages",
+      "ads_management",
+      "webhook_subscription"
+    ]
+  },
+  "blockedActions": [
+    "execute_oauth",
+    "connect_account",
+    "post_content",
+    "schedule_content",
+    "pull_analytics",
+    "read_dms",
+    "read_comments",
+    "activate_n8n",
+    "store_credentials_in_repo",
+    "use_paid_tools"
+  ],
+  "nextRequiredApproval": "Owner must approve approval-instagram-oauth-execution before any Instagram OAuth flow can start. OAuth approval still does not authorize posting, scheduling, analytics, DMs/comments, or n8n activation.",
+  "sourceRecords": [
+    ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
+    ".codex/social/instagram-oauth-plan-20260704-agdigitalz.json",
+    "docs/instagram-oauth-readiness-package.md"
+  ],
+  "createdAt": "2026-07-08T00:00:00Z",
+  "updatedAt": "2026-07-08T00:00:00Z"
+}

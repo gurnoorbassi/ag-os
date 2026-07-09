@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/social-connector-preflight.schema.json",
+  "title": "AG OS Social Connector Preflight",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "preflightId",
+    "recordType",
+    "status",
+    "projectId",
+    "clientId",
+    "engagementId",
+    "targetPlatform",
+    "targetHandle",
+    "requestedAction",
+    "credentialStoreRequired",
+    "secureCredentialStoreConfirmed",
+    "approvalRequired",
+    "liveActionAllowed",
+    "checks",
+    "blockedReasons",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../../schemas/social-connector-preflight.schema.json" },
+    "preflightId": { "type": "string", "pattern": "^social-preflight-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "recordType": { "type": "string", "const": "social_connector_preflight" },
+    "status": { "type": "string", "enum": ["template", "blocked", "ready_after_approval", "passed", "failed"] },
+    "projectId": { "type": "string", "pattern": "^project-[a-z0-9-]+$" },
+    "clientId": { "type": "string", "pattern": "^client-[a-z0-9-]+$" },
+    "engagementId": { "type": "string", "pattern": "^engagement-[a-z0-9-]+$" },
+    "targetPlatform": { "type": "string", "enum": ["Instagram", "TikTok", "YouTube Shorts", "LinkedIn"] },
+    "targetHandle": { "type": "string", "minLength": 1 },
+    "requestedAction": { "type": "string", "enum": ["execute_oauth", "publish_single_post", "schedule_posts", "analytics_readonly"] },
+    "credentialStoreRequired": { "type": "boolean" },
+    "secureCredentialStoreConfirmed": { "type": "boolean" },
+    "approvalRequired": { "type": "boolean", "const": true },
+    "liveActionAllowed": { "type": "boolean", "const": false },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["checkId", "status", "evidence"],
+        "properties": {
+          "checkId": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "status": { "type": "string", "enum": ["pass", "warning", "blocked", "not_checked"] },
+          "evidence": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "blockedReasons": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9_]+$" } },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string", "minLength": 1 }
+  }
+}

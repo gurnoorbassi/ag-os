@@ -87,6 +87,7 @@ for (const requiredText of [
   "Capabilities",
   "Client Management",
   "Social Media System v1",
+  "Production Social Posting",
   "Approvals",
   "GitHub / Netlify / n8n",
   "Quality and Review",
@@ -275,6 +276,51 @@ if (data.socialMediaSystem.safetyBlocks.socialOauthConnected !== false) {
 }
 if (data.socialMediaSystem.safetyBlocks.clientConfigAdded !== true) {
   fail("dashboard control center must show Social Media client config added after AG Digitalz records are registered");
+}
+if (!data.socialPosting || data.socialPosting.status !== "foundation_active") {
+  fail("dashboard control center must expose the Production Social Posting read model");
+}
+if (data.socialPosting.targetHandle !== "@agdigitalz") {
+  fail("dashboard control center must show @agdigitalz as the Instagram posting target handle");
+}
+if (data.socialPosting.accountState !== "not_connected") {
+  fail("dashboard control center must show Instagram account not_connected until OAuth is approved and completed");
+}
+if (data.socialPosting.oauthStatus !== "blocked") {
+  fail("dashboard control center must show Instagram OAuth blocked before execution approval");
+}
+if (data.socialPosting.credentialsStoredInRepo !== false) {
+  fail("dashboard control center must show credentials are not stored in repo");
+}
+if (data.socialPosting.livePostingBlocked !== true ||
+  data.socialPosting.schedulingBlocked !== true ||
+  data.socialPosting.analyticsBlocked !== true ||
+  data.socialPosting.dmCommentsBlocked !== true ||
+  data.socialPosting.n8nActivationBlocked !== true) {
+  fail("dashboard control center must show all production social actions blocked by default");
+}
+if (data.socialPosting.approvedDraftPostsCount !== sprint.ownerApprovedDraftCount) {
+  fail("dashboard control center social posting approved-draft count must match the content sprint");
+}
+if (data.socialPosting.weeklyReportApprovalStatus !== sprint.weeklyReportApprovalStatus) {
+  fail("dashboard control center social posting weekly report status must match the content sprint");
+}
+if (data.socialPosting.postsReadyForPublishApproval !== 0) {
+  fail("dashboard control center must not show posts ready for publish approval before exact post records exist");
+}
+if (!data.socialPosting.blockedPublishReasons.includes("exact_single_post_publish_approval_missing")) {
+  fail("dashboard control center must show exact single-post publish approval missing");
+}
+if (data.socialPosting.permissionModel.oauthDoesNotAuthorizePosting !== true ||
+  data.socialPosting.permissionModel.connectedDraftOnlyDoesNotAuthorizePosting !== true ||
+  data.socialPosting.permissionModel.draftApprovalDoesNotAuthorizePosting !== true ||
+  data.socialPosting.permissionModel.memoryCanGrantPermission !== false ||
+  data.socialPosting.permissionModel.skillsCanGrantPermission !== false ||
+  data.socialPosting.permissionModel.candidateLessonsCanGrantPermission !== false) {
+  fail("dashboard control center must show OAuth, drafts, memory, and skills cannot grant posting permission");
+}
+if (!data.ownerAttention.some((item) => item.id === "instagram-oauth-execution-needed" && item.status === "blocked")) {
+  fail("dashboard control center must show Instagram OAuth execution as blocked owner attention");
 }
 if (data.dashboardActionQueue.manualPostingAvailable === true &&
   !data.ownerAttention.some((item) => item.id === "manual-posting-available" && item.status === "ready")) {

@@ -1,0 +1,60 @@
+{
+  "approvalId": "approval-20260708-instagram-single-post-publish",
+  "status": "revoked",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "ag-os-runtime",
+  "approvedBy": "REQUIRED_APPROVER_ID",
+  "projectId": "project-social-media-management-system-v1",
+  "commandCategory": "send_message",
+  "requestedAction": "Publish one exact owner-approved Instagram post for @agdigitalz.",
+  "target": "instagram:@agdigitalz:REQUIRED_SOCIAL_POST_ID",
+  "scope": "If converted into an active approved lock later, this may authorize one exact Instagram post ID only. It does not authorize scheduling, analytics, DMs/comments, n8n activation, additional posts, paid tools, credential storage in repo, domain/DNS, Lead Gen, AI Receptionist, or Constitution changes.",
+  "riskLevel": "R5",
+  "dataClass": "public",
+  "budget": {
+    "required": false,
+    "maxUsd": 0,
+    "usageLedgerRef": ".codex/costs/budget.json"
+  },
+  "approvalRequiredFor": [
+    "publish_single_instagram_post",
+    "send_message"
+  ],
+  "approvedActions": [
+    "publish_single_post"
+  ],
+  "prohibitedActions": [
+    "schedule_content",
+    "pull_analytics",
+    "send_dm",
+    "send_comment",
+    "activate_n8n",
+    "publish_additional_posts",
+    "store_credentials_in_repo",
+    "print_tokens",
+    "use_paid_service",
+    "change_domain",
+    "change_dns",
+    "change_lead_gen",
+    "change_ai_receptionist",
+    "change_constitution"
+  ],
+  "revocationPath": "This approval is revoked, expired, cancelled, or invalidated when the owner revokes it, expiration passes, the post ID differs from the exact approved post, the target account differs from Instagram @agdigitalz, the post content changes after approval, account state is revoked, expired, or blocked, or any scheduling, analytics, DMs/comments, n8n activation, paid tools, domain/DNS, Lead Gen, AI Receptionist, or Constitution scope appears.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Owner must approve one exact future social post ID before publishing.",
+      "verified": false
+    },
+    {
+      "type": "other",
+      "reference": "docs/social-post-lifecycle.md",
+      "verified": false
+    }
+  ],
+  "approvalText": "REQUIRED_EXACT_OWNER_APPROVAL_TEXT",
+  "approvedAt": "REQUIRED_APPROVED_AT",
+  "expiresAt": "REQUIRED_EXPIRES_AT",
+  "createdAt": "REQUIRED_CREATED_AT",
+  "updatedAt": "REQUIRED_UPDATED_AT"
+}
