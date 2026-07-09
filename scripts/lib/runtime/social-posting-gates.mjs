@@ -12,9 +12,9 @@ const SECRET_MARKERS = [
   /\baccess[_-]?token\b/i,
   /\brefresh[_-]?token\b/i,
   /\bpassword\b/i,
-  /\bsecret\b/i,
   /\bapi[_-]?key\b/i,
   /\boauth[_-]?code\b/i,
+  /\bsecret\s*[:=]\s*[^,\s"']{8,}/i,
   /\btoken\s*[:=]\s*[^,\s"']{8,}/i
 ];
 
@@ -139,7 +139,7 @@ export function evaluateSocialPostingPermission({
     blockedReasons.push("credential_reference_missing");
   }
 
-  if (account?.postingBlocked === true && account?.accountState !== "approved_for_single_publish") {
+  if (account?.postingBlocked === true || account?.livePostingBlocked === true) {
     blockedReasons.push("live_posting_blocked");
   }
 

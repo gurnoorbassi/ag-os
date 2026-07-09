@@ -523,6 +523,27 @@ function renderProductionSocialPosting() {
       ]
     }),
     card({
+      title: "Credential Store",
+      status: posting.credentialStoreReadiness,
+      metric: posting.credentialRefId,
+      detail: "Reference-only credential path is ready; no token value is stored in AG OS.",
+      meta: [
+        `referenceStatus: ${posting.credentialReferenceStatus}`,
+        `storageBackend: ${posting.credentialStorageBackend}`,
+        `repoSafe: ${boolText(posting.credentialReferenceRepoSafe, "true", "false")}`,
+        `secretStoredInRepo: ${boolText(posting.credentialReferenceSecretStoredInRepo, "true", "false")}`
+      ]
+    }),
+    card({
+      title: "OAuth Preflight",
+      status: posting.oauthPreflightStatus,
+      metric: posting.oauthConnectorPathAvailable ? "connector path recorded" : "connector path missing",
+      detail: posting.oauthExecutionReady
+        ? "OAuth execution is ready for final owner approval."
+        : "OAuth still needs final owner approval and a recorded connector execution path.",
+      meta: posting.oauthPreflightBlockedReasons
+    }),
+    card({
       title: "Draft Content",
       status: posting.approvedDraftPostsCount > 0 ? "ready" : "zero",
       metric: `${posting.approvedDraftPostsCount} approved drafts`,

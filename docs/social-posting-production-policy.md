@@ -3,7 +3,7 @@
 AG OS may only publish through a production social connector after all gates pass:
 
 1. Target account is registered.
-2. Secure credential store is approved.
+2. A repo-safe credential reference and external secure credential store path are approved.
 3. OAuth is approved and completed without storing tokens in the repo.
 4. The account is not revoked, expired, or blocked.
 5. The post content is owner-approved for live publishing, not merely approved as a draft.
@@ -24,4 +24,4 @@ AG OS may only publish through a production social connector after all gates pas
 
 ## Current Production Posture
 
-The production posting path is not active. This foundation only defines records, schemas, gates, and dashboard read model.
+The production posting path is not active. The Instagram credential reference is ready for OAuth preflight, but OAuth has not executed, the account is not connected, and no live posting permission exists.

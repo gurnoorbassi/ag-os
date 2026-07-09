@@ -283,11 +283,28 @@ if (!data.socialPosting || data.socialPosting.status !== "foundation_active") {
 if (data.socialPosting.targetHandle !== "@agdigitalz") {
   fail("dashboard control center must show @agdigitalz as the Instagram posting target handle");
 }
-if (data.socialPosting.accountState !== "not_connected") {
-  fail("dashboard control center must show Instagram account not_connected until OAuth is approved and completed");
+if (data.socialPosting.accountState !== "access_requested") {
+  fail("dashboard control center must show Instagram account access_requested until OAuth is approved and completed");
 }
-if (data.socialPosting.oauthStatus !== "blocked") {
-  fail("dashboard control center must show Instagram OAuth blocked before execution approval");
+if (data.socialPosting.oauthStatus !== "ready_after_approval") {
+  fail("dashboard control center must show Instagram OAuth ready_after_approval before execution approval");
+}
+if (data.socialPosting.credentialRefId !== "credential-ref-instagram-agdigitalz-oauth") {
+  fail("dashboard control center must show the Instagram OAuth credential reference id");
+}
+if (data.socialPosting.credentialStoreReadiness !== "reference_ready") {
+  fail("dashboard control center must show credential reference readiness for Instagram OAuth");
+}
+if (data.socialPosting.credentialReferenceSecretStoredInRepo !== false ||
+  data.socialPosting.credentialReferenceRepoSafe !== true) {
+  fail("dashboard control center must show the Instagram credential reference is repo-safe and stores no secret");
+}
+if (data.socialPosting.oauthPreflightStatus !== "blocked") {
+  fail("dashboard control center must show Instagram OAuth preflight blocked until final approval and connector path");
+}
+if (!data.socialPosting.oauthPreflightBlockedReasons.includes("final_owner_approval_missing") ||
+  !data.socialPosting.oauthPreflightBlockedReasons.includes("social_oauth_connector_missing")) {
+  fail("dashboard control center must show Instagram OAuth final approval and connector path blockers");
 }
 if (data.socialPosting.credentialsStoredInRepo !== false) {
   fail("dashboard control center must show credentials are not stored in repo");
@@ -310,6 +327,9 @@ if (data.socialPosting.postsReadyForPublishApproval !== 0) {
 }
 if (!data.socialPosting.blockedPublishReasons.includes("exact_single_post_publish_approval_missing")) {
   fail("dashboard control center must show exact single-post publish approval missing");
+}
+if (!data.socialPosting.blockedPublishReasons.includes("oauth_not_executed")) {
+  fail("dashboard control center must show OAuth has not been executed");
 }
 if (data.socialPosting.permissionModel.oauthDoesNotAuthorizePosting !== true ||
   data.socialPosting.permissionModel.connectedDraftOnlyDoesNotAuthorizePosting !== true ||

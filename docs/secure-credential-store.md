@@ -36,7 +36,15 @@ The only planned storage options are:
 - future local encrypted secret store
 - future platform environment variables, owner-approved
 
-Each option remains blocked until separately approved, implemented, tested, and audited.
+The Instagram `@agdigitalz` OAuth path now has one approved reference-only destination:
+
+- `.codex/credentials/credential-ref-instagram-agdigitalz-oauth.json`
+- storage backend: `future_secure_connector_credential_store`
+- status: `approved_reference`
+
+This is not a stored secret. It is only the source-controlled id AG OS may use later to point at an external approved credential store. The external credential store and OAuth connector still require final owner approval before use.
+
+Other storage options remain blocked until separately approved, implemented, tested, and audited.
 
 ## Forbidden Storage Locations
 
@@ -55,6 +63,8 @@ Credential values are forbidden in:
 ## First Candidate Use Case
 
 The first candidate credential use case is Instagram `@agdigitalz` in `connected_draft_only` mode.
+
+The credential reference path is ready for preflight, but OAuth is not active and Instagram is not connected.
 
 Even after credential storage exists, the following remain separately blocked until owner-approved:
 
