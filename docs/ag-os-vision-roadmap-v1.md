@@ -77,7 +77,7 @@ Status: complete through the Social Media Management System. Build, review, merg
 
 Goal: the learning loop runs itself. Every completed project auto-produces a quality score and lesson candidates; below-bar scores force improvement recommendations; accepted lessons feed archetype updates through reviewed PRs; boot briefing moves from load-everything to relevance retrieval (most similar past projects, their scores, applicable lessons). Add the skills library: reusable proven build patterns that plans reference instead of re-deriving. Exit criteria: a new project in a known category demonstrably reuses lessons and skills from prior projects, visible in its plan basis.
 
-Status: partially implemented. Unified memory, accepted-only loading, promotion/rejection mechanics, the skills-library foundation, guarded done-job scoring, and project/archetype/output relevance retrieval are implemented. Demonstrated lesson/skill reuse in a new project remains open.
+Status: partially implemented. Unified memory, accepted-only loading, promotion/rejection mechanics, the skills-library foundation, guarded done-job scoring, project/archetype/output relevance retrieval, and reviewed-PR archetype update proposals are implemented. Demonstrated lesson/skill reuse in a new project remains open.
 
 ### H4 — Scaled Operations
 
@@ -131,7 +131,7 @@ Status values: `proven` (done under gates, evidence recorded), `ready` (mechanic
 | 7 | Auto-score + lesson candidates required for every `done` job | H3 | M | complete | Completion Policy v1 fails closed unless the local execution processor produces score and lesson evidence; future completion paths must use the same contract. |
 | 8 | Boot briefing relevance retrieval (similar projects, applicable lessons only) | H3 | M | complete | Workers can request deterministic project/archetype/output briefings; planners record selected accepted lessons and high-quality examples. |
 | 9 | Skills library foundation (schema, `.codex/skills/`, first proven pattern) | H3 | M | complete | Three active evidence-cited procedural skills exist. |
-| 10 | Archetype update path from accepted lessons (reviewed PRs) | H3 | S | open | Compounding into category knowledge. |
+| 10 | Archetype update path from accepted lessons (reviewed PRs) | H3 | S | complete | Accepted lessons can create safe draft proposals; archetypes never auto-mutate and application requires a separate reviewed PR. |
 | 11 | First standing approval lock (owner grant, class-scoped, expiring) | H4 | S | open | Biggest micromanagement reducer. |
 | 12 | Batched approval review surface | H4 | M | open | One place to approve queued gated work. |
 | 13 | Metrics instrumentation: cost variance, quality trend, rework, lesson application | H4 | M | open | Evidence the system improves. |

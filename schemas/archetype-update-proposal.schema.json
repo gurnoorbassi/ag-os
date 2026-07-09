@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/archetype-update-proposal.schema.json",
+  "title": "AG OS Archetype Update Proposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "proposalId",
+    "status",
+    "acceptedLessonId",
+    "acceptedLessonPath",
+    "archetypeId",
+    "archetypePath",
+    "targetSection",
+    "proposedAddition",
+    "rationale",
+    "evidence",
+    "requiresReviewedPr",
+    "autoApplyAllowed",
+    "grantsPermission",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../../schemas/archetype-update-proposal.schema.json" },
+    "proposalId": { "type": "string", "pattern": "^archetype-update-[a-z0-9-]+$" },
+    "status": { "type": "string", "enum": ["draft", "applied", "rejected", "archived"] },
+    "acceptedLessonId": { "type": "string", "pattern": "^lesson-[a-z0-9-]+$" },
+    "acceptedLessonPath": { "type": "string", "minLength": 1 },
+    "archetypeId": { "type": "string", "pattern": "^archetype-[a-z0-9-]+$" },
+    "archetypePath": { "type": "string", "minLength": 1 },
+    "targetSection": {
+      "type": "string",
+      "enum": [
+        "professionalExpectations",
+        "minimumQualityBar",
+        "commonModules",
+        "uxExpectations",
+        "knownPitfalls",
+        "approvalGates",
+        "qualityChecklist",
+        "whatToBuildFirst",
+        "whatNotToOverbuildEarly",
+        "stopConditions"
+      ]
+    },
+    "proposedAddition": { "type": "string", "minLength": 1 },
+    "rationale": { "type": "string", "minLength": 1 },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "requiresReviewedPr": { "type": "boolean", "const": true },
+    "autoApplyAllowed": { "type": "boolean", "const": false },
+    "grantsPermission": { "type": "boolean", "const": false },
+    "appliedInPr": { "type": "string", "minLength": 1 },
+    "rejectionReason": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string", "minLength": 1 }
+  }
+}

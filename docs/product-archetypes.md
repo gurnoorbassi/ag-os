@@ -75,4 +75,4 @@ These fields are validated by `schemas/product-archetype.schema.json`.
 
 The Archetype Pack v1 records are enough for plan-only and local builder-readiness work across the common AG Digitalz product categories. They do not make AG OS ready for live deployments, domain work, Netlify activation, n8n activation, phone or voice actions, social account connections, live outreach, payment processing, or production data handling.
 
-Future archetype changes should be small, evidence-backed updates driven by owner commands, quality reviews, or promoted lessons.
+Future archetype changes should be small, evidence-backed updates driven by owner commands, quality reviews, or promoted lessons. Accepted lessons enter through draft records under `.codex/memory/archetype-updates/`; proposals never auto-apply and require a separate reviewed PR.

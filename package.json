@@ -13,6 +13,7 @@
     "connector:preflight": "node scripts/process-connector-preflight.mjs",
     "memory:load": "node scripts/load-accepted-lessons.mjs",
     "lessons:promote": "node scripts/process-lesson-promotion.mjs",
+    "archetypes:propose": "node scripts/process-archetype-update-proposal.mjs",
     "security:scan": "node scripts/scan-secrets.mjs",
     "validate": "node scripts/validate-foundation.mjs && node scripts/check-dashboard.mjs"
   },

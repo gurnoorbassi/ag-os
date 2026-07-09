@@ -57,6 +57,7 @@ const requiredPaths = [
   ".codex/memory/accepted/README.md",
   ".codex/memory/rejected/README.md",
   ".codex/memory/conflicts/README.md",
+  ".codex/memory/archetype-updates/README.md",
   ".codex/costs/README.md",
   ".codex/costs/budget.json",
   ".codex/quality/README.md",
@@ -311,6 +312,12 @@ const knowledgeRecordDirectories = [
     recordDir: ".codex/skills",
     schemaPath: "schemas/skill.schema.json",
     allowedStatuses: ["draft", "active", "deprecated"]
+  },
+  {
+    name: "archetype update proposal",
+    recordDir: ".codex/memory/archetype-updates",
+    schemaPath: "schemas/archetype-update-proposal.schema.json",
+    allowedStatuses: ["draft", "applied", "rejected", "archived"]
   },
   {
     name: "owner preference profile",
