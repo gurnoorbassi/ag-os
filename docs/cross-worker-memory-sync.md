@@ -17,7 +17,9 @@ Workers may cite candidate lessons only as advisory evidence, not as accepted gu
 
 ## Sync Contract
 
-Before planning, critique, build review, or connector execution preflight, a worker should load accepted lessons using `scripts/load-accepted-lessons.mjs` or the dashboard read model.
+Before planning, critique, build review, or connector execution preflight, a worker should load a relevance-ranked accepted-memory briefing using `scripts/load-accepted-lessons.mjs --project <project-id> --archetype <archetype-id> --output <output-type> --worker <worker-type>` or the dashboard read model.
+
+The briefing may include high-quality source-controlled examples from similar projects. Examples are evidence only; candidate scores are not accepted lessons and do not grant permission.
 
 The worker must preserve:
 

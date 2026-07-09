@@ -55,7 +55,7 @@ Known weaknesses (from the validator/schema audit):
 - Understanding depends on a worker being manually placed in the loop.
 - The accepted H2 social product remains intentionally limited to managed staging and draft-only operation; live-operation readiness is an H5 concern with separate gates.
 - Mechanical completion scoring now covers the local execution processor; remaining completion paths must adopt the same guarded `done` contract as they are added.
-- Boot briefing loads accumulated context but does not yet perform relevance retrieval against similar projects.
+- Relevance retrieval is deterministic and metadata-based; semantic retrieval and measured reuse effectiveness remain future improvements if evidence justifies them.
 - Documentation continues to grow; consolidation debt accrues.
 - Accumulated context is only an asset while it is true; stale or wrong lessons make the system worse than a cold session.
 
@@ -77,7 +77,7 @@ Status: complete through the Social Media Management System. Build, review, merg
 
 Goal: the learning loop runs itself. Every completed project auto-produces a quality score and lesson candidates; below-bar scores force improvement recommendations; accepted lessons feed archetype updates through reviewed PRs; boot briefing moves from load-everything to relevance retrieval (most similar past projects, their scores, applicable lessons). Add the skills library: reusable proven build patterns that plans reference instead of re-deriving. Exit criteria: a new project in a known category demonstrably reuses lessons and skills from prior projects, visible in its plan basis.
 
-Status: partially implemented. Unified memory, accepted-only loading, promotion/rejection mechanics, the skills-library foundation, and guarded done-job scoring are implemented. Relevance retrieval and demonstrated lesson/skill reuse in a new project remain open.
+Status: partially implemented. Unified memory, accepted-only loading, promotion/rejection mechanics, the skills-library foundation, guarded done-job scoring, and project/archetype/output relevance retrieval are implemented. Demonstrated lesson/skill reuse in a new project remains open.
 
 ### H4 — Scaled Operations
 
@@ -129,7 +129,7 @@ Status values: `proven` (done under gates, evidence recorded), `ready` (mechanic
 | 5 | Runtime proof records policy: commit milestone proof, ignore routine churn | H1 | S | complete | Runtime proof writer and record conventions are merged. |
 | 6 | End-to-end revenue product run (one archetype, staged, scored, accepted) | H2 | L | complete | Social product has staged, scored, lesson-candidate, runbook, owner-acceptance, and reconciled project-status evidence. |
 | 7 | Auto-score + lesson candidates required for every `done` job | H3 | M | complete | Completion Policy v1 fails closed unless the local execution processor produces score and lesson evidence; future completion paths must use the same contract. |
-| 8 | Boot briefing relevance retrieval (similar projects, applicable lessons only) | H3 | M | open | Before lesson store grows large. |
+| 8 | Boot briefing relevance retrieval (similar projects, applicable lessons only) | H3 | M | complete | Workers can request deterministic project/archetype/output briefings; planners record selected accepted lessons and high-quality examples. |
 | 9 | Skills library foundation (schema, `.codex/skills/`, first proven pattern) | H3 | M | complete | Three active evidence-cited procedural skills exist. |
 | 10 | Archetype update path from accepted lessons (reviewed PRs) | H3 | S | open | Compounding into category knowledge. |
 | 11 | First standing approval lock (owner grant, class-scoped, expiring) | H4 | S | open | Biggest micromanagement reducer. |

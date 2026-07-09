@@ -12,6 +12,7 @@ A worker plan draft must provide `summary`, `tasks`, `tools`, and `expectedOutpu
 
 - `productArchetype`: the archetype the plan follows, or a stated none.
 - `appliedLessons`: accepted lessons used, when any.
+- `relevantMemory`: deterministic accepted-lesson and high-quality-example paths selected for the same project, archetype, or output type. Candidates are never loaded as truth and examples never grant permission.
 - `ownerPreferencesUsed`: owner preferences applied, when any.
 - `stackChoice`: the Bootstrap Mode stack decision and why.
 - `qualityBar`: the quality bar inherited from the archetype.

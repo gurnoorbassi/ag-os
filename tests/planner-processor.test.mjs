@@ -130,6 +130,11 @@ test("uses social media archetype content for source video, accounts, approvals,
 
   assert.equal(record.basis.productArchetype, "archetype-social-media-content-operations-system");
   assert.equal(record.basis.archetypeFile, ".codex/archetypes/social-media-content-operations-system.json");
+  assert.equal(record.basis.relevantMemory.strategy, "project_archetype_output_similarity_v1");
+  assert.equal(record.basis.relevantMemory.candidatesLoadedAsTruth, false);
+  assert.equal(record.basis.relevantMemory.memoryGrantsPermission, false);
+  assert.equal(record.basis.relevantMemory.examplesGrantPermission, false);
+  assert.equal(record.basis.relevantMemory.exampleScorePaths.length > 0, true);
   assert.equal(combined.includes("source video"), true);
   assert.equal(combined.includes("accounts"), true);
   assert.equal(combined.includes("approval"), true);

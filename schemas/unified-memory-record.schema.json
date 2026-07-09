@@ -79,12 +79,20 @@
     "runtimeLoading": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["acceptedLessonsLoadedByRuntime", "candidateLessonsLoadedAsTruth", "rejectedLessonsLoadedAsTruth"],
+      "required": [
+        "acceptedLessonsLoadedByRuntime",
+        "candidateLessonsLoadedAsTruth",
+        "rejectedLessonsLoadedAsTruth",
+        "retrievalStrategy",
+        "qualityExamplesGrantPermission"
+      ],
       "properties": {
         "acceptedLessonsLoadedByRuntime": { "type": "boolean" },
         "candidateLessonsLoadedAsTruth": { "type": "boolean", "const": false },
         "rejectedLessonsLoadedAsTruth": { "type": "boolean", "const": false },
-        "loaderScript": { "type": "string" }
+        "loaderScript": { "type": "string" },
+        "retrievalStrategy": { "type": "string", "const": "project_archetype_output_similarity_v1" },
+        "qualityExamplesGrantPermission": { "type": "boolean", "const": false }
       }
     },
     "dashboard": {
