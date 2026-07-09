@@ -47,14 +47,14 @@ Compounding intelligence now includes:
 - An owner-gated lesson promotion/rejection path.
 - A validated skills library with three active evidence-cited procedural skills delivered to workers without granting permission.
 
-The Social Media Management System has progressed through draft UI, content review, manual posting pack, target-repo merge, and dedicated Netlify staging proof. Production Social Posting OS and an Instagram `@agdigitalz` reference-only OAuth preflight are source controlled. OAuth execution, account connection, posting, scheduling, analytics, DMs/comments, and n8n activation remain blocked unless separately approved.
+The Social Media Management System has progressed through draft UI, content review, manual posting pack, target-repo merge, dedicated Netlify staging proof, and full H2 owner acceptance. Production Social Posting OS and an Instagram `@agdigitalz` reference-only OAuth preflight are source controlled. OAuth execution, account connection, posting, scheduling, analytics, DMs/comments, and n8n activation remain blocked unless separately approved.
 
 Known weaknesses (from the validator/schema audit):
 
 - Validation still uses a hand-rolled JSON Schema subset: `format` is warning-only, structural keywords are unsupported, and metadata-only schemas remain deferred until active record paths exist.
 - Understanding depends on a worker being manually placed in the loop.
-- The H2 social product has candidate quality scores and staging proof, but the project registry still marks it `planned`; no complete H2 owner-acceptance record closes the end-to-end revenue-product milestone.
-- Completed jobs do not yet mechanically require automatic quality-score and lesson-candidate output.
+- The accepted H2 social product remains intentionally limited to managed staging and draft-only operation; live-operation readiness is an H5 concern with separate gates.
+- Mechanical completion scoring now covers the local execution processor; remaining completion paths must adopt the same guarded `done` contract as they are added.
 - Boot briefing loads accumulated context but does not yet perform relevance retrieval against similar projects.
 - Documentation continues to grow; consolidation debt accrues.
 - Accumulated context is only an asset while it is true; stale or wrong lessons make the system worse than a cold session.
@@ -71,13 +71,13 @@ Status: core exit criteria achieved. Remaining metadata-only schemas and any fut
 
 Goal: one archetype taken from owner command to a real, staged, approval-gated deliverable a client would pay for. Candidate: business website or social media content operations system. Exit criteria: quality score at or above bar, staged deploy under approval lock, owner acceptance recorded, at least three lesson candidates produced, and a repeatable runbook captured as records.
 
-Status: in progress through the Social Media Management System. Build, review, merge, staging, draft-content approval, and operating-package evidence exist; a complete owner-acceptance record and project-registry status reconciliation are still required before H2 can close.
+Status: complete through the Social Media Management System. Build, review, merge, staging, draft-content approval, operating-package evidence, full owner acceptance, and project-registry reconciliation are source controlled. This closes the H2 product milestone only and grants no live-operation permission.
 
 ### H3 — Compounding Intelligence
 
 Goal: the learning loop runs itself. Every completed project auto-produces a quality score and lesson candidates; below-bar scores force improvement recommendations; accepted lessons feed archetype updates through reviewed PRs; boot briefing moves from load-everything to relevance retrieval (most similar past projects, their scores, applicable lessons). Add the skills library: reusable proven build patterns that plans reference instead of re-deriving. Exit criteria: a new project in a known category demonstrably reuses lessons and skills from prior projects, visible in its plan basis.
 
-Status: partially implemented. Unified memory, accepted-only loading, promotion/rejection mechanics, and the skills-library foundation are merged. Automatic done-job scoring, relevance retrieval, and demonstrated lesson/skill reuse in a new project remain open.
+Status: partially implemented. Unified memory, accepted-only loading, promotion/rejection mechanics, the skills-library foundation, and guarded done-job scoring are implemented. Relevance retrieval and demonstrated lesson/skill reuse in a new project remain open.
 
 ### H4 — Scaled Operations
 
@@ -127,8 +127,8 @@ Status values: `proven` (done under gates, evidence recorded), `ready` (mechanic
 | 3 | Unsupported-keyword visibility: warn on `format`, fail on `$ref`/`oneOf`/etc. | H1 | S | complete | Behavior and self-tests are source controlled. |
 | 4 | Truth-up `docs/validation-limits.md` | H1 | S | complete | Current coverage, warning-only behavior, and deferred schemas are explicit. |
 | 5 | Runtime proof records policy: commit milestone proof, ignore routine churn | H1 | S | complete | Runtime proof writer and record conventions are merged. |
-| 6 | End-to-end revenue product run (one archetype, staged, scored, accepted) | H2 | L | in progress | Social product has staged and scored evidence; reconcile project status and record complete owner acceptance. |
-| 7 | Auto-score + lesson candidates required for every `done` job | H3 | M | open | Closes the loop mechanically. |
+| 6 | End-to-end revenue product run (one archetype, staged, scored, accepted) | H2 | L | complete | Social product has staged, scored, lesson-candidate, runbook, owner-acceptance, and reconciled project-status evidence. |
+| 7 | Auto-score + lesson candidates required for every `done` job | H3 | M | complete | Completion Policy v1 fails closed unless the local execution processor produces score and lesson evidence; future completion paths must use the same contract. |
 | 8 | Boot briefing relevance retrieval (similar projects, applicable lessons only) | H3 | M | open | Before lesson store grows large. |
 | 9 | Skills library foundation (schema, `.codex/skills/`, first proven pattern) | H3 | M | complete | Three active evidence-cited procedural skills exist. |
 | 10 | Archetype update path from accepted lessons (reviewed PRs) | H3 | S | open | Compounding into category knowledge. |
@@ -143,8 +143,8 @@ Status values: `proven` (done under gates, evidence recorded), `ready` (mechanic
 Evidence for the 2026-07-09 status truth-up:
 
 - H1: `tests/validate-foundation.test.mjs`, `scripts/validate-foundation.mjs`, `docs/validation-limits.md`, `docs/runtime-proof-records-policy.md`, and `scripts/process-runtime-proof-writer.mjs`.
-- H2: `.codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-manual-posting-pack-v1-20260705.json`, `.codex/audit/audit-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-executed.json`, `.codex/audit/audit-20260704-ag-digitalz-draft-content-owner-approved.json`, and `.codex/projects/registry.json`.
-- H3: `docs/unified-memory-learning-os.md`, `scripts/load-accepted-lessons.mjs`, `scripts/process-lesson-promotion.mjs`, `schemas/skill.schema.json`, and the active records under `.codex/skills/`.
+- H2: `.codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-manual-posting-pack-v1-20260705.json`, `.codex/audit/audit-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-executed.json`, `.codex/audit/audit-20260709-social-media-management-system-h2-owner-accepted.json`, and `.codex/projects/registry.json`.
+- H3: `docs/unified-memory-learning-os.md`, `scripts/load-accepted-lessons.mjs`, `scripts/process-lesson-promotion.mjs`, `scripts/lib/runtime/job-completion-processor.mjs`, `schemas/skill.schema.json`, and the active records under `.codex/skills/`.
 - Instagram production boundary: `.codex/social/preflight/social-preflight-instagram-oauth-agdigitalz.json`, `.codex/credentials/credential-ref-instagram-agdigitalz-oauth.json`, and `docs/instagram-production-readiness.md`.
 
 Backlog changes are made by editing this document through reviewed PRs, citing evidence (audit findings, quality scores, promoted lessons, or owner commands).

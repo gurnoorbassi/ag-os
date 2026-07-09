@@ -30,6 +30,8 @@ Job records must use one of these states:
 - `done`: completed with expected output recorded.
 - `cancelled`: intentionally stopped before completion.
 
+Jobs completed on or after the Job Completion Policy v1 activation must include `completionEvidence` pointing to a candidate quality score and at least one candidate lesson. A processor must fail closed before `done` when those records cannot be produced. Candidate outputs remain evidence only and never grant approval or live-action permission.
+
 ## Required Fields
 
 Future job records must identify:

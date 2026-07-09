@@ -4,6 +4,7 @@ import process from "node:process";
 import { readJson } from "./lib/runtime/common.mjs";
 
 const root = process.cwd();
+const JOB_COMPLETION_POLICY_ACTIVATED_AT = "2026-07-09T20:06:25.029Z";
 
 const requiredPaths = [
   "README.md",
@@ -945,6 +946,62 @@ function validateSecurityPolicy(record) {
   }
 }
 
+function validateJobCompletionEvidence(record, recordPath) {
+  if (record.status !== "done") {
+    return;
+  }
+
+  const completedAt = record.queueTimestamps?.completedAt;
+  const policyApplies = typeof completedAt !== "string" || completedAt >= JOB_COMPLETION_POLICY_ACTIVATED_AT;
+  if (!policyApplies) {
+    return;
+  }
+
+  const evidence = record.completionEvidence;
+  if (!evidence) {
+    fail(`${recordPath} completed after the job completion policy activation but has no completionEvidence`);
+    return;
+  }
+
+  const evidencePaths = [evidence.qualityScorePath, ...(evidence.lessonCandidatePaths ?? [])];
+  for (const evidencePath of evidencePaths) {
+    if (typeof evidencePath !== "string" || path.isAbsolute(evidencePath) || evidencePath.startsWith("..")) {
+      fail(`${recordPath} completion evidence must use a repository-relative path`);
+      continue;
+    }
+    if (!existsSync(path.join(root, evidencePath))) {
+      fail(`${recordPath} completion evidence does not exist: ${evidencePath}`);
+    }
+  }
+
+  if (typeof evidence.qualityScorePath !== "string" || !existsSync(path.join(root, evidence.qualityScorePath))) {
+    return;
+  }
+
+  try {
+    const qualityScore = readJson(evidence.qualityScorePath);
+    if (qualityScore.projectId !== record.projectId) {
+      fail(`${recordPath} completion quality score projectId must match the job`);
+    }
+
+    const expectedLessonIds = new Set(qualityScore.lessonCandidates ?? []);
+    for (const lessonPath of evidence.lessonCandidatePaths ?? []) {
+      if (!existsSync(path.join(root, lessonPath))) {
+        continue;
+      }
+      const lesson = readJson(lessonPath);
+      if (lesson.sourceScoreId !== qualityScore.scoreId) {
+        fail(`${recordPath} lesson candidate must cite completion quality score ${qualityScore.scoreId}`);
+      }
+      if (!expectedLessonIds.has(lesson.lessonId)) {
+        fail(`${recordPath} completion quality score must list lesson candidate ${lesson.lessonId}`);
+      }
+    }
+  } catch (error) {
+    fail(`${recordPath} completion evidence could not be validated: ${error.message}`);
+  }
+}
+
 function validateCredentialStorePolicy(record) {
   const approvedOptions = new Set((record.approvedStorageOptions ?? []).map((option) => option.id));
   for (const requiredOption of [
@@ -1511,6 +1568,9 @@ for (const engineRecordDirectory of engineRecordDirectories) {
       assertNoPlaceholders(record, recordPath);
       assertNoFixtureMarkers(record, recordPath);
       validateSchemaObject(record, schema, recordPath);
+      if (engineRecordDirectory.name === "job") {
+        validateJobCompletionEvidence(record, recordPath);
+      }
 
       if (failures === failuresBeforeRecord) {
         pass(`${engineRecordDirectory.name} active record structurally valid: ${recordPath}`);

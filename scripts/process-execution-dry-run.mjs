@@ -34,6 +34,8 @@ console.log(JSON.stringify({
   executionStepId: result.executionStep.executionStepId,
   executionStatus: result.executionStep.status,
   jobStatus: result.job.status,
+  qualityScorePath: result.completion?.qualityScorePath ?? null,
+  lessonCandidatePaths: result.completion?.lessonCandidatePaths ?? [],
   validationPassed: result.validationResult.passed,
   safety: result.executionStep.safety
 }, null, 2));

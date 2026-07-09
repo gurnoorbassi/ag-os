@@ -78,13 +78,13 @@ window.AG_OS_DASHBOARD_DATA = {
       {
         "id": "project-social-media-management-system-v1",
         "name": "Social Media Management System v1",
-        "status": "planned",
+        "status": "active",
         "managementMode": "managed_staging",
         "projectType": "product_project",
         "riskLevel": "medium",
         "owner": "owner-gurnoor-bassi",
         "recordPath": ".codex/projects/social-media-management-system-v1.json",
-        "boundary": "Do not create a GitHub repository."
+        "boundary": "Do not create or mutate a repository, branch, file set, or pull request outside a separately approved scope."
       }
     ]
   },
@@ -113,13 +113,13 @@ window.AG_OS_DASHBOARD_DATA = {
   "socialMediaSystem": {
     "id": "project-social-media-management-system-v1",
     "name": "Social Media Management System v1",
-    "status": "planned",
+    "status": "active",
     "managementMode": "managed_staging",
     "projectType": "product_project",
     "riskLevel": "medium",
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/social-media-management-system-v1.json",
-    "boundary": "Do not create a GitHub repository.",
+    "boundary": "Do not create or mutate a repository, branch, file set, or pull request outside a separately approved scope.",
     "currentVersion": "v1.8 manual posting pack",
     "lifecycleStatus": "Manual posting pack merged and staged; OAuth and AG OS automated posting remain blocked",
     "targetRepo": "gurnoorbassi/ag-social-media-management-system",

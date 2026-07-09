@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import process from "node:process";
 import { isoTimestamp, normalizeRunId, readJson, writeJson } from "./common.mjs";
+import { writeJobCompletionArtifacts } from "./job-completion-processor.mjs";
 
 export function runLocalValidation({ root = process.cwd() } = {}) {
   const command = process.platform === "win32" ? "cmd.exe" : "npm";
@@ -67,7 +68,12 @@ export function buildExecutionStepRecord({
   };
 }
 
-export function buildDryRunJobUpdate({ job, validationPassed = true, now = new Date() }) {
+export function buildDryRunJobUpdate({
+  job,
+  validationPassed = true,
+  completionEvidence,
+  now = new Date()
+}) {
   if (!job?.jobId) {
     throw new Error("job with jobId is required");
   }
@@ -83,9 +89,14 @@ export function buildDryRunJobUpdate({ job, validationPassed = true, now = new D
     };
   }
 
+  if (validationPassed && !completionEvidence) {
+    throw new Error("completed jobs require quality score and lesson candidate evidence");
+  }
+
   return {
     ...job,
     status: validationPassed ? "done" : "failed",
+    ...(validationPassed ? { completionEvidence } : {}),
     ...(validationPassed ? {} : { blockedReason: "Local validation failed during dry-run execution." }),
     queueTimestamps: {
       ...job.queueTimestamps,
@@ -116,12 +127,23 @@ export function writeExecutionDryRunRecords({
     validationPassed: effectiveValidationResult.passed,
     now
   });
+  const executionPath = `.codex/execution/${executionStep.executionStepId}.json`;
+  const completion = effectiveValidationResult.passed && sourceJob.approvalRequired !== true
+    ? writeJobCompletionArtifacts({
+        job: sourceJob,
+        plan: sourcePlan,
+        planRecordPath,
+        executionRecordPath: executionPath,
+        root,
+        now
+      })
+    : null;
   const updatedJob = buildDryRunJobUpdate({
     job: sourceJob,
     validationPassed: effectiveValidationResult.passed,
+    completionEvidence: completion?.completionEvidence,
     now
   });
-  const executionPath = `.codex/execution/${executionStep.executionStepId}.json`;
   const jobPath = `.codex/jobs/${updatedJob.jobId}.json`;
   writeJson(executionPath, executionStep, root);
   writeJson(jobPath, updatedJob, root);
@@ -131,6 +153,7 @@ export function writeExecutionDryRunRecords({
     jobPath,
     executionStep,
     job: updatedJob,
+    completion,
     validationResult: effectiveValidationResult
   };
 }
