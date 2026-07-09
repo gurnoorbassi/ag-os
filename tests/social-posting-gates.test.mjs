@@ -133,6 +133,38 @@ test("missing secure credential store blocks OAuth readiness", () => {
   assert.ok(result.blockedReasons.includes("secure_credential_store_missing"));
 });
 
+test("approved credential reference and exact OAuth approval allow OAuth preflight only", () => {
+  const result = evaluateSocialAccountOAuthReadiness({
+    account: {
+      ...baseAccount,
+      accountState: "access_requested",
+      credentialRefId: "credential-ref-instagram-agdigitalz-oauth",
+      credentialStorageStatus: "approved_reference"
+    },
+    credentialStoreAvailable: true,
+    approval: approval({ allowedAction: "execute_oauth", postId: null })
+  });
+
+  assert.equal(result.allowed, true);
+  assert.deepEqual(result.blockedReasons, []);
+});
+
+test("livePostingBlocked field blocks publishing even with exact approval", () => {
+  const result = evaluateSocialPostingPermission({
+    account: {
+      ...baseAccount,
+      accountState: "approved_for_single_publish",
+      credentialRefId: "credential-ref-instagram-agdigitalz-oauth",
+      livePostingBlocked: true
+    },
+    post: { ...approvedDraftPost, lifecycleState: "ready_for_live_publish_approval" },
+    approval: approval()
+  });
+
+  assert.equal(result.allowed, false);
+  assert.ok(result.blockedReasons.includes("live_posting_blocked"));
+});
+
 test("expired or revoked accounts block posting", () => {
   for (const accountState of ["expired", "revoked", "blocked"]) {
     const result = evaluateSocialPostingPermission({
@@ -185,4 +217,21 @@ test("credential and token values are rejected from social records", () => {
 
   assert.equal(result.allowed, false);
   assert.ok(result.blockedReasons.includes("credential_or_token_value_present"));
+});
+
+test("safe credential-reference wording does not look like stored credential material", () => {
+  const result = evaluateSocialAccountOAuthReadiness({
+    account: {
+      ...baseAccount,
+      accountState: "access_requested",
+      credentialRefId: "credential-ref-instagram-agdigitalz-oauth",
+      credentialStorageStatus: "approved_reference",
+      notes: ["Reference-only record. Contains no secret value and no token value."]
+    },
+    credentialStoreAvailable: true,
+    approval: approval({ allowedAction: "execute_oauth", postId: null })
+  });
+
+  assert.equal(result.allowed, true);
+  assert.deepEqual(result.blockedReasons, []);
 });

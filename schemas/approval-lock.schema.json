@@ -53,6 +53,17 @@
     "requestedAction": { "type": "string", "minLength": 1 },
     "target": { "type": "string", "minLength": 1 },
     "scope": { "type": "string", "minLength": 1 },
+    "credentialRefId": { "type": "string", "pattern": "^credential-ref-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "requestedPermissions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "excludedPermissions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
     "riskLevel": { "type": "string", "enum": ["R0", "R1", "R2", "R3", "R4", "R5", "R6"] },
     "dataClass": {
       "type": "string",

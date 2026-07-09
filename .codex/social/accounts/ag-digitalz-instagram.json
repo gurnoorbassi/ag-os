@@ -8,11 +8,11 @@
   "platform": "Instagram",
   "handle": "@agdigitalz",
   "handleStatus": "public_handle_provided",
-  "accountState": "not_connected",
+  "accountState": "access_requested",
   "connectionMode": "draft_only",
-  "oauthStatus": "blocked",
-  "credentialRefId": null,
-  "credentialStorageStatus": "none",
+  "oauthStatus": "ready_after_approval",
+  "credentialRefId": "credential-ref-instagram-agdigitalz-oauth",
+  "credentialStorageStatus": "approved_reference",
   "credentialsStoredInRepo": false,
   "postingMode": "draft_only",
   "ownerApprovalRequired": true,
@@ -50,9 +50,11 @@
     "store_credentials_in_repo",
     "use_paid_tools"
   ],
-  "nextRequiredApproval": "Owner must approve approval-instagram-oauth-execution before any Instagram OAuth flow can start. OAuth approval still does not authorize posting, scheduling, analytics, DMs/comments, or n8n activation.",
+  "nextRequiredApproval": "Owner must approve approval-instagram-oauth-execution before any Instagram OAuth flow can start. Credential reference credential-ref-instagram-agdigitalz-oauth is source-controlled as a reference only and contains no secret value. OAuth approval still does not authorize posting, scheduling, analytics, DMs/comments, or n8n activation.",
   "sourceRecords": [
     ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json",
+    ".codex/credentials/credential-ref-instagram-agdigitalz-oauth.json",
+    ".codex/social/preflight/social-preflight-instagram-oauth-agdigitalz.json",
     ".codex/social/instagram-oauth-plan-20260704-agdigitalz.json",
     "docs/instagram-oauth-readiness-package.md"
   ],

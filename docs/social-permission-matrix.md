@@ -2,7 +2,7 @@
 
 | Action | Required Account State | Approval Required | Still Blocked |
 | --- | --- | --- | --- |
-| OAuth connection | `oauth_ready` | `approval-instagram-oauth-execution` | posting, scheduling, analytics, DMs/comments, n8n activation |
+| OAuth connection | `access_requested` or `oauth_ready` | `approval-instagram-oauth-execution` plus credential reference `credential-ref-instagram-agdigitalz-oauth` | posting, scheduling, analytics, DMs/comments, n8n activation |
 | Single publish | `approved_for_single_publish` | exact post approval | scheduling, analytics, DMs/comments, n8n activation |
 | Scheduling | `approved_for_scheduling` | exact schedule approval | analytics, DMs/comments, n8n activation |
 | Analytics read-only | `connected_draft_only` or stronger | analytics read-only approval | posting, scheduling, DMs/comments, n8n activation |

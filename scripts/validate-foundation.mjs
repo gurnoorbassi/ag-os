@@ -37,6 +37,7 @@ const requiredPaths = [
   "docs/critic-worker.md",
   "docs/secure-credential-store.md",
   "docs/secret-redaction-policy.md",
+  "docs/instagram-oauth-execution-preflight.md",
   "docs/unified-memory-learning-os.md",
   "docs/lesson-promotion-policy.md",
   "docs/cross-worker-memory-sync.md",
@@ -65,6 +66,7 @@ const requiredPaths = [
   ".codex/security/policy.json",
   ".codex/security/credential-store-policy.json",
   ".codex/credentials/README.md",
+  ".codex/credentials/credential-ref-instagram-agdigitalz-oauth.json",
   ".codex/watchdog/README.md",
   ".codex/watchdog/policy.json",
   ".codex/approvals/README.md",
@@ -75,6 +77,7 @@ const requiredPaths = [
   ".codex/social/posts/README.md",
   ".codex/social/publish-approvals/README.md",
   ".codex/social/preflight/README.md",
+  ".codex/social/preflight/social-preflight-instagram-oauth-agdigitalz.json",
   ".codex/social/policies/production-posting-policy.json",
   ".codex/capabilities/README.md",
   ".codex/capabilities/registry.json",
@@ -991,8 +994,46 @@ function validateCredentialStorePolicy(record) {
     fail("credential store policy must forbid tokens in dashboard data");
   }
 
-  if (record.firstCandidateUseCase?.status !== "blocked_until_secure_storage_and_final_owner_approval") {
-    fail("credential store policy first candidate use case must remain blocked until secure storage and final owner approval");
+  const allowedFirstUseStatuses = new Set([
+    "blocked_until_secure_storage_and_final_owner_approval",
+    "credential_reference_ready_final_owner_approval_required"
+  ]);
+  if (!allowedFirstUseStatuses.has(record.firstCandidateUseCase?.status)) {
+    fail("credential store policy first candidate use case must remain blocked or waiting for final owner approval");
+  }
+}
+
+const credentialMaterialPatterns = [
+  /\baccess[_-]?token\b/i,
+  /\brefresh[_-]?token\b/i,
+  /\boauth[_-]?code\b/i,
+  /\bapi[_-]?key\b/i,
+  /\bpassword\b/i,
+  /\bsecret\s*[:=]\s*[^,\s"']{8,}/i,
+  /\btoken\s*[:=]\s*[^,\s"']{8,}/i,
+  /\btoken\s+[A-Za-z0-9_-]{8,}/i
+];
+
+function collectRecordText(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map(collectRecordText).join(" ");
+  }
+  if (typeof value === "object") {
+    return Object.values(value).map(collectRecordText).join(" ");
+  }
+  return String(value);
+}
+
+function validateCredentialReferenceRecord(record, recordPath) {
+  const text = collectRecordText(record);
+  if (credentialMaterialPatterns.some((pattern) => pattern.test(text))) {
+    fail(`${recordPath} credential reference must not contain credential or token material`);
   }
 }
 
@@ -1511,6 +1552,9 @@ for (const runtimeRecordDirectory of runtimeRecordDirectories) {
       assertNoPlaceholders(record, recordPath);
       assertNoFixtureMarkers(record, recordPath);
       validateSchemaObject(record, schema, recordPath);
+      if (runtimeRecordDirectory.name === "credential reference") {
+        validateCredentialReferenceRecord(record, recordPath);
+      }
 
       if (failures === failuresBeforeRecord) {
         pass(`${runtimeRecordDirectory.name} active record structurally valid: ${recordPath}`);

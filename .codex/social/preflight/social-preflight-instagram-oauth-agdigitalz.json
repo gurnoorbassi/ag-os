@@ -1,0 +1,71 @@
+{
+  "$schema": "../../../schemas/social-connector-preflight.schema.json",
+  "preflightId": "social-preflight-instagram-oauth-agdigitalz",
+  "recordType": "social_connector_preflight",
+  "status": "blocked",
+  "projectId": "project-social-media-management-system-v1",
+  "clientId": "client-ag-digitalz-internal",
+  "engagementId": "engagement-ag-digitalz-social-media-v1",
+  "targetPlatform": "Instagram",
+  "targetHandle": "@agdigitalz",
+  "requestedAction": "execute_oauth",
+  "credentialRefId": "credential-ref-instagram-agdigitalz-oauth",
+  "secureCredentialStoreDestination": "future_secure_connector_credential_store",
+  "credentialStoreRequired": true,
+  "secureCredentialStoreConfirmed": true,
+  "approvalRequired": true,
+  "liveActionAllowed": false,
+  "requestedPermissions": [
+    "instagram_business_basic"
+  ],
+  "excludedPermissions": [
+    "instagram_business_content_publish",
+    "instagram_content_publish",
+    "instagram_business_manage_insights",
+    "instagram_business_manage_comments",
+    "instagram_manage_comments",
+    "instagram_business_manage_messages",
+    "instagram_manage_messages",
+    "ads_management",
+    "webhook_subscription"
+  ],
+  "checks": [
+    {
+      "checkId": "public_handle_recorded",
+      "status": "pass",
+      "evidence": "Instagram public handle @agdigitalz is recorded in .codex/social/accounts/ag-digitalz-instagram.json."
+    },
+    {
+      "checkId": "credential_reference_ready",
+      "status": "pass",
+      "evidence": "Reference-only credential record exists and stores no secret values."
+    },
+    {
+      "checkId": "final_owner_approval",
+      "status": "blocked",
+      "evidence": "No active approval lock exists for Instagram OAuth execution."
+    },
+    {
+      "checkId": "social_oauth_connector",
+      "status": "blocked",
+      "evidence": "No active Instagram OAuth connector execution path is recorded yet."
+    },
+    {
+      "checkId": "live_actions",
+      "status": "blocked",
+      "evidence": "Posting, scheduling, analytics, DMs/comments, and n8n activation remain blocked."
+    }
+  ],
+  "blockedReasons": [
+    "final_owner_approval_missing",
+    "social_oauth_connector_missing",
+    "oauth_not_executed",
+    "posting_blocked",
+    "scheduling_blocked",
+    "analytics_blocked",
+    "dm_comments_blocked",
+    "n8n_activation_blocked"
+  ],
+  "createdAt": "2026-07-09T00:00:00Z",
+  "updatedAt": "2026-07-09T00:00:00Z"
+}

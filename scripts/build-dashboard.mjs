@@ -653,6 +653,14 @@ function collectSocialPosting({ firstContentSprint }) {
   const policy = readJsonIfExists(".codex/social/policies/production-posting-policy.json");
   const instagram = accounts.find((account) => account.platform === "Instagram") ?? null;
   const sprintInstagram = firstContentSprint?.platforms?.find((platform) => platform.platform === "Instagram") ?? null;
+  const credentialReference = instagram?.credentialRefId
+    ? readJsonIfExists(`.codex/credentials/${instagram.credentialRefId}.json`)
+    : null;
+  const instagramOauthPreflight = preflightRecords.find((record) =>
+    record.targetPlatform === "Instagram" &&
+    record.targetHandle === "@agdigitalz" &&
+    record.requestedAction === "execute_oauth"
+  ) ?? null;
   const readyForPublishApproval = posts.filter((post) =>
     ["ready_for_live_publish_approval", "owner_approved_for_single_publish"].includes(post.lifecycleState ?? post.status)
   );
@@ -664,8 +672,10 @@ function collectSocialPosting({ firstContentSprint }) {
   const weeklyReportApprovalStatus = firstContentSprint?.weeklyReportApprovalStatus ?? "not_recorded";
   const blockedPublishReasons = unique([
     instagram?.accountState !== "connected_draft_only" ? "account_not_connected" : null,
-    instagram?.credentialStorageStatus !== "secure_store_reference" ? "secure_credential_store_missing" : null,
-    instagram?.oauthStatus !== "connected" ? "oauth_not_approved" : null,
+    credentialReference?.status !== "approved_reference" ? "secure_credential_reference_missing" : null,
+    instagram?.oauthStatus !== "connected" ? "oauth_not_executed" : null,
+    instagramOauthPreflight?.blockedReasons?.includes("final_owner_approval_missing") ? "final_owner_approval_missing" : null,
+    instagramOauthPreflight?.blockedReasons?.includes("social_oauth_connector_missing") ? "social_oauth_connector_missing" : null,
     exactPublishApprovals.length === 0 ? "exact_single_post_publish_approval_missing" : null,
     instagram?.livePostingBlocked !== false ? "live_posting_blocked" : null,
     instagram?.schedulingBlocked !== false ? "scheduling_blocked" : null,
@@ -685,6 +695,21 @@ function collectSocialPosting({ firstContentSprint }) {
     oauthStatus: instagram?.oauthStatus ?? "not_recorded",
     credentialRefId: instagram?.credentialRefId ?? null,
     credentialStorageStatus: instagram?.credentialStorageStatus ?? "not_recorded",
+    credentialReferenceStatus: credentialReference?.status ?? "not_recorded",
+    credentialReferenceProvider: credentialReference?.provider ?? "not_recorded",
+    credentialStorageBackend: credentialReference?.storageBackend ?? "not_recorded",
+    credentialReferenceRepoSafe: credentialReference?.repoSafe ?? false,
+    credentialReferenceSecretStoredInRepo: credentialReference?.secretValueStoredInRepo ?? false,
+    credentialStoreReadiness: credentialReference?.status === "approved_reference" &&
+      credentialReference?.secretValueStoredInRepo === false &&
+      credentialReference?.repoSafe === true
+      ? "reference_ready"
+      : "blocked",
+    oauthPreflightStatus: instagramOauthPreflight?.status ?? "not_recorded",
+    oauthPreflightBlockedReasons: instagramOauthPreflight?.blockedReasons ?? [],
+    oauthConnectorPathAvailable: !instagramOauthPreflight?.blockedReasons?.includes("social_oauth_connector_missing"),
+    oauthExecutionReady: instagramOauthPreflight?.status === "ready_after_approval" &&
+      !instagramOauthPreflight?.blockedReasons?.includes("social_oauth_connector_missing"),
     credentialsStoredInRepo: instagram?.credentialsStoredInRepo ?? false,
     postingMode: instagram?.postingMode ?? "draft_only",
     ownerApprovalRequired: instagram?.ownerApprovalRequired ?? true,
@@ -720,8 +745,11 @@ function collectSocialPosting({ firstContentSprint }) {
       instagram?.recordPath,
       ".codex/social/policies/production-posting-policy.json",
       firstContentSprint?.recordPath,
+      credentialReference ? `.codex/credentials/${credentialReference.credentialRefId}.json` : null,
+      instagramOauthPreflight?.recordPath,
       "docs/social-posting-os.md",
       "docs/social-posting-production-policy.md",
+      "docs/instagram-oauth-execution-preflight.md",
       "docs/social-permission-matrix.md"
     ].filter(Boolean)
   };
