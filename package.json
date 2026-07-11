@@ -16,6 +16,7 @@
     "archetypes:propose": "node scripts/process-archetype-update-proposal.mjs",
     "security:scan": "node scripts/scan-secrets.mjs",
     "production:check": "node scripts/check-production-readiness.mjs",
+    "live:start": "node scripts/live-server.mjs",
     "validate": "node scripts/validate-foundation.mjs && node scripts/check-dashboard.mjs"
   },
   "engines": {

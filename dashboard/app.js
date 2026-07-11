@@ -894,6 +894,103 @@ function renderSafeMerge() {
   root.append(heading, summary, checks);
 }
 
+function coordinatorBaseUrl() {
+  const configured = document.querySelector("#coordinator-url").value.trim();
+  return configured ? configured.replace(/\/$/, "") : window.location.origin;
+}
+
+function runtimeHeaders() {
+  const token = document.querySelector("#owner-token").value;
+  return {
+    authorization: `Bearer ${token}`,
+    "content-type": "application/json"
+  };
+}
+
+function setRuntimeStatus(message, connected = false) {
+  document.querySelector("#runtime-status").textContent = message;
+  const mode = document.querySelector("#runtime-mode");
+  mode.textContent = connected ? "Owner connected" : "Offline evidence";
+  mode.className = `mode-lock ${connected ? "status-active" : ""}`;
+}
+
+function renderRecentCommands(commands = []) {
+  const root = clear("#recent-command-panel");
+  if (commands.length === 0) {
+    const empty = document.createElement("p");
+    empty.textContent = "No live-console commands recorded yet.";
+    root.append(empty);
+    return;
+  }
+  root.append(table(
+    ["Command", "Risk", "State", "Created"],
+    commands.map((command) => [
+      command.rawCommand,
+      pill(command.riskLevel),
+      command.requiresApproval ? "Waiting approval" : "Planned",
+      new Date(command.createdAt).toLocaleString()
+    ])
+  ));
+}
+
+async function connectRuntime() {
+  const token = document.querySelector("#owner-token").value;
+  if (!token) {
+    setRuntimeStatus("Enter the owner token to connect.");
+    return;
+  }
+  sessionStorage.setItem("ag-os-owner-token", token);
+  sessionStorage.setItem("ag-os-coordinator-url", document.querySelector("#coordinator-url").value.trim());
+  setRuntimeStatus("Connecting...");
+  try {
+    const response = await fetch(`${coordinatorBaseUrl()}/api/v1/status`, { headers: runtimeHeaders() });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.detail || result.error || "Connection failed");
+    }
+    setRuntimeStatus(`Connected. Production mode is ${result.production.status}; gated actions remain approval-controlled.`, true);
+    renderRecentCommands(result.recentCommands);
+  } catch (error) {
+    setRuntimeStatus(`Connection failed: ${error.message}`);
+  }
+}
+
+async function submitOwnerCommand(event) {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector("button[type='submit']");
+  button.disabled = true;
+  setRuntimeStatus("Creating the gated work package...", true);
+  try {
+    const response = await fetch(`${coordinatorBaseUrl()}/api/v1/commands`, {
+      method: "POST",
+      headers: runtimeHeaders(),
+      body: JSON.stringify({ command: document.querySelector("#owner-command").value })
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.detail || result.error || "Command failed");
+    }
+    document.querySelector("#owner-command").value = "";
+    setRuntimeStatus(`Created ${result.planId}. Status: ${result.status}. No live side effect was executed.`, true);
+    await connectRuntime();
+  } catch (error) {
+    setRuntimeStatus(`Command rejected: ${error.message}`);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function initializeCommandCenter() {
+  document.querySelector("#owner-token").value = sessionStorage.getItem("ag-os-owner-token") || "";
+  document.querySelector("#coordinator-url").value = sessionStorage.getItem("ag-os-coordinator-url") || "";
+  document.querySelector("#connect-runtime").addEventListener("click", connectRuntime);
+  document.querySelector("#owner-command-form").addEventListener("submit", submitOwnerCommand);
+  renderRecentCommands();
+  if (document.querySelector("#owner-token").value) {
+    connectRuntime();
+  }
+}
+
 renderOverview();
 renderOwnerAttention();
 renderActionQueue();
@@ -912,3 +1009,4 @@ renderCosts();
 renderMetrics();
 renderSkills();
 renderSafeMerge();
+initializeCommandCenter();

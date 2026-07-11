@@ -337,6 +337,85 @@ td strong {
   background: var(--surface-muted);
 }
 
+.command-console {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.command-console label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.command-connect-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.command-console input,
+.command-console textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 11px 12px;
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+  font-weight: 400;
+}
+
+.command-console textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.command-console input:focus,
+.command-console textarea:focus {
+  border-color: var(--blue);
+  outline: 2px solid rgba(34, 87, 214, 0.15);
+}
+
+.command-console button {
+  border: 1px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 11px 16px;
+  color: #fff;
+  background: var(--blue);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.command-console .button-secondary {
+  color: var(--blue);
+  background: #eef3ff;
+}
+
+.command-console button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.command-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.command-actions p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .policy-checks {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -398,7 +477,13 @@ td strong {
   }
 
   .status-grid,
-  .policy-checks {
+  .policy-checks,
+  .command-connect-row {
     grid-template-columns: 1fr;
+  }
+
+  .command-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

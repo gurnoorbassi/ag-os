@@ -59,24 +59,34 @@ const app = existsSync(path.join(root, "dashboard/app.js")) ? read("dashboard/ap
 const dashboardSource = `${index}\n${app}`;
 
 for (const forbiddenPattern of [
-  /<button\b/i,
-  /<form\b/i,
-  /<input\b/i,
-  /<textarea\b/i,
   /contenteditable/i,
-  /\bfetch\s*\(/,
   /XMLHttpRequest/,
   /navigator\.sendBeacon/,
   /\blocalStorage\b/,
-  /\bsessionStorage\b/
+  /type=["']file["']/i,
+  /<button[^>]*>\s*(?:deploy|merge|publish|post|send|spend|change\s+dns)/i,
+  /buy|purchase|subscribe/i
 ]) {
   if (forbiddenPattern.test(dashboardSource)) {
-    fail(`dashboard read-only check failed for pattern: ${forbiddenPattern}`);
+    fail(`dashboard operator-safety check failed for pattern: ${forbiddenPattern}`);
+  }
+}
+
+for (const requiredOperatorPattern of [
+  /id="owner-command-form"/,
+  /id="owner-token"[^>]*type="password"/,
+  /authorization:\s*`Bearer \$\{token\}`/,
+  /\/api\/v1\/commands/,
+  /No live side effect was executed/
+]) {
+  if (!requiredOperatorPattern.test(dashboardSource)) {
+    fail(`dashboard authenticated operator console missing invariant: ${requiredOperatorPattern}`);
   }
 }
 
 for (const requiredText of [
   "Constitution",
+  "Owner Command Center",
   "Owner Attention",
   "Dashboard Action Queue",
   "Project Registry",
