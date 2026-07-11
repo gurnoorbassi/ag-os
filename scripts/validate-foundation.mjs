@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { readJson } from "./lib/runtime/common.mjs";
+import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
 
 const root = process.cwd();
 const JOB_COMPLETION_POLICY_ACTIVATED_AT = "2026-07-09T20:06:25.029Z";
@@ -80,6 +81,8 @@ const requiredPaths = [
   ".codex/social/publish-approvals/README.md",
   ".codex/social/preflight/README.md",
   ".codex/social/preflight/social-preflight-instagram-oauth-agdigitalz.json",
+  ".codex/production/README.md",
+  ".codex/production/production-readiness-social-media-management-system-v1.json",
   ".codex/social/policies/production-posting-policy.json",
   ".codex/capabilities/README.md",
   ".codex/capabilities/registry.json",
@@ -462,6 +465,12 @@ const runtimeRecordDirectories = [
     name: "social connector preflight",
     recordDir: ".codex/social/preflight",
     schemaPath: "schemas/social-connector-preflight.schema.json"
+  },
+  {
+    name: "production readiness",
+    recordDir: ".codex/production",
+    schemaPath: "schemas/production-readiness.schema.json",
+    includePrefixes: ["production-readiness-"]
   }
 ];
 let failures = 0;
@@ -1659,6 +1668,15 @@ for (const runtimeRecordDirectory of runtimeRecordDirectories) {
       validateSchemaObject(record, schema, recordPath);
       if (runtimeRecordDirectory.name === "credential reference") {
         validateCredentialReferenceRecord(record, recordPath);
+      }
+      if (runtimeRecordDirectory.name === "production readiness") {
+        const readiness = evaluateProductionReadiness(record);
+        if (record.activationAllowed === true && readiness.activationAllowed !== true) {
+          fail(`${recordPath} must fail closed while required production safeguards are blocked`);
+        }
+        if (record.status === "ready" && readiness.activationAllowed !== true) {
+          fail(`${recordPath} cannot use ready status without every required production safeguard`);
+        }
       }
 
       if (failures === failuresBeforeRecord) {

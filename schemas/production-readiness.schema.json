@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/production-readiness.schema.json",
+  "title": "AG OS Production Readiness",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "readinessId",
+    "projectId",
+    "status",
+    "targetMode",
+    "requiredChecks",
+    "recoveryTargets",
+    "incidentCommander",
+    "emergencyStop",
+    "activationAllowed",
+    "safety",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../schemas/production-readiness.schema.json" },
+    "readinessId": { "type": "string", "pattern": "^production-readiness-[a-z0-9-]+$" },
+    "projectId": { "type": "string", "pattern": "^project-[a-z0-9-]+$" },
+    "status": { "type": "string", "enum": ["blocked", "ready", "revoked", "archived"] },
+    "targetMode": { "type": "string", "const": "production_managed" },
+    "requiredChecks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["checkId", "status", "evidence"],
+        "properties": {
+          "checkId": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "status": { "type": "string", "enum": ["pass", "blocked"] },
+          "evidence": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    },
+    "recoveryTargets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rtoMinutes", "rpoMinutes", "rationale"],
+      "properties": {
+        "rtoMinutes": { "type": "integer", "minimum": 1 },
+        "rpoMinutes": { "type": "integer", "minimum": 0 },
+        "rationale": { "type": "string", "minLength": 1 }
+      }
+    },
+    "incidentCommander": { "type": "string", "pattern": "^owner-[a-z0-9-]+$" },
+    "emergencyStop": { "type": "string", "minLength": 1 },
+    "activationAllowed": { "type": "boolean" },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "credentialsInRepoAllowed",
+        "customerDataAllowed",
+        "productionDataAllowed",
+        "domainChangeAllowed",
+        "paidActionAllowed",
+        "postingAllowed"
+      ],
+      "properties": {
+        "credentialsInRepoAllowed": { "type": "boolean", "const": false },
+        "customerDataAllowed": { "type": "boolean", "const": false },
+        "productionDataAllowed": { "type": "boolean", "const": false },
+        "domainChangeAllowed": { "type": "boolean", "const": false },
+        "paidActionAllowed": { "type": "boolean", "const": false },
+        "postingAllowed": { "type": "boolean", "const": false }
+      }
+    },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string", "minLength": 1 }
+  }
+}

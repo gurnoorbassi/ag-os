@@ -331,6 +331,11 @@ if (!data.socialPosting.blockedPublishReasons.includes("exact_single_post_publis
 if (!data.socialPosting.blockedPublishReasons.includes("oauth_not_executed")) {
   fail("dashboard control center must show OAuth has not been executed");
 }
+if (data.socialPosting.productionReadiness?.activationAllowed !== false ||
+  data.socialPosting.productionReadiness?.status !== "blocked" ||
+  data.socialPosting.productionReadiness?.permissionGrantedByReadiness !== false) {
+  fail("dashboard must show production readiness as fail-closed and non-authorizing");
+}
 if (data.socialPosting.permissionModel.oauthDoesNotAuthorizePosting !== true ||
   data.socialPosting.permissionModel.connectedDraftOnlyDoesNotAuthorizePosting !== true ||
   data.socialPosting.permissionModel.draftApprovalDoesNotAuthorizePosting !== true ||
@@ -378,6 +383,15 @@ if (data.skills.skillsGrantPermission !== false) {
 }
 if (data.costs.totalRecordedActualUsd > data.costs.limits.monthlyMaxUsd) {
   fail("dashboard control center must show recorded costs within the monthly budget");
+}
+if (data.metrics?.status !== "computed_from_source_records" || data.metrics?.generatedFromLiveSystems !== false) {
+  fail("dashboard operational metrics must be computed from source-controlled records only");
+}
+if (!data.metrics?.cost || !data.metrics?.quality || !data.metrics?.rework || !data.metrics?.lessonReuse) {
+  fail("dashboard must include cost, quality, rework, and lesson-reuse metrics");
+}
+if (data.metrics.lessonReuse.acceptedLessonCount === 0 && data.metrics.lessonReuse.lessonReuseRatePercent !== 0) {
+  fail("dashboard must report truthful zero lesson reuse when no accepted lessons exist");
 }
 if (data.approvals.standingCount !== 1 || data.approvals.standingApprovals.length !== 1) {
   fail("dashboard control center must show the active scoped standing approval");

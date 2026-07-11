@@ -134,10 +134,10 @@ Status values: `proven` (done under gates, evidence recorded), `ready` (mechanic
 | 10 | Archetype update path from accepted lessons (reviewed PRs) | H3 | S | complete | Accepted lessons can create safe draft proposals; archetypes never auto-mutate and application requires a separate reviewed PR. |
 | 11 | First standing approval lock (owner grant, class-scoped, expiring) | H4 | S | complete | Ten-use AG OS codex-branch push + draft-PR lock is active through August 8, 2026 and remains immediately revocable. |
 | 12 | Batched approval review surface | H4 | M | complete | Dashboard groups owner decisions, approval packages, and standing-lock usage in one read-only, non-authorizing surface. |
-| 13 | Metrics instrumentation: cost variance, quality trend, rework, lesson application | H4 | M | open | Evidence the system improves. |
+| 13 | Metrics instrumentation: cost variance, quality trend, rework, lesson application | H4 | M | complete | Dashboard computes all four signals deterministically from source-controlled records without inventing live state. |
 | 14 | Doc consolidation pass (duplicate boot docs, restated gate lists) | H1–H4 | M | open | Own scoped PR; validator pins exact strings. |
 | 15 | AJV migration decision | H1 tail | M | open | Consider only if the hand-rolled subset blocks safe progress; requires supply-chain review. |
-| 16 | Production readiness package (rollback, backup, incident drill) | H5 | L | open | Precondition for any production deploy. |
+| 16 | Production readiness package (rollback, backup, incident drill) | H5 | L | complete | Fail-closed source record and evaluator cover backup, rollback, monitoring, incident, recovery, credentials, cost, validation, and exact approval evidence. Activation remains blocked until live evidence passes. |
 | 17 | Lead Gen migration plan execution (observe → read_only first) | H5 | L | open | Separate scoped approvals throughout. |
 
 Evidence for the 2026-07-09 status truth-up:

@@ -1108,6 +1108,22 @@ window.AG_OS_DASHBOARD_DATA = {
       "analytics_blocked",
       "n8n_activation_blocked"
     ],
+    "productionReadiness": {
+      "readinessId": "production-readiness-social-media-management-system-v1",
+      "status": "blocked",
+      "activationAllowed": false,
+      "blockers": [
+        "rollback_restore_drill",
+        "monitoring_active",
+        "credential_rotation_revocation_ready",
+        "validation_security_ci_passed",
+        "exact_production_approval_active"
+      ],
+      "passedCheckCount": 6,
+      "requiredCheckCount": 11,
+      "liveActionPerformed": false,
+      "permissionGrantedByReadiness": false
+    },
     "nextRequiredOwnerApproval": "Owner must approve approval-instagram-oauth-execution before any Instagram OAuth flow can start. Credential reference credential-ref-instagram-agdigitalz-oauth is source-controlled as a reference only and contains no secret value. OAuth approval still does not authorize posting, scheduling, analytics, DMs/comments, or n8n activation.",
     "permissionModel": {
       "oauthDoesNotAuthorizePosting": true,
@@ -1155,7 +1171,8 @@ window.AG_OS_DASHBOARD_DATA = {
       "docs/social-posting-os.md",
       "docs/social-posting-production-policy.md",
       "docs/instagram-oauth-execution-preflight.md",
-      "docs/social-permission-matrix.md"
+      "docs/social-permission-matrix.md",
+      ".codex/production/production-readiness-social-media-management-system-v1.json"
     ]
   },
   "ownerAttention": [
@@ -3562,6 +3579,47 @@ window.AG_OS_DASHBOARD_DATA = {
       "dailyMaxUsd": 10,
       "perTaskMaxUsd": 5
     }
+  },
+  "metrics": {
+    "status": "computed_from_source_records",
+    "generatedFromLiveSystems": false,
+    "cost": {
+      "ledgerCount": 41,
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "varianceUsd": 0,
+      "variancePercent": 0
+    },
+    "quality": {
+      "scoreCount": 12,
+      "averageScore": 9.2,
+      "passCount": 12,
+      "recentAverage": 9.34,
+      "priorAverage": 9.1,
+      "trendDelta": 0.24
+    },
+    "rework": {
+      "critiqueCount": 11,
+      "critiquesRequiringFixes": 0,
+      "requiredFixCount": 0,
+      "failedJobCount": 0,
+      "reworkSignalRatePercent": 0
+    },
+    "lessonReuse": {
+      "acceptedLessonCount": 0,
+      "eligiblePlanCount": 3,
+      "plansUsingAcceptedLessons": 0,
+      "plansUsingQualityExamples": 0,
+      "lessonReuseRatePercent": 0,
+      "exampleReuseRatePercent": 0,
+      "skillApplicationsRecorded": 6
+    },
+    "limitations": [
+      "Metrics are computed only from source-controlled AG OS records.",
+      "Rework rate is a deterministic signal from required critique fixes, not time tracking.",
+      "Zero accepted lessons produces a truthful zero lesson-reuse rate.",
+      "Metrics do not grant approval or authorize live operations."
+    ]
   },
   "skills": {
     "draftCount": 0,

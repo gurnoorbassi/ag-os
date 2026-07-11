@@ -580,6 +580,15 @@ function renderProductionSocialPosting() {
         `skillsCanGrantPermission: ${boolText(posting.permissionModel.skillsCanGrantPermission, "true", "false")}`,
         `candidateLessonsCanGrantPermission: ${boolText(posting.permissionModel.candidateLessonsCanGrantPermission, "true", "false")}`
       ]
+    }),
+    card({
+      title: "Production Safeguards",
+      status: posting.productionReadiness.activationAllowed ? "ready" : "blocked",
+      metric: `${posting.productionReadiness.passedCheckCount}/${posting.productionReadiness.requiredCheckCount}`,
+      detail: posting.productionReadiness.activationAllowed
+        ? "Every safeguard has evidence; exact action approval is still evaluated separately."
+        : "Production activation fails closed until every required safeguard carries evidence.",
+      meta: posting.productionReadiness.blockers
     })
   );
 
@@ -831,6 +840,44 @@ function renderSkills() {
   );
 }
 
+function renderMetrics() {
+  const root = clear("#metrics-panel");
+  const metrics = data.metrics;
+  root.append(
+    card({
+      title: "Cost Variance",
+      status: metrics.cost.varianceUsd <= 0 ? "ready" : "review",
+      metric: `$${metrics.cost.varianceUsd.toFixed(2)}`,
+      detail: `$${metrics.cost.actualUsd.toFixed(2)} actual vs $${metrics.cost.estimatedUsd.toFixed(2)} estimated across ${metrics.cost.ledgerCount} ledgers.`,
+      meta: [`Variance: ${metrics.cost.variancePercent}%`]
+    }),
+    card({
+      title: "Quality Trend",
+      status: metrics.quality.trendDelta >= 0 ? "ready" : "review",
+      metric: metrics.quality.averageScore.toFixed(1),
+      detail: `${metrics.quality.passCount}/${metrics.quality.scoreCount} scores meet the bar.`,
+      meta: [`Recent average: ${metrics.quality.recentAverage}`, `Trend delta: ${metrics.quality.trendDelta}`]
+    }),
+    card({
+      title: "Rework Signals",
+      status: metrics.rework.requiredFixCount === 0 ? "ready" : "review",
+      metric: `${metrics.rework.reworkSignalRatePercent}%`,
+      detail: `${metrics.rework.critiquesRequiringFixes}/${metrics.rework.critiqueCount} critiques required fixes.`,
+      meta: [`Required fixes: ${metrics.rework.requiredFixCount}`, `Failed jobs: ${metrics.rework.failedJobCount}`]
+    }),
+    card({
+      title: "Lesson Reuse",
+      status: metrics.lessonReuse.acceptedLessonCount > 0 ? "active" : "zero",
+      metric: `${metrics.lessonReuse.lessonReuseRatePercent}%`,
+      detail: `${metrics.lessonReuse.plansUsingAcceptedLessons}/${metrics.lessonReuse.eligiblePlanCount} eligible plans use accepted lessons.`,
+      meta: [
+        `Quality-example reuse: ${metrics.lessonReuse.exampleReuseRatePercent}%`,
+        `Skill applications recorded: ${metrics.lessonReuse.skillApplicationsRecorded}`
+      ]
+    })
+  );
+}
+
 function renderSafeMerge() {
   const root = clear("#safe-merge-panel");
   const heading = document.createElement("h3");
@@ -862,5 +909,6 @@ renderConnectors();
 renderQualityReview();
 renderUnifiedMemory();
 renderCosts();
+renderMetrics();
 renderSkills();
 renderSafeMerge();

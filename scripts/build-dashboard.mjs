@@ -2,6 +2,8 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { listDirectJson, readJson } from "./lib/runtime/common.mjs";
+import { computeOperationalMetrics } from "./lib/runtime/metrics-processor.mjs";
+import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
 
 const root = process.cwd();
 
@@ -689,6 +691,17 @@ function collectSocialPosting({ firstContentSprint }) {
     record.targetHandle === "@agdigitalz" &&
     record.requestedAction === "execute_oauth"
   ) ?? null;
+  const productionReadinessRecord = readJsonIfExists(".codex/production/production-readiness-social-media-management-system-v1.json");
+  const productionReadiness = productionReadinessRecord
+    ? evaluateProductionReadiness(productionReadinessRecord)
+    : {
+        status: "blocked",
+        activationAllowed: false,
+        blockers: ["production_readiness_record_missing"],
+        passedCheckCount: 0,
+        requiredCheckCount: 11,
+        permissionGrantedByReadiness: false
+      };
   const readyForPublishApproval = posts.filter((post) =>
     ["ready_for_live_publish_approval", "owner_approved_for_single_publish"].includes(post.lifecycleState ?? post.status)
   );
@@ -753,6 +766,7 @@ function collectSocialPosting({ firstContentSprint }) {
     exactSinglePostApprovalCount: exactPublishApprovals.length,
     connectorPreflightCount: preflightRecords.length,
     blockedPublishReasons,
+    productionReadiness,
     nextRequiredOwnerApproval: instagram?.nextRequiredApproval ??
       "Approve Instagram OAuth execution first; separate exact single-post approval is still required before AG OS can post.",
     permissionModel: {
@@ -778,7 +792,8 @@ function collectSocialPosting({ firstContentSprint }) {
       "docs/social-posting-os.md",
       "docs/social-posting-production-policy.md",
       "docs/instagram-oauth-execution-preflight.md",
-      "docs/social-permission-matrix.md"
+      "docs/social-permission-matrix.md",
+      ".codex/production/production-readiness-social-media-management-system-v1.json"
     ].filter(Boolean)
   };
 }
@@ -1059,6 +1074,7 @@ export function collectDashboardData() {
   const connectorAuth = collectConnectorAuth();
   const unifiedMemory = collectUnifiedMemory();
   const costReadModel = collectCosts(costBudget);
+  const operationalMetrics = computeOperationalMetrics({ root });
   const skills = collectSkills();
   const clientManagement = collectClientManagement();
   const firstClientReadiness = collectFirstClientReadiness(clientManagement);
@@ -1383,6 +1399,7 @@ export function collectDashboardData() {
     qualityReview,
     unifiedMemory,
     costs: costReadModel,
+    metrics: operationalMetrics,
     skills,
     safeMerge: {
       status: "conditional",
