@@ -1,0 +1,82 @@
+{
+  "$schema": "../../schemas/production-readiness.schema.json",
+  "readinessId": "production-readiness-ag-os-coordinator-v1",
+  "projectId": "project-ag-os-coordinator-runtime",
+  "status": "blocked",
+  "targetMode": "production_managed",
+  "requiredChecks": [
+    {
+      "checkId": "staging_proven",
+      "status": "pass",
+      "evidence": ["tests/live-command-service.test.mjs", "Local HTTP verification proved health 200, unauthenticated status 401, and authenticated owner status on 2026-07-11."]
+    },
+    {
+      "checkId": "owner_product_acceptance",
+      "status": "pass",
+      "evidence": ["Owner directed AG OS to be made live for owner use after PR #128 merged the coordinator runtime."]
+    },
+    {
+      "checkId": "source_backup_verified",
+      "status": "pass",
+      "evidence": ["GitHub main merge commit 81866ec6b4e127db254ba0ba15bfc9ee7cf7f9dd is the first known-good coordinator source recovery point.", "scripts/lib/runtime/state-backup.mjs"]
+    },
+    {
+      "checkId": "rollback_restore_drill",
+      "status": "pass",
+      "evidence": ["tests/state-backup.test.mjs performs an isolated hashed backup, mutation, restore, and integrity verification without touching live data."]
+    },
+    {
+      "checkId": "monitoring_active",
+      "status": "blocked",
+      "evidence": ["Passive health monitor and systemd timer templates exist, but no live monitoring call or timer is active before deployment approval."]
+    },
+    {
+      "checkId": "incident_response_ready",
+      "status": "pass",
+      "evidence": ["docs/incident-response.md", "docs/ag-os-coordinator-deployment-runbook.md", "owner-gurnoor-bassi is incident commander."]
+    },
+    {
+      "checkId": "credential_rotation_revocation_ready",
+      "status": "blocked",
+      "evidence": ["Rotation and revocation procedure is documented, but no production owner token or reverse-proxy password may be created or changed without exact approval."]
+    },
+    {
+      "checkId": "cost_review_passed",
+      "status": "pass",
+      "evidence": ["Deployment plan adds no approved paid service; existing Hetzner capacity must be confirmed before activation and any added charge remains blocked."]
+    },
+    {
+      "checkId": "validation_security_ci_passed",
+      "status": "blocked",
+      "evidence": ["Local gates must pass and GitHub CI must succeed for the exact deployment-prep candidate commit before production approval."]
+    },
+    {
+      "checkId": "exact_production_approval_active",
+      "status": "blocked",
+      "evidence": ["No exact Hetzner target, source SHA, credential setup, reverse-proxy activation, monitoring activation, or production deployment approval is active."]
+    },
+    {
+      "checkId": "post_activation_validation_plan",
+      "status": "pass",
+      "evidence": ["ops/post-deploy-check.mjs", "docs/ag-os-coordinator-deployment-runbook.md"]
+    }
+  ],
+  "recoveryTargets": {
+    "rtoMinutes": 60,
+    "rpoMinutes": 0,
+    "rationale": "Owner commands and evidence records must be snapshotted before change; a source and state rollback should restore the internal command center within one hour without accepted record loss."
+  },
+  "incidentCommander": "owner-gurnoor-bassi",
+  "emergencyStop": "Disable ag-os-monitor.timer, stop ag-os.service, preserve logs and the current state directory, revoke the owner API token and dashboard password under exact approval, and restore the last verified source commit plus state snapshot before restarting.",
+  "activationAllowed": false,
+  "safety": {
+    "credentialsInRepoAllowed": false,
+    "customerDataAllowed": false,
+    "productionDataAllowed": false,
+    "domainChangeAllowed": false,
+    "paidActionAllowed": false,
+    "postingAllowed": false
+  },
+  "createdAt": "2026-07-12T05:18:39.000Z",
+  "updatedAt": "2026-07-12T05:18:39.000Z"
+}

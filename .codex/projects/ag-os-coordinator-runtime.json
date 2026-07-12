@@ -1,0 +1,70 @@
+{
+  "id": "project-ag-os-coordinator-runtime",
+  "name": "AG OS Coordinator Runtime",
+  "status": "active",
+  "owner": "owner-gurnoor-bassi",
+  "projectType": "ag_os_core",
+  "managementMode": "managed_staging",
+  "goal": "Provide Gurnoor with a private always-on AG OS command center while preserving exact approval gates for every external or production side effect.",
+  "knownFacts": [
+    "PR #128 merged the authenticated owner command console and dependency-free coordinator into main at merge commit 81866ec6b4e127db254ba0ba15bfc9ee7cf7f9dd.",
+    "The intended owner-only runtime is a localhost-bound Node.js service behind an authenticated TLS reverse proxy on the existing Hetzner VPS.",
+    "No VPS deployment, hostname, DNS change, owner token, dashboard password, live monitor, or production connector is active from this record."
+  ],
+  "scope": [
+    "Prepare the coordinator for private Hetzner operation.",
+    "Provide backup, restore, monitoring, post-deploy verification, incident, and credential-rotation procedures.",
+    "Track coordinator-specific production readiness separately from Social Media Management System readiness."
+  ],
+  "outOfScope": [
+    "Do not deploy without exact approval naming the target and source commit.",
+    "Do not store, rotate, revoke, or expose credentials from source control or chat.",
+    "Do not change DNS, domains, firewall, account settings, billing, or production data.",
+    "Do not authorize posting, messaging, paid actions, customer data, social OAuth, or n8n activation."
+  ],
+  "trustLevel": 2,
+  "stack": [
+    "Node.js 20+",
+    "Hetzner VPS",
+    "systemd",
+    "Caddy",
+    "GitHub"
+  ],
+  "risks": [
+    {
+      "risk": "An internet-exposed operator console could disclose internal operating evidence or accept unauthorized commands.",
+      "mitigation": "Bind the coordinator to localhost, require a bearer token, require a separate reverse-proxy password, use TLS, and fail closed when either authentication layer is absent."
+    },
+    {
+      "risk": "File-backed runtime state could be lost or corrupted during deployment or rollback.",
+      "mitigation": "Create an integrity-hashed state snapshot before change, retain the previous source commit, and verify restored state before service restart."
+    },
+    {
+      "risk": "A healthy process could still be operationally unsafe.",
+      "mitigation": "Post-deploy validation checks unauthenticated rejection, authenticated status, production blocker state, and exact source version before acceptance."
+    }
+  ],
+  "approvalRequiredFor": [
+    "VPS access",
+    "production deployment",
+    "credential creation rotation or revocation",
+    "reverse proxy or firewall changes",
+    "domain or DNS changes",
+    "live monitoring activation",
+    "management mode promotion",
+    "production rollback"
+  ],
+  "qualityGates": [
+    "Foundation validation, dashboard check, boot check, secret scan, tests, and diff check pass for the exact candidate.",
+    "State backup and isolated restore drill pass.",
+    "Service refuses to start without owner authentication.",
+    "Unauthenticated API calls receive 401 and authenticated status succeeds.",
+    "Monitoring and rollback commands are documented before deployment.",
+    "Exact deployment approval is active before the first VPS mutation."
+  ],
+  "securityReview": "Owner-only internal runtime. Secrets remain external to Git and chat. The coordinator binds to localhost, the reverse proxy supplies TLS and a separate access gate, and all external actions remain separately approval-controlled.",
+  "costTracking": "No new paid service or billing change is authorized. Reuse of existing Hetzner capacity requires confirmation that it adds no new charge; any added service or cost requires separate approval.",
+  "deploymentPlan": "Deploy an exact reviewed main commit to /opt/ag-os on the named Hetzner target, snapshot state first, install disabled service definitions, verify localhost health, enable the private TLS route and passive monitor only under exact approval, then record evidence. Roll back to the prior commit and verified snapshot if any acceptance check fails.",
+  "createdAt": "2026-07-12T05:18:39.000Z",
+  "updatedAt": "2026-07-12T05:18:39.000Z"
+}

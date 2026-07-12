@@ -39,7 +39,7 @@ window.AG_OS_DASHBOARD_DATA = {
   },
   "projectRegistry": {
     "status": "active",
-    "count": 3,
+    "count": 4,
     "source": ".codex/projects/registry.json",
     "projects": [
       {
@@ -85,6 +85,17 @@ window.AG_OS_DASHBOARD_DATA = {
         "owner": "owner-gurnoor-bassi",
         "recordPath": ".codex/projects/social-media-management-system-v1.json",
         "boundary": "Do not create or mutate a repository, branch, file set, or pull request outside a separately approved scope."
+      },
+      {
+        "id": "project-ag-os-coordinator-runtime",
+        "name": "AG OS Coordinator Runtime",
+        "status": "active",
+        "managementMode": "managed_staging",
+        "projectType": "ag_os_core",
+        "riskLevel": "high",
+        "owner": "owner-gurnoor-bassi",
+        "recordPath": ".codex/projects/ag-os-coordinator-runtime.json",
+        "boundary": "Do not deploy without exact approval naming the target and source commit."
       }
     ]
   },

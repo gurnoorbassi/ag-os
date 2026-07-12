@@ -27,6 +27,14 @@
       "owner": "owner-gurnoor-bassi",
       "riskLevel": "medium",
       "lastReviewedAt": "2026-07-09T20:06:25.029Z"
+    },
+    {
+      "projectId": "project-ag-os-coordinator-runtime",
+      "recordPath": ".codex/projects/ag-os-coordinator-runtime.json",
+      "status": "active",
+      "owner": "owner-gurnoor-bassi",
+      "riskLevel": "high",
+      "lastReviewedAt": "2026-07-12T05:18:39.000Z"
     }
   ],
   "rules": {
