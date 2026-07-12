@@ -1,6 +1,8 @@
 [Unit]
 Description=AG OS Coordinator
 After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -16,6 +18,7 @@ PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
 ReadWritePaths=/opt/ag-os/.codex /opt/ag-os/dashboard
+UMask=0077
 
 [Install]
 WantedBy=multi-user.target
