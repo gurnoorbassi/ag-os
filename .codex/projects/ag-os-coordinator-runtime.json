@@ -9,6 +9,8 @@
   "knownFacts": [
     "PR #128 merged the authenticated owner command console and dependency-free coordinator into main at merge commit 81866ec6b4e127db254ba0ba15bfc9ee7cf7f9dd.",
     "The intended owner-only runtime is a localhost-bound Node.js service behind an authenticated TLS reverse proxy on the existing Hetzner VPS.",
+    "Read-only preflight on 2026-07-12 verified host agdigitalz-prod at 5.78.87.188, Docker 29.1.3, Docker Compose 2.40.3, 47 GiB available disk, 2.3 GiB available memory, free loopback port 8787, and no existing /opt/ag-os path.",
+    "The host Node.js version is 18.19.1 and the production Caddy proxy runs inside infra-proxy-1; the first activation therefore uses an isolated pinned Node 20 container and an SSH tunnel without modifying host Node, Caddy, DNS, or the existing infra Compose stack.",
     "No VPS deployment, hostname, DNS change, owner token, dashboard password, live monitor, or production connector is active from this record."
   ],
   "scope": [
@@ -25,9 +27,10 @@
   "trustLevel": 2,
   "stack": [
     "Node.js 20+",
+    "Pinned Node 20 Alpine container",
     "Hetzner VPS",
-    "systemd",
-    "Caddy",
+    "Docker Compose",
+    "SSH tunnel",
     "GitHub"
   ],
   "risks": [
@@ -62,9 +65,9 @@
     "Monitoring and rollback commands are documented before deployment.",
     "Exact deployment approval is active before the first VPS mutation."
   ],
-  "securityReview": "Owner-only internal runtime. Secrets remain external to Git and chat. The coordinator binds to localhost, the reverse proxy supplies TLS and a separate access gate, and all external actions remain separately approval-controlled.",
+  "securityReview": "Owner-only internal runtime. Secrets remain external to Git and chat. The first activation binds the container to host loopback only and requires an authenticated SSH tunnel plus the bearer token. Caddy, DNS, and public exposure remain out of scope, and all external actions remain separately approval-controlled.",
   "costTracking": "No new paid service or billing change is authorized. Reuse of existing Hetzner capacity requires confirmation that it adds no new charge; any added service or cost requires separate approval.",
-  "deploymentPlan": "Deploy an exact reviewed main commit to /opt/ag-os on the named Hetzner target, snapshot state first, install disabled service definitions, verify localhost health, enable the private TLS route and passive monitor only under exact approval, then record evidence. Roll back to the prior commit and verified snapshot if any acceptance check fails.",
+  "deploymentPlan": "First activation target: exact reviewed main commit on agdigitalz-prod (5.78.87.188), built as the pinned Node 20 Docker image from ops/docker-compose.hetzner.yml, with state under /var/lib/ag-os/state and port 8787 bound only to 127.0.0.1. Access is through an owner SSH tunnel. Do not modify host Node, the infra Compose stack, Caddy, firewall, or DNS. Snapshot state first and roll back the isolated container, source, and state if acceptance fails.",
   "createdAt": "2026-07-12T05:18:39.000Z",
   "updatedAt": "2026-07-12T05:18:39.000Z"
 }

@@ -1,0 +1,37 @@
+services:
+  coordinator:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: ag-os-coordinator:local
+    container_name: ag-os-coordinator
+    restart: unless-stopped
+    init: true
+    env_file:
+      - /etc/ag-os/ag-os.env
+    environment:
+      AG_OS_HOST: 0.0.0.0
+      AG_OS_PORT: 8787
+      AG_OS_ALLOWED_ORIGIN: http://127.0.0.1:8787
+    ports:
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - /var/lib/ag-os/state:/app/.codex
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: 0.75
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8787/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s

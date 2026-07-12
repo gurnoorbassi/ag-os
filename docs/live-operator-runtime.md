@@ -23,9 +23,9 @@ The server refuses to start without `AG_OS_OWNER_TOKEN`. It binds to localhost b
 
 ## VPS target
 
-The production target remains the Hetzner VPS. Use `ops/ag-os.service.template` as the systemd baseline and a private hostname/TLS reverse proxy based on `ops/Caddyfile.template`. The reverse proxy must retain its separate password gate; generate its hash with `caddy hash-password`, provide it as `AG_OS_DASHBOARD_PASSWORD_HASH`, and do not commit it. Store the owner API token in `/etc/ag-os/ag-os.env` with root-only permissions. Do not reuse the dashboard password as the owner API token.
+The verified first production target is the existing Hetzner VPS using `ops/docker-compose.hetzner.yml`. It runs the pinned Node 20 container on loopback port 8787 and is accessed through an SSH tunnel. This deliberately avoids the host's Node 18 runtime and the production Caddy/n8n Compose stack. Store the owner API token in `/etc/ag-os/ag-os.env` with root-only permissions and never commit it.
 
-For the first owner-only activation, serve both the dashboard and coordinator through this private VPS endpoint. A public Netlify copy remains unsuitable for internal operational evidence unless an independently reviewed access-control layer protects it.
+For the first owner-only activation, serve both the dashboard and coordinator through the loopback-only VPS endpoint. A public Netlify copy remains unsuitable for internal operational evidence unless an independently reviewed access-control layer protects it. A Caddy hostname and DNS route are a later, separately approved promotion.
 
 Before activation, prove the exact source commit, backup, rollback, monitoring, credential revocation, CI/security gates, and exact deployment approval. A deployed coordinator still does not authorize posting, spending, DNS, credentials, production data, or other gated actions.
 
