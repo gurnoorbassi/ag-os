@@ -164,12 +164,10 @@
           "const": false
         },
         "usesPaidService": {
-          "type": "boolean",
-          "const": false
+          "type": "boolean"
         },
         "usesLiveApi": {
-          "type": "boolean",
-          "const": false
+          "type": "boolean"
         },
         "requiresOwnerApproval": {
           "type": "boolean"

@@ -1,7 +1,11 @@
 const data = window.AG_OS_DASHBOARD_DATA;
+let runtimeAiPlanner = null;
 
 function statusClass(value) {
   const normalized = String(value).toLowerCase();
+  if (normalized === "live") return "status-active";
+  if (normalized.includes("setup needed")) return "status-blocked";
+  if (normalized.includes("approval gated")) return "status-conditional";
   if (normalized.includes("ready")) return "status-active";
   if (normalized.includes("pass")) return "status-active";
   if (normalized.includes("not_connected")) return "status-disabled";
@@ -174,6 +178,89 @@ function renderOverview() {
       meta: data.systemStatus.activeWarnings
     })
   );
+}
+
+function renderActivationCenter(connected = false, productionStatus = "private runtime", aiPlanner = runtimeAiPlanner) {
+  const root = clear("#activation-grid");
+  const items = [
+    {
+      title: "Private coordinator",
+      status: connected ? "live" : "running - connect to verify",
+      detail: connected ? `Owner-authenticated and ${productionStatus}.` : "Running privately on the VPS; connect with the owner token to use it."
+    },
+    {
+      title: "Command intake",
+      status: "ready",
+      detail: "Creates classified, routed, costed, approval-gated work packages."
+    },
+    {
+      title: "Anthropic planning worker",
+      status: aiPlanner?.ready ? "ready" : "setup needed",
+      detail: aiPlanner?.ready
+        ? `${aiPlanner.model} is enabled with a scoped, usage-audited approval.`
+        : "Needs the Anthropic key, token pricing, enable flag, and a scoped paid-planning approval."
+    },
+    {
+      title: "Remote access",
+      status: "private",
+      detail: "Use the SSH tunnel. Public web access, Caddy, and DNS are intentionally unchanged."
+    },
+    {
+      title: "External actions",
+      status: "approval gated",
+      detail: "Posting, messaging, spending, credentials, DNS, and production changes need separate approval."
+    }
+  ];
+  items.forEach((item) => {
+    const el = document.createElement("article");
+    el.className = "activation-card";
+    const heading = document.createElement("h3");
+    heading.textContent = item.title;
+    const detail = document.createElement("p");
+    detail.textContent = item.detail;
+    el.append(pill(item.status), heading, detail);
+    root.append(el);
+  });
+}
+
+const dashboardViews = {
+  daily: new Set(["command-center", "activation-center", "owner-attention", "action-queue", "projects"]),
+  operations: new Set([
+    "command-center", "activation-center", "owner-attention", "action-queue", "projects",
+    "client-management", "social-media", "production-social-posting", "approvals", "connector-proofs"
+  ])
+};
+
+function setDashboardView(view) {
+  document.querySelectorAll(".view-switcher button").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.dashboardView === view));
+  });
+  document.querySelectorAll("main .section-band").forEach((section) => {
+    section.hidden = view !== "all" && !dashboardViews[view].has(section.id);
+  });
+}
+
+function initializeNavigation() {
+  const nav = document.querySelector("#section-nav");
+  const toggle = document.querySelector("#nav-toggle");
+  toggle.addEventListener("click", () => {
+    const open = nav.classList.toggle("is-open");
+    toggle.setAttribute("aria-expanded", String(open));
+  });
+  document.querySelectorAll(".view-switcher button").forEach((button) => {
+    button.addEventListener("click", () => setDashboardView(button.dataset.dashboardView));
+  });
+  nav.querySelectorAll("a[href^='#']").forEach((link) => {
+    link.addEventListener("click", () => {
+      const target = document.querySelector(link.getAttribute("href"));
+      if (target?.hidden) setDashboardView("all");
+      nav.querySelectorAll("a").forEach((item) => item.removeAttribute("aria-current"));
+      link.setAttribute("aria-current", "location");
+      nav.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+    });
+  });
+  setDashboardView("daily");
 }
 
 function renderOwnerAttention() {
@@ -912,6 +999,7 @@ function setRuntimeStatus(message, connected = false) {
   const mode = document.querySelector("#runtime-mode");
   mode.textContent = connected ? "Owner connected" : "Offline evidence";
   mode.className = `mode-lock ${connected ? "status-active" : ""}`;
+  if (!connected) renderActivationCenter(false);
 }
 
 function renderRecentCommands(commands = []) {
@@ -949,6 +1037,13 @@ async function connectRuntime() {
       throw new Error(result.detail || result.error || "Connection failed");
     }
     setRuntimeStatus(`Connected. Production mode is ${result.production.status}; gated actions remain approval-controlled.`, true);
+    runtimeAiPlanner = result.aiPlanner;
+    const plannerCheckbox = document.querySelector("#use-ai-planner");
+    plannerCheckbox.disabled = !runtimeAiPlanner?.ready;
+    document.querySelector("#ai-planner-help").textContent = runtimeAiPlanner?.ready
+      ? `${runtimeAiPlanner.model} is ready. Each use is costed and audited.`
+      : runtimeAiPlanner?.blockers?.join("; ") || "Anthropic planning worker is not ready.";
+    renderActivationCenter(true, result.production.status, runtimeAiPlanner);
     renderRecentCommands(result.recentCommands);
   } catch (error) {
     setRuntimeStatus(`Connection failed: ${error.message}`);
@@ -964,14 +1059,19 @@ async function submitOwnerCommand(event) {
     const response = await fetch(`${coordinatorBaseUrl()}/api/v1/commands`, {
       method: "POST",
       headers: runtimeHeaders(),
-      body: JSON.stringify({ command: document.querySelector("#owner-command").value })
+      body: JSON.stringify({
+        command: document.querySelector("#owner-command").value,
+        useAiPlanner: document.querySelector("#use-ai-planner").checked
+      })
     });
     const result = await response.json();
     if (!response.ok) {
       throw new Error(result.detail || result.error || "Command failed");
     }
     document.querySelector("#owner-command").value = "";
-    setRuntimeStatus(`Created ${result.planId}. Status: ${result.status}. No live side effect was executed.`, true);
+    setRuntimeStatus(result.aiPlanner?.used
+      ? `Created ${result.planId} with ${result.aiPlanner.model}. Cost: $${result.aiPlanner.actualCostUsd}. No external business action was executed.`
+      : `Created ${result.planId}. Status: ${result.status}. No live side effect was executed.`, true);
     await connectRuntime();
   } catch (error) {
     setRuntimeStatus(`Command rejected: ${error.message}`);
@@ -992,6 +1092,7 @@ function initializeCommandCenter() {
 }
 
 renderOverview();
+renderActivationCenter();
 renderOwnerAttention();
 renderActionQueue();
 renderProjects();
@@ -1010,3 +1111,4 @@ renderMetrics();
 renderSkills();
 renderSafeMerge();
 initializeCommandCenter();
+initializeNavigation();

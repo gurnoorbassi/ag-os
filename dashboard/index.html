@@ -9,6 +9,7 @@
   <body>
     <div class="app-shell">
       <aside class="sidebar" aria-label="Dashboard sections">
+        <div class="brand-row">
         <div class="brand">
           <div class="brand-mark" aria-hidden="true">AG</div>
           <div>
@@ -16,26 +17,35 @@
             <p class="brand-subtitle">Control Center v1</p>
           </div>
         </div>
-        <nav class="section-nav">
-          <a href="#command-center">Command Center</a>
-          <a href="#overview">Overview</a>
-          <a href="#owner-attention">Owner Attention</a>
-          <a href="#action-queue">Action Queue</a>
+          <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="section-nav">Menu</button>
+        </div>
+        <nav id="section-nav" class="section-nav">
+          <a class="nav-primary" href="#command-center">Start a job</a>
+          <a class="nav-primary" href="#activation-center">Activation center</a>
+          <a href="#owner-attention">Needs your decision</a>
           <a href="#projects">Projects</a>
-          <a href="#registries">Registries</a>
-          <a href="#capabilities">Capabilities</a>
-          <a href="#client-management">Clients</a>
-          <a href="#social-media">Social Media</a>
-          <a href="#production-social-posting">Production Posting</a>
-          <a href="#approvals">Approvals</a>
-          <a href="#connector-proofs">Connectors</a>
-          <a href="#quality-review">Quality</a>
-          <a href="#unified-memory">Memory Learning</a>
-          <a href="#costs">Costs</a>
-          <a href="#metrics">Metrics</a>
-          <a href="#skills">Skills</a>
-          <a href="#operating-systems">Operating Systems</a>
-          <a href="#safe-merge">Safe Merge</a>
+          <details open>
+            <summary>Operations</summary>
+            <a href="#action-queue">Action queue</a>
+            <a href="#client-management">Clients</a>
+            <a href="#social-media">Social media</a>
+            <a href="#production-social-posting">Production posting</a>
+            <a href="#approvals">Approvals</a>
+            <a href="#connector-proofs">Connectors</a>
+          </details>
+          <details>
+            <summary>Evidence and settings</summary>
+            <a href="#overview">System overview</a>
+            <a href="#registries">Registries</a>
+            <a href="#capabilities">Capabilities</a>
+            <a href="#quality-review">Quality</a>
+            <a href="#unified-memory">Memory and learning</a>
+            <a href="#costs">Costs</a>
+            <a href="#metrics">Metrics</a>
+            <a href="#skills">Skills</a>
+            <a href="#operating-systems">Operating systems</a>
+            <a href="#safe-merge">Safe merge</a>
+          </details>
         </nav>
       </aside>
 
@@ -47,6 +57,13 @@
           </div>
           <div id="runtime-mode" class="mode-lock" aria-label="Dashboard mode">Offline evidence</div>
         </header>
+
+        <div class="view-switcher" role="group" aria-label="Dashboard view">
+          <span>Show:</span>
+          <button type="button" data-dashboard-view="daily" aria-pressed="true">Daily work</button>
+          <button type="button" data-dashboard-view="operations" aria-pressed="false">Operations</button>
+          <button type="button" data-dashboard-view="all" aria-pressed="false">All evidence</button>
+        </div>
 
         <section id="command-center" class="section-band">
           <div class="section-heading">
@@ -71,12 +88,30 @@
               What do you want AG OS to accomplish?
               <textarea id="owner-command" rows="5" maxlength="10000" required placeholder="Example: Build and operate a professional lead follow-up system for AG Digitalz. Keep all sends waiting for my approval."></textarea>
             </label>
+            <label class="ai-planner-option">
+              <input id="use-ai-planner" type="checkbox" disabled>
+              <span><strong>Use Anthropic planning worker</strong><small id="ai-planner-help">Connect first to verify the key, budget, and scoped approval.</small></span>
+            </label>
             <div class="command-actions">
               <p id="runtime-status" role="status">Not connected. Existing evidence remains available below.</p>
               <button type="submit">Create work package</button>
             </div>
           </form>
           <div id="recent-command-panel" class="stack-panel"></div>
+        </section>
+
+        <section id="activation-center" class="section-band activation-center">
+          <div class="section-heading">
+            <div>
+              <h2>Activation Center</h2>
+              <p>One place to see what is live, what is usable now, and what still needs setup or a separate approval.</p>
+            </div>
+          </div>
+          <div id="activation-grid" class="activation-grid" aria-live="polite"></div>
+          <div class="activation-next-step">
+            <strong>Fastest path to useful work</strong>
+            <p>Connect with the owner token, enter one outcome above, and review the generated work package. Autonomous execution needs an AI worker runtime; external actions stay separately approval-gated.</p>
+          </div>
         </section>
 
         <section id="overview" class="section-band">

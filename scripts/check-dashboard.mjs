@@ -75,6 +75,7 @@ for (const forbiddenPattern of [
 for (const requiredOperatorPattern of [
   /id="owner-command-form"/,
   /id="owner-token"[^>]*type="password"/,
+  /id="use-ai-planner"[^>]*type="checkbox"[^>]*disabled/,
   /authorization:\s*`Bearer \$\{token\}`/,
   /\/api\/v1\/commands/,
   /No live side effect was executed/
@@ -87,6 +88,7 @@ for (const requiredOperatorPattern of [
 for (const requiredText of [
   "Constitution",
   "Owner Command Center",
+  "Activation Center",
   "Owner Attention",
   "Dashboard Action Queue",
   "Project Registry",
