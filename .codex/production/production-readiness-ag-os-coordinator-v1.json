@@ -18,7 +18,7 @@
     {
       "checkId": "source_backup_verified",
       "status": "pass",
-      "evidence": ["GitHub main merge commit 81866ec6b4e127db254ba0ba15bfc9ee7cf7f9dd is the first known-good coordinator source recovery point.", "scripts/lib/runtime/state-backup.mjs"]
+      "evidence": ["GitHub main merge commit b4797f3b6778437d6892d2d76bb102eecf4fb5c6 contains the coordinator deployment-safeguard baseline.", "scripts/lib/runtime/state-backup.mjs"]
     },
     {
       "checkId": "rollback_restore_drill",
@@ -28,7 +28,7 @@
     {
       "checkId": "monitoring_active",
       "status": "blocked",
-      "evidence": ["Passive health monitor and systemd timer templates exist, but no live monitoring call or timer is active before deployment approval."]
+      "evidence": ["Container healthcheck and passive monitor templates exist, but no live monitoring call or timer is active before deployment approval."]
     },
     {
       "checkId": "incident_response_ready",
@@ -53,7 +53,7 @@
     {
       "checkId": "exact_production_approval_active",
       "status": "blocked",
-      "evidence": ["No exact Hetzner target, source SHA, credential setup, reverse-proxy activation, monitoring activation, or production deployment approval is active."]
+      "evidence": ["Target agdigitalz-prod at 5.78.87.188 is verified, but no exact candidate SHA, image pull or build, credential setup, state initialization, container activation, monitoring activation, or production deployment approval is active."]
     },
     {
       "checkId": "post_activation_validation_plan",

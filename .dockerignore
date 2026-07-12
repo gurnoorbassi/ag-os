@@ -1,0 +1,13 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+node_modules
+local
+backups
+*.log
+*.pem
+*.key
+*.p12
+*.pfx

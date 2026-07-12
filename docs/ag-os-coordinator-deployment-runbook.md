@@ -2,13 +2,19 @@
 
 Status: deployment-ready procedure; no deployment or credential action is authorized by this file.
 
+## Verified target profile
+
+Read-only preflight on 2026-07-12 verified `agdigitalz-prod` at `5.78.87.188`: Ubuntu kernel 6.8, Docker 29.1.3, Docker Compose 2.40.3, Node.js 18.19.1, 47 GiB available disk, 2.3 GiB available memory, no swap, and no `/opt/ag-os` directory. Ports 80 and 443 are owned by `infra-proxy-1`; Caddy v2.9.1 runs inside that container from `/opt/ai-lead-command-center/infra/Caddyfile`. Port 8787 is unused and not publicly reachable.
+
+The first activation must use `ops/docker-compose.hetzner.yml`, bind only `127.0.0.1:8787`, and use an SSH tunnel. Do not upgrade host Node, attach to `infra_default`, edit Caddy, edit the existing `.env`, recreate an `infra-*` container, open firewall ports, or change DNS.
+
 ## Exact activation inputs
 
 Before any VPS mutation, record and approve:
 
 - exact Hetzner host identifier and existing secure SSH path
 - exact reviewed Git commit SHA
-- private HTTPS hostname or an owner-approved no-DNS private-network route
+- owner-approved SSH-tunnel route for first activation; public hostname and DNS remain out of scope
 - confirmation that existing capacity adds no new charge
 - state backup path and successful integrity result
 - prior known-good source SHA
@@ -22,13 +28,13 @@ Never paste secret values into chat, Git, logs, command history, PRs, or dashboa
 1. Verify the target identity, free disk, Node.js 20+, systemd, Caddy, and current service state without changing them.
 2. Create an integrity-hashed `.codex` state snapshot outside `/opt/ag-os` with `node ops/state-backup.mjs create --workspace /opt/ag-os --backup-root /var/backups/ag-os --backup-id <approved-id>`, then verify it with `node ops/state-backup.mjs verify --backup /var/backups/ag-os/<approved-id>`.
 3. Record the current source SHA as the rollback target.
-4. Place the approved source SHA in `/opt/ag-os` without touching unrelated services or repositories.
+4. Place the approved source SHA in `/opt/ag-os` without touching unrelated services or repositories. The reviewed Docker base is pinned to the verified linux/amd64 digest in `Dockerfile`.
 5. Install `/etc/ag-os/ag-os.env` with root ownership and mode `0600`; store only approved runtime values.
-6. Install the reviewed service templates but do not enable them until the exact activation approval covers service and monitor activation.
-7. Validate Caddy configuration and keep the separate password gate. A public unauthenticated dashboard is forbidden.
-8. Start the coordinator, verify localhost `/healthz`, then activate the approved private route.
+6. Build only `ops/docker-compose.hetzner.yml`; never run Compose against `/opt/ai-lead-command-center` for this deployment.
+7. Confirm the Compose rendering contains only `127.0.0.1:8787:8787`, the AG OS state bind, and no `infra_default` network before starting it.
+8. Start only `ag-os-coordinator`, verify localhost `/healthz`, and keep all access behind the SSH tunnel.
 9. Run `ops/post-deploy-check.mjs`; acceptance requires health 200, unauthenticated API 401, authenticated status 200, fail-closed production state, and no secret output.
-10. Enable the passive monitoring timer only if the approval includes live monitoring.
+10. Rely on the container healthcheck first. Enable the separate passive monitoring timer only if the approval includes live monitoring.
 11. Record source SHA, target, timestamps, non-secret check output, backup identifier, and residual blockers in the audit trail.
 
 ## Credential rotation and revocation
@@ -50,3 +56,7 @@ Rollback is separately approval-gated unless the activation approval explicitly 
 ## Stop conditions
 
 Stop without deployment if the target is ambiguous, secure access is unavailable, the candidate SHA differs, a new charge appears, backup verification fails, another production service would be affected, credentials could leak, Caddy would expose the dashboard publicly, CI/security gates fail, or exact approval is missing.
+
+## Owner access after activation
+
+From an authorized computer, open the tunnel with `ssh -N -L 8787:127.0.0.1:8787 root@5.78.87.188`, then browse to `http://127.0.0.1:8787`. Enter the owner API token only in the AG OS session field. Closing the SSH process closes remote access; no public listener or DNS record is created.
