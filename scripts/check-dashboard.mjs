@@ -405,11 +405,24 @@ if (!data.metrics?.cost || !data.metrics?.quality || !data.metrics?.rework || !d
 if (data.metrics.lessonReuse.acceptedLessonCount === 0 && data.metrics.lessonReuse.lessonReuseRatePercent !== 0) {
   fail("dashboard must report truthful zero lesson reuse when no accepted lessons exist");
 }
-if (data.approvals.standingCount !== 1 || data.approvals.standingApprovals.length !== 1) {
-  fail("dashboard control center must show the active scoped standing approval");
+if (data.approvals.standingCount < 1 || data.approvals.standingApprovals.length !== data.approvals.standingCount) {
+  fail("dashboard control center must show every active scoped standing approval");
 }
-if (data.approvals.standingApprovals[0]?.remainingUses !== 10 || data.approvals.standingApprovals[0]?.revocableImmediately !== true) {
-  fail("dashboard control center standing approval must show ten remaining uses and immediate revocation");
+if (data.approvals.standingApprovals.some((approval) =>
+  approval.revocableImmediately !== true ||
+  !Number.isInteger(approval.maxUses) ||
+  !Number.isInteger(approval.remainingUses) ||
+  approval.remainingUses < 0 ||
+  approval.remainingUses > approval.maxUses)) {
+  fail("dashboard control center standing approvals must show valid remaining uses and immediate revocation");
+}
+const codexDraftPrApproval = data.approvals.standingApprovals.find((approval) => approval.approvalId === "approval-20260709-ag-os-codex-draft-pr-standing");
+if (codexDraftPrApproval?.remainingUses !== 10) {
+  fail("dashboard control center must preserve the Codex draft PR standing approval usage limit");
+}
+const anthropicPlanningApproval = data.approvals.standingApprovals.find((approval) => approval.approvalId === "approval-20260712-anthropic-planning");
+if (anthropicPlanningApproval?.remainingUses !== 20 || anthropicPlanningApproval?.budget?.maxUsd !== 0.25) {
+  fail("dashboard control center must show the Anthropic planning approval use and cost limits");
 }
 if (data.dashboardActionQueue.approvalBatch?.mode !== "read_only" ||
   data.dashboardActionQueue.approvalBatch?.writeActionsAllowed !== false ||
