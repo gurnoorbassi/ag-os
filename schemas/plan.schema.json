@@ -118,6 +118,35 @@
             "minLength": 1
           }
         },
+        "relevantMemory": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "strategy",
+            "acceptedLessonPaths",
+            "exampleScorePaths",
+            "candidatesLoadedAsTruth",
+            "memoryGrantsPermission",
+            "examplesGrantPermission"
+          ],
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "const": "project_archetype_output_similarity_v1"
+            },
+            "acceptedLessonPaths": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "exampleScorePaths": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "candidatesLoadedAsTruth": { "type": "boolean", "const": false },
+            "memoryGrantsPermission": { "type": "boolean", "const": false },
+            "examplesGrantPermission": { "type": "boolean", "const": false }
+          }
+        },
         "ownerPreferencesUsed": {
           "type": "array",
           "items": {

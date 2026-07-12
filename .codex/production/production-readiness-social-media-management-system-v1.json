@@ -1,0 +1,82 @@
+{
+  "$schema": "../../schemas/production-readiness.schema.json",
+  "readinessId": "production-readiness-social-media-management-system-v1",
+  "projectId": "project-social-media-management-system-v1",
+  "status": "blocked",
+  "targetMode": "production_managed",
+  "requiredChecks": [
+    {
+      "checkId": "staging_proven",
+      "status": "pass",
+      "evidence": [".codex/audit/audit-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-executed.json"]
+    },
+    {
+      "checkId": "owner_product_acceptance",
+      "status": "pass",
+      "evidence": [".codex/audit/audit-20260709-social-media-management-system-h2-owner-accepted.json"]
+    },
+    {
+      "checkId": "source_backup_verified",
+      "status": "pass",
+      "evidence": ["GitHub source history and recorded staging source SHA provide the non-secret source recovery point."]
+    },
+    {
+      "checkId": "rollback_restore_drill",
+      "status": "blocked",
+      "evidence": ["A restore drill must prove the previous known-good staging build before production activation."]
+    },
+    {
+      "checkId": "monitoring_active",
+      "status": "blocked",
+      "evidence": ["Live health, failure, and post-action monitoring are not active yet."]
+    },
+    {
+      "checkId": "incident_response_ready",
+      "status": "pass",
+      "evidence": ["docs/incident-response.md", "owner-gurnoor-bassi is incident commander for I3/I4."]
+    },
+    {
+      "checkId": "credential_rotation_revocation_ready",
+      "status": "blocked",
+      "evidence": ["External credential store and live OAuth connector rotation/revocation evidence are still missing."]
+    },
+    {
+      "checkId": "cost_review_passed",
+      "status": "pass",
+      "evidence": ["Current source-controlled cost ledgers record zero paid production authorization."]
+    },
+    {
+      "checkId": "validation_security_ci_passed",
+      "status": "blocked",
+      "evidence": ["Must be re-evaluated against the exact production candidate commit and CI result."]
+    },
+    {
+      "checkId": "exact_production_approval_active",
+      "status": "blocked",
+      "evidence": ["No production deployment, live posting, scheduling, analytics, or automation approval is active."]
+    },
+    {
+      "checkId": "post_activation_validation_plan",
+      "status": "pass",
+      "evidence": ["Verify exact target, health, audit event, public result when applicable, error state, rollback trigger, and residual risk after every approved action."]
+    }
+  ],
+  "recoveryTargets": {
+    "rtoMinutes": 240,
+    "rpoMinutes": 0,
+    "rationale": "Source-controlled draft content and application state should be reproducible without accepting source-record loss; a four-hour manual recovery objective is appropriate before monitored automation is proven."
+  },
+  "incidentCommander": "owner-gurnoor-bassi",
+  "emergencyStop": "Revoke the active action approval, stop connector execution, preserve non-secret evidence, and roll back to the last recorded known-good staging/source version. No live containment action may expand beyond the incident approval.",
+  "activationAllowed": false,
+  "safety": {
+    "credentialsInRepoAllowed": false,
+    "customerDataAllowed": false,
+    "productionDataAllowed": false,
+    "domainChangeAllowed": false,
+    "paidActionAllowed": false,
+    "postingAllowed": false
+  },
+  "createdAt": "2026-07-11T00:00:00.000Z",
+  "updatedAt": "2026-07-11T00:00:00.000Z"
+}

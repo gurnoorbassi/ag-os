@@ -1,6 +1,6 @@
 # Quality Score + Lesson Candidate Loop
 
-Status: foundation v1.
+Status: active completion policy v1.
 
 This loop lets AG OS turn source-controlled work evidence into reviewable quality signals and candidate lessons without creating authority by automation.
 
@@ -13,6 +13,19 @@ The loop exists to make planning and execution improve over time while preservin
 - `candidate` lesson records that point back to the score and source evidence.
 
 Quality scores and lesson candidates are records, not commands, approval, memory truth, or permission to execute.
+
+## Mechanical Job Completion
+
+For jobs completed on or after `2026-07-09T20:06:25.029Z`, `done` is a guarded state. The execution processor must successfully create:
+
+- one candidate quality score tied to the job's source-controlled plan; and
+- at least one source-linked candidate lesson generated from that score.
+
+The completed job stores the score and lesson paths in `completionEvidence`. Validation fails when a new completed job omits that evidence, references missing files, crosses project scope, or points to lessons that do not cite the completion score.
+
+Historical jobs completed before policy activation remain immutable evidence. They are not silently rewritten or presented as mechanically closed. New processors must use `scripts/lib/runtime/job-completion-processor.mjs` before writing `status: "done"`.
+
+If scoring or lesson generation fails, the job must not become `done`. Partial local records may be inspected and cleaned up before retry, but they grant no authority.
 
 ## Quality Score Timing
 

@@ -78,13 +78,13 @@ window.AG_OS_DASHBOARD_DATA = {
       {
         "id": "project-social-media-management-system-v1",
         "name": "Social Media Management System v1",
-        "status": "planned",
+        "status": "active",
         "managementMode": "managed_staging",
         "projectType": "product_project",
         "riskLevel": "medium",
         "owner": "owner-gurnoor-bassi",
         "recordPath": ".codex/projects/social-media-management-system-v1.json",
-        "boundary": "Do not create a GitHub repository."
+        "boundary": "Do not create or mutate a repository, branch, file set, or pull request outside a separately approved scope."
       }
     ]
   },
@@ -113,13 +113,13 @@ window.AG_OS_DASHBOARD_DATA = {
   "socialMediaSystem": {
     "id": "project-social-media-management-system-v1",
     "name": "Social Media Management System v1",
-    "status": "planned",
+    "status": "active",
     "managementMode": "managed_staging",
     "projectType": "product_project",
     "riskLevel": "medium",
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/social-media-management-system-v1.json",
-    "boundary": "Do not create a GitHub repository.",
+    "boundary": "Do not create or mutate a repository, branch, file set, or pull request outside a separately approved scope.",
     "currentVersion": "v1.8 manual posting pack",
     "lifecycleStatus": "Manual posting pack merged and staged; OAuth and AG OS automated posting remain blocked",
     "targetRepo": "gurnoorbassi/ag-social-media-management-system",
@@ -1108,6 +1108,22 @@ window.AG_OS_DASHBOARD_DATA = {
       "analytics_blocked",
       "n8n_activation_blocked"
     ],
+    "productionReadiness": {
+      "readinessId": "production-readiness-social-media-management-system-v1",
+      "status": "blocked",
+      "activationAllowed": false,
+      "blockers": [
+        "rollback_restore_drill",
+        "monitoring_active",
+        "credential_rotation_revocation_ready",
+        "validation_security_ci_passed",
+        "exact_production_approval_active"
+      ],
+      "passedCheckCount": 6,
+      "requiredCheckCount": 11,
+      "liveActionPerformed": false,
+      "permissionGrantedByReadiness": false
+    },
     "nextRequiredOwnerApproval": "Owner must approve approval-instagram-oauth-execution before any Instagram OAuth flow can start. Credential reference credential-ref-instagram-agdigitalz-oauth is source-controlled as a reference only and contains no secret value. OAuth approval still does not authorize posting, scheduling, analytics, DMs/comments, or n8n activation.",
     "permissionModel": {
       "oauthDoesNotAuthorizePosting": true,
@@ -1155,7 +1171,8 @@ window.AG_OS_DASHBOARD_DATA = {
       "docs/social-posting-os.md",
       "docs/social-posting-production-policy.md",
       "docs/instagram-oauth-execution-preflight.md",
-      "docs/social-permission-matrix.md"
+      "docs/social-permission-matrix.md",
+      ".codex/production/production-readiness-social-media-management-system-v1.json"
     ]
   },
   "ownerAttention": [
@@ -1424,6 +1441,177 @@ window.AG_OS_DASHBOARD_DATA = {
         "recordPath": ".codex/approvals/approval-instagram-single-post-publish.template.json"
       }
     ],
+    "approvalBatch": {
+      "mode": "read_only",
+      "standingApprovals": [
+        {
+          "approvalId": "approval-20260709-ag-os-codex-draft-pr-standing",
+          "status": "approved",
+          "riskLevel": "R4",
+          "expiresAt": "2026-08-09T06:59:59.000Z",
+          "approvedBy": "owner-gurnoor-bassi",
+          "approvalKind": "standing",
+          "actionClass": "push_codex_branch_and_open_draft_pull_request",
+          "maxUses": 10,
+          "target": "github.com/gurnoorbassi/ag-os",
+          "approvedActions": [
+            "push_codex_branch",
+            "open_draft_pull_request"
+          ],
+          "revocableImmediately": true,
+          "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
+          "archived": false,
+          "usesRecorded": 0,
+          "remainingUses": 10
+        }
+      ],
+      "ownerDecisions": [
+        {
+          "id": "missing-social-handles",
+          "status": "waiting_owner",
+          "decision": "Provide remaining public platform handles",
+          "detail": "TikTok, YouTube Shorts, LinkedIn remain not_provided / pending_owner_input.",
+          "sourceRecord": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
+        },
+        {
+          "id": "credential-store-decision",
+          "status": "blocked",
+          "decision": "Choose secure credential store before OAuth",
+          "detail": "Instagram OAuth remains blocked until a secure credential store and connector path are approved.",
+          "sourceRecord": "docs/instagram-oauth-readiness-package.md"
+        }
+      ],
+      "approvalPackages": [
+        {
+          "approvalId": "approval-20260703-github-repo-create",
+          "status": "template_ready",
+          "commandCategory": "connect_service",
+          "requestedAction": "Create one private GitHub repository only.",
+          "target": "REQUIRED_OWNER_APPROVED_REPOSITORY_NAME",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-20260703-github-repo-create.template.json"
+        },
+        {
+          "approvalId": "approval-20260704-github-builder-pr",
+          "status": "template_ready",
+          "commandCategory": "build",
+          "requestedAction": "Create one branch, add starter construction website files, and open one pull request in gurnoorbassi/ag-test-construction-website.",
+          "target": "github:gurnoorbassi/ag-test-construction-website#ag-os/starter-construction-website-v1",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-20260704-github-builder-pr.template.json"
+        },
+        {
+          "approvalId": "approval-20260704-instagram-oauth-readiness",
+          "status": "template_ready",
+          "commandCategory": "connect_service",
+          "requestedAction": "Prepare future Instagram OAuth connection readiness for @agdigitalz in connected_draft_only mode.",
+          "target": "instagram:@agdigitalz",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-20260704-instagram-oauth-readiness.template.json"
+        },
+        {
+          "approvalId": "approval-20260704-n8n-draft-workflow-proof",
+          "status": "template_ready",
+          "commandCategory": "connect_service",
+          "requestedAction": "Create one inactive n8n draft workflow for construction website lead intake follow-up proof, export its workflow JSON, validate the exported JSON, record the result, and stop before activation or outbound messaging.",
+          "target": "n8n:REQUIRED_OWNER_APPROVED_DRAFT_WORKFLOW_NAME",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-20260704-n8n-draft-workflow-proof.template.json"
+        },
+        {
+          "approvalId": "approval-20260704-netlify-staging-test-construction",
+          "status": "template_ready",
+          "commandCategory": "deploy_staging",
+          "requestedAction": "Create or connect one Netlify staging site for gurnoorbassi/ag-test-construction-website and deploy staging from main.",
+          "target": "netlify:REQUIRED_OWNER_APPROVED_NETLIFY_STAGING_SITE_NAME",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-20260704-netlify-staging-test-construction.template.json"
+        },
+        {
+          "approvalId": "approval-20260704-social-media-netlify-staging",
+          "status": "template_ready",
+          "commandCategory": "deploy_staging",
+          "requestedAction": "Create or connect one dedicated Netlify staging-only site for gurnoorbassi/ag-social-media-management-system and deploy from main.",
+          "target": "netlify:ag-social-media-management-system-staging",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-20260704-social-media-netlify-staging.template.json"
+        },
+        {
+          "approvalId": "approval-20260704-social-media-system-v1-1-upgrade",
+          "status": "template_ready",
+          "commandCategory": "build",
+          "requestedAction": "Create one branch, update approved Social Media Management System v1.1 starter files, and open one pull request in gurnoorbassi/ag-social-media-management-system.",
+          "target": "github:gurnoorbassi/ag-social-media-management-system#REQUIRED_BRANCH_NAME",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-social-media-system-v1-1-upgrade.template.json"
+        },
+        {
+          "approvalId": "approval-20260704-social-media-system-v1-package",
+          "status": "template_ready",
+          "commandCategory": "plan_only",
+          "requestedAction": "Approve merging the Social Media Management System v1 draft/staging approval and build package into AG OS source of truth.",
+          "target": "ag-os:project-social-media-management-system-v1",
+          "riskLevel": "R2",
+          "recordPath": ".codex/approvals/approval-20260704-social-media-system-v1-package.template.json"
+        },
+        {
+          "approvalId": "approval-20260704-social-oauth-readiness",
+          "status": "template_ready",
+          "commandCategory": "connect_service",
+          "requestedAction": "Prepare future per-platform OAuth connection readiness for Instagram, TikTok, YouTube Shorts, and LinkedIn in connected_draft_only mode.",
+          "target": "social-oauth:ag-digitalz-social-media-management-system-v1",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-social-oauth-readiness.template.json"
+        },
+        {
+          "approvalId": "approval-20260705-ag-os-dashboard-netlify-staging",
+          "status": "template_ready",
+          "commandCategory": "deploy_staging",
+          "requestedAction": "Create or connect one dedicated Netlify staging-only site named ag-os-dashboard-staging and deploy the AG OS dashboard from gurnoorbassi/ag-os.",
+          "target": "netlify:ag-os-dashboard-staging",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-20260705-ag-os-dashboard-netlify-staging.template.json"
+        },
+        {
+          "approvalId": "approval-20260708-instagram-analytics-readonly",
+          "status": "template_ready",
+          "commandCategory": "audit",
+          "requestedAction": "Read Instagram analytics for @agdigitalz in read-only mode.",
+          "target": "instagram:@agdigitalz:analytics-readonly",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-instagram-analytics-readonly.template.json"
+        },
+        {
+          "approvalId": "approval-20260708-instagram-oauth-execution",
+          "status": "template_ready",
+          "commandCategory": "connect_service",
+          "requestedAction": "Execute owner-controlled Instagram OAuth for @agdigitalz in connected_draft_only mode only.",
+          "target": "instagram:@agdigitalz",
+          "riskLevel": "R4",
+          "recordPath": ".codex/approvals/approval-instagram-oauth-execution.template.json"
+        },
+        {
+          "approvalId": "approval-20260708-instagram-scheduling",
+          "status": "template_ready",
+          "commandCategory": "send_message",
+          "requestedAction": "Schedule owner-approved Instagram posts for @agdigitalz within an exact approved schedule.",
+          "target": "instagram:@agdigitalz:REQUIRED_SCHEDULE_ID",
+          "riskLevel": "R5",
+          "recordPath": ".codex/approvals/approval-instagram-scheduling.template.json"
+        },
+        {
+          "approvalId": "approval-20260708-instagram-single-post-publish",
+          "status": "template_ready",
+          "commandCategory": "send_message",
+          "requestedAction": "Publish one exact owner-approved Instagram post for @agdigitalz.",
+          "target": "instagram:@agdigitalz:REQUIRED_SOCIAL_POST_ID",
+          "riskLevel": "R5",
+          "recordPath": ".codex/approvals/approval-instagram-single-post-publish.template.json"
+        }
+      ],
+      "writeActionsAllowed": false,
+      "batchApprovalGrantsPermission": false
+    },
     "staleApprovals": [],
     "safeNextMilestones": [
       {
@@ -1450,11 +1638,32 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "approvals": {
-    "activeCount": 0,
+    "activeCount": 1,
     "expiredCount": 25,
     "blockedCount": 0,
     "staleWarningCount": 0,
-    "activeApprovals": [],
+    "activeApprovals": [
+      {
+        "approvalId": "approval-20260709-ag-os-codex-draft-pr-standing",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-08-09T06:59:59.000Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "standing",
+        "actionClass": "push_codex_branch_and_open_draft_pull_request",
+        "maxUses": 10,
+        "target": "github.com/gurnoorbassi/ag-os",
+        "approvedActions": [
+          "push_codex_branch",
+          "open_draft_pull_request"
+        ],
+        "revocableImmediately": true,
+        "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
+        "archived": false,
+        "usesRecorded": 0,
+        "remainingUses": 10
+      }
+    ],
     "expiredApprovals": [
       {
         "approvalId": "approval-20260705-ag-digitalz-manual-posting-pack-v1",
@@ -1462,6 +1671,20 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T20:55:00Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging; ag-os:proof-records",
+        "approvedActions": [
+          "create_branch",
+          "update_files",
+          "open_pr",
+          "review_pr",
+          "merge_pr",
+          "redeploy_netlify_staging",
+          "record_proof"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260705-ag-digitalz-manual-posting-pack-v1.json",
         "archived": true
       },
@@ -1471,6 +1694,21 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T19:00:00Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "ag-os:client-management-dashboard-records; github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging",
+        "approvedActions": [
+          "record_public_handle",
+          "create_branch",
+          "update_files",
+          "open_pr",
+          "review_pr",
+          "merge_pr",
+          "redeploy_netlify_staging",
+          "record_proof"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260705-ag-digitalz-instagram-handle-live-update.json",
         "archived": true
       },
@@ -1480,6 +1718,17 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T08:08:00Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "netlify:ag-os-dashboard-staging; ag-os:dashboard",
+        "approvedActions": [
+          "create_netlify_staging_site",
+          "deploy_dashboard_staging",
+          "verify_http_200",
+          "record_proof"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260705-ag-os-dashboard-netlify-staging.json",
         "archived": true
       },
@@ -1489,6 +1738,20 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T07:25:00Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging; ag-os:proof-records",
+        "approvedActions": [
+          "create_branch",
+          "update_files",
+          "open_pr",
+          "review_pr",
+          "merge_pr",
+          "redeploy_netlify_staging",
+          "record_proof"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260705-social-media-interactive-draft-ui.json",
         "archived": true
       },
@@ -1498,6 +1761,21 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T06:32:26Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging; ag-os:social-oauth-readiness-package",
+        "approvedActions": [
+          "record_draft_content_approval",
+          "create_branch",
+          "update_files",
+          "open_pr",
+          "review_pr",
+          "merge_pr",
+          "redeploy_netlify_staging",
+          "prepare_social_oauth_readiness"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-draft-approval-oauth-readiness.json",
         "archived": true
       },
@@ -1507,6 +1785,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T05:55:37Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "netlify:ag-social-media-management-system-staging",
+        "approvedActions": [
+          "redeploy_netlify_staging"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-content-review-netlify-staging.json",
         "archived": true
       },
@@ -1516,6 +1802,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T05:48:00Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system#5",
+        "approvedActions": [
+          "merge_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-ag-digitalz-content-review-v1.json",
         "archived": true
       },
@@ -1525,6 +1819,16 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T05:26:42Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/ag-digitalz-content-review-v1",
+        "approvedActions": [
+          "create_branch",
+          "update_files",
+          "open_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-content-review-build.json",
         "archived": true
       },
@@ -1534,6 +1838,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T04:58:46Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "netlify:ag-social-media-management-system-staging",
+        "approvedActions": [
+          "redeploy_netlify_staging"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-first-content-sprint-netlify-staging.json",
         "archived": true
       },
@@ -1543,6 +1855,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T04:52:30Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system#4",
+        "approvedActions": [
+          "merge_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-ag-digitalz-first-content-sprint-v1.json",
         "archived": true
       },
@@ -1552,6 +1872,16 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T04:36:18Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/ag-digitalz-first-content-sprint-v1",
+        "approvedActions": [
+          "create_branch",
+          "update_files",
+          "open_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-first-content-sprint-build.json",
         "archived": true
       },
@@ -1561,6 +1891,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T02:10:39Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "netlify:ag-social-media-management-system-staging",
+        "approvedActions": [
+          "redeploy_netlify_staging"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-netlify-staging-redeploy.json",
         "archived": true
       },
@@ -1570,6 +1908,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T02:05:01Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system#3",
+        "approvedActions": [
+          "merge_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-ag-digitalz-draft-config.json",
         "archived": true
       },
@@ -1579,6 +1925,16 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T01:52:50Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/ag-digitalz-draft-config",
+        "approvedActions": [
+          "create_branch",
+          "update_files",
+          "open_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-ag-digitalz-draft-config-build.json",
         "archived": true
       },
@@ -1588,6 +1944,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T00:59:30Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "netlify:ag-social-media-management-system-staging",
+        "approvedActions": [
+          "deploy_staging"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-social-media-netlify-staging-v1-1.json",
         "archived": true
       },
@@ -1597,6 +1961,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T00:56:29Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system#2",
+        "approvedActions": [
+          "merge_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-social-media-system-v1-1.json",
         "archived": true
       },
@@ -1606,6 +1978,16 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-06T00:47:02Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/social-media-system-v1-1-upgrade",
+        "approvedActions": [
+          "create_branch",
+          "update_files",
+          "open_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-social-media-system-v1-1-upgrade.json",
         "archived": true
       },
@@ -1615,6 +1997,15 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-05T23:17:35.591Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "netlify:ag-social-media-management-system-staging",
+        "approvedActions": [
+          "connect_netlify",
+          "deploy_staging"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-social-media-netlify-staging.json",
         "archived": true
       },
@@ -1624,6 +2015,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-05T22:31:45.718Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system#1",
+        "approvedActions": [
+          "merge_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-social-media-system-v1.json",
         "archived": true
       },
@@ -1633,6 +2032,17 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-05T21:35:09Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/social-media-system-v1-starter",
+        "approvedActions": [
+          "create_branch",
+          "create_files",
+          "update_files",
+          "open_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-social-media-starter-build.json",
         "archived": true
       },
@@ -1642,6 +2052,17 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-05T11:18:16Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "n8n:Construction Website Lead Intake Follow-up Draft",
+        "approvedActions": [
+          "create_inactive_n8n_draft_workflow",
+          "export_n8n_workflow_json",
+          "validate_n8n_workflow_json",
+          "record_n8n_draft_result"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-n8n-draft-workflow-proof.json",
         "archived": true
       },
@@ -1651,6 +2072,15 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-05T10:50:47.913Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "netlify:gurnoorbassi/ag-test-construction-website:staging",
+        "approvedActions": [
+          "connect_netlify",
+          "deploy_staging"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-netlify-staging-test-construction.json",
         "archived": true
       },
@@ -1660,6 +2090,14 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-05T10:16:16.617Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-test-construction-website#1",
+        "approvedActions": [
+          "merge_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-target-pr-merge-construction-website.json",
         "archived": true
       },
@@ -1669,6 +2107,17 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-05T08:55:58.002Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-test-construction-website#ag-os/starter-construction-website-v1",
+        "approvedActions": [
+          "create_branch",
+          "create_files",
+          "update_files",
+          "open_pr"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260704-github-builder-pr.json",
         "archived": true
       },
@@ -1678,13 +2127,66 @@ window.AG_OS_DASHBOARD_DATA = {
         "riskLevel": "R4",
         "expiresAt": "2026-07-04T21:06:41Z",
         "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "target": "github:gurnoorbassi/ag-test-construction-website",
+        "approvedActions": [
+          "create_repo",
+          "create_starter_readme_if_required"
+        ],
+        "revocableImmediately": false,
         "recordPath": ".codex/approvals/archive/approval-20260703-github-repo-create.json",
         "archived": true
       }
     ],
     "blockedApprovals": [],
     "staleApprovals": [],
-    "recentApprovedActions": []
+    "recentApprovedActions": [
+      {
+        "approvalId": "approval-20260709-ag-os-codex-draft-pr-standing",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-08-09T06:59:59.000Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "standing",
+        "actionClass": "push_codex_branch_and_open_draft_pull_request",
+        "maxUses": 10,
+        "target": "github.com/gurnoorbassi/ag-os",
+        "approvedActions": [
+          "push_codex_branch",
+          "open_draft_pull_request"
+        ],
+        "revocableImmediately": true,
+        "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
+        "archived": false,
+        "usesRecorded": 0,
+        "remainingUses": 10
+      }
+    ],
+    "standingCount": 1,
+    "standingApprovals": [
+      {
+        "approvalId": "approval-20260709-ag-os-codex-draft-pr-standing",
+        "status": "approved",
+        "riskLevel": "R4",
+        "expiresAt": "2026-08-09T06:59:59.000Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "standing",
+        "actionClass": "push_codex_branch_and_open_draft_pull_request",
+        "maxUses": 10,
+        "target": "github.com/gurnoorbassi/ag-os",
+        "approvedActions": [
+          "push_codex_branch",
+          "open_draft_pull_request"
+        ],
+        "revocableImmediately": true,
+        "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
+        "archived": false,
+        "usesRecorded": 0,
+        "remainingUses": 10
+      }
+    ]
   },
   "connectorProofs": {
     "github": [
@@ -3077,6 +3579,47 @@ window.AG_OS_DASHBOARD_DATA = {
       "dailyMaxUsd": 10,
       "perTaskMaxUsd": 5
     }
+  },
+  "metrics": {
+    "status": "computed_from_source_records",
+    "generatedFromLiveSystems": false,
+    "cost": {
+      "ledgerCount": 41,
+      "estimatedUsd": 0,
+      "actualUsd": 0,
+      "varianceUsd": 0,
+      "variancePercent": 0
+    },
+    "quality": {
+      "scoreCount": 12,
+      "averageScore": 9.2,
+      "passCount": 12,
+      "recentAverage": 9.34,
+      "priorAverage": 9.1,
+      "trendDelta": 0.24
+    },
+    "rework": {
+      "critiqueCount": 11,
+      "critiquesRequiringFixes": 0,
+      "requiredFixCount": 0,
+      "failedJobCount": 0,
+      "reworkSignalRatePercent": 0
+    },
+    "lessonReuse": {
+      "acceptedLessonCount": 0,
+      "eligiblePlanCount": 3,
+      "plansUsingAcceptedLessons": 0,
+      "plansUsingQualityExamples": 0,
+      "lessonReuseRatePercent": 0,
+      "exampleReuseRatePercent": 0,
+      "skillApplicationsRecorded": 6
+    },
+    "limitations": [
+      "Metrics are computed only from source-controlled AG OS records.",
+      "Rework rate is a deterministic signal from required critique fixes, not time tracking.",
+      "Zero accepted lessons produces a truthful zero lesson-reuse rate.",
+      "Metrics do not grant approval or authorize live operations."
+    ]
   },
   "skills": {
     "draftCount": 0,

@@ -1,10 +1,10 @@
 # Metrics Foundation v1
 
-Status: template foundation only.
+Status: active deterministic read model.
 
-Metrics Foundation v1 defines what AG OS should measure over time without inventing totals. Until metric processors exist, AG OS stores templates only.
+Metrics Foundation v1 computes cost variance, quality trend, rework signals, and lesson/example reuse from source-controlled AG OS records. `scripts/lib/runtime/metrics-processor.mjs` is the deterministic processor and the dashboard is its read-only presentation layer.
 
-## Metrics To Track Later
+## Metrics Tracked
 
 - commands received
 - plans created
@@ -22,6 +22,13 @@ Metrics Foundation v1 defines what AG OS should measure over time without invent
 - blocked actions
 - stale approvals
 - client, engagement, deliverable, and access request counts
+
+The completion dashboard emphasizes four operating signals:
+
+- estimated versus actual recorded cost and variance;
+- average quality, pass count, and recent-versus-prior trend;
+- critiques requiring fixes, total required fixes, and failed-job signals;
+- accepted-lesson reuse, similar-quality-example reuse, and recorded skill applications.
 
 ## Rules
 
@@ -55,4 +62,4 @@ Future metrics may read:
 
 ## Validation Gate
 
-Metric records should not become active until a schema and deterministic processor exist. This foundation only prepares template shapes for later validation.
+Dashboard validation fails when the four operating metric groups are missing, are not source-record-derived, or report non-zero lesson reuse while no accepted lessons exist. Metrics never grant approval or authorize live operations.

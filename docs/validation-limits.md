@@ -28,6 +28,7 @@ Validation is local and offline. It must not call live services, read credential
 - Structure and selected safety rules for Connector Registry, Command Registry, Cost OS budget, Quality OS policy, Security OS policy, Watchdog OS policy, Memory OS policy, Capability Registry, and Project Registry.
 - Active Project Registry entries and matching active project records, including protected Lead Gen posture and AI Receptionist project posture.
 - Active engine records under `.codex/jobs/`, `.codex/plans/`, `.codex/router/`, `.codex/boot/`, `.codex/execution/`, `.codex/commands/`, `.codex/audit/`, and `.codex/approvals/`.
+- Job Completion Policy v1 evidence for newly completed jobs: quality-score existence, lesson-candidate existence, project match, and score-to-lesson linkage.
 - Runtime records under `.codex/costs/cost-ledger-*.json`, `.codex/connectors/connector-exec-*.json`, `.codex/github/github-plan-*.json`, and `.codex/github/github-mcp-gate-*.json`.
 - Future quality score records under `.codex/quality-scores/quality-score-*.json`; an empty quality-score directory is valid and does not imply accepted scores exist.
 - Product archetype records, lesson candidate records, accepted lesson records when present, and owner preference records.

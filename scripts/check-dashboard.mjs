@@ -59,24 +59,34 @@ const app = existsSync(path.join(root, "dashboard/app.js")) ? read("dashboard/ap
 const dashboardSource = `${index}\n${app}`;
 
 for (const forbiddenPattern of [
-  /<button\b/i,
-  /<form\b/i,
-  /<input\b/i,
-  /<textarea\b/i,
   /contenteditable/i,
-  /\bfetch\s*\(/,
   /XMLHttpRequest/,
   /navigator\.sendBeacon/,
   /\blocalStorage\b/,
-  /\bsessionStorage\b/
+  /type=["']file["']/i,
+  /<button[^>]*>\s*(?:deploy|merge|publish|post|send|spend|change\s+dns)/i,
+  /buy|purchase|subscribe/i
 ]) {
   if (forbiddenPattern.test(dashboardSource)) {
-    fail(`dashboard read-only check failed for pattern: ${forbiddenPattern}`);
+    fail(`dashboard operator-safety check failed for pattern: ${forbiddenPattern}`);
+  }
+}
+
+for (const requiredOperatorPattern of [
+  /id="owner-command-form"/,
+  /id="owner-token"[^>]*type="password"/,
+  /authorization:\s*`Bearer \$\{token\}`/,
+  /\/api\/v1\/commands/,
+  /No live side effect was executed/
+]) {
+  if (!requiredOperatorPattern.test(dashboardSource)) {
+    fail(`dashboard authenticated operator console missing invariant: ${requiredOperatorPattern}`);
   }
 }
 
 for (const requiredText of [
   "Constitution",
+  "Owner Command Center",
   "Owner Attention",
   "Dashboard Action Queue",
   "Project Registry",
@@ -331,6 +341,11 @@ if (!data.socialPosting.blockedPublishReasons.includes("exact_single_post_publis
 if (!data.socialPosting.blockedPublishReasons.includes("oauth_not_executed")) {
   fail("dashboard control center must show OAuth has not been executed");
 }
+if (data.socialPosting.productionReadiness?.activationAllowed !== false ||
+  data.socialPosting.productionReadiness?.status !== "blocked" ||
+  data.socialPosting.productionReadiness?.permissionGrantedByReadiness !== false) {
+  fail("dashboard must show production readiness as fail-closed and non-authorizing");
+}
 if (data.socialPosting.permissionModel.oauthDoesNotAuthorizePosting !== true ||
   data.socialPosting.permissionModel.connectedDraftOnlyDoesNotAuthorizePosting !== true ||
   data.socialPosting.permissionModel.draftApprovalDoesNotAuthorizePosting !== true ||
@@ -378,6 +393,26 @@ if (data.skills.skillsGrantPermission !== false) {
 }
 if (data.costs.totalRecordedActualUsd > data.costs.limits.monthlyMaxUsd) {
   fail("dashboard control center must show recorded costs within the monthly budget");
+}
+if (data.metrics?.status !== "computed_from_source_records" || data.metrics?.generatedFromLiveSystems !== false) {
+  fail("dashboard operational metrics must be computed from source-controlled records only");
+}
+if (!data.metrics?.cost || !data.metrics?.quality || !data.metrics?.rework || !data.metrics?.lessonReuse) {
+  fail("dashboard must include cost, quality, rework, and lesson-reuse metrics");
+}
+if (data.metrics.lessonReuse.acceptedLessonCount === 0 && data.metrics.lessonReuse.lessonReuseRatePercent !== 0) {
+  fail("dashboard must report truthful zero lesson reuse when no accepted lessons exist");
+}
+if (data.approvals.standingCount !== 1 || data.approvals.standingApprovals.length !== 1) {
+  fail("dashboard control center must show the active scoped standing approval");
+}
+if (data.approvals.standingApprovals[0]?.remainingUses !== 10 || data.approvals.standingApprovals[0]?.revocableImmediately !== true) {
+  fail("dashboard control center standing approval must show ten remaining uses and immediate revocation");
+}
+if (data.dashboardActionQueue.approvalBatch?.mode !== "read_only" ||
+  data.dashboardActionQueue.approvalBatch?.writeActionsAllowed !== false ||
+  data.dashboardActionQueue.approvalBatch?.batchApprovalGrantsPermission !== false) {
+  fail("dashboard batched approval review must remain read-only and non-authorizing");
 }
 
 if (failures.length > 0) {

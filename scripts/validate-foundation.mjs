@@ -2,8 +2,10 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { readJson } from "./lib/runtime/common.mjs";
+import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
 
 const root = process.cwd();
+const JOB_COMPLETION_POLICY_ACTIVATED_AT = "2026-07-09T20:06:25.029Z";
 
 const requiredPaths = [
   "README.md",
@@ -56,6 +58,7 @@ const requiredPaths = [
   ".codex/memory/accepted/README.md",
   ".codex/memory/rejected/README.md",
   ".codex/memory/conflicts/README.md",
+  ".codex/memory/archetype-updates/README.md",
   ".codex/costs/README.md",
   ".codex/costs/budget.json",
   ".codex/quality/README.md",
@@ -78,6 +81,8 @@ const requiredPaths = [
   ".codex/social/publish-approvals/README.md",
   ".codex/social/preflight/README.md",
   ".codex/social/preflight/social-preflight-instagram-oauth-agdigitalz.json",
+  ".codex/production/README.md",
+  ".codex/production/production-readiness-social-media-management-system-v1.json",
   ".codex/social/policies/production-posting-policy.json",
   ".codex/capabilities/README.md",
   ".codex/capabilities/registry.json",
@@ -312,6 +317,12 @@ const knowledgeRecordDirectories = [
     allowedStatuses: ["draft", "active", "deprecated"]
   },
   {
+    name: "archetype update proposal",
+    recordDir: ".codex/memory/archetype-updates",
+    schemaPath: "schemas/archetype-update-proposal.schema.json",
+    allowedStatuses: ["draft", "applied", "rejected", "archived"]
+  },
+  {
     name: "owner preference profile",
     recordDir: ".codex/owners/preferences",
     schemaPath: "schemas/owner-preferences.schema.json",
@@ -454,6 +465,12 @@ const runtimeRecordDirectories = [
     name: "social connector preflight",
     recordDir: ".codex/social/preflight",
     schemaPath: "schemas/social-connector-preflight.schema.json"
+  },
+  {
+    name: "production readiness",
+    recordDir: ".codex/production",
+    schemaPath: "schemas/production-readiness.schema.json",
+    includePrefixes: ["production-readiness-"]
   }
 ];
 let failures = 0;
@@ -942,6 +959,100 @@ function validateSecurityPolicy(record) {
 
   if (record.rules?.secretsFindingBlocksMerge !== true) {
     fail("security policy must block merge when secrets are found");
+  }
+}
+
+function validateJobCompletionEvidence(record, recordPath) {
+  if (record.status !== "done") {
+    return;
+  }
+
+  const completedAt = record.queueTimestamps?.completedAt;
+  const policyApplies = typeof completedAt !== "string" || completedAt >= JOB_COMPLETION_POLICY_ACTIVATED_AT;
+  if (!policyApplies) {
+    return;
+  }
+
+  const evidence = record.completionEvidence;
+  if (!evidence) {
+    fail(`${recordPath} completed after the job completion policy activation but has no completionEvidence`);
+    return;
+  }
+
+  const evidencePaths = [evidence.qualityScorePath, ...(evidence.lessonCandidatePaths ?? [])];
+  for (const evidencePath of evidencePaths) {
+    if (typeof evidencePath !== "string" || path.isAbsolute(evidencePath) || evidencePath.startsWith("..")) {
+      fail(`${recordPath} completion evidence must use a repository-relative path`);
+      continue;
+    }
+    if (!existsSync(path.join(root, evidencePath))) {
+      fail(`${recordPath} completion evidence does not exist: ${evidencePath}`);
+    }
+  }
+
+  if (typeof evidence.qualityScorePath !== "string" || !existsSync(path.join(root, evidence.qualityScorePath))) {
+    return;
+  }
+
+  try {
+    const qualityScore = readJson(evidence.qualityScorePath);
+    if (qualityScore.projectId !== record.projectId) {
+      fail(`${recordPath} completion quality score projectId must match the job`);
+    }
+
+    const expectedLessonIds = new Set(qualityScore.lessonCandidates ?? []);
+    for (const lessonPath of evidence.lessonCandidatePaths ?? []) {
+      if (!existsSync(path.join(root, lessonPath))) {
+        continue;
+      }
+      const lesson = readJson(lessonPath);
+      if (lesson.sourceScoreId !== qualityScore.scoreId) {
+        fail(`${recordPath} lesson candidate must cite completion quality score ${qualityScore.scoreId}`);
+      }
+      if (!expectedLessonIds.has(lesson.lessonId)) {
+        fail(`${recordPath} completion quality score must list lesson candidate ${lesson.lessonId}`);
+      }
+    }
+  } catch (error) {
+    fail(`${recordPath} completion evidence could not be validated: ${error.message}`);
+  }
+}
+
+function validateStandingApprovalRecord(record, recordPath) {
+  if (record.approvalKind !== "standing") {
+    return;
+  }
+
+  if (!record.actionClass) {
+    fail(`${recordPath} standing approval must define actionClass`);
+  }
+  if (!Array.isArray(record.inclusionCriteria) || record.inclusionCriteria.length === 0) {
+    fail(`${recordPath} standing approval must define deterministic inclusionCriteria`);
+  }
+  if (!Number.isInteger(record.maxUses) || record.maxUses < 1) {
+    fail(`${recordPath} standing approval maxUses must be a positive integer`);
+  }
+  if (record.usageAuditRequired !== true) {
+    fail(`${recordPath} standing approval must require a per-use audit event`);
+  }
+  if (record.revocableImmediately !== true) {
+    fail(`${recordPath} standing approval must be immediately revocable`);
+  }
+
+  const requiredPermanentExclusions = [
+    "merge_pull_request",
+    "credential_handling",
+    "customer_data_handling",
+    "message_send",
+    "social_posting",
+    "paid_action",
+    "dns_change",
+    "production_change"
+  ];
+  for (const exclusion of requiredPermanentExclusions) {
+    if (!(record.prohibitedActions ?? []).includes(exclusion)) {
+      fail(`${recordPath} standing approval missing permanent exclusion: ${exclusion}`);
+    }
   }
 }
 
@@ -1511,6 +1622,9 @@ for (const engineRecordDirectory of engineRecordDirectories) {
       assertNoPlaceholders(record, recordPath);
       assertNoFixtureMarkers(record, recordPath);
       validateSchemaObject(record, schema, recordPath);
+      if (engineRecordDirectory.name === "job") {
+        validateJobCompletionEvidence(record, recordPath);
+      }
 
       if (failures === failuresBeforeRecord) {
         pass(`${engineRecordDirectory.name} active record structurally valid: ${recordPath}`);
@@ -1554,6 +1668,15 @@ for (const runtimeRecordDirectory of runtimeRecordDirectories) {
       validateSchemaObject(record, schema, recordPath);
       if (runtimeRecordDirectory.name === "credential reference") {
         validateCredentialReferenceRecord(record, recordPath);
+      }
+      if (runtimeRecordDirectory.name === "production readiness") {
+        const readiness = evaluateProductionReadiness(record);
+        if (record.activationAllowed === true && readiness.activationAllowed !== true) {
+          fail(`${recordPath} must fail closed while required production safeguards are blocked`);
+        }
+        if (record.status === "ready" && readiness.activationAllowed !== true) {
+          fail(`${recordPath} cannot use ready status without every required production safeguard`);
+        }
       }
 
       if (failures === failuresBeforeRecord) {
@@ -1627,6 +1750,9 @@ for (const schemaValidatedRecordDirectory of schemaValidatedRecordDirectories) {
       const record = readJson(recordPath);
       const failuresBeforeRecord = failures;
       validateSchemaObject(record, schema, recordPath);
+      if (schemaValidatedRecordDirectory.name === "approval lock") {
+        validateStandingApprovalRecord(record, recordPath);
+      }
       if (failures === failuresBeforeRecord) {
         pass(`${schemaValidatedRecordDirectory.name} record structurally valid: ${recordPath}`);
       }

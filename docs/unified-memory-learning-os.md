@@ -42,6 +42,18 @@ Runtime memory loading must preserve:
 - `memoryGrantsPermission: false`
 - `skillsGrantPermission: false`
 
+## Relevance Retrieval
+
+Workers may request a relevance-ranked briefing using project ID, archetype ID, output type, and worker type. `scripts/load-accepted-lessons.mjs` ranks:
+
+- accepted lessons from the same project or archetype;
+- accepted company/agent-shared lessons applicable to the worker; and
+- source-controlled quality-score examples that match the project, archetype, or output type and meet the quality bar.
+
+Planner records store the selected accepted-lesson paths and quality-example paths in `basis.relevantMemory`. Candidate and rejected lessons are never selected as truth. Quality examples remain evidence, may still have candidate status, and never grant permission.
+
+The retrieval strategy is deterministic and local: `project_archetype_output_similarity_v1`. It does not call live services or use embeddings, credentials, customer data, or production data.
+
 ## Promotion and Rejection
 
 `scripts/process-lesson-promotion.mjs` supports local promotion and rejection workflows.
@@ -82,6 +94,12 @@ Skills must not:
 - override Security OS
 - change Constitution authority
 - store credentials
+
+## Archetype Feedback
+
+Accepted lessons may generate draft archetype update proposals through `scripts/process-archetype-update-proposal.mjs`. The processor requires an exact active archetype match, an allowed target section, and safe lesson text. It writes proposal evidence only; it cannot mutate an archetype, open or merge a PR, or grant permission.
+
+Candidate and rejected lessons are blocked from the archetype path. Every applied proposal requires a separate reviewed PR and full validation.
 
 ## Dashboard
 

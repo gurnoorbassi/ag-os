@@ -141,6 +141,42 @@ test("validator fails when a required field is missing", () => withTempRepo((roo
   assert.match(result.output, /missing required field: status/);
 }));
 
+test("validator blocks new completed jobs without mechanical learning evidence", () => withTempRepo((root) => {
+  const recordPath = ".codex/jobs/job-runtime-quality-loop-crm-20260704.json";
+  const job = readJson(root, recordPath);
+  job.status = "done";
+  job.queueTimestamps.completedAt = "2026-07-10T00:00:00.000Z";
+  job.updatedAt = "2026-07-10T00:00:00.000Z";
+  writeJson(root, recordPath, job);
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /completed after the job completion policy activation but has no completionEvidence/);
+}));
+
+test("validator blocks completed jobs whose learning evidence paths do not exist", () => withTempRepo((root) => {
+  const recordPath = ".codex/jobs/job-runtime-quality-loop-crm-20260704.json";
+  const job = readJson(root, recordPath);
+  job.status = "done";
+  job.queueTimestamps.completedAt = "2026-07-10T00:00:00.000Z";
+  job.updatedAt = "2026-07-10T00:00:00.000Z";
+  job.completionEvidence = {
+    policyVersion: 1,
+    qualityScorePath: ".codex/quality-scores/quality-score-missing.json",
+    lessonCandidatePaths: [
+      ".codex/memory/lessons/candidates/lesson-missing-01.json"
+    ],
+    generatedBy: "scripts/lib/runtime/job-completion-processor.mjs"
+  };
+  writeJson(root, recordPath, job);
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /completion evidence does not exist/);
+}));
+
 test("validator fails when a schema enum value is wrong", () => withTempRepo((root) => {
   const recordPath = ".codex/connectors/registry.json";
   const registry = readJson(root, recordPath);

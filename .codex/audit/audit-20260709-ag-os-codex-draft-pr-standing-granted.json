@@ -1,0 +1,24 @@
+{
+  "id": "audit-20260709-ag-os-codex-draft-pr-standing-granted",
+  "occurredAt": "2026-07-09T20:34:04.540Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted the first revocable AG OS standing approval for scoped Codex branch pushes and draft pull requests.",
+  "scope": "gurnoorbassi/ag-os codex/* push and draft PR only; 10 uses; expires end of August 8, 2026 America/Vancouver",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260709-ag-os-codex-draft-pr-standing"
+    },
+    {
+      "type": "document",
+      "reference": "docs/standing-approvals.md"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Grant recording only; no push or PR was performed. Every use requires all local gates, a passing secret scan, exact repo and branch match, excluded-file review, remaining usage budget, and a standing_approval_used audit event. Merge and all prohibited actions remain unauthorized. Revocation is immediate.",
+  "createdAt": "2026-07-09T20:34:04.540Z"
+}

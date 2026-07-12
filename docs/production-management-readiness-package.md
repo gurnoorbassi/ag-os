@@ -1,8 +1,10 @@
 # Production Management Readiness Package
 
-Status: planning only. Not approved for execution.
+Status: active fail-closed safeguard package. Not approved for execution.
 
 This package defines what AG OS must prove before managing any production system. It does not deploy, change DNS, connect domains, access production data, change databases, activate workflows, or use paid tools.
+
+The active source record for the Social Media Management System is `.codex/production/production-readiness-social-media-management-system-v1.json`. `npm.cmd run production:check` evaluates it and exits non-zero while any safeguard lacks evidence. Readiness never grants permission; exact production actions still require their own approval locks.
 
 ## Production Preconditions
 
@@ -66,3 +68,6 @@ Stop immediately if:
 - domain/DNS changes are bundled with unrelated changes
 - production and staging scopes are mixed in one approval
 
+## Current Social Media Blockers
+
+The system remains blocked on a tested rollback/restore drill, active monitoring, credential rotation/revocation evidence, exact-candidate validation and CI, and an exact production action approval. These are visible in the dashboard and cannot be overridden by project acceptance, memory, skills, metrics, or the standing draft-PR approval.

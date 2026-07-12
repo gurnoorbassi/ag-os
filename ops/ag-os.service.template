@@ -1,0 +1,21 @@
+[Unit]
+Description=AG OS Coordinator
+After=network.target
+
+[Service]
+Type=simple
+User=ag-os
+Group=ag-os
+WorkingDirectory=/opt/ag-os
+EnvironmentFile=/etc/ag-os/ag-os.env
+ExecStart=/usr/bin/node scripts/live-server.mjs
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/ag-os/.codex /opt/ag-os/dashboard
+
+[Install]
+WantedBy=multi-user.target

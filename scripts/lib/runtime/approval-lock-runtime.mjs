@@ -13,6 +13,12 @@ export function buildApprovalLockRecord({
   ownerId = DEFAULT_OWNER_ID,
   requestedBy = "ag-os-runtime",
   approvedBy = DEFAULT_OWNER_ID,
+  approvalKind = "single_action",
+  actionClass,
+  inclusionCriteria,
+  maxUses,
+  usageAuditRequired,
+  revocableImmediately,
   commandCategory,
   requestedAction,
   target,
@@ -35,6 +41,12 @@ export function buildApprovalLockRecord({
   return {
     approvalId: `approval-${dateStamp(now)}-${approvalSlug}`,
     status: "approved",
+    approvalKind,
+    ...(actionClass ? { actionClass } : {}),
+    ...(inclusionCriteria ? { inclusionCriteria } : {}),
+    ...(maxUses ? { maxUses } : {}),
+    ...(usageAuditRequired !== undefined ? { usageAuditRequired } : {}),
+    ...(revocableImmediately !== undefined ? { revocableImmediately } : {}),
     ownerId,
     requestedBy,
     approvedBy,
@@ -94,6 +106,24 @@ export function validateApprovalLockRecord(approval) {
 
   if (!approval?.createdAt) {
     errors.push("createdAt is required");
+  }
+
+  if (approval?.approvalKind === "standing") {
+    if (!approval.actionClass) {
+      errors.push("standing approval actionClass is required");
+    }
+    if (!Array.isArray(approval.inclusionCriteria) || approval.inclusionCriteria.length === 0) {
+      errors.push("standing approval inclusionCriteria must not be empty");
+    }
+    if (!Number.isInteger(approval.maxUses) || approval.maxUses < 1) {
+      errors.push("standing approval maxUses must be a positive integer");
+    }
+    if (approval.usageAuditRequired !== true) {
+      errors.push("standing approval must require per-use audit events");
+    }
+    if (approval.revocableImmediately !== true) {
+      errors.push("standing approval must be immediately revocable");
+    }
   }
 
   return {

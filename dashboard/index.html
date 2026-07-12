@@ -17,6 +17,7 @@
           </div>
         </div>
         <nav class="section-nav">
+          <a href="#command-center">Command Center</a>
           <a href="#overview">Overview</a>
           <a href="#owner-attention">Owner Attention</a>
           <a href="#action-queue">Action Queue</a>
@@ -31,6 +32,7 @@
           <a href="#quality-review">Quality</a>
           <a href="#unified-memory">Memory Learning</a>
           <a href="#costs">Costs</a>
+          <a href="#metrics">Metrics</a>
           <a href="#skills">Skills</a>
           <a href="#operating-systems">Operating Systems</a>
           <a href="#safe-merge">Safe Merge</a>
@@ -41,10 +43,41 @@
         <header class="topbar">
           <div>
             <h1>AG OS Control Center</h1>
-            <p>Read-only operating view from source-controlled AG OS records.</p>
+            <p>Owner-operated command center backed by source-controlled AG OS evidence.</p>
           </div>
-          <div class="mode-lock" aria-label="Dashboard mode">Read-only</div>
+          <div id="runtime-mode" class="mode-lock" aria-label="Dashboard mode">Offline evidence</div>
         </header>
+
+        <section id="command-center" class="section-band">
+          <div class="section-heading">
+            <div>
+              <h2>Owner Command Center</h2>
+              <p>Give AG OS one outcome. The coordinator will classify, route, plan, cost, gate, and audit it.</p>
+            </div>
+          </div>
+          <form id="owner-command-form" class="command-console">
+            <div class="command-connect-row">
+              <label>
+                Coordinator URL
+                <input id="coordinator-url" type="url" placeholder="Same origin or https://your-private-coordinator" autocomplete="url">
+              </label>
+              <label>
+                Owner token
+                <input id="owner-token" type="password" placeholder="Stored for this browser session only" autocomplete="current-password">
+              </label>
+              <button id="connect-runtime" type="button" class="button-secondary">Connect</button>
+            </div>
+            <label>
+              What do you want AG OS to accomplish?
+              <textarea id="owner-command" rows="5" maxlength="10000" required placeholder="Example: Build and operate a professional lead follow-up system for AG Digitalz. Keep all sends waiting for my approval."></textarea>
+            </label>
+            <div class="command-actions">
+              <p id="runtime-status" role="status">Not connected. Existing evidence remains available below.</p>
+              <button type="submit">Create work package</button>
+            </div>
+          </form>
+          <div id="recent-command-panel" class="stack-panel"></div>
+        </section>
 
         <section id="overview" class="section-band">
           <div class="section-heading">
@@ -172,6 +205,14 @@
             <p>Cost ledgers and budget posture from source-controlled records.</p>
           </div>
           <div id="costs-panel" class="stack-panel"></div>
+        </section>
+
+        <section id="metrics" class="section-band">
+          <div class="section-heading">
+            <h2>Operational Metrics</h2>
+            <p>Cost variance, quality trend, rework signals, and lesson reuse computed from source-controlled evidence.</p>
+          </div>
+          <div id="metrics-panel" class="status-grid"></div>
         </section>
 
         <section id="skills" class="section-band">

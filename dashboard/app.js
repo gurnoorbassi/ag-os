@@ -580,6 +580,15 @@ function renderProductionSocialPosting() {
         `skillsCanGrantPermission: ${boolText(posting.permissionModel.skillsCanGrantPermission, "true", "false")}`,
         `candidateLessonsCanGrantPermission: ${boolText(posting.permissionModel.candidateLessonsCanGrantPermission, "true", "false")}`
       ]
+    }),
+    card({
+      title: "Production Safeguards",
+      status: posting.productionReadiness.activationAllowed ? "ready" : "blocked",
+      metric: `${posting.productionReadiness.passedCheckCount}/${posting.productionReadiness.requiredCheckCount}`,
+      detail: posting.productionReadiness.activationAllowed
+        ? "Every safeguard has evidence; exact action approval is still evaluated separately."
+        : "Production activation fails closed until every required safeguard carries evidence.",
+      meta: posting.productionReadiness.blockers
     })
   );
 
@@ -633,6 +642,23 @@ function renderApprovals() {
       metric: data.approvals.blockedCount,
       detail: "Blocked approval records require owner attention.",
       meta: data.approvals.blockedApprovals.map((approval) => `${approval.approvalId}: ${approval.status}`)
+    }),
+    card({
+      title: "Standing Approvals",
+      status: data.approvals.standingCount > 0 ? "active" : "zero",
+      metric: data.approvals.standingCount,
+      detail: "Reusable locks remain exact-scope, expiring, usage-limited, audited, and immediately revocable.",
+      meta: data.approvals.standingApprovals.map((approval) => `${approval.approvalId}: ${approval.remainingUses}/${approval.maxUses} uses remain; expires ${approval.expiresAt}`)
+    }),
+    card({
+      title: "Batched Approval Review",
+      status: "read_only",
+      metric: `${data.dashboardActionQueue.approvalBatch.ownerDecisions.length} decisions`,
+      detail: `${data.dashboardActionQueue.approvalBatch.approvalPackages.length} approval package(s) ready. This surface cannot approve or execute actions.`,
+      meta: [
+        ...data.dashboardActionQueue.approvalBatch.ownerDecisions.slice(0, 4).map((item) => `${item.decision}: ${item.status}`),
+        ...data.dashboardActionQueue.approvalBatch.approvalPackages.slice(0, 4).map((item) => `${item.approvalId}: ${item.requestedAction}`)
+      ]
     })
   );
 }
@@ -814,6 +840,44 @@ function renderSkills() {
   );
 }
 
+function renderMetrics() {
+  const root = clear("#metrics-panel");
+  const metrics = data.metrics;
+  root.append(
+    card({
+      title: "Cost Variance",
+      status: metrics.cost.varianceUsd <= 0 ? "ready" : "review",
+      metric: `$${metrics.cost.varianceUsd.toFixed(2)}`,
+      detail: `$${metrics.cost.actualUsd.toFixed(2)} actual vs $${metrics.cost.estimatedUsd.toFixed(2)} estimated across ${metrics.cost.ledgerCount} ledgers.`,
+      meta: [`Variance: ${metrics.cost.variancePercent}%`]
+    }),
+    card({
+      title: "Quality Trend",
+      status: metrics.quality.trendDelta >= 0 ? "ready" : "review",
+      metric: metrics.quality.averageScore.toFixed(1),
+      detail: `${metrics.quality.passCount}/${metrics.quality.scoreCount} scores meet the bar.`,
+      meta: [`Recent average: ${metrics.quality.recentAverage}`, `Trend delta: ${metrics.quality.trendDelta}`]
+    }),
+    card({
+      title: "Rework Signals",
+      status: metrics.rework.requiredFixCount === 0 ? "ready" : "review",
+      metric: `${metrics.rework.reworkSignalRatePercent}%`,
+      detail: `${metrics.rework.critiquesRequiringFixes}/${metrics.rework.critiqueCount} critiques required fixes.`,
+      meta: [`Required fixes: ${metrics.rework.requiredFixCount}`, `Failed jobs: ${metrics.rework.failedJobCount}`]
+    }),
+    card({
+      title: "Lesson Reuse",
+      status: metrics.lessonReuse.acceptedLessonCount > 0 ? "active" : "zero",
+      metric: `${metrics.lessonReuse.lessonReuseRatePercent}%`,
+      detail: `${metrics.lessonReuse.plansUsingAcceptedLessons}/${metrics.lessonReuse.eligiblePlanCount} eligible plans use accepted lessons.`,
+      meta: [
+        `Quality-example reuse: ${metrics.lessonReuse.exampleReuseRatePercent}%`,
+        `Skill applications recorded: ${metrics.lessonReuse.skillApplicationsRecorded}`
+      ]
+    })
+  );
+}
+
 function renderSafeMerge() {
   const root = clear("#safe-merge-panel");
   const heading = document.createElement("h3");
@@ -828,6 +892,103 @@ function renderSafeMerge() {
     checks.append(li);
   });
   root.append(heading, summary, checks);
+}
+
+function coordinatorBaseUrl() {
+  const configured = document.querySelector("#coordinator-url").value.trim();
+  return configured ? configured.replace(/\/$/, "") : window.location.origin;
+}
+
+function runtimeHeaders() {
+  const token = document.querySelector("#owner-token").value;
+  return {
+    authorization: `Bearer ${token}`,
+    "content-type": "application/json"
+  };
+}
+
+function setRuntimeStatus(message, connected = false) {
+  document.querySelector("#runtime-status").textContent = message;
+  const mode = document.querySelector("#runtime-mode");
+  mode.textContent = connected ? "Owner connected" : "Offline evidence";
+  mode.className = `mode-lock ${connected ? "status-active" : ""}`;
+}
+
+function renderRecentCommands(commands = []) {
+  const root = clear("#recent-command-panel");
+  if (commands.length === 0) {
+    const empty = document.createElement("p");
+    empty.textContent = "No live-console commands recorded yet.";
+    root.append(empty);
+    return;
+  }
+  root.append(table(
+    ["Command", "Risk", "State", "Created"],
+    commands.map((command) => [
+      command.rawCommand,
+      pill(command.riskLevel),
+      command.requiresApproval ? "Waiting approval" : "Planned",
+      new Date(command.createdAt).toLocaleString()
+    ])
+  ));
+}
+
+async function connectRuntime() {
+  const token = document.querySelector("#owner-token").value;
+  if (!token) {
+    setRuntimeStatus("Enter the owner token to connect.");
+    return;
+  }
+  sessionStorage.setItem("ag-os-owner-token", token);
+  sessionStorage.setItem("ag-os-coordinator-url", document.querySelector("#coordinator-url").value.trim());
+  setRuntimeStatus("Connecting...");
+  try {
+    const response = await fetch(`${coordinatorBaseUrl()}/api/v1/status`, { headers: runtimeHeaders() });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.detail || result.error || "Connection failed");
+    }
+    setRuntimeStatus(`Connected. Production mode is ${result.production.status}; gated actions remain approval-controlled.`, true);
+    renderRecentCommands(result.recentCommands);
+  } catch (error) {
+    setRuntimeStatus(`Connection failed: ${error.message}`);
+  }
+}
+
+async function submitOwnerCommand(event) {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector("button[type='submit']");
+  button.disabled = true;
+  setRuntimeStatus("Creating the gated work package...", true);
+  try {
+    const response = await fetch(`${coordinatorBaseUrl()}/api/v1/commands`, {
+      method: "POST",
+      headers: runtimeHeaders(),
+      body: JSON.stringify({ command: document.querySelector("#owner-command").value })
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.detail || result.error || "Command failed");
+    }
+    document.querySelector("#owner-command").value = "";
+    setRuntimeStatus(`Created ${result.planId}. Status: ${result.status}. No live side effect was executed.`, true);
+    await connectRuntime();
+  } catch (error) {
+    setRuntimeStatus(`Command rejected: ${error.message}`);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function initializeCommandCenter() {
+  document.querySelector("#owner-token").value = sessionStorage.getItem("ag-os-owner-token") || "";
+  document.querySelector("#coordinator-url").value = sessionStorage.getItem("ag-os-coordinator-url") || "";
+  document.querySelector("#connect-runtime").addEventListener("click", connectRuntime);
+  document.querySelector("#owner-command-form").addEventListener("submit", submitOwnerCommand);
+  renderRecentCommands();
+  if (document.querySelector("#owner-token").value) {
+    connectRuntime();
+  }
 }
 
 renderOverview();
@@ -845,5 +1006,7 @@ renderConnectors();
 renderQualityReview();
 renderUnifiedMemory();
 renderCosts();
+renderMetrics();
 renderSkills();
 renderSafeMerge();
+initializeCommandCenter();

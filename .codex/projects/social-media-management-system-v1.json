@@ -1,30 +1,31 @@
 {
   "id": "project-social-media-management-system-v1",
   "name": "Social Media Management System v1",
-  "status": "planned",
+  "status": "active",
   "owner": "owner-gurnoor-bassi",
   "projectType": "product_project",
   "managementMode": "managed_staging",
   "goal": "Prepare the first reusable AG OS client-system package for social media content operations in draft and staging mode only.",
   "knownFacts": [
-    "This project is a planned product project package, not AG OS core.",
-    "The package is draft and staging only until separate owner approval authorizes a repository, build, deployment, connector use, or live action.",
-    "The proposed future repository name is ag-social-media-management-system.",
+    "This is an active product project in managed staging, not AG OS core.",
+    "The owner accepted the complete H2 staged product and operating package on 2026-07-09.",
+    "Build, target-repository merge, dedicated Netlify staging, content review, draft-content approval, and manual posting pack evidence are source controlled.",
+    "The accepted H2 package remains draft and staging only; acceptance does not authorize OAuth, account connection, posting, scheduling, analytics, messages/comments, n8n activation, paid tools, production deployment, credentials, domain/DNS, or production/customer data.",
     "The system must support multiple clients, multiple brands per client, and multiple platform accounts per client without hardcoded client records.",
     "Every platform account starts not connected, draft only, approval required, and live posting blocked.",
     "No social account connection, credential, live posting, scheduling, direct message, comment, analytics API, external platform API call, production data, or customer data is authorized by this record."
   ],
   "scope": [
-    "Record production-clean AG OS project metadata for Social Media Management System v1.",
-    "Prepare approval and build package documentation for a future draft/staging build.",
+    "Maintain production-clean AG OS project metadata for Social Media Management System v1.",
+    "Operate the accepted product in managed-staging and draft-only mode.",
     "Define client, brand, platform account, content, post package, approval, report, and activity-log models.",
     "Define safety gates for draft-only operation and blocked live actions.",
-    "Document future connector paths for GitHub, Netlify, n8n, social OAuth, analytics, scheduling, and client portal integration without activating them."
+    "Document and validate future connector paths for GitHub, Netlify, n8n, social OAuth, analytics, scheduling, and client portal integration without activating them.",
+    "Preserve H2 acceptance, quality, staging, lesson-candidate, and runbook evidence as the baseline for future work."
   ],
   "outOfScope": [
-    "Do not create a GitHub repository.",
-    "Do not create branches, files, or pull requests in a target product repository.",
-    "Do not deploy to Netlify or any other host.",
+    "Do not create or mutate a repository, branch, file set, or pull request outside a separately approved scope.",
+    "Do not perform another staging deploy or any production deploy without separate owner approval.",
     "Do not connect social accounts.",
     "Do not use or store credentials.",
     "Do not post, schedule, send messages, manage comments, or perform live outreach.",
@@ -83,11 +84,12 @@
     "Every account defaults to not connected, draft only, approval required, and live posting blocked.",
     "No live connector, credential, paid tool, production data, or customer data is introduced.",
     "Future build plan preserves the social media content operations archetype quality checklist.",
-    "Validation, boot check, tests, and git diff check pass before package PR merge."
+    "Validation, boot check, tests, and git diff check pass before package PR merge.",
+    "Full H2 owner acceptance is recorded without granting live-operation permission."
   ],
   "securityReview": "Production-clean metadata and docs only. No social credentials, account tokens, platform secrets, client private data, production data, live endpoints, or external API payloads are recorded.",
   "costTracking": "No paid actions authorized. Future build, connector, AI, media, storage, scheduling, analytics, or platform costs require Cost OS review and owner approval.",
-  "deploymentPlan": "No deployment in this PR. Future Netlify staging deployment requires a separate approval package, active approval lock, validation, boot check, target repo review, and recorded connector result.",
+  "deploymentPlan": "Dedicated Netlify staging proof exists for the accepted H2 product. Every future staging redeploy or production deployment requires a separate approval package, active approval lock, validation, boot check, target repo review, rollback evidence, and recorded connector result.",
   "createdAt": "2026-07-04T12:40:00Z",
-  "updatedAt": "2026-07-04T12:40:00Z"
+  "updatedAt": "2026-07-09T20:06:25.029Z"
 }

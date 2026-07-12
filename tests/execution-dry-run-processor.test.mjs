@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -14,6 +14,14 @@ import {
 } from "../scripts/lib/runtime/execution-dry-run-processor.mjs";
 
 const fixedNow = new Date("2026-07-03T12:00:00.000Z");
+const completionEvidence = {
+  policyVersion: 1,
+  qualityScorePath: ".codex/quality-scores/quality-score-runtime-construction-website-dry-run.json",
+  lessonCandidatePaths: [
+    ".codex/memory/lessons/candidates/lesson-runtime-construction-website-dry-run-01.json"
+  ],
+  generatedBy: "scripts/lib/runtime/job-completion-processor.mjs"
+};
 
 function buildChain() {
   const commandIntake = buildCommandIntakeRecord({
@@ -52,10 +60,19 @@ test("builds a completed local validation execution step", () => {
   assert.equal(JSON.stringify(record).includes("REQUIRED_"), false);
 });
 
-test("marks dry-run jobs done, failed, or waiting_approval based on local state", () => {
+test("marks dry-run jobs done only with completion evidence, or failed/waiting approval", () => {
   const { job } = buildChain();
 
-  assert.equal(buildDryRunJobUpdate({ job, validationPassed: true, now: fixedNow }).status, "done");
+  assert.throws(
+    () => buildDryRunJobUpdate({ job, validationPassed: true, now: fixedNow }),
+    /completed jobs require quality score and lesson candidate evidence/
+  );
+  assert.equal(buildDryRunJobUpdate({
+    job,
+    validationPassed: true,
+    completionEvidence,
+    now: fixedNow
+  }).status, "done");
   assert.equal(buildDryRunJobUpdate({ job, validationPassed: false, now: fixedNow }).status, "failed");
   assert.equal(buildDryRunJobUpdate({
     job: {
@@ -72,9 +89,22 @@ test("writes execution step and updated job records to a local workspace only", 
   const { job, plan } = buildChain();
 
   try {
+    const planRecordPath = `.codex/plans/${plan.planId}.json`;
+    const planAbsolutePath = path.join(root, planRecordPath);
+    const archetypeAbsolutePath = path.join(root, ".codex/archetypes/website.json");
+    mkdirSync(path.dirname(planAbsolutePath), { recursive: true });
+    mkdirSync(path.dirname(archetypeAbsolutePath), { recursive: true });
+    writeFileSync(planAbsolutePath, `${JSON.stringify(plan, null, 2)}\n`, "utf8");
+    writeFileSync(
+      archetypeAbsolutePath,
+      readFileSync(path.join(process.cwd(), ".codex/archetypes/website.json"), "utf8"),
+      "utf8"
+    );
+
     const result = writeExecutionDryRunRecords({
       job,
       plan,
+      planRecordPath,
       validationResult: { passed: true, status: 0, stdout: "", stderr: "" },
       now: fixedNow,
       root
@@ -87,6 +117,20 @@ test("writes execution step and updated job records to a local workspace only", 
     assert.equal(executionStep.status, "done");
     assert.equal(updatedJob.status, "done");
     assert.equal(executionStep.safety.liveServiceUseAllowed, false);
+    assert.equal(updatedJob.completionEvidence.policyVersion, 1);
+    assert.equal(result.completion.qualityScore.status, "candidate");
+    assert.equal(result.completion.qualityScore.scoreType, "plan_quality_score");
+    assert.ok(result.completion.lessonCandidatePaths.length >= 1);
+    assert.equal(
+      result.completion.qualityScore.lessonCandidates.length,
+      result.completion.lessonCandidatePaths.length
+    );
+    for (const evidencePath of [
+      result.completion.qualityScorePath,
+      ...result.completion.lessonCandidatePaths
+    ]) {
+      assert.equal(Boolean(readFileSync(path.join(root, evidencePath), "utf8")), true);
+    }
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

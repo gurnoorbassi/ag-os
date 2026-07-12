@@ -35,7 +35,9 @@
     "acceptedLessonsLoadedByRuntime": true,
     "candidateLessonsLoadedAsTruth": false,
     "rejectedLessonsLoadedAsTruth": false,
-    "loaderScript": "scripts/load-accepted-lessons.mjs"
+    "loaderScript": "scripts/load-accepted-lessons.mjs",
+    "retrievalStrategy": "project_archetype_output_similarity_v1",
+    "qualityExamplesGrantPermission": false
   },
   "dashboard": {
     "lessonDecisionQueueVisible": true,
@@ -44,5 +46,5 @@
   },
   "notes": "Unified Memory + Learning OS v1 registry. This is governance metadata only; it does not promote candidates, create accepted lessons, or grant live-action permission.",
   "createdAt": "2026-07-06T00:00:00Z",
-  "updatedAt": "2026-07-06T00:00:00Z"
+  "updatedAt": "2026-07-09T20:06:25.029Z"
 }

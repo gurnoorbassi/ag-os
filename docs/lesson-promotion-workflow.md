@@ -15,6 +15,18 @@ AG OS should learn from repeated work without letting unreviewed observations be
 
 The local promotion helper is `scripts/process-lesson-promotion.mjs`. It supports promotion, rejection, and conflict checks, but it does not remove the requirement for owner approval and reviewed source-control changes.
 
+## Accepted Lesson To Archetype Path
+
+After promotion, an accepted lesson may create a draft archetype update proposal:
+
+```powershell
+npm.cmd run archetypes:propose -- --lesson .codex/memory/accepted/<lesson-id>.json --archetype <archetype-id> --section <target-section>
+```
+
+The proposal is written under `.codex/memory/archetype-updates/`. It cites the accepted lesson and active archetype, but it never mutates the archetype automatically. Applying the proposal requires a separate reviewed PR that edits the named archetype, validates the full repo, and records the PR on the proposal before it can become `applied`.
+
+Candidate, rejected, mismatched, or gate-weakening lessons are refused before a proposal is written.
+
 ## Evidence Requirements
 
 A lesson candidate should include:

@@ -43,10 +43,13 @@ Current registered projects:
 | --- | --- | --- | --- | --- |
 | `project-lead-generation-system` | Lead Generation System | `complete` | `observe_only` | `.codex/projects/lead-generation-system.json` |
 | `project-ag-digitalz-ai-receptionist` | AG Digitalz AI Receptionist | `active` | `active_build` | `.codex/projects/ag-digitalz-ai-receptionist.json` |
+| `project-social-media-management-system-v1` | Social Media Management System v1 | `active` | `managed_staging` | `.codex/projects/social-media-management-system-v1.json` |
 
 The Lead Generation System record is observe-only. AG OS must not touch source code, VPS, Postgres, n8n workflows, domain or DNS, deployments, credentials, production data, or customer data.
 
 The AG Digitalz AI Receptionist record marks it as a separate product project, not AG OS core. AG OS must not infer live service status beyond known repository records.
+
+The Social Media Management System v1 record reflects owner acceptance of the H2 staged product and operating package. It remains draft/staging only: acceptance does not authorize OAuth, posting, scheduling, analytics, DMs/comments, n8n activation, credentials, paid tools, production deployment, domain/DNS, or production/customer data.
 
 ## Adding A Future Project
 

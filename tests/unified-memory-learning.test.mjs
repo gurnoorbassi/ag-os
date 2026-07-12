@@ -11,7 +11,8 @@ import {
 } from "../scripts/process-lesson-promotion.mjs";
 import {
   buildAcceptedLessonRuntimeBriefing,
-  loadAcceptedLessons
+  loadAcceptedLessons,
+  retrieveRelevantMemory
 } from "../scripts/load-accepted-lessons.mjs";
 
 function withTempDir(assertion) {
@@ -199,4 +200,88 @@ test("accepted lesson runtime briefing is safe for planner critic builder and ne
   assert.equal(briefing.lessons[0].runtimeUse.allowedForPlanning, true);
   assert.equal(briefing.lessons[0].runtimeUse.allowedForCritic, true);
   assert.equal(briefing.lessons[0].runtimeUse.allowedForBuilder, true);
+}));
+
+test("relevance retrieval selects accepted lessons and high-quality examples from similar projects", () => withTempDir((root) => {
+  writeJson(root, ".codex/memory/accepted/lesson-social-staging.json", baseLesson({
+    lessonId: "lesson-social-staging",
+    status: "accepted",
+    scope: "project",
+    projectId: "project-social-media-management-system-v1",
+    appliesTo: ["archetype-social-media-content-operations-system", "social_media_system", "planner"],
+    promotion: {
+      approvalId: "approval-20260709-promote-social-staging",
+      approvedBy: "owner-gurnoor-bassi",
+      approvedAt: "2026-07-09T19:00:00Z",
+      evidence: [".codex/audit/audit-social-staging-promotion.json"],
+      sourceCandidatePath: ".codex/memory/lessons/candidates/lesson-social-staging.json"
+    }
+  }));
+  writeJson(root, ".codex/memory/accepted/lesson-unrelated-crm.json", baseLesson({
+    lessonId: "lesson-unrelated-crm",
+    status: "accepted",
+    scope: "project",
+    projectId: "project-crm",
+    appliesTo: ["archetype-crm"],
+    promotion: {
+      approvalId: "approval-20260709-promote-crm",
+      approvedBy: "owner-gurnoor-bassi",
+      approvedAt: "2026-07-09T19:00:00Z",
+      evidence: [".codex/audit/audit-crm-promotion.json"],
+      sourceCandidatePath: ".codex/memory/lessons/candidates/lesson-unrelated-crm.json"
+    }
+  }));
+  writeJson(root, ".codex/memory/lessons/candidates/lesson-social-candidate.json", baseLesson({
+    lessonId: "lesson-social-candidate",
+    appliesTo: ["archetype-social-media-content-operations-system"]
+  }));
+  writeJson(root, ".codex/quality-scores/quality-score-social-example.json", {
+    scoreId: "quality-score-social-example",
+    status: "candidate",
+    projectId: "project-social-media-management-system-v1",
+    archetypeId: "archetype-social-media-content-operations-system",
+    outputType: "social_media_system",
+    sourcePlanPath: ".codex/plans/plan-social-example.json",
+    overallScore: 9.2,
+    meetsBar: true,
+    reviewStatus: "pass",
+    updatedAt: "2026-07-09T18:00:00Z"
+  });
+  writeJson(root, ".codex/quality-scores/quality-score-crm-example.json", {
+    scoreId: "quality-score-crm-example",
+    status: "candidate",
+    projectId: "project-crm",
+    archetypeId: "archetype-crm",
+    outputType: "crm",
+    sourcePlanPath: ".codex/plans/plan-crm-example.json",
+    overallScore: 9.5,
+    meetsBar: true,
+    reviewStatus: "pass",
+    updatedAt: "2026-07-09T18:00:00Z"
+  });
+
+  const result = retrieveRelevantMemory({
+    root,
+    projectId: "project-social-media-management-system-v1",
+    archetypeId: "archetype-social-media-content-operations-system",
+    outputType: "social_media_system",
+    workerType: "planner"
+  });
+
+  assert.deepEqual(result.lessons.map((lesson) => lesson.lessonId), ["lesson-social-staging"]);
+  assert.deepEqual(result.examples.map((example) => example.scoreId), ["quality-score-social-example"]);
+  assert.equal(result.candidatesLoadedAsTruth, false);
+  assert.equal(result.examplesGrantPermission, false);
+  assert.equal(result.memoryGrantsPermission, false);
+
+  const briefing = buildAcceptedLessonRuntimeBriefing({
+    root,
+    workerType: "planner",
+    projectId: "project-social-media-management-system-v1",
+    archetypeId: "archetype-social-media-content-operations-system",
+    outputType: "social_media_system"
+  });
+  assert.equal(briefing.retrievalStrategy, "project_archetype_output_similarity_v1");
+  assert.deepEqual(briefing.lessons.map((lesson) => lesson.lessonId), ["lesson-social-staging"]);
+  assert.deepEqual(briefing.relevantExamples.map((example) => example.scoreId), ["quality-score-social-example"]);
 }));

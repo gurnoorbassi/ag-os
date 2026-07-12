@@ -2,6 +2,7 @@ import process from "node:process";
 import path from "node:path";
 import { existsSync, readdirSync } from "node:fs";
 import { DEFAULT_OWNER_ID, isoTimestamp, normalizeRunId, readJson, writeJson } from "./common.mjs";
+import { retrieveRelevantMemory } from "../../load-accepted-lessons.mjs";
 
 const PER_TASK_COST_LIMIT_USD = 5;
 
@@ -394,6 +395,31 @@ export function buildPlanRecord({ route, job, commandIntake, planDraft, runId, n
   const commandId = job?.commandId || commandIntake?.commandIntakeId || "command-intake-unavailable";
   const jobId = job?.jobId || route.jobId;
   const projectId = route.projectId || job?.projectId || commandIntake?.projectId || "project-unregistered";
+  const relevantMemory = basis
+    ? retrieveRelevantMemory({
+        root,
+        projectId,
+        archetypeId: basis.productArchetype,
+        workerType: "planner"
+      })
+    : null;
+  const basisWithMemory = basis
+    ? {
+        ...basis,
+        appliedLessons: uniqueStrings([
+          ...(basis.appliedLessons || []),
+          ...relevantMemory.lessons.map((lesson) => lesson.lessonId)
+        ]),
+        relevantMemory: {
+          strategy: relevantMemory.strategy,
+          acceptedLessonPaths: relevantMemory.lessons.map((lesson) => lesson.recordPath),
+          exampleScorePaths: relevantMemory.examples.map((example) => example.recordPath),
+          candidatesLoadedAsTruth: false,
+          memoryGrantsPermission: false,
+          examplesGrantPermission: false
+        }
+      }
+    : basis;
 
   return {
     planId: commandIntake?.nextRecord?.planId || `plan-${normalizedRunId}`,
@@ -405,7 +431,7 @@ export function buildPlanRecord({ route, job, commandIntake, planDraft, runId, n
     estimatedCostUsd: draft.estimatedCostUsd ?? 0,
     tools: draft.tools,
     tasks: mergeTasks(archetypeTasks, draft.tasks),
-    ...(basis ? { basis } : {}),
+    ...(basisWithMemory ? { basis: basisWithMemory } : {}),
     approvalGates: mergeApprovalGates([
       ...(draft.approvalGates || []),
       ...archetypeApprovalGates
