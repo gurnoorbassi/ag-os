@@ -102,7 +102,50 @@ function clearJsonRecords(root, relativeDir, prefix) {
 }
 
 function clearQualityScoreRecords(root) {
+  const qualityScoreDirectory = path.join(root, ".codex/quality-scores");
+  const removedQualityScorePaths = new Set(
+    existsSync(qualityScoreDirectory)
+      ? readdirSync(qualityScoreDirectory)
+        .filter((name) => name.startsWith("quality-score-") && name.endsWith(".json"))
+        .map((name) => `.codex/quality-scores/${name}`)
+      : []
+  );
   clearJsonRecords(root, ".codex/quality-scores", "quality-score-");
+
+  const jobsDirectory = path.join(root, ".codex/jobs");
+  if (existsSync(jobsDirectory)) {
+    for (const name of readdirSync(jobsDirectory)) {
+      if (!name.endsWith(".json")) {
+        continue;
+      }
+
+      const recordPath = path.join(jobsDirectory, name);
+      const job = JSON.parse(readFileSync(recordPath, "utf8"));
+      if (
+        job.status === "done"
+        && removedQualityScorePaths.has(job.completionEvidence?.qualityScorePath)
+      ) {
+        rmSync(recordPath, { force: true });
+      }
+    }
+  }
+
+  const acceptedLessonsDirectory = path.join(root, ".codex/memory/accepted");
+  if (!existsSync(acceptedLessonsDirectory)) {
+    return;
+  }
+
+  for (const name of readdirSync(acceptedLessonsDirectory)) {
+    if (!name.endsWith(".json")) {
+      continue;
+    }
+
+    const recordPath = path.join(acceptedLessonsDirectory, name);
+    const lesson = JSON.parse(readFileSync(recordPath, "utf8"));
+    if ((lesson.sources ?? []).some((source) => removedQualityScorePaths.has(source))) {
+      rmSync(recordPath, { force: true });
+    }
+  }
 }
 
 function clearCritiqueRecords(root) {
