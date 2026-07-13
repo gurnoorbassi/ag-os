@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { cpSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -87,4 +88,16 @@ test("authenticated command service uses an approved AI plan and audits cost wit
   const usageAudit = JSON.parse(readFileSync(path.join(workspace, usageAuditPath), "utf8"));
   assert.equal(usageAudit.eventType, "standing_approval_used");
   assert.equal(usageAudit.liveServiceTouched, true);
+
+  const ownerCommandAuditPath = result.recordsCreated.find((item) => item.includes(result.auditId));
+  const ownerCommandAudit = JSON.parse(readFileSync(path.join(workspace, ownerCommandAuditPath), "utf8"));
+  assert.equal(ownerCommandAudit.eventType, "owner_command_received");
+  assert.equal(ownerCommandAudit.source, "ag_os_coordinator");
+
+  const validation = spawnSync(process.execPath, ["scripts/validate-foundation.mjs"], {
+    cwd: workspace,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"]
+  });
+  assert.equal(validation.status, 0, validation.stderr || validation.stdout);
 });
