@@ -691,6 +691,7 @@ td strong {
 }
 
 .command-console input,
+.command-console select,
 .command-console textarea {
   width: 100%;
   border: 1px solid var(--border);
@@ -740,6 +741,7 @@ td strong {
 }
 
 .command-console input:focus,
+.command-console select:focus,
 .command-console textarea:focus {
   border-color: var(--blue);
   outline: 3px solid rgba(111, 145, 255, 0.12);

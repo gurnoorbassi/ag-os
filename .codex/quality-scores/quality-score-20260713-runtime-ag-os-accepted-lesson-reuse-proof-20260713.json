@@ -1,0 +1,55 @@
+{
+  "$schema": "../../schemas/quality-score.schema.json",
+  "scoreId": "quality-score-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713",
+  "status": "candidate",
+  "scoreType": "plan_quality_score",
+  "projectId": "project-ag-os-coordinator-runtime",
+  "planId": "plan-runtime-ag-os-accepted-lesson-reuse-proof-20260713",
+  "sourcePlanPath": ".codex/plans/plan-runtime-ag-os-accepted-lesson-reuse-proof-20260713.json",
+  "outputType": "dashboard",
+  "archetypeId": "archetype-dashboard",
+  "archetypeFile": ".codex/archetypes/dashboard-internal-tool.json",
+  "checklistItemsEvaluated": [
+    "Source, status, timestamp, and uncertainty are visible for each important data area.",
+    "No live connector, database, production data, customer data, or deployment connection exists without approval.",
+    "Navigation, filtering, responsive layout, and empty states are clear.",
+    "Risk, approval, validation, boot, cost, and incident surfaces are not hidden.",
+    "Every data surface has source, timestamp, and limitation context.",
+    "Dashboard remains read-only unless a separate approved command model exists.",
+    "Responsive layout is dense, scannable, accessible, and free of overlapping text.",
+    "Blocked actions, approvals, incidents, costs, and validation state are visible."
+  ],
+  "dimensions": {
+    "completeness": 10,
+    "craft": 9,
+    "maintainability": 9,
+    "ux": 9,
+    "security": 10,
+    "performance": 7,
+    "ownerAcceptance": 8,
+    "archetypeFit": 10,
+    "costDiscipline": 10
+  },
+  "overallScore": 9.1,
+  "meetsBar": true,
+  "reviewStatus": "pass",
+  "improvementRecommendations": [
+    "Improve performance evidence before promotion beyond plan-only work."
+  ],
+  "lessonCandidates": [
+    "lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-01",
+    "lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-02",
+    "lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-03"
+  ],
+  "evidence": [
+    ".codex/plans/plan-runtime-ag-os-accepted-lesson-reuse-proof-20260713.json",
+    ".codex/commands/command-intake-runtime-ag-os-accepted-lesson-reuse-proof-20260713.json"
+  ],
+  "generatedBy": "scripts/process-quality-score.mjs",
+  "limitations": [
+    "No product output was provided; this is a plan quality only score and does not represent owner acceptance or product quality."
+  ],
+  "notes": "Candidate score only. It does not authorize execution, deployment, live connector use, or accepted lessons.",
+  "createdAt": "2026-07-13T09:35:12.629Z",
+  "updatedAt": "2026-07-13T09:35:12.629Z"
+}

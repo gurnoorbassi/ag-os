@@ -3,6 +3,7 @@ import path from "node:path";
 import { existsSync, readdirSync } from "node:fs";
 import { DEFAULT_OWNER_ID, isoTimestamp, normalizeRunId, readJson, writeJson } from "./common.mjs";
 import { retrieveRelevantMemory } from "../../load-accepted-lessons.mjs";
+import { retrieveRelevantSkills } from "./skill-retrieval.mjs";
 
 const PER_TASK_COST_LIMIT_USD = 5;
 
@@ -403,6 +404,18 @@ export function buildPlanRecord({ route, job, commandIntake, planDraft, runId, n
         workerType: "planner"
       })
     : null;
+  const mergedPlanTasks = mergeTasks(archetypeTasks, draft.tasks);
+  const relevantSkills = basis
+    ? retrieveRelevantSkills({
+        root,
+        projectId,
+        archetypeId: basis.productArchetype,
+        outputType: draft.expectedOutput,
+        workerType: "planner",
+        tools: draft.tools,
+        tasks: mergedPlanTasks
+      })
+    : null;
   const basisWithMemory = basis
     ? {
         ...basis,
@@ -417,6 +430,15 @@ export function buildPlanRecord({ route, job, commandIntake, planDraft, runId, n
           candidatesLoadedAsTruth: false,
           memoryGrantsPermission: false,
           examplesGrantPermission: false
+        },
+        appliedSkills: uniqueStrings([
+          ...(basis.appliedSkills || []),
+          ...relevantSkills.skills.map((skill) => skill.skillId)
+        ]),
+        relevantSkills: {
+          strategy: relevantSkills.strategy,
+          skillPaths: relevantSkills.skills.map((skill) => skill.recordPath),
+          skillsGrantPermission: false
         }
       }
     : basis;
@@ -430,7 +452,7 @@ export function buildPlanRecord({ route, job, commandIntake, planDraft, runId, n
     riskLevel: route.riskLevel || job?.riskLevel || "R1",
     estimatedCostUsd: draft.estimatedCostUsd ?? 0,
     tools: draft.tools,
-    tasks: mergeTasks(archetypeTasks, draft.tasks),
+    tasks: mergedPlanTasks,
     ...(basisWithMemory ? { basis: basisWithMemory } : {}),
     approvalGates: mergeApprovalGates([
       ...(draft.approvalGates || []),

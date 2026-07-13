@@ -161,6 +161,18 @@ test("keeps unknown product types as explicit archetype gaps", () => {
   assert.equal(record.projectId, "project-unregistered-vendor-scheduling-hub");
 });
 
+test("uses an explicit registered-project target without changing product classification", () => {
+  const record = buildCommandIntakeRecord({
+    command: "Improve the internal dashboard navigation",
+    projectId: "project-ag-os-coordinator-runtime",
+    runId: "coordinator-dashboard-target",
+    now: fixedNow
+  });
+
+  assert.equal(record.projectId, "project-ag-os-coordinator-runtime");
+  assert.equal(record.productContext.archetypeId, "archetype-dashboard");
+});
+
 test("writes command intake records to a local workspace only", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "ag-os-command-intake-"));
 

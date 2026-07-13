@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260713-runtime-ag-os-compounding-completion-20260713-03",
+  "title": "Reuse archetype-backed scoring for dashboard",
+  "lesson": "Plans that cite an active archetype and carry its checklist, gates, pitfalls, and stop conditions can be scored without using live services. Keep the score as candidate evidence until owner promotion.",
+  "sources": [
+    ".codex/quality-scores/quality-score-20260713-runtime-ag-os-compounding-completion-20260713.json",
+    ".codex/plans/plan-runtime-ag-os-compounding-completion-20260713.json",
+    ".codex/execution/exec-runtime-ag-os-compounding-completion-20260713-run-validation.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "high",
+  "status": "candidate",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-ag-os-coordinator-runtime",
+  "appliesTo": [
+    "archetype-dashboard",
+    "plan_quality_score",
+    "quality-score-lesson-loop"
+  ],
+  "sourceScoreId": "quality-score-20260713-runtime-ag-os-compounding-completion-20260713",
+  "generatedBy": "scripts/process-lesson-candidates.mjs",
+  "whyThisMatters": "This creates compounding planning intelligence while preserving owner authority and offline safety.",
+  "whenToUse": "Use for future plan-only dry runs that cite an active product archetype and remain within Cost OS limits.",
+  "whenNotToUse": "Do not use for product output scoring unless actual output evidence is provided.",
+  "notes": "Candidate only. Not accepted truth until owner-reviewed and promoted through the memory learning policy.",
+  "createdAt": "2026-07-13T09:23:19.817Z",
+  "updatedAt": "2026-07-13T09:23:19.817Z"
+}

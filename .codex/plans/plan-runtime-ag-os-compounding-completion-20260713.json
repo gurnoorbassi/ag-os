@@ -1,0 +1,244 @@
+{
+  "planId": "plan-runtime-ag-os-compounding-completion-20260713",
+  "jobId": "job-runtime-ag-os-compounding-completion-20260713",
+  "commandId": "command-intake-runtime-ag-os-compounding-completion-20260713",
+  "projectId": "project-ag-os-coordinator-runtime",
+  "summary": "Complete AG OS plan-level skill retrieval, registered-project command targeting, and truthful scaled-operation metrics.",
+  "riskLevel": "R1",
+  "estimatedCostUsd": 0,
+  "tools": [
+    "local-filesystem",
+    "github-after-approval"
+  ],
+  "tasks": [
+    {
+      "taskId": "work-archetype-first-read-only-status-overview-from-repository-record",
+      "description": "Archetype first build item for Dashboard Internal Tool: Read-only status overview from repository records.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-first-project-connector-command-cost-capability-watchd",
+      "description": "Archetype first build item for Dashboard Internal Tool: Project, connector, command, cost, capability, watchdog, and memory panels.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-first-source-and-freshness-labels",
+      "description": "Archetype first build item for Dashboard Internal Tool: Source and freshness labels.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-first-local-dashboard-build-and-check-validation",
+      "description": "Archetype first build item for Dashboard Internal Tool: Local dashboard build and check validation.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-read-only",
+      "description": "Dashboard Internal Tool phase - Read-Only Visibility: Display registry, project, cost, approval, boot, and watchdog status from repository data. Validate build and dashboard checks locally.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-operational-context",
+      "description": "Dashboard Internal Tool phase - Operational Context: Add filtering, source timestamps, limitations, and blocked-action explanations. Expose what needs owner approval without creating write controls.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-approved-runtime",
+      "description": "Dashboard Internal Tool phase - Approved Runtime: Add live adapters only after owner approval, connector review, and data classification. Keep rollback, audit, and stale-data indicators visible.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-common-modules",
+      "description": "Plan common Dashboard Internal Tool modules/features: Health overview, status cards, registry summaries, project list, approval queue, cost panel, and incident panel. Validation, boot, CI, connector, watchdog, and storage-risk status surfaces. Audit trail, recent changes, blocked actions, and next required owner approval. Read-only data adapters from repository records before live runtime adapters exist.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-risk-review",
+      "description": "Review Dashboard Internal Tool known pitfalls before build mode: Showing metrics without source, timestamp, or limitation. Adding write controls before command intake, approvals, and audit are runtime-ready. Connecting live data before repository-backed read-only value is proven. Using decorative layouts that slow operational scanning.",
+      "owner": "quality-os",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-wire-relevant-skills",
+      "description": "Build deterministic active-skill retrieval and record selected skills in every applicable plan basis.",
+      "owner": "codex-worker",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-target-registered-projects",
+      "description": "Add a registered-project selector to the owner command center and reject unknown project identifiers.",
+      "owner": "codex-worker",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-measure-scaled-operations",
+      "description": "Measure skill reuse and cross-project planning batches from source-controlled records without claiming simultaneous execution.",
+      "owner": "quality-os",
+      "status": "planned"
+    }
+  ],
+  "basis": {
+    "productArchetype": "archetype-dashboard",
+    "assumptions": [
+      "No external execution is authorized.",
+      "Skills remain procedural memory and grant no permission."
+    ],
+    "qualityBar": [
+      "All selection is deterministic and tested.",
+      "Unknown projects fail closed.",
+      "Metrics state their evidence boundary.",
+      "Source, status, timestamp, and uncertainty are visible for each important data area.",
+      "No live connector, database, production data, customer data, or deployment connection exists without approval.",
+      "Navigation, filtering, responsive layout, and empty states are clear.",
+      "Risk, approval, validation, boot, cost, and incident surfaces are not hidden.",
+      "Every data surface has source, timestamp, and limitation context.",
+      "Dashboard remains read-only unless a separate approved command model exists.",
+      "Responsive layout is dense, scannable, accessible, and free of overlapping text.",
+      "Blocked actions, approvals, incidents, costs, and validation state are visible."
+    ],
+    "archetypeFile": ".codex/archetypes/dashboard-internal-tool.json",
+    "archetypeVersion": null,
+    "qualityChecklistSource": "archetype:archetype-dashboard",
+    "appliedPhases": [
+      "phase-read-only: Read-Only Visibility - Display registry, project, cost, approval, boot, and watchdog status from repository data. Validate build and dashboard checks locally.",
+      "phase-operational-context: Operational Context - Add filtering, source timestamps, limitations, and blocked-action explanations. Expose what needs owner approval without creating write controls.",
+      "phase-approved-runtime: Approved Runtime - Add live adapters only after owner approval, connector review, and data classification. Keep rollback, audit, and stale-data indicators visible."
+    ],
+    "appliedWhatToBuildFirst": [
+      "Read-only status overview from repository records.",
+      "Project, connector, command, cost, capability, watchdog, and memory panels.",
+      "Source and freshness labels.",
+      "Local dashboard build and check validation."
+    ],
+    "appliedApprovalGates": [
+      "Owner approval is required before live connectors, database access, deployment, domain or DNS changes, paid tools, or credentials.",
+      "Owner approval is required before displaying customer, production, confidential, or restricted data.",
+      "Owner approval is required before adding write buttons, forms, destructive actions, or command execution.",
+      "Owner approval is required before Netlify production deployment."
+    ],
+    "appliedStopConditions": [
+      "Stop before live connectors, deployment, domain or DNS, paid tools, credentials, production data, or customer data.",
+      "Stop before adding write actions, command execution, or destructive controls.",
+      "Stop before modifying Lead Gen production or the AI Receptionist repo."
+    ],
+    "appliedKnownPitfalls": [
+      "Showing metrics without source, timestamp, or limitation.",
+      "Adding write controls before command intake, approvals, and audit are runtime-ready.",
+      "Connecting live data before repository-backed read-only value is proven.",
+      "Using decorative layouts that slow operational scanning."
+    ],
+    "appliedCommonModules": [
+      "Health overview, status cards, registry summaries, project list, approval queue, cost panel, and incident panel.",
+      "Validation, boot, CI, connector, watchdog, and storage-risk status surfaces.",
+      "Audit trail, recent changes, blocked actions, and next required owner approval.",
+      "Read-only data adapters from repository records before live runtime adapters exist."
+    ],
+    "appliedWhatNotToOverbuildEarly": [
+      "Live database, Netlify, n8n, or GitHub adapters before approval.",
+      "Write controls, command bars, or destructive actions.",
+      "Complex charting before source reliability is clear.",
+      "Role-based access beyond documented owner and future placeholders."
+    ],
+    "stackChoice": "Bootstrap Mode stack: Static dashboard generated from repository records; Local build and check scripts; GitHub-governed source updates; Netlify only after approved read-only deployment; Live adapters only after connector and data approval. Notes: Start read-only from existing records. Do not add live connectors or write controls in the first dashboard.",
+    "appliedLessons": [],
+    "relevantMemory": {
+      "strategy": "project_archetype_output_similarity_v1",
+      "acceptedLessonPaths": [],
+      "exampleScorePaths": [],
+      "candidatesLoadedAsTruth": false,
+      "memoryGrantsPermission": false,
+      "examplesGrantPermission": false
+    },
+    "appliedSkills": [
+      "skill-github-branch-pr-flow",
+      "skill-target-pr-review-quality-score"
+    ],
+    "relevantSkills": {
+      "strategy": "task_tool_skill_similarity_v1",
+      "skillPaths": [
+        ".codex/skills/skill-github-branch-pr-flow.json",
+        ".codex/skills/skill-target-pr-review-quality-score.json"
+      ],
+      "skillsGrantPermission": false
+    }
+  },
+  "approvalGates": [
+    {
+      "gateId": "approval-live-connector-action",
+      "approvalRequired": true,
+      "reason": "Any live connector action, including repository creation, requires owner approval."
+    },
+    {
+      "gateId": "approval-preview-or-production-deploy",
+      "approvalRequired": true,
+      "reason": "Any staging or production deploy requires owner approval before live connector use."
+    },
+    {
+      "gateId": "approval-domain-or-dns-change",
+      "approvalRequired": true,
+      "reason": "Any domain or DNS change is blocked until explicit owner approval."
+    },
+    {
+      "gateId": "approval-paid-tool-use",
+      "approvalRequired": true,
+      "reason": "Paid tools or paid API usage are blocked unless owner approved and within Cost OS limits."
+    },
+    {
+      "gateId": "approval-publish-completion-package",
+      "approvalRequired": true,
+      "reason": "Publishing or merging the completion package remains separately approval-gated."
+    },
+    {
+      "gateId": "approval-archetype-owner-approval-is-required-before-live-connector",
+      "approvalRequired": true,
+      "reason": "Owner approval is required before live connectors, database access, deployment, domain or DNS changes, paid tools, or credentials."
+    },
+    {
+      "gateId": "approval-archetype-owner-approval-is-required-before-displaying-cus",
+      "approvalRequired": true,
+      "reason": "Owner approval is required before displaying customer, production, confidential, or restricted data."
+    },
+    {
+      "gateId": "approval-archetype-owner-approval-is-required-before-adding-write-b",
+      "approvalRequired": true,
+      "reason": "Owner approval is required before adding write buttons, forms, destructive actions, or command execution."
+    },
+    {
+      "gateId": "approval-archetype-owner-approval-is-required-before-netlify-produc",
+      "approvalRequired": true,
+      "reason": "Owner approval is required before Netlify production deployment."
+    }
+  ],
+  "expectedOutput": "A locally validated AG OS completion package with plan-level skill reuse, project targeting, and scaled-operation metrics.",
+  "stopConditions": [
+    "Stop before any live connector action without a valid approval lock.",
+    "Stop before any deployment, preview deployment, domain change, or DNS change.",
+    "Stop before using credentials, private endpoints, paid services, customer data, or production data.",
+    "Stop when scope, risk tier, or approval requirements become unclear.",
+    "Stop before credentials, live connectors, deployment, paid actions, or protected product changes.",
+    "Stop before changing the Constitution, authority order, approval workflow, validator, CI, or dependencies without exact approval.",
+    "Stop before live connectors, deployment, domain or DNS, paid tools, credentials, production data, or customer data.",
+    "Stop before adding write actions, command execution, or destructive controls.",
+    "Stop before modifying Lead Gen production or the AI Receptionist repo.",
+    "Do not overbuild early: Live database, Netlify, n8n, or GitHub adapters before approval.",
+    "Do not overbuild early: Write controls, command bars, or destructive actions.",
+    "Do not overbuild early: Complex charting before source reliability is clear.",
+    "Do not overbuild early: Role-based access beyond documented owner and future placeholders."
+  ],
+  "safety": {
+    "executionAuthorized": false,
+    "liveServiceUseAllowed": false,
+    "deploymentAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-13T09:23:04.658Z",
+  "updatedAt": "2026-07-13T09:23:04.658Z"
+}

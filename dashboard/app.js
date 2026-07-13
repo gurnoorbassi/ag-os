@@ -996,8 +996,16 @@ function renderMetrics() {
       detail: `${metrics.lessonReuse.plansUsingAcceptedLessons}/${metrics.lessonReuse.eligiblePlanCount} eligible plans use accepted lessons.`,
       meta: [
         `Quality-example reuse: ${metrics.lessonReuse.exampleReuseRatePercent}%`,
+        `Plan skill reuse: ${metrics.lessonReuse.skillReuseRatePercent}%`,
         `Skill applications recorded: ${metrics.lessonReuse.skillApplicationsRecorded}`
       ]
+    }),
+    card({
+      title: "Scaled operations",
+      status: metrics.scaledOperations.concurrentPlanningProven ? "ready" : "review",
+      metric: `${metrics.scaledOperations.projectsInConcurrentBatches.length} projects`,
+      detail: `${metrics.scaledOperations.concurrentProjectPairCount} cross-project planning pair(s) recorded within five-minute operating batches.`,
+      meta: ["Planning concurrency evidence only; external actions remain separately gated."]
     })
   );
 }
@@ -1100,6 +1108,7 @@ async function submitOwnerCommand(event) {
       headers: runtimeHeaders(),
       body: JSON.stringify({
         command: document.querySelector("#owner-command").value,
+        projectId: document.querySelector("#owner-command-project").value || undefined,
         useAiPlanner: document.querySelector("#use-ai-planner").checked
       })
     });
@@ -1120,6 +1129,15 @@ async function submitOwnerCommand(event) {
 }
 
 function initializeCommandCenter() {
+  const projectSelect = document.querySelector("#owner-command-project");
+  data.projectRegistry.projects
+    .filter((project) => project.id !== "project-ag-os")
+    .forEach((project) => {
+      const option = document.createElement("option");
+      option.value = project.id;
+      option.textContent = project.name;
+      projectSelect.append(option);
+    });
   document.querySelector("#owner-token").value = sessionStorage.getItem("ag-os-owner-token") || "";
   document.querySelector("#coordinator-url").value = sessionStorage.getItem("ag-os-coordinator-url") || "";
   document.querySelector("#connect-runtime").addEventListener("click", connectRuntime);

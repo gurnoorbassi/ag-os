@@ -157,6 +157,7 @@ const server = createServer(async (request, response) => {
       const plannerReadiness = aiPlannerReadiness();
       const result = await submitOwnerCommand({
         command: body.command,
+        projectId: body.projectId,
         understanding: body.understanding,
         useAiPlanner: body.useAiPlanner === true,
         aiPlannerReadiness: plannerReadiness,

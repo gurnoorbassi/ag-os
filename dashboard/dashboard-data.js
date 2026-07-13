@@ -1677,7 +1677,7 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "approvals": {
-    "activeCount": 2,
+    "activeCount": 3,
     "expiredCount": 25,
     "blockedCount": 0,
     "staleWarningCount": 0,
@@ -1729,6 +1729,29 @@ window.AG_OS_DASHBOARD_DATA = {
         "archived": false,
         "usesRecorded": 0,
         "remainingUses": 10
+      },
+      {
+        "approvalId": "approval-20260713-h3-compounding-proof",
+        "status": "approved",
+        "riskLevel": "R2",
+        "expiresAt": "2026-07-14T09:32:19.851Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "budget": null,
+        "target": "gurnoorbassi/ag-os local accepted memory and milestone proof records",
+        "approvedActions": [
+          "promote_named_lesson",
+          "create_followup_reuse_proof",
+          "create_draft_archetype_proposal",
+          "commit_exact_milestone_proof_sets"
+        ],
+        "revocableImmediately": false,
+        "recordPath": ".codex/approvals/approval-20260713-h3-compounding-proof.json",
+        "archived": false,
+        "usesRecorded": 0,
+        "remainingUses": null
       }
     ],
     "expiredApprovals": [
@@ -2382,6 +2405,29 @@ window.AG_OS_DASHBOARD_DATA = {
         "archived": false,
         "usesRecorded": 0,
         "remainingUses": 10
+      },
+      {
+        "approvalId": "approval-20260713-h3-compounding-proof",
+        "status": "approved",
+        "riskLevel": "R2",
+        "expiresAt": "2026-07-14T09:32:19.851Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": null,
+        "maxUses": null,
+        "budget": null,
+        "target": "gurnoorbassi/ag-os local accepted memory and milestone proof records",
+        "approvedActions": [
+          "promote_named_lesson",
+          "create_followup_reuse_proof",
+          "create_draft_archetype_proposal",
+          "commit_exact_milestone_proof_sets"
+        ],
+        "revocableImmediately": false,
+        "recordPath": ".codex/approvals/approval-20260713-h3-compounding-proof.json",
+        "archived": false,
+        "usesRecorded": 0,
+        "remainingUses": null
       }
     ],
     "standingCount": 2,
@@ -3542,8 +3588,41 @@ window.AG_OS_DASHBOARD_DATA = {
     ],
     "reviewRequiredCount": 0,
     "failedCount": 0,
-    "qualityScoreCount": 12,
+    "qualityScoreCount": 15,
     "latestQualityScores": [
+      {
+        "scoreId": "quality-score-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713",
+        "scoreType": "plan_quality_score",
+        "status": "candidate",
+        "projectId": "project-ag-os-coordinator-runtime",
+        "archetypeId": "archetype-dashboard",
+        "overallScore": 9.1,
+        "reviewStatus": "pass",
+        "updatedAt": "2026-07-13T09:35:12.629Z",
+        "recordPath": ".codex/quality-scores/quality-score-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713.json"
+      },
+      {
+        "scoreId": "quality-score-20260713-runtime-social-doc-consolidation-20260713",
+        "scoreType": "plan_quality_score",
+        "status": "candidate",
+        "projectId": "project-social-media-management-system-v1",
+        "archetypeId": "archetype-social-media-content-operations-system",
+        "overallScore": 9.1,
+        "reviewStatus": "pass",
+        "updatedAt": "2026-07-13T09:23:27.690Z",
+        "recordPath": ".codex/quality-scores/quality-score-20260713-runtime-social-doc-consolidation-20260713.json"
+      },
+      {
+        "scoreId": "quality-score-20260713-runtime-ag-os-compounding-completion-20260713",
+        "scoreType": "plan_quality_score",
+        "status": "candidate",
+        "projectId": "project-ag-os-coordinator-runtime",
+        "archetypeId": "archetype-dashboard",
+        "overallScore": 9.1,
+        "reviewStatus": "pass",
+        "updatedAt": "2026-07-13T09:23:19.817Z",
+        "recordPath": ".codex/quality-scores/quality-score-20260713-runtime-ag-os-compounding-completion-20260713.json"
+      },
       {
         "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-manual-posting-pack-v1-20260705",
         "scoreType": "product_quality_score",
@@ -3565,110 +3644,159 @@ window.AG_OS_DASHBOARD_DATA = {
         "reviewStatus": "pass",
         "updatedAt": "2026-07-05T19:10:50Z",
         "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-instagram-handle-20260705.json"
-      },
-      {
-        "scoreId": "quality-score-runtime-target-pr-review-social-media-interactive-draft-ui-v1-20260705",
-        "scoreType": "product_quality_score",
-        "status": "candidate",
-        "projectId": "project-social-media-management-system-v1",
-        "archetypeId": "archetype-social-media-content-operations-system",
-        "overallScore": 9.2,
-        "reviewStatus": "pass",
-        "updatedAt": "2026-07-05T07:52:00Z",
-        "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-social-media-interactive-draft-ui-v1-20260705.json"
-      },
-      {
-        "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704",
-        "scoreType": "product_quality_score",
-        "status": "candidate",
-        "projectId": "project-social-media-management-system-v1",
-        "archetypeId": "archetype-social-media-content-operations-system",
-        "overallScore": 9.4,
-        "reviewStatus": "pass",
-        "updatedAt": "2026-07-05T06:37:48Z",
-        "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704.json"
-      },
-      {
-        "scoreId": "quality-score-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704",
-        "scoreType": "product_quality_score",
-        "status": "candidate",
-        "projectId": "project-social-media-management-system-v1",
-        "archetypeId": "archetype-social-media-content-operations-system",
-        "overallScore": 9.5,
-        "reviewStatus": "pass",
-        "updatedAt": "2026-07-05T05:39:30Z",
-        "recordPath": ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json"
       }
     ],
-    "candidateLessonCount": 14,
-    "acceptedLessonCount": 0,
+    "candidateLessonCount": 23,
+    "acceptedLessonCount": 1,
     "candidatesLoadedAsTruth": false
   },
   "unifiedMemory": {
     "status": "active",
     "registryPath": ".codex/memory/registry.json",
-    "acceptedCount": 0,
-    "candidateCount": 14,
+    "acceptedCount": 1,
+    "candidateCount": 23,
     "rejectedCount": 0,
     "conflictCount": 0,
     "staleCount": 0,
-    "decisionQueueCount": 14,
+    "decisionQueueCount": 23,
     "candidatesLoadedAsTruth": false,
     "rejectedLoadedAsTruth": false,
     "acceptedLessonsLoadedByRuntime": true,
     "memoryGrantsPermission": false,
     "skillsGrantPermission": false,
-    "latestAcceptedLessons": [],
+    "latestAcceptedLessons": [
+      {
+        "lessonId": "lesson-20260713-runtime-ag-os-compounding-completion-20260713-03",
+        "title": "Reuse archetype-backed scoring for dashboard",
+        "scope": "agent_shared",
+        "status": "accepted",
+        "confidence": "high",
+        "updatedAt": "2026-07-13T09:32:26.020Z",
+        "recordPath": ".codex/memory/accepted/lesson-20260713-runtime-ag-os-compounding-completion-20260713-03.json"
+      }
+    ],
     "latestCandidateLessons": [
       {
-        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01",
-        "title": "Owner draft approval is not social execution approval",
+        "lessonId": "lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-01",
+        "title": "Improve low quality dimensions for archetype-dashboard",
         "scope": "agent_shared",
         "status": "candidate",
-        "confidence": "high",
-        "updatedAt": "2026-07-05T06:37:48Z",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01.json"
+        "confidence": "medium",
+        "updatedAt": "2026-07-13T09:35:12.629Z",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-01.json"
       },
       {
-        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01",
-        "title": "Draft approval must remain separate from live social approval",
+        "lessonId": "lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-02",
+        "title": "Preserve recommendations from quality-score-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713",
         "scope": "agent_shared",
         "status": "candidate",
-        "confidence": "high",
-        "updatedAt": "2026-07-05T05:39:30Z",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01.json"
+        "confidence": "medium",
+        "updatedAt": "2026-07-13T09:35:12.629Z",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-02.json"
       },
       {
-        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01",
-        "title": "Draft content sprints need evidence and risk notes before live-channel approval",
+        "lessonId": "lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-03",
+        "title": "Reuse archetype-backed scoring for dashboard",
         "scope": "agent_shared",
         "status": "candidate",
         "confidence": "high",
-        "updatedAt": "2026-07-05T04:43:00Z",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01.json"
+        "updatedAt": "2026-07-13T09:35:12.629Z",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-03.json"
       },
       {
-        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01",
-        "title": "Internal social client configs must keep account access pending until owner input exists",
+        "lessonId": "lesson-20260713-runtime-social-doc-consolidation-20260713-01",
+        "title": "Improve low quality dimensions for archetype-social-media-content-operations-system",
         "scope": "agent_shared",
         "status": "candidate",
-        "confidence": "high",
-        "updatedAt": "2026-07-05T01:59:30Z",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01.json"
+        "confidence": "medium",
+        "updatedAt": "2026-07-13T09:23:27.690Z",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-social-doc-consolidation-20260713-01.json"
       },
       {
-        "lessonId": "lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01",
-        "title": "Draft social media upgrades should surface intake gaps before build complexity",
+        "lessonId": "lesson-20260713-runtime-social-doc-consolidation-20260713-02",
+        "title": "Preserve recommendations from quality-score-20260713-runtime-social-doc-consolidation-20260713",
         "scope": "agent_shared",
         "status": "candidate",
-        "confidence": "high",
-        "updatedAt": "2026-07-05T00:51:42Z",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01.json"
+        "confidence": "medium",
+        "updatedAt": "2026-07-13T09:23:27.690Z",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-social-doc-consolidation-20260713-02.json"
       }
     ],
     "latestRejectedLessons": [],
     "conflicts": [],
     "decisionQueue": [
+      {
+        "id": "review-lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-01.json"
+      },
+      {
+        "id": "review-lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-02",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-02",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-02.json"
+      },
+      {
+        "id": "review-lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-03",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-03",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-accepted-lesson-reuse-proof-20260713-03.json"
+      },
+      {
+        "id": "review-lesson-20260713-runtime-social-doc-consolidation-20260713-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260713-runtime-social-doc-consolidation-20260713-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-social-doc-consolidation-20260713-01.json"
+      },
+      {
+        "id": "review-lesson-20260713-runtime-social-doc-consolidation-20260713-02",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260713-runtime-social-doc-consolidation-20260713-02",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-social-doc-consolidation-20260713-02.json"
+      },
+      {
+        "id": "review-lesson-20260713-runtime-social-doc-consolidation-20260713-03",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260713-runtime-social-doc-consolidation-20260713-03",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-social-doc-consolidation-20260713-03.json"
+      },
+      {
+        "id": "review-lesson-20260713-runtime-ag-os-compounding-completion-20260713-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260713-runtime-ag-os-compounding-completion-20260713-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-compounding-completion-20260713-01.json"
+      },
+      {
+        "id": "review-lesson-20260713-runtime-ag-os-compounding-completion-20260713-02",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260713-runtime-ag-os-compounding-completion-20260713-02",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-compounding-completion-20260713-02.json"
+      },
+      {
+        "id": "review-lesson-20260713-runtime-ag-os-compounding-completion-20260713-03",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260713-runtime-ag-os-compounding-completion-20260713-03",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-compounding-completion-20260713-03.json"
+      },
       {
         "id": "review-lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01",
         "decisionType": "candidate_lesson_review",
@@ -3676,78 +3804,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01",
         "detail": "Owner can promote, reject, or leave candidate advisory.",
         "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01.json"
-      },
-      {
-        "id": "review-lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01",
-        "decisionType": "candidate_lesson_review",
-        "status": "review_needed",
-        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01",
-        "detail": "Owner can promote, reject, or leave candidate advisory.",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01.json"
-      },
-      {
-        "id": "review-lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01",
-        "decisionType": "candidate_lesson_review",
-        "status": "review_needed",
-        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01",
-        "detail": "Owner can promote, reject, or leave candidate advisory.",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704-01.json"
-      },
-      {
-        "id": "review-lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01",
-        "decisionType": "candidate_lesson_review",
-        "status": "review_needed",
-        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01",
-        "detail": "Owner can promote, reject, or leave candidate advisory.",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-config-20260704-01.json"
-      },
-      {
-        "id": "review-lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01",
-        "decisionType": "candidate_lesson_review",
-        "status": "review_needed",
-        "lessonId": "lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01",
-        "detail": "Owner can promote, reject, or leave candidate advisory.",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-social-media-system-v1-1-20260704-01.json"
-      },
-      {
-        "id": "review-lesson-20260704-runtime-target-pr-review-social-media-system-v1-20260704-01",
-        "decisionType": "candidate_lesson_review",
-        "status": "review_needed",
-        "lessonId": "lesson-20260704-runtime-target-pr-review-social-media-system-v1-20260704-01",
-        "detail": "Owner can promote, reject, or leave candidate advisory.",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-social-media-system-v1-20260704-01.json"
-      },
-      {
-        "id": "review-lesson-20260704-runtime-target-pr-review-construction-website-20260704-01",
-        "decisionType": "candidate_lesson_review",
-        "status": "review_needed",
-        "lessonId": "lesson-20260704-runtime-target-pr-review-construction-website-20260704-01",
-        "detail": "Owner can promote, reject, or leave candidate advisory.",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-construction-website-20260704-01.json"
-      },
-      {
-        "id": "review-lesson-20260704-runtime-closed-loop-crm-proof-20260704-01",
-        "decisionType": "candidate_lesson_review",
-        "status": "review_needed",
-        "lessonId": "lesson-20260704-runtime-closed-loop-crm-proof-20260704-01",
-        "detail": "Owner can promote, reject, or leave candidate advisory.",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-closed-loop-crm-proof-20260704-01.json"
-      },
-      {
-        "id": "review-lesson-20260704-runtime-closed-loop-crm-proof-20260704-02",
-        "decisionType": "candidate_lesson_review",
-        "status": "review_needed",
-        "lessonId": "lesson-20260704-runtime-closed-loop-crm-proof-20260704-02",
-        "detail": "Owner can promote, reject, or leave candidate advisory.",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-closed-loop-crm-proof-20260704-02.json"
-      },
-      {
-        "id": "review-lesson-20260704-runtime-closed-loop-crm-proof-20260704-03",
-        "decisionType": "candidate_lesson_review",
-        "status": "review_needed",
-        "lessonId": "lesson-20260704-runtime-closed-loop-crm-proof-20260704-03",
-        "detail": "Owner can promote, reject, or leave candidate advisory.",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-closed-loop-crm-proof-20260704-03.json"
       }
     ],
     "scopes": [
@@ -3769,8 +3825,32 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "costs": {
-    "ledgerCount": 41,
+    "ledgerCount": 44,
     "latestCosts": [
+      {
+        "costLedgerId": "cost-ledger-runtime-ag-os-accepted-lesson-reuse-proof-20260713",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-13T09:35:20.350Z",
+        "recordPath": ".codex/costs/cost-ledger-runtime-ag-os-accepted-lesson-reuse-proof-20260713.json"
+      },
+      {
+        "costLedgerId": "cost-ledger-runtime-social-doc-consolidation-20260713",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-13T09:23:58.562Z",
+        "recordPath": ".codex/costs/cost-ledger-runtime-social-doc-consolidation-20260713.json"
+      },
+      {
+        "costLedgerId": "cost-ledger-runtime-ag-os-compounding-completion-20260713",
+        "status": "active",
+        "actualTaskCostUsd": 0,
+        "budgetStatus": "within_limit",
+        "updatedAt": "2026-07-13T09:23:58.558Z",
+        "recordPath": ".codex/costs/cost-ledger-runtime-ag-os-compounding-completion-20260713.json"
+      },
       {
         "costLedgerId": "cost-ledger-20260705-ag-digitalz-manual-posting-pack-v1",
         "status": "active",
@@ -3794,30 +3874,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "budgetStatus": "within_limit",
         "updatedAt": "2026-07-05T08:30:00Z",
         "recordPath": ".codex/costs/cost-ledger-20260705-ag-digitalz-instagram-handle-update.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-20260705-ag-os-dashboard-netlify-staging",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-05T08:12:00Z",
-        "recordPath": ".codex/costs/cost-ledger-20260705-ag-os-dashboard-netlify-staging.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-20260705-social-media-interactive-draft-ui",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-05T07:52:00Z",
-        "recordPath": ".codex/costs/cost-ledger-20260705-social-media-interactive-draft-ui.json"
-      },
-      {
-        "costLedgerId": "cost-ledger-20260704-ag-digitalz-draft-approval-netlify-staging",
-        "status": "active",
-        "actualTaskCostUsd": 0,
-        "budgetStatus": "within_limit",
-        "updatedAt": "2026-07-05T06:40:50Z",
-        "recordPath": ".codex/costs/cost-ledger-20260704-ag-digitalz-draft-approval-netlify-staging.json"
       }
     ],
     "totalRecordedActualUsd": 0,
@@ -3832,19 +3888,19 @@ window.AG_OS_DASHBOARD_DATA = {
     "status": "computed_from_source_records",
     "generatedFromLiveSystems": false,
     "cost": {
-      "ledgerCount": 41,
+      "ledgerCount": 44,
       "estimatedUsd": 0,
       "actualUsd": 0,
       "varianceUsd": 0,
       "variancePercent": 0
     },
     "quality": {
-      "scoreCount": 12,
-      "averageScore": 9.2,
-      "passCount": 12,
-      "recentAverage": 9.34,
-      "priorAverage": 9.1,
-      "trendDelta": 0.24
+      "scoreCount": 15,
+      "averageScore": 9.18,
+      "passCount": 15,
+      "recentAverage": 9.18,
+      "priorAverage": 9.36,
+      "trendDelta": -0.18
     },
     "rework": {
       "critiqueCount": 11,
@@ -3854,18 +3910,39 @@ window.AG_OS_DASHBOARD_DATA = {
       "reworkSignalRatePercent": 0
     },
     "lessonReuse": {
-      "acceptedLessonCount": 0,
-      "eligiblePlanCount": 3,
-      "plansUsingAcceptedLessons": 0,
-      "plansUsingQualityExamples": 0,
-      "lessonReuseRatePercent": 0,
-      "exampleReuseRatePercent": 0,
+      "acceptedLessonCount": 1,
+      "eligiblePlanCount": 6,
+      "plansUsingAcceptedLessons": 1,
+      "plansUsingQualityExamples": 2,
+      "plansUsingSkills": 3,
+      "lessonReuseRatePercent": 16.67,
+      "exampleReuseRatePercent": 33.33,
+      "skillReuseRatePercent": 50,
       "skillApplicationsRecorded": 6
+    },
+    "scaledOperations": {
+      "evidenceType": "registered_project_plans_within_five_minutes",
+      "concurrentProjectPairCount": 1,
+      "projectsInConcurrentBatches": [
+        "project-ag-os-coordinator-runtime",
+        "project-social-media-management-system-v1"
+      ],
+      "concurrentPlanningProven": true,
+      "latestPairs": [
+        {
+          "firstPlanId": "plan-runtime-ag-os-compounding-completion-20260713",
+          "firstProjectId": "project-ag-os-coordinator-runtime",
+          "secondPlanId": "plan-runtime-social-doc-consolidation-20260713",
+          "secondProjectId": "project-social-media-management-system-v1",
+          "deltaSeconds": 0
+        }
+      ]
     },
     "limitations": [
       "Metrics are computed only from source-controlled AG OS records.",
       "Rework rate is a deterministic signal from required critique fixes, not time tracking.",
       "Zero accepted lessons produces a truthful zero lesson-reuse rate.",
+      "Concurrent planning proves distinct registered projects progressed through planning in one operating batch; it does not claim simultaneous worker execution.",
       "Metrics do not grant approval or authorize live operations."
     ]
   },

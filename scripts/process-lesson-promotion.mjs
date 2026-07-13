@@ -81,6 +81,16 @@ function promotionRuntimeUse() {
   };
 }
 
+function acceptedLessonNotes(candidateNotes) {
+  const retained = typeof candidateNotes === "string" && !/candidate|not accepted (?:permanent )?truth/i.test(candidateNotes)
+    ? candidateNotes.trim()
+    : "";
+  return [
+    retained,
+    "Accepted lesson is runtime-readable advisory knowledge only. It grants no permission for live actions."
+  ].filter(Boolean).join(" ");
+}
+
 export function assertLessonTextIsSafe(lesson) {
   const text = [
     lesson.title,
@@ -189,10 +199,7 @@ export function promoteLessonCandidate({
     },
     runtimeUse: promotionRuntimeUse(),
     updatedAt: timestamp,
-    notes: [
-      candidate.notes,
-      "Accepted lesson is runtime-readable advisory knowledge only. It grants no permission for live actions."
-    ].filter(Boolean).join(" ")
+    notes: acceptedLessonNotes(candidate.notes)
   };
   const filePath = `.codex/memory/accepted/${record.lessonId}.json`;
   if (writeRecord) {

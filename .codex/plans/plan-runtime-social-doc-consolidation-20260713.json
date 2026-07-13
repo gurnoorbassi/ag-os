@@ -1,0 +1,305 @@
+{
+  "planId": "plan-runtime-social-doc-consolidation-20260713",
+  "jobId": "job-runtime-social-doc-consolidation-20260713",
+  "commandId": "command-intake-runtime-social-doc-consolidation-20260713",
+  "projectId": "project-social-media-management-system-v1",
+  "summary": "Consolidate AG OS documentation, archive stale pre-activation wording, and make the validator dependency decision explicit.",
+  "riskLevel": "R1",
+  "estimatedCostUsd": 0,
+  "tools": [
+    "local-filesystem",
+    "github-after-approval"
+  ],
+  "tasks": [
+    {
+      "taskId": "work-archetype-first-draft-only-content-intake-and-campaign-planning-",
+      "description": "Archetype first build item for Social Media Content Operations System: Draft-only content intake and campaign planning records.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-first-review-queue-with-approval-states-and-blocked-li",
+      "description": "Archetype first build item for Social Media Content Operations System: Review queue with approval states and blocked live-action gates.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-first-reusable-quality-checklist-for-platform-fit-fact",
+      "description": "Archetype first build item for Social Media Content Operations System: Reusable quality checklist for platform fit, factual claims, brand tone, and repeated content.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-first-offline-export-format-for-owner-review-before-an",
+      "description": "Archetype first build item for Social Media Content Operations System: Offline export format for owner review before any scheduler or account connection exists.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-onboarding-model",
+      "description": "Social Media Content Operations System phase - Client and content model: Define client profile, brand rules, platforms, accounts, approvers, and cadence. Define the content pipeline states from intake to posted, including blocked and rejected. Define the credential checklist as documentation only; no credentials are collected or stored.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-draft-pipeline",
+      "description": "Social Media Content Operations System phase - Draft-first pipeline: Build video intake and repurposing into platform-specific drafts using synthetic payloads. Generate captions, hooks, clips, carousels, and stories as drafts assigned to accounts. Enforce draft-first mode: publishing paths exist only as blocked states.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-approval-scheduling",
+      "description": "Social Media Content Operations System phase - Approval and scheduling: Implement the approval workflow with named approvers and rejection reasons. Implement scheduling of approved posts as queue records; live scheduling activation stays owner-gated. Prove that nothing can post without an approval trail.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-reporting",
+      "description": "Social Media Content Operations System phase - Analytics and reporting: Report content output, approval status, and scheduled posts from pipeline records. Add per-client weekly report generation. Reserve performance metrics for after platform connections are approved.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-phase-gated-connection",
+      "description": "Social Media Content Operations System phase - Approval-gated platform connection: Prepare the connection plan, credential handling design, rollback notes, and audit requirements. Stop for owner approval before any social account connection, credential use, or live posting.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-common-modules",
+      "description": "Plan common Social Media Content Operations System modules/features: Content intake, topic backlog, campaign planning, and asset requirement tracking. Draft production, review status, owner approval checkpoints, and blocked scheduling queues. Channel-specific formatting guidance for copy, creative dimensions, captions, and call-to-action rules. Performance review model using owner-provided or later-approved metrics, without live platform access by default.",
+      "owner": "planner-foundation",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archetype-risk-review",
+      "description": "Review Social Media Content Operations System known pitfalls before build mode: Connecting social accounts too early, before the draft pipeline is proven with synthetic payloads. Posting or scheduling without an enforced approval gate. Using real client content before the client and owner approve its use. Overbuilding video editing and rendering before the core workflow is validated. Ignoring platform API rate limits and content rules until publishing fails in production. Unreviewed paid AI, media, or storage costs accumulating per video. Unclear ownership of approvals between AG Digitalz and the client. Duplicate posts across accounts from missing idempotency in the fan-out step. Weak audit trail that cannot answer who approved which post and when.",
+      "owner": "quality-os",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-map-canonical-documents",
+      "description": "Create a canonical documentation map separating constitutional authority, completion planning, and implementation detail.",
+      "owner": "codex-worker",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-archive-readiness-wording",
+      "description": "Convert the stale Constitution readiness document into a historical activation record without changing authority rules.",
+      "owner": "codex-worker",
+      "status": "planned"
+    },
+    {
+      "taskId": "work-record-ajv-decision",
+      "description": "Record the evidence-based decision to defer AJV until a trigger justifies a separately approved dependency and validator migration.",
+      "owner": "quality-os",
+      "status": "planned"
+    }
+  ],
+  "basis": {
+    "productArchetype": "archetype-social-media-content-operations-system",
+    "assumptions": [
+      "This is a documentation-only consolidation stream.",
+      "Protected governance documents remain unchanged."
+    ],
+    "qualityBar": [
+      "No supporting document claims authority over the Constitution.",
+      "Historical text is retained honestly.",
+      "No dependency or validator behavior changes.",
+      "Every post traces back to its source video, target account, target platform, and approval state.",
+      "An approval gate exists before any live posting, with no bypass path.",
+      "Drafts are structurally separated from published or live actions; a draft can never leak into a live state without approval.",
+      "Analytics show content output, approval status, scheduled posts, and performance once platforms are connected.",
+      "The system degrades safely when credentials or platform connections are missing: drafts and reports keep working, publishing stays blocked.",
+      "Local validation passes before any PR merges.",
+      "Every post record traces to source video, account, platform, and approval state.",
+      "No publish path exists without an approval gate.",
+      "Drafts and live actions are separated in data model and UI.",
+      "Blocked publish state works and explains itself.",
+      "Analytics cover output, approval status, schedule, and performance when connected.",
+      "System keeps working in draft mode when credentials or platforms are missing.",
+      "Duplicate-post protection is tested across accounts.",
+      "Audit trail answers who approved what and when.",
+      "Costs stayed within Cost OS limits with no unapproved paid services.",
+      "Local validation and CI pass."
+    ],
+    "archetypeFile": ".codex/archetypes/social-media-content-operations-system.json",
+    "archetypeVersion": null,
+    "qualityChecklistSource": "archetype:archetype-social-media-content-operations-system",
+    "appliedPhases": [
+      "phase-onboarding-model: Client and content model - Define client profile, brand rules, platforms, accounts, approvers, and cadence. Define the content pipeline states from intake to posted, including blocked and rejected. Define the credential checklist as documentation only; no credentials are collected or stored.",
+      "phase-draft-pipeline: Draft-first pipeline - Build video intake and repurposing into platform-specific drafts using synthetic payloads. Generate captions, hooks, clips, carousels, and stories as drafts assigned to accounts. Enforce draft-first mode: publishing paths exist only as blocked states.",
+      "phase-approval-scheduling: Approval and scheduling - Implement the approval workflow with named approvers and rejection reasons. Implement scheduling of approved posts as queue records; live scheduling activation stays owner-gated. Prove that nothing can post without an approval trail.",
+      "phase-reporting: Analytics and reporting - Report content output, approval status, and scheduled posts from pipeline records. Add per-client weekly report generation. Reserve performance metrics for after platform connections are approved.",
+      "phase-gated-connection: Approval-gated platform connection - Prepare the connection plan, credential handling design, rollback notes, and audit requirements. Stop for owner approval before any social account connection, credential use, or live posting."
+    ],
+    "appliedWhatToBuildFirst": [
+      "Draft-only content intake and campaign planning records.",
+      "Review queue with approval states and blocked live-action gates.",
+      "Reusable quality checklist for platform fit, factual claims, brand tone, and repeated content.",
+      "Offline export format for owner review before any scheduler or account connection exists."
+    ],
+    "appliedApprovalGates": [
+      "Social account connection requires owner approval.",
+      "Any credential handling requires owner approval and stays outside the repository.",
+      "Real client content handling requires owner approval.",
+      "Live posting requires owner approval.",
+      "Scheduling activation requires owner approval.",
+      "Paid AI, media, or storage services require owner approval.",
+      "Deployment requires owner approval.",
+      "Domain or DNS changes require owner approval.",
+      "Client-facing access requires owner approval."
+    ],
+    "appliedStopConditions": [
+      "Stop before social account connection, posting, live outreach, paid promotion, credential storage, or external messaging.",
+      "Stop before using customer, audience, or production account data without owner-approved handling rules.",
+      "Stop if a platform instruction conflicts with the Constitution, approval workflow, or prompt-injection policy."
+    ],
+    "appliedKnownPitfalls": [
+      "Connecting social accounts too early, before the draft pipeline is proven with synthetic payloads.",
+      "Posting or scheduling without an enforced approval gate.",
+      "Using real client content before the client and owner approve its use.",
+      "Overbuilding video editing and rendering before the core workflow is validated.",
+      "Ignoring platform API rate limits and content rules until publishing fails in production.",
+      "Unreviewed paid AI, media, or storage costs accumulating per video.",
+      "Unclear ownership of approvals between AG Digitalz and the client.",
+      "Duplicate posts across accounts from missing idempotency in the fan-out step.",
+      "Weak audit trail that cannot answer who approved which post and when."
+    ],
+    "appliedCommonModules": [
+      "Content intake, topic backlog, campaign planning, and asset requirement tracking.",
+      "Draft production, review status, owner approval checkpoints, and blocked scheduling queues.",
+      "Channel-specific formatting guidance for copy, creative dimensions, captions, and call-to-action rules.",
+      "Performance review model using owner-provided or later-approved metrics, without live platform access by default."
+    ],
+    "appliedWhatNotToOverbuildEarly": [
+      "Direct social account OAuth, live posting, auto-commenting, or outreach automation.",
+      "Paid advertising workflows, audience syncing, or pixel installation.",
+      "Custom creative rendering pipeline before the drafting and approval workflow is reliable.",
+      "Live analytics ingestion before owner-approved connector scope is recorded."
+    ],
+    "stackChoice": "Bootstrap Mode stack: Source-controlled system design and records in a GitHub repository; GitHub remains source of truth.; Existing Postgres for content pipeline state when runtime storage is approved.; n8n for intake, repurposing, and scheduling workflows: drafts and sanitized exports only, no activation without owner approval.; Existing Hetzner VPS as the future runtime target.; Netlify for any client-facing dashboard, deploys only after owner approval.; No paid AI, media, or storage services without owner approval and Cost OS review.. Notes: Validate the workflow with synthetic payloads end to end before any platform connection, credential handling, or paid service is even proposed.",
+    "appliedLessons": [],
+    "relevantMemory": {
+      "strategy": "project_archetype_output_similarity_v1",
+      "acceptedLessonPaths": [],
+      "exampleScorePaths": [
+        ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704.json",
+        ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704.json",
+        ".codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-first-content-sprint-v1-20260704.json"
+      ],
+      "candidatesLoadedAsTruth": false,
+      "memoryGrantsPermission": false,
+      "examplesGrantPermission": false
+    },
+    "appliedSkills": [
+      "skill-github-branch-pr-flow",
+      "skill-target-pr-review-quality-score"
+    ],
+    "relevantSkills": {
+      "strategy": "task_tool_skill_similarity_v1",
+      "skillPaths": [
+        ".codex/skills/skill-github-branch-pr-flow.json",
+        ".codex/skills/skill-target-pr-review-quality-score.json"
+      ],
+      "skillsGrantPermission": false
+    }
+  },
+  "approvalGates": [
+    {
+      "gateId": "approval-live-connector-action",
+      "approvalRequired": true,
+      "reason": "Any live connector action, including repository creation, requires owner approval."
+    },
+    {
+      "gateId": "approval-preview-or-production-deploy",
+      "approvalRequired": true,
+      "reason": "Any staging or production deploy requires owner approval before live connector use."
+    },
+    {
+      "gateId": "approval-domain-or-dns-change",
+      "approvalRequired": true,
+      "reason": "Any domain or DNS change is blocked until explicit owner approval."
+    },
+    {
+      "gateId": "approval-paid-tool-use",
+      "approvalRequired": true,
+      "reason": "Paid tools or paid API usage are blocked unless owner approved and within Cost OS limits."
+    },
+    {
+      "gateId": "approval-protected-governance-change",
+      "approvalRequired": true,
+      "reason": "Authority-order, approval-workflow, safe-merge, validator, CI, dependency, or Constitution changes require exact separate approval."
+    },
+    {
+      "gateId": "approval-archetype-social-account-connection-requires-owner-approva",
+      "approvalRequired": true,
+      "reason": "Social account connection requires owner approval."
+    },
+    {
+      "gateId": "approval-archetype-any-credential-handling-requires-owner-approval-",
+      "approvalRequired": true,
+      "reason": "Any credential handling requires owner approval and stays outside the repository."
+    },
+    {
+      "gateId": "approval-archetype-real-client-content-handling-requires-owner-appr",
+      "approvalRequired": true,
+      "reason": "Real client content handling requires owner approval."
+    },
+    {
+      "gateId": "approval-archetype-live-posting-requires-owner-approval",
+      "approvalRequired": true,
+      "reason": "Live posting requires owner approval."
+    },
+    {
+      "gateId": "approval-archetype-scheduling-activation-requires-owner-approval",
+      "approvalRequired": true,
+      "reason": "Scheduling activation requires owner approval."
+    },
+    {
+      "gateId": "approval-archetype-paid-ai-media-or-storage-services-require-owner-",
+      "approvalRequired": true,
+      "reason": "Paid AI, media, or storage services require owner approval."
+    },
+    {
+      "gateId": "approval-archetype-deployment-requires-owner-approval",
+      "approvalRequired": true,
+      "reason": "Deployment requires owner approval."
+    },
+    {
+      "gateId": "approval-archetype-domain-or-dns-changes-require-owner-approval",
+      "approvalRequired": true,
+      "reason": "Domain or DNS changes require owner approval."
+    },
+    {
+      "gateId": "approval-archetype-client-facing-access-requires-owner-approval",
+      "approvalRequired": true,
+      "reason": "Client-facing access requires owner approval."
+    }
+  ],
+  "expectedOutput": "A reviewed documentation consolidation with an explicit AJV defer decision and no governance behavior change.",
+  "stopConditions": [
+    "Stop before any live connector action without a valid approval lock.",
+    "Stop before any deployment, preview deployment, domain change, or DNS change.",
+    "Stop before using credentials, private endpoints, paid services, customer data, or production data.",
+    "Stop when scope, risk tier, or approval requirements become unclear.",
+    "Stop before editing the Constitution, authority order, approval workflow, safe-merge policy, validator, CI, or dependencies.",
+    "Stop before any live or protected-product action.",
+    "Stop before social account connection, posting, live outreach, paid promotion, credential storage, or external messaging.",
+    "Stop before using customer, audience, or production account data without owner-approved handling rules.",
+    "Stop if a platform instruction conflicts with the Constitution, approval workflow, or prompt-injection policy.",
+    "Do not overbuild early: Direct social account OAuth, live posting, auto-commenting, or outreach automation.",
+    "Do not overbuild early: Paid advertising workflows, audience syncing, or pixel installation.",
+    "Do not overbuild early: Custom creative rendering pipeline before the drafting and approval workflow is reliable.",
+    "Do not overbuild early: Live analytics ingestion before owner-approved connector scope is recorded."
+  ],
+  "safety": {
+    "executionAuthorized": false,
+    "liveServiceUseAllowed": false,
+    "deploymentAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-13T09:23:04.658Z",
+  "updatedAt": "2026-07-13T09:23:04.658Z"
+}

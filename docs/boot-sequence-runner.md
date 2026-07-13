@@ -1,6 +1,8 @@
 # Boot Sequence Runner Foundation
 
-The Boot Sequence Runner defines the startup checks AG OS must run before command execution.
+`docs/boot-sequence.md` is the canonical mandatory boot policy. This document describes the offline runner record and briefing mechanics only; it does not restate or override that policy.
+
+The Boot Sequence Runner records the startup checks AG OS runs before command execution.
 
 This foundation is templates and schema metadata only. It does not add runtime code, call live services, connect credentials, deploy code, or modify production systems.
 
@@ -59,7 +61,7 @@ The briefing is assembled only from source-controlled records. It makes no live 
 
 ## Output
 
-Each future boot run must produce:
+Each boot run must produce:
 
 - boot run ID
 - status

@@ -1,0 +1,59 @@
+{
+  "understanding": {
+    "producedBy": "codex-worker",
+    "inferredBusinessObjective": "Close the mechanical gap between stored AG OS skills and actual project plans while making owner commands target registered projects.",
+    "productArchetype": "archetype-dashboard",
+    "targetUser": "AG OS owner",
+    "successCriteria": [
+      "Relevant active skills appear in the plan basis without granting permission.",
+      "Owner commands can target a registered project.",
+      "Metrics report plan-level skill reuse and cross-project planning evidence."
+    ],
+    "criticalUnknowns": [],
+    "confidence": "high",
+    "assumptions": [
+      "All work remains local and source controlled until separately approved for publication.",
+      "No live connector, credential, deployment, production data, or paid action is needed."
+    ],
+    "ownerConstraints": [
+      "The Constitution governs the entire system.",
+      "Roadmap work improves AG OS but does not grant permission.",
+      "Complete locally safe unfinished work and preserve approval gates."
+    ]
+  },
+  "commandIntakeId": "command-intake-runtime-ag-os-compounding-completion-20260713",
+  "status": "classified",
+  "rawCommand": "Improve the AG OS dashboard planning system with skill reuse, project targeting, and scaled-operation metrics",
+  "normalizedCommand": "Create a plan-only dashboard plan.",
+  "commandCategory": "plan_only",
+  "projectId": "project-ag-os-coordinator-runtime",
+  "riskLevel": "R1",
+  "classification": {
+    "requiresPlan": true,
+    "requiresApproval": false,
+    "requiresLiveService": false,
+    "requiresDeployment": false,
+    "requiresDomainChange": false,
+    "requiresPaidAction": false,
+    "requiresProductionData": false
+  },
+  "productContext": {
+    "productType": "dashboard",
+    "archetypeId": "archetype-dashboard",
+    "archetypeRegistered": true,
+    "archetypeGap": null
+  },
+  "plannedOutput": "Plan-only command intake record for dashboard.",
+  "nextRecord": {
+    "jobId": "job-runtime-ag-os-compounding-completion-20260713",
+    "planId": "plan-runtime-ag-os-compounding-completion-20260713"
+  },
+  "safety": {
+    "executesCommand": false,
+    "createsLiveSideEffect": false,
+    "usesCredentials": false,
+    "callsConnector": false
+  },
+  "createdAt": "2026-07-13T09:22:44.841Z",
+  "updatedAt": "2026-07-13T09:22:44.841Z"
+}

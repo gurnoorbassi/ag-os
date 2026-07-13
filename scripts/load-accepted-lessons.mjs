@@ -77,12 +77,16 @@ function rankAcceptedLesson(lesson, { projectId, archetypeId, outputType, worker
     score += 2;
     reasons.push("same_worker");
   }
+  if (appliesTo.has("any") || appliesTo.has("all")) {
+    score += 1;
+    reasons.push("globally_applicable");
+  }
   const hasSpecificMatch = score > 0;
-  if (["company", "agent_shared"].includes(lesson.scope)) {
+  if (hasSpecificMatch && ["company", "agent_shared"].includes(lesson.scope)) {
     score += 1;
     reasons.push("shared_scope");
   }
-  if ((hasSpecificMatch || ["company", "agent_shared"].includes(lesson.scope)) && lesson.confidence === "high") {
+  if (hasSpecificMatch && lesson.confidence === "high") {
     score += 1;
     reasons.push("high_confidence");
   }

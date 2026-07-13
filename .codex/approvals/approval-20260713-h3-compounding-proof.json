@@ -1,0 +1,55 @@
+{
+  "approvalId": "approval-20260713-h3-compounding-proof",
+  "status": "approved",
+  "approvalKind": "single_action",
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "agent-codex",
+  "approvedBy": "owner-gurnoor-bassi",
+  "commandCategory": "build",
+  "requestedAction": "Promote the exact named lesson and commit the three exact H3/H4 milestone proof sets.",
+  "target": "gurnoorbassi/ag-os local accepted memory and milestone proof records",
+  "scope": "Only lesson-20260713-runtime-ag-os-compounding-completion-20260713-03, runtime-ag-os-compounding-completion-20260713, runtime-social-doc-consolidation-20260713, and runtime-ag-os-accepted-lesson-reuse-proof-20260713, including matching approval, audit, accepted-lesson, reuse-plan, quality-score, lesson-candidate, and draft archetype-update proposal records.",
+  "riskLevel": "R2",
+  "dataClass": "internal",
+  "approvalRequiredFor": [
+    "lesson_promotion",
+    "milestone_proof_commit"
+  ],
+  "approvedActions": [
+    "promote_named_lesson",
+    "create_followup_reuse_proof",
+    "create_draft_archetype_proposal",
+    "commit_exact_milestone_proof_sets"
+  ],
+  "prohibitedActions": [
+    "constitution_change",
+    "authority_order_change",
+    "approval_workflow_change",
+    "validator_change",
+    "ci_change",
+    "dependency_change",
+    "merge_pull_request",
+    "deployment",
+    "credential_handling",
+    "lead_gen_change",
+    "production_data_handling",
+    "social_posting",
+    "message_send",
+    "paid_action",
+    "dns_change",
+    "external_connector_action"
+  ],
+  "revocationPath": "Owner may revoke this one-time approval immediately before completion; stop and mark the lock revoked without promoting or committing further proof.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Exact owner approval recorded in the 2026-07-13 AG OS completion task.",
+      "verified": true
+    }
+  ],
+  "approvalText": "Approve promotion of lesson-20260713-runtime-ag-os-compounding-completion-20260713-03 into accepted AG OS runtime memory under approval-20260713-h3-compounding-proof. Approve committing the milestone proof sets for runtime-ag-os-compounding-completion-20260713, runtime-social-doc-consolidation-20260713, and the follow-up runtime-ag-os-accepted-lesson-reuse-proof-20260713. Codex may create the matching approval, audit, accepted-lesson, reuse-plan, quality-score, lesson-candidate, and draft archetype-update proposal records. No Constitution, authority-order, approval-workflow, validator, CI, dependency, merge, deployment, credential, Lead Gen, production-data, posting, messaging, paid, DNS, or external-connector action is approved.",
+  "approvedAt": "2026-07-13T09:32:19.851Z",
+  "expiresAt": "2026-07-14T09:32:19.851Z",
+  "createdAt": "2026-07-13T09:32:19.851Z",
+  "updatedAt": "2026-07-13T09:32:19.851Z"
+}
