@@ -1,0 +1,72 @@
+{
+  "approvalId": "approval-20260712-anthropic-planning",
+  "status": "approved",
+  "approvalKind": "standing",
+  "actionClass": "anthropic_plan_generation",
+  "inclusionCriteria": [
+    "Target is exactly the Anthropic Messages API for AG OS planning.",
+    "Each use generates one schema-constrained plan only.",
+    "Each use costs no more than USD $0.25.",
+    "No more than 20 successful uses may occur before expiration.",
+    "Every use records the approval id, model, token counts, computed cost, and plan evidence in the audit trail.",
+    "The Anthropic key remains root-only and is never written to source control, logs, dashboard responses, prompts, or audit evidence.",
+    "No downstream repository execution or external action is authorized by the generated plan."
+  ],
+  "maxUses": 20,
+  "usageAuditRequired": true,
+  "revocableImmediately": true,
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "agent-codex",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-ag-os",
+  "commandCategory": "plan_only",
+  "requestedAction": "Generate one schema-constrained AG OS plan through the Anthropic Messages API and record its model usage and cost.",
+  "target": "anthropic:messages-api",
+  "scope": "Revocable standing approval for AG OS Anthropic plan generation only, limited to 20 successful uses at no more than USD $0.25 per use through the end of August 12, 2026 America/Vancouver.",
+  "riskLevel": "R3",
+  "dataClass": "internal",
+  "budget": {
+    "required": true,
+    "maxUsd": 0.25,
+    "usageLedgerRef": ".codex/costs"
+  },
+  "approvalRequiredFor": [
+    "paid_actions",
+    "anthropic_api_call",
+    "root_only_credential_use"
+  ],
+  "approvedActions": [
+    "anthropic_plan_generation"
+  ],
+  "prohibitedActions": [
+    "merge_pull_request",
+    "repository_execution",
+    "deployment",
+    "social_posting",
+    "message_send",
+    "credential_disclosure",
+    "credential_commit",
+    "credential_use_outside_anthropic_planning",
+    "credential_handling",
+    "customer_data_handling",
+    "production_data_handling",
+    "paid_action_beyond_approved_model_call",
+    "paid_action",
+    "dns_change",
+    "external_connector_action",
+    "production_change"
+  ],
+  "revocationPath": "Owner may revoke this approval immediately by instruction. AG OS must set status to revoked, record an audit event, and stop every future Anthropic planning call before using the credential or API.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Owner approval recorded in the 2026-07-12 AG OS task with an August 12, 2026 expiry, 20-use limit, USD $0.25 per-use limit, exact Anthropic planning scope, per-use evidence, strict exclusions, and immediate revocability.",
+      "verified": true
+    }
+  ],
+  "approvalText": "Approve a revocable Anthropic planning approval for AG OS, valid until August 12, 2026, limited to 20 uses and USD $0.25 per use. Scope is Anthropic Messages API plan generation only. Every use must record model, tokens, cost, and approval evidence. No repository execution, deployment, posting, messaging, credentials beyond the root-only Anthropic key, customer or production data, paid action beyond the approved model call, DNS, or external connector action is authorized.",
+  "approvedAt": "2026-07-12T10:24:30.810Z",
+  "expiresAt": "2026-08-13T06:59:59.000Z",
+  "createdAt": "2026-07-12T10:24:30.810Z",
+  "updatedAt": "2026-07-12T10:24:30.810Z"
+}

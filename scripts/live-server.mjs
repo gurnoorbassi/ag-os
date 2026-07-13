@@ -6,6 +6,8 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { listRecentOwnerCommands, submitOwnerCommand } from "./lib/runtime/live-command-service.mjs";
 import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
+import { createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
+import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-planner-readiness.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dashboardRoot = path.join(root, "dashboard");
@@ -79,6 +81,22 @@ function readinessStatus() {
   return evaluateProductionReadiness(JSON.parse(readFileSync(file, "utf8")));
 }
 
+function aiPlannerReadiness() {
+  return evaluateAnthropicPlannerReadiness({ root });
+}
+
+function publicAiPlannerStatus(readiness = aiPlannerReadiness()) {
+  return {
+    ready: readiness.ready,
+    enabled: readiness.enabled,
+    credentialConfigured: readiness.credentialConfigured,
+    model: readiness.model,
+    approvalId: readiness.approvalId,
+    uses: readiness.uses,
+    blockers: readiness.blockers
+  };
+}
+
 function serveStatic(request, response) {
   const requestPath = new URL(request.url, "http://localhost").pathname;
   const relative = requestPath === "/" ? "index.html" : decodeURIComponent(requestPath.slice(1));
@@ -128,6 +146,7 @@ const server = createServer(async (request, response) => {
         service: "ag-os-coordinator",
         mode: "owner_operated_fail_closed",
         production: readinessStatus(),
+        aiPlanner: publicAiPlannerStatus(),
         recentCommands: listRecentOwnerCommands({ root })
       }, headers);
       return;
@@ -135,7 +154,20 @@ const server = createServer(async (request, response) => {
 
     if (request.method === "POST" && url.pathname === "/api/v1/commands") {
       const body = await readJsonBody(request);
-      const result = submitOwnerCommand({ command: body.command, understanding: body.understanding, root });
+      const plannerReadiness = aiPlannerReadiness();
+      const result = await submitOwnerCommand({
+        command: body.command,
+        understanding: body.understanding,
+        useAiPlanner: body.useAiPlanner === true,
+        aiPlannerReadiness: plannerReadiness,
+        planDraftProvider: (input) => createAnthropicPlanDraft({
+          ...input,
+          apiKey: process.env.ANTHROPIC_API_KEY,
+          model: plannerReadiness.model,
+          baseUrl: process.env.ANTHROPIC_BASE_URL
+        }),
+        root
+      });
       json(response, 201, result, headers);
       return;
     }

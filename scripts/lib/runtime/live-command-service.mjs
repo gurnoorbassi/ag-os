@@ -11,6 +11,7 @@ import { writeCostLedgerRecord } from "./cost-ledger-writer.mjs";
 import { writeJobRecord } from "./job-queue-processor.mjs";
 import { writePlanRecord } from "./planner-processor.mjs";
 import { writeTaskRouteRecord } from "./task-router-processor.mjs";
+import { calculateAnthropicCostUsd } from "./anthropic-planner.mjs";
 
 const MAX_COMMAND_LENGTH = 10_000;
 
@@ -63,8 +64,19 @@ export function listRecentOwnerCommands({ root = process.cwd(), limit = 10 } = {
     .slice(0, Math.max(1, Math.min(limit, 50)));
 }
 
-export function submitOwnerCommand({ command, understanding, root = process.cwd(), now = new Date() }) {
+export async function submitOwnerCommand({
+  command,
+  understanding,
+  useAiPlanner = false,
+  aiPlannerReadiness,
+  planDraftProvider,
+  root = process.cwd(),
+  now = new Date()
+}) {
   assertOwnerCommand(command);
+  if (useAiPlanner && (!aiPlannerReadiness?.ready || typeof planDraftProvider !== "function")) {
+    throw new Error(`AI planner is not ready: ${(aiPlannerReadiness?.blockers || ["planner provider unavailable"]).join("; ")}`);
+  }
   const runId = createOperatorRunId(now);
   const boot = writeBootRunRecord({ runId, now, root });
 
@@ -75,21 +87,37 @@ export function submitOwnerCommand({ command, understanding, root = process.cwd(
   const intake = writeCommandIntakeRecord({ command: command.trim(), understanding, runId, now, root });
   const job = writeJobRecord({ commandIntake: intake.record, runId, now, root });
   const route = writeTaskRouteRecord({ job: job.record, commandIntake: intake.record, runId, now, root });
+  const aiPlanning = useAiPlanner
+    ? await planDraftProvider({ commandIntake: intake.record, job: job.record, route: route.record })
+    : null;
   const plan = writePlanRecord({
     route: route.record,
     job: job.record,
     commandIntake: intake.record,
+    planDraft: aiPlanning?.planDraft,
     runId,
     now,
     root
   });
+  const actualAiCostUsd = aiPlanning
+    ? calculateAnthropicCostUsd({
+        usage: aiPlanning.usage,
+        inputCostPerMillionUsd: aiPlannerReadiness.inputCostPerMillionUsd,
+        outputCostPerMillionUsd: aiPlannerReadiness.outputCostPerMillionUsd
+      })
+    : 0;
+  if (aiPlanning && actualAiCostUsd > aiPlannerReadiness.approval.budget.maxUsd) {
+    throw new Error("AI planning call exceeded the approved budget");
+  }
   const cost = writeCostLedgerRecord({
     job: job.record,
     plan: plan.record,
     runId,
     now,
     estimatedCostUsd: plan.record.estimatedCostUsd,
-    actualCostUsd: 0,
+    actualCostUsd: actualAiCostUsd,
+    usesPaidService: Boolean(aiPlanning),
+    usesLiveApi: Boolean(aiPlanning),
     root
   });
   const connectorGates = writeConnectorDryRunGateRecords({ plan: plan.record, runId, now, root });
@@ -110,11 +138,33 @@ export function submitOwnerCommand({ command, understanding, root = process.cwd(
     source: "ag_os_coordinator",
     relatedArtifacts,
     riskLevel: intake.record.riskLevel,
-    liveServiceTouched: false,
-    notes: "The coordinator created planning and gate records only. It did not execute connectors or live side effects.",
+    liveServiceTouched: Boolean(aiPlanning),
+    notes: aiPlanning
+      ? `The coordinator used approved Anthropic planning via ${aiPlannerReadiness.approvalId}; model ${aiPlanning.model}; input tokens ${aiPlanning.usage.input_tokens || 0}; output tokens ${aiPlanning.usage.output_tokens || 0}; actual recorded cost USD ${actualAiCostUsd}. No connector, deployment, message, post, DNS, or production action was executed.`
+      : "The coordinator created planning and gate records only. It did not execute connectors or live side effects.",
     now,
     root
   });
+
+  const aiUsageAudit = aiPlanning
+    ? writeAuditEventRecord({
+        runId: `${runId}-anthropic-planner-use`,
+        eventType: "standing_approval_used",
+        summary: `Scoped approval ${aiPlannerReadiness.approvalId} used for one Anthropic plan generation call.`,
+        scope: "anthropic_plan_generation",
+        source: "connector_metadata",
+        relatedArtifacts: [
+          artifact("approval", aiPlannerReadiness.approvalId),
+          artifact("other", plan.record.planId),
+          artifact("other", cost.record.costLedgerId)
+        ],
+        riskLevel: intake.record.riskLevel,
+        liveServiceTouched: true,
+        notes: `Model ${aiPlanning.model}; input tokens ${aiPlanning.usage.input_tokens || 0}; output tokens ${aiPlanning.usage.output_tokens || 0}; recorded cost USD ${actualAiCostUsd}.`,
+        now,
+        root
+      })
+    : null;
 
   runDashboardBuild(root);
 
@@ -134,14 +184,24 @@ export function submitOwnerCommand({ command, understanding, root = process.cwd(
       plan.filePath,
       cost.filePath,
       ...connectorGates.written.map((item) => item.filePath),
-      audit.filePath
+      audit.filePath,
+      ...(aiUsageAudit ? [aiUsageAudit.filePath] : [])
     ],
     safety: {
-      liveActionExecuted: false,
-      credentialsUsed: false,
+      liveActionExecuted: Boolean(aiPlanning),
+      externalBusinessActionExecuted: false,
+      credentialsUsed: Boolean(aiPlanning),
       deploymentTriggered: false,
       productionDataAccessed: false,
-      paidActionTriggered: false
-    }
+      paidActionTriggered: Boolean(aiPlanning)
+    },
+    aiPlanner: aiPlanning ? {
+      used: true,
+      model: aiPlanning.model,
+      inputTokens: aiPlanning.usage.input_tokens || 0,
+      outputTokens: aiPlanning.usage.output_tokens || 0,
+      actualCostUsd: actualAiCostUsd,
+      approvalId: aiPlannerReadiness.approvalId
+    } : { used: false }
   };
 }

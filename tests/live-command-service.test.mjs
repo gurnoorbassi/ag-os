@@ -29,9 +29,9 @@ test("owner commands require non-empty bounded input", () => {
   assert.throws(() => assertOwnerCommand("x".repeat(10_001)), /10000 characters/);
 });
 
-test("authenticated command service creates a complete gated work package", () => {
+test("authenticated command service creates a complete gated work package", async () => {
   const workspace = tempWorkspace();
-  const result = submitOwnerCommand({
+  const result = await submitOwnerCommand({
     command: "Build a dashboard for my internal operations",
     root: workspace,
     now: new Date("2026-07-11T12:00:00.000Z")
@@ -47,4 +47,44 @@ test("authenticated command service creates a complete gated work package", () =
   const plan = JSON.parse(readFileSync(path.join(workspace, `.codex/plans/${result.planId}.json`), "utf8"));
   assert.equal(plan.safety.executionAuthorized, false);
   assert.ok(plan.approvalGates.some((gate) => gate.gateId === "approval-preview-or-production-deploy"));
+});
+
+test("authenticated command service uses an approved AI plan and audits cost without external business actions", async () => {
+  const workspace = tempWorkspace();
+  const result = await submitOwnerCommand({
+    command: "Build a dashboard for my internal operations",
+    useAiPlanner: true,
+    aiPlannerReadiness: {
+      ready: true,
+      approvalId: "approval-20260712-anthropic-planning",
+      approval: { budget: { maxUsd: 1 } },
+      inputCostPerMillionUsd: 3,
+      outputCostPerMillionUsd: 15,
+      blockers: []
+    },
+    planDraftProvider: async () => ({
+      model: "claude-sonnet-5",
+      usage: { input_tokens: 1000, output_tokens: 500 },
+      planDraft: {
+        summary: "Build and verify the internal dashboard locally.",
+        tools: ["local-filesystem"],
+        tasks: [{ taskId: "work-dashboard", description: "Build the dashboard.", owner: "builder", status: "planned" }],
+        expectedOutput: "A locally validated dashboard.",
+        estimatedCostUsd: 0.02,
+        approvalGates: ["Separate approval before deployment."],
+        stopConditions: ["Stop before live services."]
+      }
+    }),
+    root: workspace,
+    now: new Date("2026-07-12T12:00:00.000Z")
+  });
+
+  assert.equal(result.aiPlanner.used, true);
+  assert.equal(result.aiPlanner.actualCostUsd, 0.0105);
+  assert.equal(result.safety.paidActionTriggered, true);
+  assert.equal(result.safety.externalBusinessActionExecuted, false);
+  const usageAuditPath = result.recordsCreated.find((item) => item.includes("anthropic-planner-use"));
+  const usageAudit = JSON.parse(readFileSync(path.join(workspace, usageAuditPath), "utf8"));
+  assert.equal(usageAudit.eventType, "standing_approval_used");
+  assert.equal(usageAudit.liveServiceTouched, true);
 });

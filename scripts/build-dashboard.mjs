@@ -135,6 +135,7 @@ function summarizeApproval(approvalPath, archive = false) {
     approvalKind: approval.approvalKind ?? "single_action",
     actionClass: approval.actionClass ?? null,
     maxUses: approval.maxUses ?? null,
+    budget: approval.budget ?? null,
     target: approval.target ?? "not_recorded",
     approvedActions: approval.approvedActions ?? [],
     revocableImmediately: approval.revocableImmediately === true,

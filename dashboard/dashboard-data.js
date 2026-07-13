@@ -1456,6 +1456,30 @@ window.AG_OS_DASHBOARD_DATA = {
       "mode": "read_only",
       "standingApprovals": [
         {
+          "approvalId": "approval-20260712-anthropic-planning",
+          "status": "approved",
+          "riskLevel": "R3",
+          "expiresAt": "2026-08-13T06:59:59.000Z",
+          "approvedBy": "owner-gurnoor-bassi",
+          "approvalKind": "standing",
+          "actionClass": "anthropic_plan_generation",
+          "maxUses": 20,
+          "budget": {
+            "required": true,
+            "maxUsd": 0.25,
+            "usageLedgerRef": ".codex/costs"
+          },
+          "target": "anthropic:messages-api",
+          "approvedActions": [
+            "anthropic_plan_generation"
+          ],
+          "revocableImmediately": true,
+          "recordPath": ".codex/approvals/approval-20260712-anthropic-planning.json",
+          "archived": false,
+          "usesRecorded": 0,
+          "remainingUses": 20
+        },
+        {
           "approvalId": "approval-20260709-ag-os-codex-draft-pr-standing",
           "status": "approved",
           "riskLevel": "R4",
@@ -1464,6 +1488,10 @@ window.AG_OS_DASHBOARD_DATA = {
           "approvalKind": "standing",
           "actionClass": "push_codex_branch_and_open_draft_pull_request",
           "maxUses": 10,
+          "budget": {
+            "required": false,
+            "maxUsd": 0
+          },
           "target": "github.com/gurnoorbassi/ag-os",
           "approvedActions": [
             "push_codex_branch",
@@ -1649,11 +1677,35 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "approvals": {
-    "activeCount": 1,
+    "activeCount": 2,
     "expiredCount": 25,
     "blockedCount": 0,
     "staleWarningCount": 0,
     "activeApprovals": [
+      {
+        "approvalId": "approval-20260712-anthropic-planning",
+        "status": "approved",
+        "riskLevel": "R3",
+        "expiresAt": "2026-08-13T06:59:59.000Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "standing",
+        "actionClass": "anthropic_plan_generation",
+        "maxUses": 20,
+        "budget": {
+          "required": true,
+          "maxUsd": 0.25,
+          "usageLedgerRef": ".codex/costs"
+        },
+        "target": "anthropic:messages-api",
+        "approvedActions": [
+          "anthropic_plan_generation"
+        ],
+        "revocableImmediately": true,
+        "recordPath": ".codex/approvals/approval-20260712-anthropic-planning.json",
+        "archived": false,
+        "usesRecorded": 0,
+        "remainingUses": 20
+      },
       {
         "approvalId": "approval-20260709-ag-os-codex-draft-pr-standing",
         "status": "approved",
@@ -1663,6 +1715,10 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "standing",
         "actionClass": "push_codex_branch_and_open_draft_pull_request",
         "maxUses": 10,
+        "budget": {
+          "required": false,
+          "maxUsd": 0
+        },
         "target": "github.com/gurnoorbassi/ag-os",
         "approvedActions": [
           "push_codex_branch",
@@ -1685,6 +1741,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260705-ag-digitalz-manual-posting-pack-v1.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging; ag-os:proof-records",
         "approvedActions": [
           "create_branch",
@@ -1708,6 +1769,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260705-ag-digitalz-instagram-handle-live-update.json"
+        },
         "target": "ag-os:client-management-dashboard-records; github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging",
         "approvedActions": [
           "record_public_handle",
@@ -1732,6 +1798,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260705-ag-os-dashboard-netlify-staging.json"
+        },
         "target": "netlify:ag-os-dashboard-staging; ag-os:dashboard",
         "approvedActions": [
           "create_netlify_staging_site",
@@ -1752,6 +1823,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260705-social-media-interactive-draft-ui.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging; ag-os:proof-records",
         "approvedActions": [
           "create_branch",
@@ -1775,6 +1851,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-ag-digitalz-draft-approval-netlify-staging.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system; netlify:ag-social-media-management-system-staging; ag-os:social-oauth-readiness-package",
         "approvedActions": [
           "record_draft_content_approval",
@@ -1799,6 +1880,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-ag-digitalz-content-review-netlify-staging.json"
+        },
         "target": "netlify:ag-social-media-management-system-staging",
         "approvedActions": [
           "redeploy_netlify_staging"
@@ -1816,6 +1902,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-target-pr-merge-ag-digitalz-content-review-v1.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system#5",
         "approvedActions": [
           "merge_pr"
@@ -1833,6 +1924,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-ag-digitalz-content-review-build.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/ag-digitalz-content-review-v1",
         "approvedActions": [
           "create_branch",
@@ -1852,6 +1948,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-ag-digitalz-first-content-sprint-netlify-staging.json"
+        },
         "target": "netlify:ag-social-media-management-system-staging",
         "approvedActions": [
           "redeploy_netlify_staging"
@@ -1869,6 +1970,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-target-pr-merge-ag-digitalz-first-content-sprint-v1.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system#4",
         "approvedActions": [
           "merge_pr"
@@ -1886,6 +1992,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-ag-digitalz-first-content-sprint-build.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/ag-digitalz-first-content-sprint-v1",
         "approvedActions": [
           "create_branch",
@@ -1905,6 +2016,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-ag-digitalz-netlify-staging-redeploy.json"
+        },
         "target": "netlify:ag-social-media-management-system-staging",
         "approvedActions": [
           "redeploy_netlify_staging"
@@ -1922,6 +2038,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-target-pr-merge-ag-digitalz-draft-config.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system#3",
         "approvedActions": [
           "merge_pr"
@@ -1939,6 +2060,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-ag-digitalz-draft-config-build.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/ag-digitalz-draft-config",
         "approvedActions": [
           "create_branch",
@@ -1958,6 +2084,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-social-media-netlify-staging-v1-1.json"
+        },
         "target": "netlify:ag-social-media-management-system-staging",
         "approvedActions": [
           "deploy_staging"
@@ -1975,6 +2106,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-target-pr-merge-social-media-system-v1-1.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system#2",
         "approvedActions": [
           "merge_pr"
@@ -1992,6 +2128,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-social-media-system-v1-1-upgrade.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/social-media-system-v1-1-upgrade",
         "approvedActions": [
           "create_branch",
@@ -2011,6 +2152,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-social-media-netlify-staging.json"
+        },
         "target": "netlify:ag-social-media-management-system-staging",
         "approvedActions": [
           "connect_netlify",
@@ -2029,6 +2175,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-target-pr-merge-social-media-system-v1.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system#1",
         "approvedActions": [
           "merge_pr"
@@ -2046,6 +2197,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-social-media-starter-build.json"
+        },
         "target": "github:gurnoorbassi/ag-social-media-management-system#ag-os/social-media-system-v1-starter",
         "approvedActions": [
           "create_branch",
@@ -2066,6 +2222,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/budget.json"
+        },
         "target": "n8n:Construction Website Lead Intake Follow-up Draft",
         "approvedActions": [
           "create_inactive_n8n_draft_workflow",
@@ -2086,6 +2247,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-netlify-staging-test-construction.json"
+        },
         "target": "netlify:gurnoorbassi/ag-test-construction-website:staging",
         "approvedActions": [
           "connect_netlify",
@@ -2104,6 +2270,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-target-pr-merge-construction-website.json"
+        },
         "target": "github:gurnoorbassi/ag-test-construction-website#1",
         "approvedActions": [
           "merge_pr"
@@ -2121,6 +2292,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-20260704-github-builder-pr.json"
+        },
         "target": "github:gurnoorbassi/ag-test-construction-website#ag-os/starter-construction-website-v1",
         "approvedActions": [
           "create_branch",
@@ -2141,6 +2317,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "single_action",
         "actionClass": null,
         "maxUses": null,
+        "budget": {
+          "required": false,
+          "maxUsd": 0,
+          "usageLedgerRef": ".codex/costs/cost-ledger-runtime-github-construction-website-repo-20260703.json"
+        },
         "target": "github:gurnoorbassi/ag-test-construction-website",
         "approvedActions": [
           "create_repo",
@@ -2155,6 +2336,30 @@ window.AG_OS_DASHBOARD_DATA = {
     "staleApprovals": [],
     "recentApprovedActions": [
       {
+        "approvalId": "approval-20260712-anthropic-planning",
+        "status": "approved",
+        "riskLevel": "R3",
+        "expiresAt": "2026-08-13T06:59:59.000Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "standing",
+        "actionClass": "anthropic_plan_generation",
+        "maxUses": 20,
+        "budget": {
+          "required": true,
+          "maxUsd": 0.25,
+          "usageLedgerRef": ".codex/costs"
+        },
+        "target": "anthropic:messages-api",
+        "approvedActions": [
+          "anthropic_plan_generation"
+        ],
+        "revocableImmediately": true,
+        "recordPath": ".codex/approvals/approval-20260712-anthropic-planning.json",
+        "archived": false,
+        "usesRecorded": 0,
+        "remainingUses": 20
+      },
+      {
         "approvalId": "approval-20260709-ag-os-codex-draft-pr-standing",
         "status": "approved",
         "riskLevel": "R4",
@@ -2163,6 +2368,10 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "standing",
         "actionClass": "push_codex_branch_and_open_draft_pull_request",
         "maxUses": 10,
+        "budget": {
+          "required": false,
+          "maxUsd": 0
+        },
         "target": "github.com/gurnoorbassi/ag-os",
         "approvedActions": [
           "push_codex_branch",
@@ -2175,8 +2384,32 @@ window.AG_OS_DASHBOARD_DATA = {
         "remainingUses": 10
       }
     ],
-    "standingCount": 1,
+    "standingCount": 2,
     "standingApprovals": [
+      {
+        "approvalId": "approval-20260712-anthropic-planning",
+        "status": "approved",
+        "riskLevel": "R3",
+        "expiresAt": "2026-08-13T06:59:59.000Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "standing",
+        "actionClass": "anthropic_plan_generation",
+        "maxUses": 20,
+        "budget": {
+          "required": true,
+          "maxUsd": 0.25,
+          "usageLedgerRef": ".codex/costs"
+        },
+        "target": "anthropic:messages-api",
+        "approvedActions": [
+          "anthropic_plan_generation"
+        ],
+        "revocableImmediately": true,
+        "recordPath": ".codex/approvals/approval-20260712-anthropic-planning.json",
+        "archived": false,
+        "usesRecorded": 0,
+        "remainingUses": 20
+      },
       {
         "approvalId": "approval-20260709-ag-os-codex-draft-pr-standing",
         "status": "approved",
@@ -2186,6 +2419,10 @@ window.AG_OS_DASHBOARD_DATA = {
         "approvalKind": "standing",
         "actionClass": "push_codex_branch_and_open_draft_pull_request",
         "maxUses": 10,
+        "budget": {
+          "required": false,
+          "maxUsd": 0
+        },
         "target": "github.com/gurnoorbassi/ag-os",
         "approvedActions": [
           "push_codex_branch",

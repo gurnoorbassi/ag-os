@@ -13,7 +13,9 @@ export function buildCostLedgerRecord({
   runId,
   now = new Date(),
   estimatedCostUsd = 0,
-  actualCostUsd = 0
+  actualCostUsd = 0,
+  usesPaidService = false,
+  usesLiveApi = false
 }) {
   if (!job?.jobId) {
     throw new Error("job with jobId is required");
@@ -49,8 +51,8 @@ export function buildCostLedgerRecord({
     },
     safety: {
       createsBillingChange: false,
-      usesPaidService: false,
-      usesLiveApi: false,
+      usesPaidService,
+      usesLiveApi,
       requiresOwnerApproval: approvalRequired
     },
     createdAt: timestamp,
@@ -67,6 +69,8 @@ export function writeCostLedgerRecord({
   now,
   estimatedCostUsd,
   actualCostUsd,
+  usesPaidService,
+  usesLiveApi,
   root = process.cwd()
 }) {
   const sourceJob = job ?? readJson(jobRecordPath, root);
@@ -77,7 +81,9 @@ export function writeCostLedgerRecord({
     runId,
     now,
     estimatedCostUsd,
-    actualCostUsd
+    actualCostUsd,
+    usesPaidService,
+    usesLiveApi
   });
   const filePath = `.codex/costs/${record.costLedgerId}.json`;
   writeJson(filePath, record, root);

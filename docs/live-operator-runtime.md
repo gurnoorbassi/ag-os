@@ -12,10 +12,24 @@ AG OS now includes a dependency-free authenticated coordinator and owner command
 
 The console does not silently execute connectors. Posting, messages, paid actions, credentials, production/customer data, deployment, DNS, merges, and destructive actions retain their separate action approvals.
 
+## Anthropic planning worker
+
+AG OS can replace the deterministic fallback plan with a schema-constrained Anthropic plan. It uses the Messages API through built-in Node `fetch`, so no SDK or dependency installation is required. The worker can only author the plan; it cannot use connectors, edit external repositories, deploy, publish, message, change DNS, or access production/customer data.
+
+The worker remains disabled unless all of these are true:
+
+- `ANTHROPIC_API_KEY` exists in the root-only runtime environment.
+- `AG_OS_AI_PLANNER_ENABLED=true`.
+- `ANTHROPIC_MODEL` names the reviewed model (the default is `claude-sonnet-5`).
+- `ANTHROPIC_INPUT_COST_PER_MILLION_USD` and `ANTHROPIC_OUTPUT_COST_PER_MILLION_USD` record the current prices used by the cost ledger.
+- `AG_OS_AI_PLANNER_APPROVAL_ID` points to an active, unexpired approval for target `anthropic:messages-api`, action `anthropic_plan_generation`, and `paid_actions`, with a positive per-use budget no greater than USD $5.
+
+Every successful call records the approval use, model, token counts, and computed cost. The API key is never returned by the status endpoint or written to AG OS evidence. A model call does not authorize any downstream live action.
+
 ## Local start
 
 1. Generate a long random owner token and store it outside Git and chat.
-2. Set `AG_OS_OWNER_TOKEN` in the shell or a local ignored `.env` loader.
+2. Set `AG_OS_OWNER_TOKEN` in the shell or a local ignored `.env` loader. If enabling Anthropic planning, set its variables in the same ignored/root-only environment and never paste the key into chat or source control.
 3. Run `npm.cmd run dashboard:build` and `npm.cmd run live:start`.
 4. Open `http://127.0.0.1:8787`, enter the same token, and connect.
 

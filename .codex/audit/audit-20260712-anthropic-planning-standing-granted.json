@@ -1,0 +1,24 @@
+{
+  "id": "audit-20260712-anthropic-planning-standing-granted",
+  "occurredAt": "2026-07-12T10:24:30.810Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "approval_granted",
+  "summary": "Owner granted a revocable standing approval for cost-limited Anthropic plan generation in AG OS.",
+  "scope": "Anthropic Messages API planning only; 20 successful uses; USD $0.25 maximum per use; expires end of August 12, 2026 America/Vancouver",
+  "source": "owner_instruction",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260712-anthropic-planning"
+    },
+    {
+      "type": "document",
+      "reference": "docs/live-operator-runtime.md"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "notes": "Grant recording only. No Anthropic credential was accessed or stored and no API call, repository execution, deployment, post, message, customer or production data action, DNS change, or external connector action occurred. Every future use must pass the runtime readiness gate and produce a standing_approval_used audit event.",
+  "createdAt": "2026-07-12T10:24:30.810Z"
+}
