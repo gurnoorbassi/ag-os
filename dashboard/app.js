@@ -4,8 +4,15 @@ let runtimeAiPlanner = null;
 function statusClass(value) {
   const normalized = String(value).toLowerCase();
   if (normalized === "live") return "status-active";
+  if (normalized.includes("protected")) return "status-protected";
+  if (normalized.includes("approval gated")) return "status-protected";
+  if (normalized.includes("approval_gated")) return "status-protected";
+  if (normalized.includes("owner action")) return "status-owner-action";
+  if (normalized.includes("owner_action")) return "status-owner-action";
+  if (normalized.includes("optional_input")) return "status-zero";
+  if (normalized.includes("feature_setup")) return "status-zero";
+  if (normalized.includes("reference")) return "status-zero";
   if (normalized.includes("setup needed")) return "status-blocked";
-  if (normalized.includes("approval gated")) return "status-conditional";
   if (normalized.includes("ready")) return "status-active";
   if (normalized.includes("pass")) return "status-active";
   if (normalized.includes("not_connected")) return "status-disabled";
@@ -121,6 +128,21 @@ function table(headers, rows) {
   return wrap;
 }
 
+function collapsible(title, content, detail = "") {
+  const disclosure = document.createElement("details");
+  disclosure.className = "dashboard-disclosure";
+  const summary = document.createElement("summary");
+  summary.textContent = title;
+  disclosure.append(summary);
+  if (detail) {
+    const description = document.createElement("p");
+    description.textContent = detail;
+    disclosure.append(description);
+  }
+  disclosure.append(content);
+  return disclosure;
+}
+
 function labelStack(title, subtitle) {
   const wrap = document.createElement("div");
   const strong = document.createElement("strong");
@@ -165,9 +187,9 @@ function renderOverview() {
     }),
     card({
       title: "Safety Posture",
-      status: data.systemStatus.safetyPosture,
-      metric: "Read-only",
-      detail: "No live connector action is performed by this dashboard.",
+      status: "protected",
+      metric: "Constitution protected",
+      detail: "The dashboard can show protected actions without treating them as system failures.",
       meta: data.systemStatus.blockedActions.slice(0, 6)
     }),
     card({
@@ -308,10 +330,11 @@ function initializeNavigation() {
 function renderOwnerAttention() {
   const root = clear("#owner-attention-grid");
   data.ownerAttention.forEach((item) => {
+    const presentationStatus = item.presentationStatus ?? item.status;
     root.append(card({
       title: item.title,
-      status: item.status,
-      metric: item.status,
+      status: presentationStatus,
+      metric: presentationStatus,
       detail: item.action,
       meta: [item.detail, item.sourceRecord]
     }));
@@ -323,25 +346,25 @@ function renderActionQueue() {
   const grid = clear("#action-queue-grid");
   grid.append(
     card({
-      title: "Owner Decisions",
+      title: "Owner Choices",
       status: queue.status,
-      metric: queue.ownerDecisionCount,
-      detail: "Decision queue from AG OS records. This dashboard cannot execute actions.",
+      metric: `${queue.blockingCoreDecisionCount} core blockers`,
+      detail: `${queue.featureDecisionCount} feature-scoped choice(s) can wait until that feature is activated.`,
       meta: queue.ownerDecisionsNeeded.map((item) => `${item.decision}: ${item.status}`)
     }),
     card({
-      title: "Blocked Actions",
-      status: queue.blockedActionCount === 0 ? "ready" : "blocked",
-      metric: queue.blockedActionCount,
-      detail: "Live social, credentials, production, and domain actions remain blocked.",
-      meta: queue.blockedActions.map((item) => `${item.id}: ${item.reason}`)
+      title: "Constitution Protections",
+      status: queue.protectedActionCount === 0 ? "ready" : "protected",
+      metric: queue.protectedActionCount,
+      detail: "These are deliberate approval gates, not broken system components.",
+      meta: queue.protectedActions.map((item) => `${item.id}: ${item.reason}`)
     }),
     card({
       title: "Approval Packages",
-      status: queue.approvalPackageCount === 0 ? "zero" : "draft",
+      status: queue.approvalPackageCount === 0 ? "zero" : "reference",
       metric: `${queue.approvalPackageCount} ready`,
-      detail: "Templates are readiness packages only; they do not grant execution permission.",
-      meta: queue.approvalPackagesReady.slice(0, 6).map((item) => `${item.approvalId}: ${item.commandCategory}`)
+      detail: "Reference templates are kept out of the owner decision count and do not grant permission.",
+      meta: queue.approvalPackagesReady.slice(0, 3).map((item) => `${item.approvalId}: ${item.commandCategory}`)
     }),
     card({
       title: "Manual Posting",
@@ -355,23 +378,28 @@ function renderActionQueue() {
   const panel = clear("#action-queue-panel");
   panel.append(
     table(
-      ["Decision", "Status", "Detail", "Source"],
+      ["Owner choice", "Status", "Scope", "Detail", "Source"],
       queue.ownerDecisionsNeeded.map((item) => [
         labelStack(item.decision, item.id),
         pill(item.status),
+        item.scope,
         item.detail,
         item.sourceRecord
       ])
     ),
-    table(
-      ["Approval package", "Category", "Target", "Risk", "Record"],
-      queue.approvalPackagesReady.map((item) => [
-        labelStack(item.approvalId, item.requestedAction),
-        item.commandCategory,
-        item.target,
-        item.riskLevel,
-        item.recordPath
-      ])
+    collapsible(
+      `Reference approval templates (${queue.approvalPackagesReady.length})`,
+      table(
+        ["Approval package", "Category", "Target", "Risk", "Record"],
+        queue.approvalPackagesReady.map((item) => [
+          labelStack(item.approvalId, item.requestedAction),
+          item.commandCategory,
+          item.target,
+          item.riskLevel,
+          item.recordPath
+        ])
+      ),
+      "Collapsed by default because templates are reference material, not unfinished owner work."
     ),
     table(
       ["Safe next milestone", "Status", "Detail"],

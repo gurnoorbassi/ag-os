@@ -577,10 +577,16 @@ h3 {
 .status-read_only,
 .status-review,
 .status-waiting_approval,
-.status-approval_gated,
-.status-setup_needed {
+.status-setup_needed,
+.status-owner-action {
   color: var(--amber);
   background: rgba(242, 184, 75, 0.11);
+}
+
+.status-protected,
+.status-approval_gated {
+  color: #8fa9ff;
+  background: rgba(111, 145, 255, 0.13);
 }
 
 .status-blocked,
@@ -614,6 +620,35 @@ h3 {
 
 .stack-panel .table-wrap {
   padding: 0;
+}
+
+.dashboard-disclosure {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+}
+
+.dashboard-disclosure > summary {
+  padding: 14px 16px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.dashboard-disclosure > p {
+  margin: 0;
+  padding: 0 16px 14px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.dashboard-disclosure[open] > summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.dashboard-disclosure .table-wrap {
+  padding: 0 16px 16px;
 }
 
 table {

@@ -1188,41 +1188,19 @@ window.AG_OS_DASHBOARD_DATA = {
   },
   "ownerAttention": [
     {
-      "id": "connector-auth-connector-github-mcp",
-      "status": "review",
-      "title": "Connector auth: connector-github-mcp",
-      "detail": "Last known auth status is expired (observed 2026-07-06T00:00:00Z via owner_report).",
-      "action": "Re-authenticate or verify this connector before gated execution work.",
-      "sourceRecord": ".codex/connectors/connector-auth-github-mcp.json"
-    },
-    {
-      "id": "connector-auth-connector-n8n-mcp",
-      "status": "review",
-      "title": "Connector auth: connector-n8n-mcp",
-      "detail": "Last known auth status is unknown (observed 2026-07-04T00:00:00Z via gated_execution_record).",
-      "action": "Re-authenticate or verify this connector before gated execution work.",
-      "sourceRecord": ".codex/connectors/connector-auth-n8n-mcp.json"
-    },
-    {
-      "id": "connector-auth-connector-netlify-mcp",
-      "status": "review",
-      "title": "Connector auth: connector-netlify-mcp",
-      "detail": "Last known auth status is unknown (observed 2026-07-05T00:00:00Z via gated_execution_record).",
-      "action": "Re-authenticate or verify this connector before gated execution work.",
-      "sourceRecord": ".codex/connectors/connector-auth-netlify-mcp.json"
-    },
-    {
       "id": "live-social-integrations-blocked",
       "status": "blocked",
-      "title": "Live social integrations",
-      "detail": "OAuth, credentials, posting, scheduling, analytics API, and n8n activation remain blocked.",
-      "action": "Use future approval packages before any live integration work.",
+      "presentationStatus": "protected",
+      "title": "Live social integrations protected",
+      "detail": "OAuth, credentials, posting, scheduling, analytics API, and n8n activation require separate scoped approval.",
+      "action": "No failure: the Constitution is holding these actions until an exact approval is active.",
       "sourceRecord": "docs/social-media-management-system-v1-future-connectors.md"
     },
     {
       "id": "instagram-oauth-execution-needed",
       "status": "blocked",
-      "title": "Instagram OAuth execution",
+      "presentationStatus": "approval_gated",
+      "title": "Instagram OAuth approval gate",
       "detail": "@agdigitalz remains access_requested; automated posting cannot start.",
       "action": "Owner must approve approval-instagram-oauth-execution before any Instagram OAuth flow can start. Credential reference credential-ref-instagram-agdigitalz-oauth is source-controlled as a reference only and contains no secret value. OAuth approval still does not authorize posting, scheduling, analytics, DMs/comments, or n8n activation.",
       "sourceRecord": ".codex/social/accounts/ag-digitalz-instagram.json"
@@ -1240,33 +1218,68 @@ window.AG_OS_DASHBOARD_DATA = {
     "records": [
       {
         "connectorId": "connector-github-mcp",
-        "authStatus": "expired",
-        "lastObservedAt": "2026-07-06T00:00:00Z",
-        "observationSource": "owner_report",
+        "authStatus": "authenticated",
+        "lastObservedAt": "2026-07-13T22:26:28Z",
+        "observationSource": "gated_execution_record",
         "recordPath": ".codex/connectors/connector-auth-github-mcp.json"
       },
       {
         "connectorId": "connector-n8n-mcp",
-        "authStatus": "unknown",
-        "lastObservedAt": "2026-07-04T00:00:00Z",
+        "authStatus": "authenticated",
+        "lastObservedAt": "2026-07-13T22:26:28Z",
         "observationSource": "gated_execution_record",
         "recordPath": ".codex/connectors/connector-auth-n8n-mcp.json"
       },
       {
         "connectorId": "connector-netlify-mcp",
-        "authStatus": "unknown",
-        "lastObservedAt": "2026-07-05T00:00:00Z",
+        "authStatus": "authenticated",
+        "lastObservedAt": "2026-07-13T22:26:28Z",
         "observationSource": "gated_execution_record",
         "recordPath": ".codex/connectors/connector-auth-netlify-mcp.json"
       }
     ],
-    "notAuthenticatedCount": 3,
+    "notAuthenticatedCount": 0,
     "authStatusGrantsPermission": false
   },
   "dashboardActionQueue": {
-    "status": "blocked",
+    "status": "ready",
     "mode": "read_only",
     "ownerDecisionCount": 2,
+    "blockingCoreDecisionCount": 0,
+    "featureDecisionCount": 2,
+    "protectedActionCount": 5,
+    "protectedActions": [
+      {
+        "id": "social-oauth",
+        "status": "protected",
+        "reason": "No approved secure credential store or OAuth execution connector.",
+        "sourceRecord": "docs/instagram-oauth-readiness-package.md"
+      },
+      {
+        "id": "automated-posting",
+        "status": "protected",
+        "reason": "Posting and scheduling are outside current approval scope.",
+        "sourceRecord": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
+      },
+      {
+        "id": "analytics-api",
+        "status": "protected",
+        "reason": "Analytics API use needs separate connector, credential, and owner approval gates.",
+        "sourceRecord": "docs/social-oauth-readiness-package.md"
+      },
+      {
+        "id": "n8n-live-activation",
+        "status": "protected",
+        "reason": "n8n proof is inactive draft only; activation requires separate approval.",
+        "sourceRecord": "docs/n8n-draft-workflow-approval-package.md"
+      },
+      {
+        "id": "production-domain",
+        "status": "protected",
+        "reason": "Production deployment, custom domain, and DNS changes require separate owner approval.",
+        "sourceRecord": "docs/action-matrix.md"
+      }
+    ],
     "blockedActionCount": 5,
     "approvalPackageCount": 14,
     "staleApprovalCount": 0,
@@ -1274,52 +1287,56 @@ window.AG_OS_DASHBOARD_DATA = {
     "manualPostingDetail": "21 owner-approved draft post package(s) can be used manually while automation remains blocked.",
     "oauthBlockedReason": "OAuth is blocked until secure credential storage and an approved connector path exist.",
     "credentialStoreMissingReason": "No approved credential store record is active; tokens remain forbidden in repo, chat, and source-controlled files.",
-    "nextSafeCommand": "Run Connector Preflight Runtime v1 locally after source PRs merge and GitHub connector auth is restored.",
+    "nextSafeCommand": "Connector sessions are authenticated; use an exact scoped approval before any mutating connector action.",
     "latestStagingUrl": "https://ag-social-media-management-system-staging.netlify.app",
     "ownerDecisionsNeeded": [
       {
         "id": "missing-social-handles",
-        "status": "waiting_owner",
+        "status": "optional_input",
+        "scope": "social_activation",
+        "blockingCore": false,
         "decision": "Provide remaining public platform handles",
-        "detail": "TikTok, YouTube Shorts, LinkedIn remain not_provided / pending_owner_input.",
+        "detail": "TikTok, YouTube Shorts, LinkedIn can be added when those channels are activated; they do not block AG OS core use.",
         "sourceRecord": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
       },
       {
         "id": "credential-store-decision",
-        "status": "blocked",
+        "status": "feature_setup",
+        "scope": "social_activation",
+        "blockingCore": false,
         "decision": "Choose secure credential store before OAuth",
-        "detail": "Instagram OAuth remains blocked until a secure credential store and connector path are approved.",
+        "detail": "Needed only when Instagram OAuth is activated; it does not block private AG OS project automation.",
         "sourceRecord": "docs/instagram-oauth-readiness-package.md"
       }
     ],
     "blockedActions": [
       {
         "id": "social-oauth",
-        "status": "blocked",
+        "status": "protected",
         "reason": "No approved secure credential store or OAuth execution connector.",
         "sourceRecord": "docs/instagram-oauth-readiness-package.md"
       },
       {
         "id": "automated-posting",
-        "status": "blocked",
+        "status": "protected",
         "reason": "Posting and scheduling are outside current approval scope.",
         "sourceRecord": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
       },
       {
         "id": "analytics-api",
-        "status": "blocked",
+        "status": "protected",
         "reason": "Analytics API use needs separate connector, credential, and owner approval gates.",
         "sourceRecord": "docs/social-oauth-readiness-package.md"
       },
       {
         "id": "n8n-live-activation",
-        "status": "blocked",
+        "status": "protected",
         "reason": "n8n proof is inactive draft only; activation requires separate approval.",
         "sourceRecord": "docs/n8n-draft-workflow-approval-package.md"
       },
       {
         "id": "production-domain",
-        "status": "blocked",
+        "status": "protected",
         "reason": "Production deployment, custom domain, and DNS changes require separate owner approval.",
         "sourceRecord": "docs/action-matrix.md"
       }
@@ -1500,23 +1517,27 @@ window.AG_OS_DASHBOARD_DATA = {
           "revocableImmediately": true,
           "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
           "archived": false,
-          "usesRecorded": 3,
-          "remainingUses": 7
+          "usesRecorded": 4,
+          "remainingUses": 6
         }
       ],
       "ownerDecisions": [
         {
           "id": "missing-social-handles",
-          "status": "waiting_owner",
+          "status": "optional_input",
+          "scope": "social_activation",
+          "blockingCore": false,
           "decision": "Provide remaining public platform handles",
-          "detail": "TikTok, YouTube Shorts, LinkedIn remain not_provided / pending_owner_input.",
+          "detail": "TikTok, YouTube Shorts, LinkedIn can be added when those channels are activated; they do not block AG OS core use.",
           "sourceRecord": ".codex/client-management/content-sprints/content-sprint-ag-digitalz-first-content-sprint-v1.json"
         },
         {
           "id": "credential-store-decision",
-          "status": "blocked",
+          "status": "feature_setup",
+          "scope": "social_activation",
+          "blockingCore": false,
           "decision": "Choose secure credential store before OAuth",
-          "detail": "Instagram OAuth remains blocked until a secure credential store and connector path are approved.",
+          "detail": "Needed only when Instagram OAuth is activated; it does not block private AG OS project automation.",
           "sourceRecord": "docs/instagram-oauth-readiness-package.md"
         }
       ],
@@ -1655,8 +1676,8 @@ window.AG_OS_DASHBOARD_DATA = {
     "safeNextMilestones": [
       {
         "id": "connector-preflight-runtime-v1",
-        "status": "safe_local_next",
-        "detail": "Add read-only preflight checks for connector availability, exact approval scope, cost, rollback, and stop conditions."
+        "status": "complete",
+        "detail": "GitHub, Netlify, and n8n connectivity was verified through read-only connector calls on 2026-07-13."
       },
       {
         "id": "business-loop-v1",
@@ -1727,8 +1748,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 3,
-        "remainingUses": 7
+        "usesRecorded": 4,
+        "remainingUses": 6
       },
       {
         "approvalId": "approval-20260713-h3-compounding-proof",
@@ -2403,8 +2424,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 3,
-        "remainingUses": 7
+        "usesRecorded": 4,
+        "remainingUses": 6
       },
       {
         "approvalId": "approval-20260713-h3-compounding-proof",
@@ -2477,8 +2498,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 3,
-        "remainingUses": 7
+        "usesRecorded": 4,
+        "remainingUses": 6
       }
     ]
   },
