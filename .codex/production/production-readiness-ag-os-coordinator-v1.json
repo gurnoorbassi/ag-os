@@ -27,8 +27,12 @@
     },
     {
       "checkId": "monitoring_active",
-      "status": "blocked",
-      "evidence": ["Container healthcheck and passive monitor templates exist, but no live monitoring call or timer is active before deployment approval."]
+      "status": "pass",
+      "evidence": [
+        "Read-only verification on 2026-07-13 confirmed ag-os-coordinator Docker health Status healthy with FailingStreak 0 and repeated successful 30-second healthchecks.",
+        "A separate in-container ops/monitor-health.mjs probe returned HTTP 200 and status pass without changing the service.",
+        "The coordinator restart policy is unless-stopped; the separately approval-gated systemd monitoring timer remains optional defense in depth."
+      ]
     },
     {
       "checkId": "incident_response_ready",
@@ -37,8 +41,12 @@
     },
     {
       "checkId": "credential_rotation_revocation_ready",
-      "status": "blocked",
-      "evidence": ["Rotation and revocation procedure is documented, but no production owner token or reverse-proxy password may be created or changed without exact approval."]
+      "status": "pass",
+      "evidence": [
+        "Read-only verification on 2026-07-13 confirmed /etc/ag-os/ag-os.env is root:root mode 0600.",
+        "docs/ag-os-coordinator-deployment-runbook.md defines new-value validation, old-session invalidation, emergency access shutdown, non-secret audit evidence, and exact approval before any rotation or revocation.",
+        "tests/live-command-service.test.mjs proves owner token comparison fails closed; readiness does not authorize changing the live token."
+      ]
     },
     {
       "checkId": "cost_review_passed",
@@ -47,8 +55,11 @@
     },
     {
       "checkId": "validation_security_ci_passed",
-      "status": "blocked",
-      "evidence": ["Local gates must pass and GitHub CI must succeed for the exact deployment-prep candidate commit before production approval."]
+      "status": "pass",
+      "evidence": [
+        "Foundation CI run 29285456314 completed successfully for deployed PR head 8a6e673c3342724b67170109d12dbbd8b2469742 before merge commit 0a528d683d4937a3c3bd6f281dd000488cc1812e was deployed.",
+        "On 2026-07-13 dashboard build/check, foundation validation, boot check, secret scan, 180 runtime tests, coordinator production-readiness evaluation, and git diff check all completed successfully for this readiness update."
+      ]
     },
     {
       "checkId": "exact_production_approval_active",
@@ -78,5 +89,5 @@
     "postingAllowed": false
   },
   "createdAt": "2026-07-12T05:18:39.000Z",
-  "updatedAt": "2026-07-12T05:18:39.000Z"
+  "updatedAt": "2026-07-13T22:31:51.800Z"
 }

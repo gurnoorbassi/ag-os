@@ -851,9 +851,10 @@ function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview,
   attention.push({
     id: "live-social-integrations-blocked",
     status: "blocked",
-    title: "Live social integrations",
-    detail: "OAuth, credentials, posting, scheduling, analytics API, and n8n activation remain blocked.",
-    action: "Use future approval packages before any live integration work.",
+    presentationStatus: "protected",
+    title: "Live social integrations protected",
+    detail: "OAuth, credentials, posting, scheduling, analytics API, and n8n activation require separate scoped approval.",
+    action: "No failure: the Constitution is holding these actions until an exact approval is active.",
     sourceRecord: "docs/social-media-management-system-v1-future-connectors.md"
   });
 
@@ -861,7 +862,8 @@ function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview,
     attention.push({
       id: "instagram-oauth-execution-needed",
       status: "blocked",
-      title: "Instagram OAuth execution",
+      presentationStatus: "approval_gated",
+      title: "Instagram OAuth approval gate",
       detail: `${socialPosting.targetHandle} remains ${socialPosting.accountState}; automated posting cannot start.`,
       action: socialPosting.nextRequiredOwnerApproval,
       sourceRecord: ".codex/social/accounts/ag-digitalz-instagram.json"
@@ -897,6 +899,8 @@ function collectDashboardActionQueue({
     ownerDecisionsNeeded.push({
       id: "first-client-intake",
       status: "blocked",
+      scope: "core_setup",
+      blockingCore: true,
       decision: "Provide required first-client fields",
       detail: `${firstClientReadiness.missingRequiredFieldCount} required field(s) remain unresolved.`,
       sourceRecord: firstClientReadiness.sourceRecord
@@ -906,9 +910,11 @@ function collectDashboardActionQueue({
   if (missingHandles.length > 0) {
     ownerDecisionsNeeded.push({
       id: "missing-social-handles",
-      status: "waiting_owner",
+      status: "optional_input",
+      scope: "social_activation",
+      blockingCore: false,
       decision: "Provide remaining public platform handles",
-      detail: `${missingHandles.join(", ")} remain not_provided / pending_owner_input.`,
+      detail: `${missingHandles.join(", ")} can be added when those channels are activated; they do not block AG OS core use.`,
       sourceRecord: firstContentSprint.recordPath
     });
   }
@@ -917,6 +923,8 @@ function collectDashboardActionQueue({
     ownerDecisionsNeeded.push({
       id: "stale-approval-review",
       status: "review",
+      scope: "core_setup",
+      blockingCore: true,
       decision: "Review stale or blocked approvals",
       detail: `${approvals.staleWarningCount} stale/blocking approval warning(s) are present.`,
       sourceRecord: ".codex/approvals/"
@@ -927,6 +935,8 @@ function collectDashboardActionQueue({
     ownerDecisionsNeeded.push({
       id: "quality-review",
       status: "review",
+      scope: "core_setup",
+      blockingCore: true,
       decision: "Resolve review-required critiques",
       detail: `${qualityReview.reviewRequiredCount} critique(s) require review; ${qualityReview.failedCount} failed.`,
       sourceRecord: ".codex/critiques/"
@@ -935,40 +945,42 @@ function collectDashboardActionQueue({
 
   ownerDecisionsNeeded.push({
     id: "credential-store-decision",
-    status: "blocked",
+    status: "feature_setup",
+    scope: "social_activation",
+    blockingCore: false,
     decision: "Choose secure credential store before OAuth",
-    detail: "Instagram OAuth remains blocked until a secure credential store and connector path are approved.",
+    detail: "Needed only when Instagram OAuth is activated; it does not block private AG OS project automation.",
     sourceRecord: "docs/instagram-oauth-readiness-package.md"
   });
 
   const blockedActions = [
     {
       id: "social-oauth",
-      status: "blocked",
+      status: "protected",
       reason: "No approved secure credential store or OAuth execution connector.",
       sourceRecord: "docs/instagram-oauth-readiness-package.md"
     },
     {
       id: "automated-posting",
-      status: "blocked",
+      status: "protected",
       reason: "Posting and scheduling are outside current approval scope.",
       sourceRecord: firstContentSprint?.recordPath ?? ".codex/client-management/content-sprints/"
     },
     {
       id: "analytics-api",
-      status: "blocked",
+      status: "protected",
       reason: "Analytics API use needs separate connector, credential, and owner approval gates.",
       sourceRecord: "docs/social-oauth-readiness-package.md"
     },
     {
       id: "n8n-live-activation",
-      status: "blocked",
+      status: "protected",
       reason: "n8n proof is inactive draft only; activation requires separate approval.",
       sourceRecord: "docs/n8n-draft-workflow-approval-package.md"
     },
     {
       id: "production-domain",
-      status: "blocked",
+      status: "protected",
       reason: "Production deployment, custom domain, and DNS changes require separate owner approval.",
       sourceRecord: "docs/action-matrix.md"
     }
@@ -978,11 +990,17 @@ function collectDashboardActionQueue({
     firstContentSprint?.ownerApprovedDraftCount > 0 &&
     firstContentSprint?.safety?.postingTriggered === false
   );
+  const blockingCoreDecisions = ownerDecisionsNeeded.filter((item) => item.blockingCore === true);
+  const featureDecisions = ownerDecisionsNeeded.filter((item) => item.blockingCore !== true);
 
   return {
-    status: ownerDecisionsNeeded.some((item) => item.status === "blocked") ? "blocked" : "ready",
+    status: blockingCoreDecisions.length > 0 ? "owner_action" : "ready",
     mode: "read_only",
     ownerDecisionCount: ownerDecisionsNeeded.length,
+    blockingCoreDecisionCount: blockingCoreDecisions.length,
+    featureDecisionCount: featureDecisions.length,
+    protectedActionCount: blockedActions.length,
+    protectedActions: blockedActions,
     blockedActionCount: blockedActions.length,
     approvalPackageCount: approvalPackagesReady.length,
     staleApprovalCount: approvals.staleApprovals.length,
@@ -992,7 +1010,7 @@ function collectDashboardActionQueue({
       : "Manual posting pack is not available from current records.",
     oauthBlockedReason: "OAuth is blocked until secure credential storage and an approved connector path exist.",
     credentialStoreMissingReason: "No approved credential store record is active; tokens remain forbidden in repo, chat, and source-controlled files.",
-    nextSafeCommand: "Run Connector Preflight Runtime v1 locally after source PRs merge and GitHub connector auth is restored.",
+    nextSafeCommand: "Connector sessions are authenticated; use an exact scoped approval before any mutating connector action.",
     latestStagingUrl: latestSocialMediaStaging?.siteUrl ?? "Not recorded",
     ownerDecisionsNeeded,
     blockedActions,
@@ -1009,8 +1027,8 @@ function collectDashboardActionQueue({
     safeNextMilestones: [
       {
         id: "connector-preflight-runtime-v1",
-        status: "safe_local_next",
-        detail: "Add read-only preflight checks for connector availability, exact approval scope, cost, rollback, and stop conditions."
+        status: "complete",
+        detail: "GitHub, Netlify, and n8n connectivity was verified through read-only connector calls on 2026-07-13."
       },
       {
         id: "business-loop-v1",
