@@ -1,0 +1,24 @@
+{
+  "id": "audit-runtime-approval-20260709-ag-os-codex-draft-pr-standing-use-4",
+  "occurredAt": "2026-07-13T22:37:22.390Z",
+  "actor": "agent-codex",
+  "eventType": "standing_approval_used",
+  "summary": "Standing approval approval-20260709-ag-os-codex-draft-pr-standing used for codex branch push and draft PR creation.",
+  "scope": "gurnoorbassi/ag-os:codex/real-setup-constitution-owner-queue-20260713",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260709-ag-os-codex-draft-pr-standing"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/138"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Use 4 of 10. Secret scan and all required local gates passed. Merge and deployment remain prohibited. Changed files are limited to connector auth evidence, coordinator readiness evidence, dashboard source/generated data, and dashboard presentation.",
+  "createdAt": "2026-07-13T22:37:22.390Z"
+}
