@@ -1,0 +1,24 @@
+{
+  "id": "audit-runtime-approval-20260709-ag-os-codex-draft-pr-standing-use-2",
+  "occurredAt": "2026-07-13T20:39:04.648Z",
+  "actor": "agent-codex",
+  "eventType": "standing_approval_used",
+  "summary": "Standing approval approval-20260709-ag-os-codex-draft-pr-standing used for codex branch push and draft PR creation.",
+  "scope": "gurnoorbassi/ag-os:codex/end-to-end-owner-automation-20260713",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260709-ag-os-codex-draft-pr-standing"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/136"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Use 2 of 10. Secret scan and all required local gates passed. Merge remains prohibited. Changed files: dashboard/app.js, dashboard/index.html, dashboard/styles.css, scripts/lib/runtime/autonomous-runner.mjs, scripts/lib/runtime/project-service.mjs, scripts/live-server.mjs, tests/autonomous-runner.test.mjs, tests/project-service.test.mjs.",
+  "createdAt": "2026-07-13T20:39:04.648Z"
+}

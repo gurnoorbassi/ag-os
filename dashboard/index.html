@@ -136,6 +136,7 @@
             </div>
           </form>
           <div id="recent-command-panel" class="stack-panel"></div>
+          <div id="runtime-job-panel" class="stack-panel"></div>
         </section>
 
         <section id="activation-center" class="section-band activation-center">
@@ -180,8 +181,49 @@
         <section id="projects" class="section-band">
           <div class="section-heading">
             <h2>Projects</h2>
-            <p>Registered product and operating projects.</p>
+            <p>Create a production-clean project, then send it an owner command. Live actions remain separately approval-gated.</p>
           </div>
+          <form id="project-create-form" class="command-console project-create-form">
+            <div class="project-form-grid">
+              <label>
+                Project name
+                <input id="project-name" maxlength="120" required placeholder="Example: AG Digitalz client onboarding">
+              </label>
+              <label>
+                Project type
+                <select id="project-type">
+                  <option value="internal_project">Internal project</option>
+                  <option value="product_project">Product project</option>
+                </select>
+              </label>
+              <label>
+                Starting trust
+                <select id="project-trust-level">
+                  <option value="1">Level 1 - local work only</option>
+                  <option value="0">Level 0 - observe only</option>
+                  <option value="2">Level 2 - reviewed staging</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              Goal
+              <textarea id="project-goal" rows="3" maxlength="5000" required placeholder="What successful completion looks like."></textarea>
+            </label>
+            <div class="project-form-grid two-column">
+              <label>
+                Scope (one item per line)
+                <textarea id="project-scope" rows="4" maxlength="5000" required placeholder="Build the workflow&#10;Verify the result&#10;Record quality and lessons"></textarea>
+              </label>
+              <label>
+                Stack or tools (comma separated)
+                <textarea id="project-stack" rows="4" maxlength="5000" required placeholder="AG OS, GitHub, local filesystem"></textarea>
+              </label>
+            </div>
+            <div class="command-actions">
+              <p id="project-create-status" role="status">Connect with the owner token before creating a project.</p>
+              <button type="submit">Create project</button>
+            </div>
+          </form>
           <div class="table-wrap">
             <table>
               <thead>

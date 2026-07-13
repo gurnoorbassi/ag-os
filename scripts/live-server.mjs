@@ -8,6 +8,8 @@ import { listRecentOwnerCommands, submitOwnerCommand } from "./lib/runtime/live-
 import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
 import { createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
 import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-planner-readiness.mjs";
+import { createProject, listProjects } from "./lib/runtime/project-service.mjs";
+import { listAutonomousJobs, processQueuedJobs } from "./lib/runtime/autonomous-runner.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dashboardRoot = path.join(root, "dashboard");
@@ -23,6 +25,15 @@ const MIME_TYPES = {
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml"
 };
+
+function runAutomaticQueue() {
+  try {
+    return processQueuedJobs({ root });
+  } catch (error) {
+    console.error(JSON.stringify({ service: "ag-os-coordinator", event: "automatic-run-failed", detail: error.message }));
+    return { status: "failed", processed: [], error: error.message };
+  }
+}
 
 function json(response, status, body, extraHeaders = {}) {
   response.writeHead(status, {
@@ -145,10 +156,31 @@ const server = createServer(async (request, response) => {
       json(response, 200, {
         service: "ag-os-coordinator",
         mode: "owner_operated_fail_closed",
+        automation: {
+          enabled: process.env.AG_OS_AUTOMATION_ENABLED !== "false",
+          pollIntervalSeconds: 15,
+          adapter: "built_in_local_validation",
+          liveAdaptersEnabled: false
+        },
         production: readinessStatus(),
         aiPlanner: publicAiPlannerStatus(),
+        projects: listProjects({ root }),
+        jobs: listAutonomousJobs({ root }),
         recentCommands: listRecentOwnerCommands({ root })
       }, headers);
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/v1/projects") {
+      const body = await readJsonBody(request);
+      const result = createProject({ input: body, root });
+      json(response, 201, result, headers);
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/v1/automation/run") {
+      const result = processQueuedJobs({ root });
+      json(response, 200, result, headers);
       return;
     }
 
@@ -170,6 +202,7 @@ const server = createServer(async (request, response) => {
         root
       });
       json(response, 201, result, headers);
+      setImmediate(runAutomaticQueue);
       return;
     }
 
@@ -201,5 +234,9 @@ if (isMain) {
 
   server.listen(port, host, () => {
     console.log(JSON.stringify({ service: "ag-os-coordinator", status: "listening", host, port }));
+    if (process.env.AG_OS_AUTOMATION_ENABLED !== "false") {
+      setImmediate(runAutomaticQueue);
+      setInterval(runAutomaticQueue, 15_000).unref();
+    }
   });
 }
