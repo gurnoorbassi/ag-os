@@ -112,12 +112,10 @@
       ],
       "properties": {
         "credentialsAllowed": {
-          "type": "boolean",
-          "const": false
+          "type": "boolean"
         },
         "liveServiceUseAllowed": {
-          "type": "boolean",
-          "const": false
+          "type": "boolean"
         },
         "deploymentAllowed": {
           "type": "boolean",
@@ -132,8 +130,7 @@
           "const": false
         },
         "paidActionAllowed": {
-          "type": "boolean",
-          "const": false
+          "type": "boolean"
         }
       }
     },

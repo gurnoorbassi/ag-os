@@ -97,8 +97,7 @@
           "type": "boolean"
         },
         "usesCredentials": {
-          "type": "boolean",
-          "const": false
+          "type": "boolean"
         },
         "triggersDeployment": {
           "type": "boolean",

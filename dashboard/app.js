@@ -1,5 +1,6 @@
 const data = window.AG_OS_DASHBOARD_DATA;
 let runtimeAiPlanner = null;
+let runtimeAiWorker = null;
 
 function statusClass(value) {
   const normalized = String(value).toLowerCase();
@@ -1126,17 +1127,67 @@ function renderRuntimeJobs(jobs = []) {
     return;
   }
   root.append(table(
-    ["Job", "Project", "State", "Quality / learning", "Updated"],
+    ["Job", "Project", "Worker", "State", "Quality / learning", "Decision", "Updated"],
     jobs.map((job) => [
       labelStack(job.jobId, job.assignedAgent),
       job.projectId,
+      labelStack(job.adapter?.name || "Unassigned", job.adapter?.adapterId || "No adapter"),
       pill(job.status),
       job.qualityScorePath
         ? `Scored; ${job.lessonCandidatePaths.length} lesson candidate(s)`
         : job.blockedReason || "In progress",
+      runtimeJobDecisionControls(job),
       new Date(job.updatedAt).toLocaleString()
     ])
   ));
+}
+
+function runtimeJobDecisionControls(job) {
+  const actions = document.createElement("div");
+  actions.className = "job-actions";
+  if (!job.availableDecisions?.length) {
+    actions.textContent = job.status === "done" ? "Completed" : "No decision needed";
+    return actions;
+  }
+  for (const decision of job.availableDecisions) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = decision === "approve" ? "job-approve" : "job-reject";
+    button.textContent = decision === "approve" ? "Approve once" : (decision === "revoke" ? "Revoke" : "Reject");
+    button.addEventListener("click", () => decideRuntimeJob(job, decision, button));
+    actions.append(button);
+  }
+  return actions;
+}
+
+async function decideRuntimeJob(job, decision, button) {
+  const label = decision === "approve"
+    ? "approve exactly one execution"
+    : (decision === "revoke" ? "revoke this approval before the adapter performs another step" : "reject and cancel this job");
+  if (!window.confirm(`${label} for ${job.jobId}?`)) return;
+  button.disabled = true;
+  setRuntimeStatus(`${decision === "approve" ? "Approving" : (decision === "revoke" ? "Revoking" : "Rejecting")} ${job.jobId}...`, true);
+  try {
+    const response = await fetch(`${coordinatorBaseUrl()}/api/v1/jobs/${encodeURIComponent(job.jobId)}/decision`, {
+      method: "POST",
+      headers: runtimeHeaders(),
+      body: JSON.stringify({
+        decision,
+        confirmation: `${decision.toUpperCase()} ${job.jobId}`
+      })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.detail || result.error || "Decision failed");
+    setRuntimeStatus(decision === "approve"
+      ? `${job.jobId} approved once and re-queued. Its registered adapter must still pass every readiness gate.`
+      : (decision === "revoke"
+          ? `${job.jobId} approval revoked. The adapter must stop before its next mutation.`
+          : `${job.jobId} rejected and cancelled without execution.`), true);
+    await connectRuntime();
+  } catch (error) {
+    setRuntimeStatus(`Decision rejected: ${error.message}`, true);
+    button.disabled = false;
+  }
 }
 
 async function connectRuntime() {
@@ -1154,13 +1205,19 @@ async function connectRuntime() {
     if (!response.ok) {
       throw new Error(result.detail || result.error || "Connection failed");
     }
-    setRuntimeStatus(`Connected. Production mode is ${result.production.status}; gated actions remain approval-controlled.`, true);
+    setRuntimeStatus(`Connected. Private runtime is ${result.runtimeDeployment?.status || "live"}; coordinator readiness is ${result.readiness?.coordinator?.passedCheckCount || 0}/${result.readiness?.coordinator?.requiredCheckCount || 0}; operational safeguards are ${result.safeguards?.status || "unknown"}. Gated actions remain approval-controlled.`, true);
     runtimeAiPlanner = result.aiPlanner;
+    runtimeAiWorker = result.aiWorker;
     const plannerCheckbox = document.querySelector("#use-ai-planner");
     plannerCheckbox.disabled = !runtimeAiPlanner?.ready;
     document.querySelector("#ai-planner-help").textContent = runtimeAiPlanner?.ready
       ? `${runtimeAiPlanner.model} is ready. Each use is costed and audited.`
       : runtimeAiPlanner?.blockers?.join("; ") || "Anthropic planning worker is not ready.";
+    const workerCheckbox = document.querySelector("#use-ai-worker");
+    workerCheckbox.disabled = !runtimeAiWorker?.ready;
+    document.querySelector("#ai-worker-help").textContent = runtimeAiWorker?.ready
+      ? `${runtimeAiWorker.model} is ready to create bounded files. Each use is separately costed and audited.`
+      : runtimeAiWorker?.blockers?.join("; ") || "Anthropic builder worker is not ready.";
     renderActivationCenter(true, result.production.status, runtimeAiPlanner);
     renderRecentCommands(result.recentCommands);
     renderRuntimeJobs(result.jobs);
@@ -1218,7 +1275,8 @@ async function submitOwnerCommand(event) {
       body: JSON.stringify({
         command: document.querySelector("#owner-command").value,
         projectId: document.querySelector("#owner-command-project").value || undefined,
-        useAiPlanner: document.querySelector("#use-ai-planner").checked
+        useAiPlanner: document.querySelector("#use-ai-planner").checked,
+        useAiWorker: document.querySelector("#use-ai-worker").checked
       })
     });
     const result = await response.json();
@@ -1226,7 +1284,9 @@ async function submitOwnerCommand(event) {
       throw new Error(result.detail || result.error || "Command failed");
     }
     document.querySelector("#owner-command").value = "";
-    setRuntimeStatus(result.aiPlanner?.used
+    setRuntimeStatus(result.aiWorker?.used
+      ? `Completed ${result.jobId} with ${result.aiWorker.model}: ${result.aiWorker.workProductPaths.length} bounded work-product file(s), quality score, lesson candidates, and audit evidence. Builder cost: $${result.aiWorker.actualCostUsd}. No external business action was executed.`
+      : result.aiPlanner?.used
       ? `Created ${result.planId} with ${result.aiPlanner.model}. Cost: $${result.aiPlanner.actualCostUsd}. No external business action was executed.`
       : `Created ${result.planId}. Status: ${result.status}. No live side effect was executed.`, true);
     await connectRuntime();

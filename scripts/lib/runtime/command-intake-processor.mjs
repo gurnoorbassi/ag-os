@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { DEFAULT_PROJECT_ID, isoTimestamp, normalizeRunId, slugify, writeJson } from "./common.mjs";
+import { validateGitHubDraftPrRequest } from "./github-draft-pr-adapter.mjs";
 
 // Product type detection is a deterministic hint, not understanding. Real
 // understanding comes from the worker block; these matchers only pick a
@@ -205,13 +206,16 @@ export function assertUnderstandingShape(understanding) {
   }
 }
 
-export function buildCommandIntakeRecord({ command, projectId, runId, understanding, now = new Date(), root = process.cwd() }) {
+export function buildCommandIntakeRecord({ command, projectId, runId, understanding, executionRequest, now = new Date(), root = process.cwd() }) {
   if (!command || typeof command !== "string" || command.trim().length === 0) {
     throw new Error("command is required");
   }
 
   if (understanding) {
     assertUnderstandingShape(understanding);
+  }
+  if (executionRequest) {
+    validateGitHubDraftPrRequest({ request: executionRequest, root });
   }
 
   const normalizedRunId = normalizeRunId(runId || command);
@@ -223,14 +227,19 @@ export function buildCommandIntakeRecord({ command, projectId, runId, understand
 
   return {
     ...(understanding ? { understanding } : {}),
+    ...(executionRequest ? { executionRequest } : {}),
     commandIntakeId: `command-intake-${normalizedRunId}`,
     status: "classified",
     rawCommand: command.trim(),
     normalizedCommand: classification.normalizedCommand,
     commandCategory: "plan_only",
     projectId: selectedProjectId,
-    riskLevel: classification.riskLevel,
-    classification: classification.classification,
+    riskLevel: executionRequest ? "R3" : classification.riskLevel,
+    classification: executionRequest ? {
+      ...classification.classification,
+      requiresApproval: true,
+      requiresLiveService: true
+    } : classification.classification,
     productContext: classification.productContext,
     plannedOutput: classification.plannedOutput,
     nextRecord: {
@@ -248,8 +257,8 @@ export function buildCommandIntakeRecord({ command, projectId, runId, understand
   };
 }
 
-export function writeCommandIntakeRecord({ command, projectId, runId, understanding, now, root = process.cwd() }) {
-  const record = buildCommandIntakeRecord({ command, projectId, runId, understanding, now, root });
+export function writeCommandIntakeRecord({ command, projectId, runId, understanding, executionRequest, now, root = process.cwd() }) {
+  const record = buildCommandIntakeRecord({ command, projectId, runId, understanding, executionRequest, now, root });
   const filePath = `.codex/commands/${record.commandIntakeId}.json`;
   writeJson(filePath, record, root);
   return { filePath, record };

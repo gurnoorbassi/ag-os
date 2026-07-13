@@ -4,7 +4,12 @@ import path from "node:path";
 import process from "node:process";
 import { writeAuditEventRecord } from "./audit-writer.mjs";
 import { isoTimestamp, readJson, writeJson } from "./common.mjs";
-import { writeExecutionDryRunRecords } from "./execution-dry-run-processor.mjs";
+import { runLocalValidation } from "./execution-dry-run-processor.mjs";
+import { listExecutionAdapters, selectExecutionAdapter } from "./execution-adapter-registry.mjs";
+import { activeJobApproval } from "./job-approval-service.mjs";
+import { writeJobCompletionArtifacts } from "./job-completion-processor.mjs";
+import { executeLocalWorkProduct } from "./local-work-product-adapter.mjs";
+import { executeGitHubDraftPr } from "./github-draft-pr-adapter.mjs";
 
 const LIVE_JOB_PREFIX = "job-runtime-operator-";
 let processing = false;
@@ -79,7 +84,7 @@ function writeJobState(job, root, now, updates) {
   return next;
 }
 
-export function listAutonomousJobs({ root = process.cwd(), limit = 25 } = {}) {
+export function listAutonomousJobs({ root = process.cwd(), env = process.env, limit = 25 } = {}) {
   const directory = path.join(root, ".codex/jobs");
   if (!existsSync(directory)) return [];
   return readdirSync(directory)
@@ -87,7 +92,11 @@ export function listAutonomousJobs({ root = process.cwd(), limit = 25 } = {}) {
     .map((name) => JSON.parse(readFileSync(path.join(directory, name), "utf8")))
     .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)))
     .slice(0, Math.max(1, Math.min(limit, 100)))
-    .map((job) => ({
+    .map((job) => {
+      const command = readJson(commandPath(job), root);
+      const adapter = selectExecutionAdapter({ command, env });
+      const approval = activeJobApproval({ job, adapter, root });
+      return {
       jobId: job.jobId,
       projectId: job.projectId,
       status: job.status,
@@ -98,17 +107,31 @@ export function listAutonomousJobs({ root = process.cwd(), limit = 25 } = {}) {
       expectedOutput: job.expectedOutput,
       qualityScorePath: job.completionEvidence?.qualityScorePath,
       lessonCandidatePaths: job.completionEvidence?.lessonCandidatePaths || [],
+      adapter,
+      approvalId: job.approvalId,
+      approvalValid: approval.valid,
+      availableDecisions: job.status === "waiting_approval"
+        ? [...(approval.valid ? [] : ["approve"]), "reject", ...(approval.valid ? ["revoke"] : [])]
+        : (approval.valid && ["queued", "running"].includes(job.status) ? ["revoke"] : []),
       createdAt: job.createdAt,
       updatedAt: job.updatedAt
-    }));
+      };
+    });
 }
 
-export function processAutonomousJob({ jobId, root = process.cwd(), now = new Date(), runValidation = true }) {
+export async function processAutonomousJob({
+  jobId,
+  root = process.cwd(),
+  env = process.env,
+  now = new Date(),
+  runValidation = true,
+  githubFetch = globalThis.fetch
+}) {
   const sourceJob = readJson(jobPath(jobId), root);
   if (!sourceJob.jobId.startsWith(LIVE_JOB_PREFIX)) {
     throw new Error("the autonomous runner only processes authenticated owner-console jobs");
   }
-  if (sourceJob.status !== "queued") {
+  if (!["queued", "waiting_approval"].includes(sourceJob.status)) {
     return { status: "skipped", job: sourceJob, reason: `job is ${sourceJob.status}` };
   }
 
@@ -116,12 +139,15 @@ export function processAutonomousJob({ jobId, root = process.cwd(), now = new Da
   const command = readJson(commandRecordPath, root);
   const planRecordPath = planPathForJob(sourceJob, root);
   const plan = readJson(planRecordPath, root);
+  const adapter = selectExecutionAdapter({ command, env });
+  const approval = activeJobApproval({ job: sourceJob, adapter, root, now });
+  const permanentGate = sourceJob.approvalRequired === true || requiresPermanentGate(command) || adapter.approvalRequired;
 
-  if (sourceJob.approvalRequired === true || requiresPermanentGate(command)) {
+  if (permanentGate && !approval.valid) {
     const waiting = writeJobState(sourceJob, root, now, {
       status: "waiting_approval",
       approvalRequired: true,
-      blockedReason: "A permanent live-action gate was detected. Exact owner approval and a registered execution adapter are required before this job can resume."
+      blockedReason: `A permanent live-action gate requires exact owner approval before ${adapter.adapterId} can run. ${approval.reasons.join("; ")}.`
     });
     const audit = writeAuditEventRecord({
       runId: `${sourceJob.jobId}-waiting-approval`,
@@ -139,48 +165,90 @@ export function processAutonomousJob({ jobId, root = process.cwd(), now = new Da
       now,
       root
     });
-    return { status: "waiting_approval", job: waiting, auditPath: audit.filePath };
+    return { status: "waiting_approval", job: waiting, adapter, auditPath: audit.filePath };
+  }
+
+  if (!adapter.executionReady) {
+    const waiting = writeJobState(sourceJob, root, now, {
+      status: "waiting_approval",
+      approvalRequired: false,
+      blockedReason: `${adapter.name} is approval-valid but not execution-ready: ${adapter.blockers.join("; ")}.`
+    });
+    return { status: "waiting_approval", job: waiting, adapter, approval: approval.approval };
   }
 
   const running = writeJobState(sourceJob, root, now, {
     status: "running",
     blockedReason: undefined,
+    safety: {
+      ...sourceJob.safety,
+      credentialsAllowed: adapter.kind === "connector",
+      liveServicesAllowed: adapter.kind === "connector"
+    },
     queueTimestamps: { runningStartedAt: isoTimestamp(now) }
   });
 
   try {
-    const execution = writeExecutionDryRunRecords({
+    const execution = adapter.adapterId === "github-draft-pr"
+      ? await executeGitHubDraftPr({
+          request: command.executionRequest,
+          job: running,
+          plan,
+          adapter,
+          approval: approval.approval,
+          token: env[["AG_OS", "GITHUB", "TOKEN"].join("_")],
+          fetchImpl: githubFetch,
+          now,
+          root
+        })
+      : executeLocalWorkProduct({
+          job: running,
+          plan,
+          command,
+          adapter,
+          runId: running.jobId.replace(/^job-/, ""),
+          now,
+          root
+        });
+    const validation = runValidation ? runLocalValidation({ root }) : { passed: true, status: 0, stdout: "", stderr: "" };
+    if (!validation.passed) throw new Error(`local validation failed: ${validation.stderr || validation.stdout}`);
+    const completion = writeJobCompletionArtifacts({
       job: running,
       plan,
-      jobRecordPath: jobPath(running.jobId),
       planRecordPath,
-      runId: running.jobId.replace(/^job-/, ""),
-      now,
-      runValidation,
-      root
+      commandRecordPath,
+      executionRecordPath: execution.executionPath || execution.filePath,
+      workProductPath: execution.workProductPath,
+      root,
+      now
+    });
+    const completed = writeJobState(running, root, now, {
+      status: "done",
+      completionEvidence: completion.completionEvidence,
+      queueTimestamps: { completedAt: isoTimestamp(now) }
     });
     const audit = writeAuditEventRecord({
       runId: `${sourceJob.jobId}-automatic-completion`,
       eventType: "validation_run",
-      summary: execution.job.status === "done"
-        ? `Autonomous local job ${sourceJob.jobId} completed with mandatory quality and lesson evidence.`
-        : `Autonomous local job ${sourceJob.jobId} failed validation.`,
+      summary: `Autonomous local job ${sourceJob.jobId} created a real isolated work product and completed with mandatory quality and lesson evidence.`,
       scope: sourceJob.jobId,
       source: "ag_os_coordinator",
       relatedArtifacts: [
-        { type: "other", reference: execution.executionPath },
-        ...(execution.completion ? [
-          { type: "other", reference: execution.completion.qualityScorePath },
-          ...execution.completion.lessonCandidatePaths.map((reference) => ({ type: "other", reference }))
-        ] : [])
+        { type: adapter.kind === "connector" ? "pull_request" : "other", reference: execution.record?.result?.pullRequestUrl || execution.executionPath },
+        { type: "other", reference: execution.workProductPath },
+        { type: "other", reference: completion.qualityScorePath },
+        ...completion.lessonCandidatePaths.map((reference) => ({ type: "other", reference })),
+        ...completion.archetypeProposalPaths.map((reference) => ({ type: "other", reference }))
       ],
       riskLevel: sourceJob.riskLevel,
-      liveServiceTouched: false,
-      notes: "The automatic runner executed only the built-in local validation adapter. Permanent live-action gates remain blocked.",
+      liveServiceTouched: adapter.kind === "connector",
+      notes: adapter.kind === "connector"
+        ? "The exact approval, isolated source directory, secret scan, codex/* branch, and draft-only pull request gates passed. Merge and deployment remain blocked."
+        : "The registered local work-product adapter wrote only to the isolated AG OS state workspace and ran local validation. Permanent live-action gates remain blocked.",
       now,
       root
     });
-    return { status: execution.job.status, ...execution, auditPath: audit.filePath };
+    return { status: completed.status, job: completed, ...execution, completion, validationResult: validation, auditPath: audit.filePath };
   } catch (error) {
     const failed = writeJobState(running, root, now, {
       status: "failed",
@@ -204,8 +272,9 @@ export function processAutonomousJob({ jobId, root = process.cwd(), now = new Da
   }
 }
 
-export function processQueuedJobs({
+export async function processQueuedJobs({
   root = process.cwd(),
+  env = process.env,
   now = new Date(),
   runValidation = true,
   dashboardBuilder = runDashboardBuild
@@ -213,10 +282,13 @@ export function processQueuedJobs({
   if (processing) return { status: "busy", processed: [] };
   processing = true;
   try {
-    const queued = listAutonomousJobs({ root, limit: 100 }).filter((job) => job.status === "queued");
-    const processed = queued.map((job) => {
+    const queued = listAutonomousJobs({ root, env, limit: 100 }).filter((job) =>
+      job.status === "queued" || (job.status === "waiting_approval" && job.approvalValid && job.adapter?.executionReady)
+    );
+    const processed = [];
+    for (const job of queued) {
       try {
-        return processAutonomousJob({ jobId: job.jobId, root, now, runValidation });
+        processed.push(await processAutonomousJob({ jobId: job.jobId, root, env, now, runValidation }));
       } catch (error) {
         const sourceJob = readJson(jobPath(job.jobId), root);
         const failed = writeJobState(sourceJob, root, now, {
@@ -237,9 +309,9 @@ export function processQueuedJobs({
           now,
           root
         });
-        return { status: "failed", job: failed, error: error.message };
+        processed.push({ status: "failed", job: failed, error: error.message });
       }
-    });
+    }
     const dashboardRefresh = refreshDashboardReadModel({
       root,
       dashboardBuilder,
@@ -249,4 +321,16 @@ export function processQueuedJobs({
   } finally {
     processing = false;
   }
+}
+
+export function autonomousExecutionStatus({ env = process.env } = {}) {
+  const adapters = listExecutionAdapters({ env });
+  return {
+    enabled: env.AG_OS_AUTOMATION_ENABLED !== "false",
+    pollIntervalSeconds: 15,
+    adapter: "registered_execution_adapters_v1",
+    localExecutionReady: adapters.some((adapter) => adapter.adapterId === "local-work-product" && adapter.readyForUngatedWork),
+    liveAdaptersEnabled: env.AG_OS_LIVE_ADAPTERS_ENABLED === "true",
+    adapters
+  };
 }

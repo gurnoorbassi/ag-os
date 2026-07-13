@@ -201,6 +201,39 @@
         }
       }
     },
+    "executionRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapterId",
+        "operation",
+        "repository",
+        "baseBranch",
+        "expectedBaseCommit",
+        "branch",
+        "sourceDirectory",
+        "title"
+      ],
+      "properties": {
+        "adapterId": { "type": "string", "const": "github-draft-pr" },
+        "operation": { "type": "string", "const": "create_draft_pr" },
+        "repository": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["owner", "name"],
+          "properties": {
+            "owner": { "type": "string", "minLength": 1 },
+            "name": { "type": "string", "minLength": 1 }
+          }
+        },
+        "baseBranch": { "type": "string", "minLength": 1 },
+        "expectedBaseCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "branch": { "type": "string", "pattern": "^codex/[A-Za-z0-9][A-Za-z0-9._/-]*$" },
+        "sourceDirectory": { "type": "string", "pattern": "^\\.codex/workspaces/" },
+        "title": { "type": "string", "minLength": 1 },
+        "body": { "type": "string" }
+      }
+    },
     "plannedOutput": {
       "type": "string",
       "minLength": 1

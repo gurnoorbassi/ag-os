@@ -1,5 +1,5 @@
 import { createHash, timingSafeEqual } from "node:crypto";
-import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
+import { createReadStream, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import path from "node:path";
 import process from "node:process";
@@ -8,8 +8,12 @@ import { listRecentOwnerCommands, submitOwnerCommand } from "./lib/runtime/live-
 import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
 import { createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
 import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-planner-readiness.mjs";
+import { createAnthropicWorkProduct } from "./lib/runtime/anthropic-worker.mjs";
+import { evaluateAnthropicWorkerReadiness } from "./lib/runtime/anthropic-worker-readiness.mjs";
 import { createProject, listProjects } from "./lib/runtime/project-service.mjs";
-import { listAutonomousJobs, processQueuedJobs } from "./lib/runtime/autonomous-runner.mjs";
+import { autonomousExecutionStatus, listAutonomousJobs, processQueuedJobs } from "./lib/runtime/autonomous-runner.mjs";
+import { decideJob } from "./lib/runtime/job-approval-service.mjs";
+import { evaluateOperationalSafeguards } from "./lib/runtime/operational-safeguards.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dashboardRoot = path.join(root, "dashboard");
@@ -26,9 +30,9 @@ const MIME_TYPES = {
   ".svg": "image/svg+xml"
 };
 
-function runAutomaticQueue() {
+async function runAutomaticQueue() {
   try {
-    const result = processQueuedJobs({ root });
+    const result = await processQueuedJobs({ root });
     if (result.dashboardRefresh?.passed === false) {
       console.error(JSON.stringify({
         service: "ag-os-coordinator",
@@ -96,15 +100,45 @@ async function readJsonBody(request) {
 }
 
 function readinessStatus() {
-  const file = path.join(root, ".codex/production/production-readiness-social-media-management-system-v1.json");
+  const file = path.join(root, ".codex/production/production-readiness-ag-os-coordinator-v1.json");
   return evaluateProductionReadiness(JSON.parse(readFileSync(file, "utf8")));
+}
+
+function projectReadinessStatuses() {
+  const directory = path.join(root, ".codex/production");
+  return readdirSync(directory)
+    .filter((name) => name.startsWith("production-readiness-") && name.endsWith(".json"))
+    .map((name) => {
+      const record = JSON.parse(readFileSync(path.join(directory, name), "utf8"));
+      return {
+        projectId: record.projectId,
+        targetMode: record.targetMode,
+        ...evaluateProductionReadiness(record)
+      };
+    });
 }
 
 function aiPlannerReadiness() {
   return evaluateAnthropicPlannerReadiness({ root });
 }
 
+function aiWorkerReadiness() {
+  return evaluateAnthropicWorkerReadiness({ root });
+}
+
 function publicAiPlannerStatus(readiness = aiPlannerReadiness()) {
+  return {
+    ready: readiness.ready,
+    enabled: readiness.enabled,
+    credentialConfigured: readiness.credentialConfigured,
+    model: readiness.model,
+    approvalId: readiness.approvalId,
+    uses: readiness.uses,
+    blockers: readiness.blockers
+  };
+}
+
+function publicAiWorkerStatus(readiness = aiWorkerReadiness()) {
   return {
     ready: readiness.ready,
     enabled: readiness.enabled,
@@ -164,14 +198,21 @@ const server = createServer(async (request, response) => {
       json(response, 200, {
         service: "ag-os-coordinator",
         mode: "owner_operated_fail_closed",
-        automation: {
-          enabled: process.env.AG_OS_AUTOMATION_ENABLED !== "false",
-          pollIntervalSeconds: 15,
-          adapter: "built_in_local_validation",
-          liveAdaptersEnabled: false
+        runtimeDeployment: {
+          status: "live_private",
+          coordinatorResponding: true,
+          publicExposureClaimed: false,
+          permissionGrantedByDeployment: false
         },
+        automation: autonomousExecutionStatus(),
+        safeguards: evaluateOperationalSafeguards({ root }),
         production: readinessStatus(),
+        readiness: {
+          coordinator: readinessStatus(),
+          projects: projectReadinessStatuses()
+        },
         aiPlanner: publicAiPlannerStatus(),
+        aiWorker: publicAiWorkerStatus(),
         projects: listProjects({ root }),
         jobs: listAutonomousJobs({ root }),
         recentCommands: listRecentOwnerCommands({ root })
@@ -187,24 +228,49 @@ const server = createServer(async (request, response) => {
     }
 
     if (request.method === "POST" && url.pathname === "/api/v1/automation/run") {
-      const result = processQueuedJobs({ root });
+      const result = await processQueuedJobs({ root });
       json(response, 200, result, headers);
+      return;
+    }
+
+    const jobDecisionMatch = url.pathname.match(/^\/api\/v1\/jobs\/([^/]+)\/decision$/);
+    if (request.method === "POST" && jobDecisionMatch) {
+      const body = await readJsonBody(request);
+      const result = decideJob({
+        jobId: decodeURIComponent(jobDecisionMatch[1]),
+        decision: body.decision,
+        confirmation: body.confirmation,
+        expiresAt: body.expiresAt,
+        root
+      });
+      json(response, 200, result, headers);
+      if (result.decision === "approve") setImmediate(runAutomaticQueue);
       return;
     }
 
     if (request.method === "POST" && url.pathname === "/api/v1/commands") {
       const body = await readJsonBody(request);
       const plannerReadiness = aiPlannerReadiness();
+      const workerReadiness = aiWorkerReadiness();
       const result = await submitOwnerCommand({
         command: body.command,
         projectId: body.projectId,
         understanding: body.understanding,
+        executionRequest: body.executionRequest,
         useAiPlanner: body.useAiPlanner === true,
+        useAiWorker: body.useAiWorker === true,
         aiPlannerReadiness: plannerReadiness,
+        aiWorkerReadiness: workerReadiness,
         planDraftProvider: (input) => createAnthropicPlanDraft({
           ...input,
           apiKey: process.env.ANTHROPIC_API_KEY,
           model: plannerReadiness.model,
+          baseUrl: process.env.ANTHROPIC_BASE_URL
+        }),
+        workProductProvider: (input) => createAnthropicWorkProduct({
+          ...input,
+          apiKey: process.env.ANTHROPIC_API_KEY,
+          model: workerReadiness.model,
           baseUrl: process.env.ANTHROPIC_BASE_URL
         }),
         root

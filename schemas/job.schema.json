@@ -168,12 +168,10 @@
       ],
       "properties": {
         "credentialsAllowed": {
-          "type": "boolean",
-          "const": false
+          "type": "boolean"
         },
         "liveServicesAllowed": {
-          "type": "boolean",
-          "const": false
+          "type": "boolean"
         },
         "deploymentAllowed": {
           "type": "boolean",

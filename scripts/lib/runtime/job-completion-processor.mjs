@@ -1,8 +1,9 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { writeLessonCandidateRecords } from "../../process-lesson-candidates.mjs";
 import { writeQualityScoreRecord } from "../../process-quality-score.mjs";
+import { buildArchetypeUpdateProposal } from "../../process-archetype-update-proposal.mjs";
 import { isoTimestamp, writeJson } from "./common.mjs";
 
 export const JOB_COMPLETION_POLICY_VERSION = 1;
@@ -13,12 +14,36 @@ function derivedCommandRecordPath(job) {
   return `.codex/commands/${job.commandId}.json`;
 }
 
+function writeRelevantArchetypeProposals({ plan, root, now }) {
+  const archetypeId = plan.basis?.productArchetype;
+  const lessonPaths = plan.basis?.relevantMemory?.acceptedLessonPaths ?? [];
+  if (!archetypeId || archetypeId === "none") return [];
+  const written = [];
+  for (const acceptedLessonPath of lessonPaths) {
+    const lesson = JSON.parse(readFileSync(path.join(root, acceptedLessonPath), "utf8"));
+    if (lesson.status !== "accepted" || !(lesson.appliesTo ?? []).includes(archetypeId)) continue;
+    const record = buildArchetypeUpdateProposal({
+      acceptedLessonPath,
+      archetypeId,
+      targetSection: "qualityChecklist",
+      proposedAddition: lesson.lesson,
+      root,
+      now
+    });
+    const filePath = `.codex/memory/archetype-updates/${record.proposalId}.json`;
+    if (!existsSync(path.join(root, filePath))) writeJson(filePath, record, root);
+    written.push(filePath);
+  }
+  return written;
+}
+
 export function writeJobCompletionArtifacts({
   job,
   plan,
   planRecordPath,
   commandRecordPath,
   executionRecordPath,
+  workProductPath,
   root = process.cwd(),
   now = new Date()
 }) {
@@ -48,6 +73,7 @@ export function writeJobCompletionArtifacts({
   const qualityScore = writeQualityScoreRecord({
     planPath: planRecordPath,
     commandIntakePath: usableCommandPath,
+    evidencePath: workProductPath,
     root,
     now
   });
@@ -71,12 +97,14 @@ export function writeJobCompletionArtifacts({
     updatedAt: isoTimestamp(now)
   };
   writeJson(qualityScore.filePath, completedScore, root);
+  const archetypeProposalPaths = writeRelevantArchetypeProposals({ plan, root, now });
 
   return {
     qualityScorePath: qualityScore.filePath.replaceAll("\\", "/"),
     lessonCandidatePaths,
     qualityScore: completedScore,
     lessonCandidates: lessons.records,
+    archetypeProposalPaths,
     completionEvidence: {
       policyVersion: JOB_COMPLETION_POLICY_VERSION,
       qualityScorePath: qualityScore.filePath.replaceAll("\\", "/"),

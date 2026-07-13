@@ -101,7 +101,7 @@
           <div class="section-heading">
             <div>
               <h2>Owner Command Center</h2>
-              <p>Give AG OS one outcome. The coordinator will classify, route, plan, cost, gate, and audit it.</p>
+              <p>Give AG OS one outcome. The coordinator will classify, route, plan, execute through a registered worker, validate, score, learn, and stop at exact approval gates.</p>
             </div>
           </div>
           <form id="owner-command-form" class="command-console">
@@ -130,6 +130,10 @@
               <input id="use-ai-planner" type="checkbox" disabled>
               <span><strong>Use Anthropic planning worker</strong><small id="ai-planner-help">Connect first to verify the key, budget, and scoped approval.</small></span>
             </label>
+            <label class="ai-planner-option">
+              <input id="use-ai-worker" type="checkbox" disabled>
+              <span><strong>Create professional work-product files</strong><small id="ai-worker-help">Requires a separate usage-limited Anthropic builder approval.</small></span>
+            </label>
             <div class="command-actions">
               <p id="runtime-status" role="status">Not connected. Existing evidence remains available below.</p>
               <button type="submit">Create work package</button>
@@ -149,7 +153,7 @@
           <div id="activation-grid" class="activation-grid" aria-live="polite"></div>
           <div class="activation-next-step">
             <strong>Fastest path to useful work</strong>
-            <p>Connect with the owner token, enter one outcome above, and review the generated work package. Autonomous execution needs an AI worker runtime; external actions stay separately approval-gated.</p>
+            <p>Connect with the owner token and enter one outcome. Safe work runs through the local work-product worker; connector actions pause for an exact approval and a ready registered adapter.</p>
           </div>
         </section>
 

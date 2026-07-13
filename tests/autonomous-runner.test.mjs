@@ -26,7 +26,7 @@ test("autonomous runner completes safe owner-console work with quality and lesso
     root: workspace,
     now: new Date("2026-07-13T13:00:00.000Z")
   });
-  const result = processAutonomousJob({
+  const result = await processAutonomousJob({
     jobId: command.jobId,
     root: workspace,
     now: new Date("2026-07-13T13:01:00.000Z"),
@@ -52,7 +52,7 @@ test("autonomous runner pauses gated work without executing it", async () => {
     root: workspace,
     now: new Date("2026-07-13T14:00:00.000Z")
   });
-  const result = processAutonomousJob({ jobId: command.jobId, root: workspace, runValidation: false });
+  const result = await processAutonomousJob({ jobId: command.jobId, root: workspace, runValidation: false });
 
   assert.equal(result.status, "waiting_approval");
   assert.equal(result.job.approvalRequired, true);
@@ -69,7 +69,7 @@ test("dashboard refresh failure never corrupts a correctly paused job and retrie
     now: new Date("2026-07-13T15:00:00.000Z")
   });
 
-  const first = processQueuedJobs({
+  const first = await processQueuedJobs({
     root: workspace,
     now: new Date("2026-07-13T15:01:00.000Z"),
     runValidation: false,
@@ -85,7 +85,7 @@ test("dashboard refresh failure never corrupts a correctly paused job and retrie
   assert.match(persisted.blockedReason, /permanent live-action gate/);
 
   let retryCount = 0;
-  const second = processQueuedJobs({
+  const second = await processQueuedJobs({
     root: workspace,
     dashboardBuilder: () => {
       retryCount += 1;

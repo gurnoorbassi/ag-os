@@ -833,6 +833,40 @@ td strong {
   font-size: 13px;
 }
 
+.job-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  min-width: 8.5rem;
+}
+
+.job-actions button {
+  border: 1px solid var(--border-strong);
+  border-radius: 0.55rem;
+  padding: 0.45rem 0.65rem;
+  color: var(--text-primary);
+  background: var(--surface-raised);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.job-actions .job-approve {
+  border-color: rgba(54, 211, 153, 0.5);
+  color: var(--green);
+}
+
+.job-actions .job-reject {
+  border-color: rgba(247, 118, 142, 0.45);
+  color: var(--red);
+}
+
+.job-actions button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 .policy-checks {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
