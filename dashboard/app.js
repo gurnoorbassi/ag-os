@@ -194,6 +194,11 @@ function renderActivationCenter(connected = false, productionStatus = "private r
       detail: "Creates classified, routed, costed, approval-gated work packages."
     },
     {
+      title: "Automatic local runner",
+      status: connected ? "active" : "running - connect to verify",
+      detail: "Safe owner-console jobs run automatically; each completion must produce quality and lesson evidence."
+    },
+    {
       title: "Anthropic planning worker",
       status: aiPlanner?.ready ? "ready" : "setup needed",
       detail: aiPlanner?.ready
@@ -379,10 +384,10 @@ function renderActionQueue() {
   );
 }
 
-function renderProjects() {
+function renderProjects(projects = data.projectRegistry.projects) {
   const tbody = document.querySelector("#projects-table");
   tbody.replaceChildren();
-  data.projectRegistry.projects.forEach((project) => {
+  projects.forEach((project) => {
     const row = document.createElement("tr");
 
     const nameCell = document.createElement("td");
@@ -408,6 +413,19 @@ function renderProjects() {
     row.append(nameCell, statusCell, modeCell, riskCell, boundaryCell);
     tbody.append(row);
   });
+}
+
+function populateProjectSelect(projects = data.projectRegistry.projects) {
+  const projectSelect = document.querySelector("#owner-command-project");
+  projectSelect.querySelectorAll("option:not(:first-child)").forEach((option) => option.remove());
+  projects
+    .filter((project) => project.id !== "project-ag-os")
+    .forEach((project) => {
+      const option = document.createElement("option");
+      option.value = project.id;
+      option.textContent = project.name;
+      projectSelect.append(option);
+    });
 }
 
 function renderRegistries() {
@@ -1068,6 +1086,31 @@ function renderRecentCommands(commands = []) {
   ));
 }
 
+function renderRuntimeJobs(jobs = []) {
+  const root = clear("#runtime-job-panel");
+  const heading = document.createElement("h3");
+  heading.textContent = "Automatic runs";
+  root.append(heading);
+  if (jobs.length === 0) {
+    const empty = document.createElement("p");
+    empty.textContent = "No automatic owner-console runs recorded yet.";
+    root.append(empty);
+    return;
+  }
+  root.append(table(
+    ["Job", "Project", "State", "Quality / learning", "Updated"],
+    jobs.map((job) => [
+      labelStack(job.jobId, job.assignedAgent),
+      job.projectId,
+      pill(job.status),
+      job.qualityScorePath
+        ? `Scored; ${job.lessonCandidatePaths.length} lesson candidate(s)`
+        : job.blockedReason || "In progress",
+      new Date(job.updatedAt).toLocaleString()
+    ])
+  ));
+}
+
 async function connectRuntime() {
   const token = document.querySelector("#owner-token").value;
   if (!token) {
@@ -1092,8 +1135,46 @@ async function connectRuntime() {
       : runtimeAiPlanner?.blockers?.join("; ") || "Anthropic planning worker is not ready.";
     renderActivationCenter(true, result.production.status, runtimeAiPlanner);
     renderRecentCommands(result.recentCommands);
+    renderRuntimeJobs(result.jobs);
+    renderProjects(result.projects);
+    populateProjectSelect(result.projects);
   } catch (error) {
     setRuntimeStatus(`Connection failed: ${error.message}`);
+  }
+}
+
+async function createProject(event) {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector("button[type='submit']");
+  const status = document.querySelector("#project-create-status");
+  button.disabled = true;
+  status.textContent = "Creating the project record, registry entry, and audit evidence...";
+  try {
+    const response = await fetch(`${coordinatorBaseUrl()}/api/v1/projects`, {
+      method: "POST",
+      headers: runtimeHeaders(),
+      body: JSON.stringify({
+        name: document.querySelector("#project-name").value,
+        goal: document.querySelector("#project-goal").value,
+        scope: document.querySelector("#project-scope").value,
+        stack: document.querySelector("#project-stack").value,
+        projectType: document.querySelector("#project-type").value,
+        trustLevel: Number(document.querySelector("#project-trust-level").value),
+        managementMode: "active_build"
+      })
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.detail || result.error || "Project creation failed");
+    }
+    event.currentTarget.reset();
+    status.textContent = `Created ${result.project.name}. It is ready for an owner command; live actions remain approval-gated.`;
+    await connectRuntime();
+    document.querySelector("#owner-command-project").value = result.project.id;
+  } catch (error) {
+    status.textContent = `Project rejected: ${error.message}`;
+  } finally {
+    button.disabled = false;
   }
 }
 
@@ -1129,20 +1210,14 @@ async function submitOwnerCommand(event) {
 }
 
 function initializeCommandCenter() {
-  const projectSelect = document.querySelector("#owner-command-project");
-  data.projectRegistry.projects
-    .filter((project) => project.id !== "project-ag-os")
-    .forEach((project) => {
-      const option = document.createElement("option");
-      option.value = project.id;
-      option.textContent = project.name;
-      projectSelect.append(option);
-    });
+  populateProjectSelect();
   document.querySelector("#owner-token").value = sessionStorage.getItem("ag-os-owner-token") || "";
   document.querySelector("#coordinator-url").value = sessionStorage.getItem("ag-os-coordinator-url") || "";
   document.querySelector("#connect-runtime").addEventListener("click", connectRuntime);
   document.querySelector("#owner-command-form").addEventListener("submit", submitOwnerCommand);
+  document.querySelector("#project-create-form").addEventListener("submit", createProject);
   renderRecentCommands();
+  renderRuntimeJobs();
   if (document.querySelector("#owner-token").value) {
     connectRuntime();
   }
