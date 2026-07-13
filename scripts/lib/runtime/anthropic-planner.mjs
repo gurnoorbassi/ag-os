@@ -2,6 +2,12 @@ import { assertPlanDraftShape } from "./planner-processor.mjs";
 
 const DEFAULT_BASE_URL = "https://api.anthropic.com";
 const ANTHROPIC_VERSION = "2023-06-01";
+const UNSUPPORTED_STRUCTURED_OUTPUT_CONSTRAINTS = new Set([
+  "maximum",
+  "minimum",
+  "minItems",
+  "minLength"
+]);
 
 export const PLAN_DRAFT_SCHEMA = {
   type: "object",
@@ -31,6 +37,21 @@ export const PLAN_DRAFT_SCHEMA = {
     stopConditions: { type: "array", items: { type: "string", minLength: 1 } }
   }
 };
+
+// Anthropic's raw Messages API rejects validation-only JSON Schema
+// constraints that its SDKs normally remove before sending. Keep the full
+// schema above for local validation, but send only the supported grammar.
+export function toAnthropicStructuredOutputSchema(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => toAnthropicStructuredOutputSchema(item));
+  }
+  if (!value || typeof value !== "object") {
+    return value;
+  }
+  return Object.fromEntries(Object.entries(value)
+    .filter(([key]) => !UNSUPPORTED_STRUCTURED_OUTPUT_CONSTRAINTS.has(key))
+    .map(([key, item]) => [key, toAnthropicStructuredOutputSchema(item)]));
+}
 
 function plannerInput({ commandIntake, job, route }) {
   return {
@@ -92,7 +113,7 @@ export async function createAnthropicPlanDraft({
       output_config: {
         format: {
           type: "json_schema",
-          schema: PLAN_DRAFT_SCHEMA
+          schema: toAnthropicStructuredOutputSchema(PLAN_DRAFT_SCHEMA)
         }
       }
     })

@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { calculateAnthropicCostUsd, createAnthropicPlanDraft } from "../scripts/lib/runtime/anthropic-planner.mjs";
+import {
+  PLAN_DRAFT_SCHEMA,
+  calculateAnthropicCostUsd,
+  createAnthropicPlanDraft,
+  toAnthropicStructuredOutputSchema
+} from "../scripts/lib/runtime/anthropic-planner.mjs";
 
 const commandIntake = {
   rawCommand: "Build an internal operations dashboard",
@@ -50,9 +55,26 @@ test("Anthropic planner requests schema-constrained plans without exposing the k
   });
   assert.equal(request.url, "https://anthropic.test/v1/messages");
   assert.equal(request.options.headers["x-api-key"], "test-key-never-logged");
-  assert.equal(JSON.parse(request.options.body).output_config.format.type, "json_schema");
+  const requestBody = JSON.parse(request.options.body);
+  assert.equal(requestBody.output_config.format.type, "json_schema");
+  assert.equal(JSON.stringify(requestBody.output_config.format.schema).includes("minLength"), false);
+  assert.equal(JSON.stringify(requestBody.output_config.format.schema).includes("minItems"), false);
+  assert.equal(JSON.stringify(requestBody.output_config.format.schema).includes("minimum"), false);
+  assert.equal(JSON.stringify(requestBody.output_config.format.schema).includes("maximum"), false);
   assert.equal(result.planDraft.tasks[0].status, "planned");
   assert.deepEqual(result.usage, { input_tokens: 100, output_tokens: 200 });
+});
+
+test("Anthropic schema adaptation preserves strict local constraints without mutating them", () => {
+  const adapted = toAnthropicStructuredOutputSchema(PLAN_DRAFT_SCHEMA);
+  assert.equal(PLAN_DRAFT_SCHEMA.properties.summary.minLength, 1);
+  assert.equal(PLAN_DRAFT_SCHEMA.properties.tasks.minItems, 1);
+  assert.equal(PLAN_DRAFT_SCHEMA.properties.estimatedCostUsd.maximum, 5);
+  assert.equal(adapted.properties.summary.minLength, undefined);
+  assert.equal(adapted.properties.tasks.minItems, undefined);
+  assert.equal(adapted.properties.estimatedCostUsd.maximum, undefined);
+  assert.equal(adapted.additionalProperties, false);
+  assert.deepEqual(adapted.required, PLAN_DRAFT_SCHEMA.required);
 });
 
 test("Anthropic planner fails closed on missing credentials and HTTP failures", async () => {

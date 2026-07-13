@@ -417,11 +417,11 @@ if (data.approvals.standingApprovals.some((approval) =>
   fail("dashboard control center standing approvals must show valid remaining uses and immediate revocation");
 }
 const codexDraftPrApproval = data.approvals.standingApprovals.find((approval) => approval.approvalId === "approval-20260709-ag-os-codex-draft-pr-standing");
-if (codexDraftPrApproval?.remainingUses !== 10) {
+if (codexDraftPrApproval?.maxUses !== 10) {
   fail("dashboard control center must preserve the Codex draft PR standing approval usage limit");
 }
 const anthropicPlanningApproval = data.approvals.standingApprovals.find((approval) => approval.approvalId === "approval-20260712-anthropic-planning");
-if (anthropicPlanningApproval?.remainingUses !== 20 || anthropicPlanningApproval?.budget?.maxUsd !== 0.25) {
+if (anthropicPlanningApproval?.maxUses !== 20 || anthropicPlanningApproval?.budget?.maxUsd !== 0.25) {
   fail("dashboard control center must show the Anthropic planning approval use and cost limits");
 }
 if (data.dashboardActionQueue.approvalBatch?.mode !== "read_only" ||
