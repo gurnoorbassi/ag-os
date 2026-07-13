@@ -205,7 +205,7 @@ export function assertUnderstandingShape(understanding) {
   }
 }
 
-export function buildCommandIntakeRecord({ command, runId, understanding, now = new Date(), root = process.cwd() }) {
+export function buildCommandIntakeRecord({ command, projectId, runId, understanding, now = new Date(), root = process.cwd() }) {
   if (!command || typeof command !== "string" || command.trim().length === 0) {
     throw new Error("command is required");
   }
@@ -217,6 +217,9 @@ export function buildCommandIntakeRecord({ command, runId, understanding, now = 
   const normalizedRunId = normalizeRunId(runId || command);
   const timestamp = isoTimestamp(now);
   const classification = classifyCommand(command.trim(), root);
+  const selectedProjectId = typeof projectId === "string" && projectId.trim().length > 0
+    ? projectId.trim()
+    : classification.projectId;
 
   return {
     ...(understanding ? { understanding } : {}),
@@ -225,7 +228,7 @@ export function buildCommandIntakeRecord({ command, runId, understanding, now = 
     rawCommand: command.trim(),
     normalizedCommand: classification.normalizedCommand,
     commandCategory: "plan_only",
-    projectId: classification.projectId,
+    projectId: selectedProjectId,
     riskLevel: classification.riskLevel,
     classification: classification.classification,
     productContext: classification.productContext,
@@ -245,8 +248,8 @@ export function buildCommandIntakeRecord({ command, runId, understanding, now = 
   };
 }
 
-export function writeCommandIntakeRecord({ command, runId, understanding, now, root = process.cwd() }) {
-  const record = buildCommandIntakeRecord({ command, runId, understanding, now, root });
+export function writeCommandIntakeRecord({ command, projectId, runId, understanding, now, root = process.cwd() }) {
+  const record = buildCommandIntakeRecord({ command, projectId, runId, understanding, now, root });
   const filePath = `.codex/commands/${record.commandIntakeId}.json`;
   writeJson(filePath, record, root);
   return { filePath, record };

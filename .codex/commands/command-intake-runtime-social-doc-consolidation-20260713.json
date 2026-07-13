@@ -1,0 +1,59 @@
+{
+  "understanding": {
+    "producedBy": "codex-worker",
+    "inferredBusinessObjective": "Consolidate AG OS completion documentation so historical readiness text and duplicate mechanics do not obscure the active Constitution.",
+    "productArchetype": "archetype-social-media-content-operations-system",
+    "targetUser": "AG OS owner and workers",
+    "successCriteria": [
+      "The active Constitution is clearly distinguished from historical activation readiness.",
+      "Canonical documentation sources are mapped.",
+      "The AJV migration decision is resolved without adding a dependency."
+    ],
+    "criticalUnknowns": [],
+    "confidence": "high",
+    "assumptions": [
+      "Documentation consolidation changes no constitutional rule or approval gate.",
+      "The current validator subset is not blocking active work."
+    ],
+    "ownerConstraints": [
+      "The Constitution runs AG OS.",
+      "The roadmap tracks completion work.",
+      "Do not treat documentation as authorization."
+    ]
+  },
+  "commandIntakeId": "command-intake-runtime-social-doc-consolidation-20260713",
+  "status": "classified",
+  "rawCommand": "Consolidate the Social Media Management System and AG OS completion documentation under the active Constitution",
+  "normalizedCommand": "Create a plan-only social media content operations plan.",
+  "commandCategory": "plan_only",
+  "projectId": "project-social-media-management-system-v1",
+  "riskLevel": "R1",
+  "classification": {
+    "requiresPlan": true,
+    "requiresApproval": false,
+    "requiresLiveService": false,
+    "requiresDeployment": false,
+    "requiresDomainChange": false,
+    "requiresPaidAction": false,
+    "requiresProductionData": false
+  },
+  "productContext": {
+    "productType": "social media content operations",
+    "archetypeId": "archetype-social-media-content-operations-system",
+    "archetypeRegistered": true,
+    "archetypeGap": null
+  },
+  "plannedOutput": "Plan-only command intake record for social media content operations.",
+  "nextRecord": {
+    "jobId": "job-runtime-social-doc-consolidation-20260713",
+    "planId": "plan-runtime-social-doc-consolidation-20260713"
+  },
+  "safety": {
+    "executesCommand": false,
+    "createsLiveSideEffect": false,
+    "usesCredentials": false,
+    "callsConnector": false
+  },
+  "createdAt": "2026-07-13T09:22:44.806Z",
+  "updatedAt": "2026-07-13T09:22:44.806Z"
+}

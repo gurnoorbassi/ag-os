@@ -40,6 +40,16 @@ export function assertOwnerCommand(command) {
   }
 }
 
+export function assertRegisteredProject({ projectId, root = process.cwd() }) {
+  if (!projectId) {
+    return;
+  }
+  const registry = JSON.parse(readFileSync(path.join(root, ".codex/projects/registry.json"), "utf8"));
+  if (!(registry.projects ?? []).some((project) => project.projectId === projectId)) {
+    throw new Error(`project is not registered: ${projectId}`);
+  }
+}
+
 export function createOperatorRunId(now = new Date()) {
   return `operator-${now.toISOString().replace(/[^0-9]/g, "").slice(0, 14)}-${randomUUID().slice(0, 8)}`;
 }
@@ -66,6 +76,7 @@ export function listRecentOwnerCommands({ root = process.cwd(), limit = 10 } = {
 
 export async function submitOwnerCommand({
   command,
+  projectId,
   understanding,
   useAiPlanner = false,
   aiPlannerReadiness,
@@ -74,6 +85,7 @@ export async function submitOwnerCommand({
   now = new Date()
 }) {
   assertOwnerCommand(command);
+  assertRegisteredProject({ projectId, root });
   if (useAiPlanner && (!aiPlannerReadiness?.ready || typeof planDraftProvider !== "function")) {
     throw new Error(`AI planner is not ready: ${(aiPlannerReadiness?.blockers || ["planner provider unavailable"]).join("; ")}`);
   }
@@ -84,7 +96,7 @@ export async function submitOwnerCommand({
     throw new Error(`AG OS boot is blocked: ${boot.record.summary.blockedReasons.join("; ")}`);
   }
 
-  const intake = writeCommandIntakeRecord({ command: command.trim(), understanding, runId, now, root });
+  const intake = writeCommandIntakeRecord({ command: command.trim(), projectId, understanding, runId, now, root });
   const job = writeJobRecord({ commandIntake: intake.record, runId, now, root });
   const route = writeTaskRouteRecord({ job: job.record, commandIntake: intake.record, runId, now, root });
   const aiPlanning = useAiPlanner

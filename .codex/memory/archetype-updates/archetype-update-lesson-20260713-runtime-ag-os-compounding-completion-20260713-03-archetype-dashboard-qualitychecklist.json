@@ -1,0 +1,23 @@
+{
+  "$schema": "../../../schemas/archetype-update-proposal.schema.json",
+  "proposalId": "archetype-update-lesson-20260713-runtime-ag-os-compounding-completion-20260713-03-archetype-dashboard-qualitychecklist",
+  "status": "draft",
+  "acceptedLessonId": "lesson-20260713-runtime-ag-os-compounding-completion-20260713-03",
+  "acceptedLessonPath": ".codex/memory/accepted/lesson-20260713-runtime-ag-os-compounding-completion-20260713-03.json",
+  "archetypeId": "archetype-dashboard",
+  "archetypePath": ".codex/archetypes/dashboard-internal-tool.json",
+  "targetSection": "qualityChecklist",
+  "proposedAddition": "For plan-only dashboard work, cite the active archetype checklist and keep quality-score evidence advisory until owner-reviewed promotion.",
+  "rationale": "Promote accepted lesson lesson-20260713-runtime-ag-os-compounding-completion-20260713-03 into the archetype-dashboard qualityChecklist through a reviewed pull request.",
+  "evidence": [
+    ".codex/memory/accepted/lesson-20260713-runtime-ag-os-compounding-completion-20260713-03.json",
+    ".codex/quality-scores/quality-score-20260713-runtime-ag-os-compounding-completion-20260713.json",
+    ".codex/plans/plan-runtime-ag-os-compounding-completion-20260713.json",
+    ".codex/execution/exec-runtime-ag-os-compounding-completion-20260713-run-validation.json"
+  ],
+  "requiresReviewedPr": true,
+  "autoApplyAllowed": false,
+  "grantsPermission": false,
+  "createdAt": "2026-07-13T09:35:20.763Z",
+  "updatedAt": "2026-07-13T09:35:20.763Z"
+}

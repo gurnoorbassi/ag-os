@@ -1,0 +1,14 @@
+{
+  "id": "audit-runtime-social-doc-consolidation-20260713",
+  "occurredAt": "2026-07-13T09:23:58.560Z",
+  "actor": "owner-gurnoor-bassi",
+  "eventType": "validation_run",
+  "summary": "AG OS documentation consolidation job finished locally with historical activation clarity, canonical document mapping, AJV decision, quality score, and lesson candidates.",
+  "scope": "runtime_processor_dry_run",
+  "source": "local_validation",
+  "relatedArtifacts": [],
+  "riskLevel": "low",
+  "dataClassification": "internal",
+  "liveServiceTouched": false,
+  "createdAt": "2026-07-13T09:23:58.560Z"
+}

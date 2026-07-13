@@ -1,0 +1,38 @@
+{
+  "jobId": "job-runtime-ag-os-compounding-completion-20260713",
+  "commandId": "command-intake-runtime-ag-os-compounding-completion-20260713",
+  "projectId": "project-ag-os-coordinator-runtime",
+  "status": "done",
+  "priority": "normal",
+  "riskLevel": "R1",
+  "commandType": "plan_only",
+  "requestedBy": "owner-gurnoor-bassi",
+  "assignedDomain": "command-os",
+  "assignedAgent": "agent-local-runtime",
+  "approvalRequired": false,
+  "expectedOutput": "Plan-only command intake record for dashboard.",
+  "queueTimestamps": {
+    "queuedAt": "2026-07-13T09:22:50.006Z",
+    "completedAt": "2026-07-13T09:23:19.822Z"
+  },
+  "safety": {
+    "credentialsAllowed": false,
+    "liveServicesAllowed": false,
+    "deploymentAllowed": false,
+    "domainChangeAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-13T09:22:50.006Z",
+  "updatedAt": "2026-07-13T09:23:19.822Z",
+  "completionEvidence": {
+    "policyVersion": 1,
+    "qualityScorePath": ".codex/quality-scores/quality-score-20260713-runtime-ag-os-compounding-completion-20260713.json",
+    "lessonCandidatePaths": [
+      ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-compounding-completion-20260713-01.json",
+      ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-compounding-completion-20260713-02.json",
+      ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-compounding-completion-20260713-03.json"
+    ],
+    "generatedBy": "scripts/lib/runtime/job-completion-processor.mjs"
+  }
+}

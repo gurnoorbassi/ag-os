@@ -1,0 +1,27 @@
+{
+  "routeId": "route-runtime-ag-os-accepted-lesson-reuse-proof-20260713",
+  "jobId": "job-runtime-ag-os-accepted-lesson-reuse-proof-20260713",
+  "commandType": "plan_only",
+  "projectId": "project-ag-os-coordinator-runtime",
+  "riskLevel": "R1",
+  "connectorNeeds": [],
+  "targetDomain": "planner",
+  "targetAgent": "planner-foundation",
+  "approvalGates": [
+    "future_build_requires_owner_confirmation",
+    "future_deployment_requires_owner_approval",
+    "future_domain_change_requires_owner_approval",
+    "future_paid_tool_use_requires_owner_approval"
+  ],
+  "routingReason": "The queued owner command is routed to the offline planner foundation because it requests a plan-only dashboard outcome and does not authorize live execution.",
+  "blockedBy": [],
+  "safety": {
+    "executionAuthorized": false,
+    "liveConnectorUseAllowed": false,
+    "deploymentAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-13T09:34:57.916Z",
+  "updatedAt": "2026-07-13T09:34:57.916Z"
+}

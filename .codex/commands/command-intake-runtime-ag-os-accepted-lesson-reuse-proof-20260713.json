@@ -1,0 +1,59 @@
+{
+  "understanding": {
+    "producedBy": "codex-worker",
+    "inferredBusinessObjective": "Prove that accepted AG OS lessons and relevant active skills are retrieved into a later project plan without granting permission.",
+    "productArchetype": "archetype-dashboard",
+    "targetUser": "AG OS owner",
+    "successCriteria": [
+      "The accepted compounding lesson appears in the generated plan basis.",
+      "Relevant active skills appear in the generated plan basis.",
+      "Completion produces a quality score and lesson candidates with source-controlled evidence."
+    ],
+    "criticalUnknowns": [],
+    "confidence": "high",
+    "assumptions": [
+      "This is a local plan-only proof with no external execution.",
+      "Accepted lessons and skills are advisory memory and grant no authority."
+    ],
+    "ownerConstraints": [
+      "The Constitution remains the governing authority.",
+      "Do not deploy, merge, access credentials, or perform external actions.",
+      "Preserve all approval and safety gates."
+    ]
+  },
+  "commandIntakeId": "command-intake-runtime-ag-os-accepted-lesson-reuse-proof-20260713",
+  "status": "classified",
+  "rawCommand": "Verify that accepted AG OS compounding lessons and relevant skills are reused in a later dashboard completion plan.",
+  "normalizedCommand": "Create a plan-only dashboard plan.",
+  "commandCategory": "plan_only",
+  "projectId": "project-ag-os-coordinator-runtime",
+  "riskLevel": "R1",
+  "classification": {
+    "requiresPlan": true,
+    "requiresApproval": false,
+    "requiresLiveService": false,
+    "requiresDeployment": false,
+    "requiresDomainChange": false,
+    "requiresPaidAction": false,
+    "requiresProductionData": false
+  },
+  "productContext": {
+    "productType": "dashboard",
+    "archetypeId": "archetype-dashboard",
+    "archetypeRegistered": true,
+    "archetypeGap": null
+  },
+  "plannedOutput": "Plan-only command intake record for dashboard.",
+  "nextRecord": {
+    "jobId": "job-runtime-ag-os-accepted-lesson-reuse-proof-20260713",
+    "planId": "plan-runtime-ag-os-accepted-lesson-reuse-proof-20260713"
+  },
+  "safety": {
+    "executesCommand": false,
+    "createsLiveSideEffect": false,
+    "usesCredentials": false,
+    "callsConnector": false
+  },
+  "createdAt": "2026-07-13T09:34:48.875Z",
+  "updatedAt": "2026-07-13T09:34:48.875Z"
+}

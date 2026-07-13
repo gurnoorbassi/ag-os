@@ -114,6 +114,8 @@ test("lesson promotion requires owner approval and preserves candidate source ev
   assert.equal(result.record.promotion.approvedBy, "owner-gurnoor-bassi");
   assert.equal(result.record.promotion.sourceCandidatePath, ".codex/memory/lessons/candidates/lesson-safe-candidate.json");
   assert.equal(result.record.runtimeUse.grantsPermission, false);
+  assert.equal(result.record.notes.includes("Candidate only"), false);
+  assert.equal(result.record.notes.includes("runtime-readable advisory knowledge only"), true);
   assert.equal(result.filePath, ".codex/memory/accepted/lesson-safe-candidate.json");
 }));
 
@@ -284,4 +286,32 @@ test("relevance retrieval selects accepted lessons and high-quality examples fro
   assert.equal(briefing.retrievalStrategy, "project_archetype_output_similarity_v1");
   assert.deepEqual(briefing.lessons.map((lesson) => lesson.lessonId), ["lesson-social-staging"]);
   assert.deepEqual(briefing.relevantExamples.map((example) => example.scoreId), ["quality-score-social-example"]);
+}));
+
+test("shared scope boosts a real relevance match but does not make unrelated lessons relevant", () => withTempDir((root) => {
+  writeJson(root, ".codex/memory/accepted/lesson-dashboard.json", {
+    lessonId: "lesson-dashboard",
+    title: "Dashboard-only lesson",
+    status: "accepted",
+    scope: "agent_shared",
+    confidence: "high",
+    appliesTo: ["archetype-dashboard"]
+  });
+
+  const unrelated = retrieveRelevantMemory({
+    root,
+    projectId: "project-social",
+    archetypeId: "archetype-social-media-content-operations-system",
+    workerType: "planner"
+  });
+  const related = retrieveRelevantMemory({
+    root,
+    projectId: "project-dashboard",
+    archetypeId: "archetype-dashboard",
+    workerType: "planner"
+  });
+
+  assert.deepEqual(unrelated.lessons, []);
+  assert.deepEqual(related.lessons.map((lesson) => lesson.lessonId), ["lesson-dashboard"]);
+  assert.equal(related.lessons[0].relevanceReasons.includes("shared_scope"), true);
 }));

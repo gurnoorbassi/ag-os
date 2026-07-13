@@ -1,0 +1,63 @@
+{
+  "$schema": "../../schemas/quality-score.schema.json",
+  "scoreId": "quality-score-20260713-runtime-social-doc-consolidation-20260713",
+  "status": "candidate",
+  "scoreType": "plan_quality_score",
+  "projectId": "project-social-media-management-system-v1",
+  "planId": "plan-runtime-social-doc-consolidation-20260713",
+  "sourcePlanPath": ".codex/plans/plan-runtime-social-doc-consolidation-20260713.json",
+  "outputType": "social_media_system",
+  "archetypeId": "archetype-social-media-content-operations-system",
+  "archetypeFile": ".codex/archetypes/social-media-content-operations-system.json",
+  "checklistItemsEvaluated": [
+    "Every post traces back to its source video, target account, target platform, and approval state.",
+    "An approval gate exists before any live posting, with no bypass path.",
+    "Drafts are structurally separated from published or live actions; a draft can never leak into a live state without approval.",
+    "Analytics show content output, approval status, scheduled posts, and performance once platforms are connected.",
+    "The system degrades safely when credentials or platform connections are missing: drafts and reports keep working, publishing stays blocked.",
+    "Local validation passes before any PR merges.",
+    "Every post record traces to source video, account, platform, and approval state.",
+    "No publish path exists without an approval gate.",
+    "Drafts and live actions are separated in data model and UI.",
+    "Blocked publish state works and explains itself.",
+    "Analytics cover output, approval status, schedule, and performance when connected.",
+    "System keeps working in draft mode when credentials or platforms are missing.",
+    "Duplicate-post protection is tested across accounts.",
+    "Audit trail answers who approved what and when.",
+    "Costs stayed within Cost OS limits with no unapproved paid services.",
+    "Local validation and CI pass."
+  ],
+  "dimensions": {
+    "completeness": 10,
+    "craft": 9,
+    "maintainability": 9,
+    "ux": 9,
+    "security": 10,
+    "performance": 7,
+    "ownerAcceptance": 8,
+    "archetypeFit": 10,
+    "costDiscipline": 10
+  },
+  "overallScore": 9.1,
+  "meetsBar": true,
+  "reviewStatus": "pass",
+  "improvementRecommendations": [
+    "Improve performance evidence before promotion beyond plan-only work."
+  ],
+  "lessonCandidates": [
+    "lesson-20260713-runtime-social-doc-consolidation-20260713-01",
+    "lesson-20260713-runtime-social-doc-consolidation-20260713-02",
+    "lesson-20260713-runtime-social-doc-consolidation-20260713-03"
+  ],
+  "evidence": [
+    ".codex/plans/plan-runtime-social-doc-consolidation-20260713.json",
+    ".codex/commands/command-intake-runtime-social-doc-consolidation-20260713.json"
+  ],
+  "generatedBy": "scripts/process-quality-score.mjs",
+  "limitations": [
+    "No product output was provided; this is a plan quality only score and does not represent owner acceptance or product quality."
+  ],
+  "notes": "Candidate score only. It does not authorize execution, deployment, live connector use, or accepted lessons.",
+  "createdAt": "2026-07-13T09:23:27.690Z",
+  "updatedAt": "2026-07-13T09:23:27.690Z"
+}

@@ -11,7 +11,7 @@ Included now:
 - Operating architecture and safety rules
 - Project, agent, task, memory, cost, quality, security, governance, and deployment schemas
 - `.codex/` operating folders for planning and state artifacts
-- Local validation placeholders
+- Local validation, dashboard, boot, test, and secret-scanning gates
 - GitHub CI that runs local validation only
 - Authenticated owner command API and operator console
 - Fail-closed command-to-intake/job/plan/cost/gate/audit pipeline
@@ -83,6 +83,8 @@ npm.cmd run live:start
 ```
 
 See `docs/live-operator-runtime.md` for the local and VPS operating path.
+
+See `docs/documentation-map.md` for the canonical document for each AG OS operating subject.
 
 The optional Anthropic planning worker is dependency-free and fail-closed. It needs a root-only `ANTHROPIC_API_KEY`, explicit enablement, configured token pricing, and a live scoped paid-action approval before the dashboard can select it.
 

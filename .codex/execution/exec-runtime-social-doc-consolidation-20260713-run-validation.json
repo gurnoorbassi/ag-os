@@ -1,0 +1,28 @@
+{
+  "executionStepId": "exec-runtime-social-doc-consolidation-20260713-run-validation",
+  "planId": "plan-runtime-social-doc-consolidation-20260713",
+  "jobId": "job-runtime-social-doc-consolidation-20260713",
+  "projectId": "project-social-media-management-system-v1",
+  "stepType": "run_validation",
+  "status": "done",
+  "riskLevel": "R1",
+  "command": "npm.cmd run validate",
+  "expectedResult": "Local AG OS validation completes without live service calls, deployments, credentials, paid usage, or production data.",
+  "evidenceRequired": [
+    "local validation command output",
+    "no live service calls",
+    "no credentials used"
+  ],
+  "rollbackRequired": false,
+  "rollbackPlan": "Remove the generated dry-run record chain if validation fails before merge.",
+  "safety": {
+    "credentialsAllowed": false,
+    "liveServiceUseAllowed": false,
+    "deploymentAllowed": false,
+    "domainChangeAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-13T09:23:27.689Z",
+  "updatedAt": "2026-07-13T09:23:27.689Z"
+}

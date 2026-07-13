@@ -1,0 +1,50 @@
+{
+  "$schema": "../../../schemas/lesson.schema.json",
+  "lessonId": "lesson-20260713-runtime-ag-os-compounding-completion-20260713-03",
+  "title": "Reuse archetype-backed scoring for dashboard",
+  "lesson": "Plans that cite an active archetype and carry its checklist, gates, pitfalls, and stop conditions can be scored without using live services. Keep the score as candidate evidence until owner promotion.",
+  "sources": [
+    ".codex/quality-scores/quality-score-20260713-runtime-ag-os-compounding-completion-20260713.json",
+    ".codex/plans/plan-runtime-ag-os-compounding-completion-20260713.json",
+    ".codex/execution/exec-runtime-ag-os-compounding-completion-20260713-run-validation.json"
+  ],
+  "scope": "agent_shared",
+  "confidence": "high",
+  "status": "accepted",
+  "owner": "owner-gurnoor-bassi",
+  "projectId": "project-ag-os-coordinator-runtime",
+  "appliesTo": [
+    "archetype-dashboard",
+    "plan_quality_score",
+    "quality-score-lesson-loop"
+  ],
+  "sourceScoreId": "quality-score-20260713-runtime-ag-os-compounding-completion-20260713",
+  "generatedBy": "scripts/process-lesson-candidates.mjs",
+  "whyThisMatters": "This creates compounding planning intelligence while preserving owner authority and offline safety.",
+  "whenToUse": "Use for future plan-only dry runs that cite an active product archetype and remain within Cost OS limits.",
+  "whenNotToUse": "Do not use for product output scoring unless actual output evidence is provided.",
+  "notes": "Accepted lesson is runtime-readable advisory knowledge only. It grants no permission for live actions.",
+  "createdAt": "2026-07-13T09:23:19.817Z",
+  "updatedAt": "2026-07-13T09:32:26.020Z",
+  "promotion": {
+    "approvalId": "approval-20260713-h3-compounding-proof",
+    "approvedBy": "owner-gurnoor-bassi",
+    "approvedAt": "2026-07-13T09:32:26.020Z",
+    "evidence": [
+      ".codex/approvals/approval-20260713-h3-compounding-proof.json",
+      ".codex/quality-scores/quality-score-20260713-runtime-ag-os-compounding-completion-20260713.json",
+      ".codex/plans/plan-runtime-ag-os-compounding-completion-20260713.json",
+      ".codex/execution/exec-runtime-ag-os-compounding-completion-20260713-run-validation.json"
+    ],
+    "sourceCandidatePath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-compounding-completion-20260713-03.json"
+  },
+  "runtimeUse": {
+    "allowedForPlanning": true,
+    "allowedForCritic": true,
+    "allowedForBuilder": true,
+    "allowedForWorkers": true,
+    "grantsPermission": false,
+    "liveActionsAllowed": false,
+    "approvalBypassAllowed": false
+  }
+}

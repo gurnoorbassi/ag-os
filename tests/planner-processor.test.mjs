@@ -135,6 +135,9 @@ test("uses social media archetype content for source video, accounts, approvals,
   assert.equal(record.basis.relevantMemory.memoryGrantsPermission, false);
   assert.equal(record.basis.relevantMemory.examplesGrantPermission, false);
   assert.equal(record.basis.relevantMemory.exampleScorePaths.length > 0, true);
+  assert.equal(record.basis.relevantSkills.strategy, "task_tool_skill_similarity_v1");
+  assert.equal(record.basis.relevantSkills.skillsGrantPermission, false);
+  assert.equal(record.basis.appliedSkills.includes("skill-target-pr-review-quality-score"), true);
   assert.equal(combined.includes("source video"), true);
   assert.equal(combined.includes("accounts"), true);
   assert.equal(combined.includes("approval"), true);

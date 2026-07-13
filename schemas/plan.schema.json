@@ -118,6 +118,33 @@
             "minLength": 1
           }
         },
+        "appliedSkills": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^skill-[a-z0-9-]+$"
+          }
+        },
+        "relevantSkills": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "strategy",
+            "skillPaths",
+            "skillsGrantPermission"
+          ],
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "const": "task_tool_skill_similarity_v1"
+            },
+            "skillPaths": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "skillsGrantPermission": { "type": "boolean", "const": false }
+          }
+        },
         "relevantMemory": {
           "type": "object",
           "additionalProperties": false,

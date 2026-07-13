@@ -23,7 +23,7 @@ Non-goals:
 - AG OS is not a task manager; it is a builder with judgment encoded in records.
 - AG OS never trades quality for tiny cost savings, and never trades safety for speed.
 
-## 2. Current State (evidence-backed, 2026-07-09)
+## 2. Current State (evidence-backed, 2026-07-13)
 
 Proven capabilities (see `.codex/capabilities/registry.json` for evidence chains):
 
@@ -46,6 +46,9 @@ Compounding intelligence now includes:
 - Unified candidate, accepted, rejected, and conflict-aware memory records with accepted-only runtime loading.
 - An owner-gated lesson promotion/rejection path.
 - A validated skills library with three active evidence-cited procedural skills delivered to workers without granting permission.
+- Deterministic active-skill retrieval wired into plan basis, plus plan-level skill reuse and registered-project concurrent-planning metrics.
+- Explicit registered-project targeting in the owner command intake path.
+- One owner-approved accepted lesson in runtime memory, a later project plan that retrieved it with its prior quality-score example, and a draft reviewed-PR archetype update proposal.
 
 The Social Media Management System has progressed through draft UI, content review, manual posting pack, target-repo merge, dedicated Netlify staging proof, and full H2 owner acceptance. Production Social Posting OS and an Instagram `@agdigitalz` reference-only OAuth preflight are source controlled. OAuth execution, account connection, posting, scheduling, analytics, DMs/comments, and n8n activation remain blocked unless separately approved.
 
@@ -56,7 +59,8 @@ Known weaknesses (from the validator/schema audit):
 - The accepted H2 social product remains intentionally limited to managed staging and draft-only operation; live-operation readiness is an H5 concern with separate gates.
 - Mechanical completion scoring now covers the local execution processor; remaining completion paths must adopt the same guarded `done` contract as they are added.
 - Relevance retrieval is deterministic and metadata-based; semantic retrieval and measured reuse effectiveness remain future improvements if evidence justifies them.
-- Documentation continues to grow; consolidation debt accrues.
+- Accepted lesson reuse is proven once; broader measured reuse effectiveness remains a future evidence question rather than an unimplemented H3 mechanism.
+- Documentation growth remains controlled by `docs/documentation-map.md`; new documents must point to canonical policy instead of restating it.
 - Accumulated context is only an asset while it is true; stale or wrong lessons make the system worse than a cold session.
 
 ## 3. Horizons
@@ -77,11 +81,13 @@ Status: complete through the Social Media Management System. Build, review, merg
 
 Goal: the learning loop runs itself. Every completed project auto-produces a quality score and lesson candidates; below-bar scores force improvement recommendations; accepted lessons feed archetype updates through reviewed PRs; boot briefing moves from load-everything to relevance retrieval (most similar past projects, their scores, applicable lessons). Add the skills library: reusable proven build patterns that plans reference instead of re-deriving. Exit criteria: a new project in a known category demonstrably reuses lessons and skills from prior projects, visible in its plan basis.
 
-Status: partially implemented. Unified memory, accepted-only loading, promotion/rejection mechanics, the skills-library foundation, guarded done-job scoring, project/archetype/output relevance retrieval, and reviewed-PR archetype update proposals are implemented. Demonstrated lesson/skill reuse in a new project remains open.
+Status: complete. Unified memory, accepted-only loading, promotion/rejection mechanics, guarded done-job scoring, project/archetype/output relevance retrieval, reviewed-PR archetype update proposals, and plan-level active-skill retrieval are implemented. The owner-approved lesson `lesson-20260713-runtime-ag-os-compounding-completion-20260713-03` is active in runtime memory. The later `runtime-ag-os-accepted-lesson-reuse-proof-20260713` plan retrieved that exact lesson, its prior quality-score example, and relevant active skills before completing with new quality, lesson-candidate, cost, and audit evidence. The proposed archetype addition remains draft-only and requires reviewed PR application.
 
 ### H4 — Scaled Operations
 
 Goal: the owner's attention is spent on judgment, not clicks. Activate the first standing approval lock (class-scoped, expiring, revocable, per `docs/standing-approvals.md`); batch owner approvals into a single review surface; run multiple projects concurrently through the job queue; instrument the system (estimate-vs-actual cost, quality trend per category, rework rate, lesson application rate). Exit criteria: two or more projects progress in parallel with owner touches only at judgment gates.
+
+Status: complete for source-controlled scaled operations. Standing approvals, batched approval review, cost/quality/rework/reuse metrics, registered-project targeting, and a two-project planning batch are recorded. The AG OS Coordinator Runtime and Social Media Management System jobs progressed through plan, local completion, cost, audit, quality-score, and lesson-candidate records without an owner touch outside the original outcome command. This proves concurrent planning progress, not simultaneous worker CPU execution and not live external-operation permission.
 
 ### H5 — Live Operations and Protected Product Management
 
@@ -101,7 +107,7 @@ Status values: `proven` (done under gates, evidence recorded), `ready` (mechanic
 | GitHub branch/PR/merge on approved targets | proven | action matrix + CI + approval where gated |
 | Critic review, quality score, lesson candidates | proven | none, offline |
 | Unified memory loading and owner-gated lesson promotion | ready | owner approval for each promotion; memory never grants permission |
-| Skills library and active procedural skills | ready | evidence-backed use; action-specific gates still apply |
+| Skills library and active procedural skills | proven | active skills are selected into relevant plan basis; action-specific gates still apply |
 | Netlify staging deploy | proven | approval lock per deploy |
 | n8n draft workflow export (inactive) | proven | approval lock per export |
 | n8n workflow activation | blocked | owner approval, rollback plan, audit |
@@ -113,7 +119,7 @@ Status values: `proven` (done under gates, evidence recorded), `ready` (mechanic
 | Paid tools / paid APIs | blocked | owner approval + Cost OS review, permanent gate |
 | Production / customer data | blocked | owner approval + data classification path |
 | Standing approval locks | ready | first lock is active for exact AG OS codex-branch push + draft-PR class; every use is audited and revocable |
-| Relevance-retrieval boot briefing | planned | H3 backlog item |
+| Relevance-retrieval boot and plan briefing | proven | deterministic accepted-lesson, quality-example, and active-skill selection; memory and skills grant no permission |
 | Instagram OAuth for `@agdigitalz` in `connected_draft_only` mode | blocked | exact owner approval plus live connector path; no posting permissions |
 | Lead Gen managed staging | blocked | scoped migration approval, backups, rollback |
 | Constitution amendments | blocked | full §32 process, always |
@@ -135,16 +141,20 @@ Status values: `proven` (done under gates, evidence recorded), `ready` (mechanic
 | 11 | First standing approval lock (owner grant, class-scoped, expiring) | H4 | S | complete | Ten-use AG OS codex-branch push + draft-PR lock is active through August 8, 2026 and remains immediately revocable. |
 | 12 | Batched approval review surface | H4 | M | complete | Dashboard groups owner decisions, approval packages, and standing-lock usage in one read-only, non-authorizing surface. |
 | 13 | Metrics instrumentation: cost variance, quality trend, rework, lesson application | H4 | M | complete | Dashboard computes all four signals deterministically from source-controlled records without inventing live state. |
-| 14 | Doc consolidation pass (duplicate boot docs, restated gate lists) | H1–H4 | M | open | Own scoped PR; validator pins exact strings. |
-| 15 | AJV migration decision | H1 tail | M | open | Consider only if the hand-rolled subset blocks safe progress; requires supply-chain review. |
+| 14 | Doc consolidation pass (duplicate boot docs, restated gate lists) | H1–H4 | M | complete | Canonical documentation map added, boot policy/mechanics separated, and stale readiness wording retained as historical activation evidence. |
+| 15 | AJV migration decision | H1 tail | M | complete | Decision is to defer until an evidence trigger justifies a separately approved dependency and validator migration; see `docs/ajv-migration-decision.md`. |
 | 16 | Production readiness package (rollback, backup, incident drill) | H5 | L | complete | Fail-closed source record and evaluator cover backup, rollback, monitoring, incident, recovery, credentials, cost, validation, and exact approval evidence. Activation remains blocked until live evidence passes. |
 | 17 | Lead Gen migration plan execution (observe → read_only first) | H5 | L | open | Separate scoped approvals throughout. |
+| 18 | First accepted-lesson promotion and subsequent plan reuse proof | H3 | S | complete | Exact owner approval promoted the named candidate; a later project plan selected the accepted lesson, its quality-score example, and relevant skills; the corresponding archetype update remains a safe draft reviewed-PR proposal. |
+| 19 | Two registered-project scaled-operation proof | H4 | M | complete | Coordinator and Social Media jobs were planned in one batch and completed with cost, audit, quality-score, and lesson-candidate evidence. |
 
-Evidence for the 2026-07-09 status truth-up:
+Evidence for the 2026-07-13 status truth-up:
 
 - H1: `tests/validate-foundation.test.mjs`, `scripts/validate-foundation.mjs`, `docs/validation-limits.md`, `docs/runtime-proof-records-policy.md`, and `scripts/process-runtime-proof-writer.mjs`.
 - H2: `.codex/quality-scores/quality-score-runtime-target-pr-review-ag-digitalz-manual-posting-pack-v1-20260705.json`, `.codex/audit/audit-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-executed.json`, `.codex/audit/audit-20260709-social-media-management-system-h2-owner-accepted.json`, and `.codex/projects/registry.json`.
 - H3: `docs/unified-memory-learning-os.md`, `scripts/load-accepted-lessons.mjs`, `scripts/process-lesson-promotion.mjs`, `scripts/lib/runtime/job-completion-processor.mjs`, `schemas/skill.schema.json`, and the active records under `.codex/skills/`.
+- H3/H4 completion evidence: `.codex/plans/plan-runtime-ag-os-compounding-completion-20260713.json`, `.codex/plans/plan-runtime-social-doc-consolidation-20260713.json`, their matching jobs, execution records, cost records, quality scores, audit records, and lesson candidates.
+- H3 accepted reuse evidence: `.codex/approvals/approval-20260713-h3-compounding-proof.json`, `.codex/memory/accepted/lesson-20260713-runtime-ag-os-compounding-completion-20260713-03.json`, `.codex/plans/plan-runtime-ag-os-accepted-lesson-reuse-proof-20260713.json`, its matching job, execution, quality-score, lesson-candidate, cost, and audit records, and `.codex/memory/archetype-updates/archetype-update-lesson-20260713-runtime-ag-os-compounding-completion-20260713-03-archetype-dashboard-qualitychecklist.json`.
 - Instagram production boundary: `.codex/social/preflight/social-preflight-instagram-oauth-agdigitalz.json`, `.codex/credentials/credential-ref-instagram-agdigitalz-oauth.json`, and `docs/instagram-production-readiness.md`.
 
 Backlog changes are made by editing this document through reviewed PRs, citing evidence (audit findings, quality scores, promoted lessons, or owner commands).

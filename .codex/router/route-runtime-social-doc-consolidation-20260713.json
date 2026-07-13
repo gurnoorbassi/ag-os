@@ -1,0 +1,27 @@
+{
+  "routeId": "route-runtime-social-doc-consolidation-20260713",
+  "jobId": "job-runtime-social-doc-consolidation-20260713",
+  "commandType": "plan_only",
+  "projectId": "project-social-media-management-system-v1",
+  "riskLevel": "R1",
+  "connectorNeeds": [],
+  "targetDomain": "planner",
+  "targetAgent": "planner-foundation",
+  "approvalGates": [
+    "future_build_requires_owner_confirmation",
+    "future_deployment_requires_owner_approval",
+    "future_domain_change_requires_owner_approval",
+    "future_paid_tool_use_requires_owner_approval"
+  ],
+  "routingReason": "The queued owner command is routed to the offline planner foundation because it requests a plan-only social media content operations outcome and does not authorize live execution.",
+  "blockedBy": [],
+  "safety": {
+    "executionAuthorized": false,
+    "liveConnectorUseAllowed": false,
+    "deploymentAllowed": false,
+    "productionDataAllowed": false,
+    "paidActionAllowed": false
+  },
+  "createdAt": "2026-07-13T09:22:56.847Z",
+  "updatedAt": "2026-07-13T09:22:56.847Z"
+}

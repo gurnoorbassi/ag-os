@@ -20,11 +20,27 @@ test("computes cost, quality, rework, and lesson reuse only from source records"
     writeJson(root, ".codex/critiques/critique-one.json", { requiredFixes: ["Fix one"] });
     writeJson(root, ".codex/jobs/job-one.json", { status: "failed" });
     writeJson(root, ".codex/plans/plan-one.json", {
+      planId: "plan-one",
+      projectId: "project-one",
+      createdAt: "2026-07-02T00:00:00Z",
       basis: {
         productArchetype: "archetype-website",
         appliedLessons: ["lesson-one"],
+        appliedSkills: ["skill-one"],
         relevantMemory: { exampleScorePaths: [".codex/quality-scores/quality-score-one.json"] }
       }
+    });
+    writeJson(root, ".codex/plans/plan-two.json", {
+      planId: "plan-two",
+      projectId: "project-two",
+      createdAt: "2026-07-02T00:03:00Z",
+      basis: { productArchetype: "archetype-dashboard" }
+    });
+    writeJson(root, ".codex/projects/registry.json", {
+      projects: [
+        { projectId: "project-one" },
+        { projectId: "project-two" }
+      ]
     });
     writeJson(root, ".codex/memory/accepted/lesson-one.json", { lessonId: "lesson-one", status: "accepted" });
     writeJson(root, ".codex/skills/skill-one.json", { evidence: { timesApplied: 3 } });
@@ -41,9 +57,13 @@ test("computes cost, quality, rework, and lesson reuse only from source records"
     assert.equal(metrics.quality.passCount, 2);
     assert.equal(metrics.rework.critiquesRequiringFixes, 1);
     assert.equal(metrics.rework.failedJobCount, 1);
-    assert.equal(metrics.lessonReuse.lessonReuseRatePercent, 100);
-    assert.equal(metrics.lessonReuse.exampleReuseRatePercent, 100);
+    assert.equal(metrics.lessonReuse.lessonReuseRatePercent, 50);
+    assert.equal(metrics.lessonReuse.exampleReuseRatePercent, 50);
+    assert.equal(metrics.lessonReuse.skillReuseRatePercent, 50);
+    assert.equal(metrics.lessonReuse.plansUsingSkills, 1);
     assert.equal(metrics.lessonReuse.skillApplicationsRecorded, 3);
+    assert.equal(metrics.scaledOperations.concurrentPlanningProven, true);
+    assert.deepEqual(metrics.scaledOperations.projectsInConcurrentBatches, ["project-one", "project-two"]);
     assert.equal(metrics.generatedFromLiveSystems, false);
   } finally {
     rmSync(root, { recursive: true, force: true });
