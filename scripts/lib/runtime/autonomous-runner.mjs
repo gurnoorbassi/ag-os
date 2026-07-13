@@ -8,6 +8,7 @@ import { writeExecutionDryRunRecords } from "./execution-dry-run-processor.mjs";
 
 const LIVE_JOB_PREFIX = "job-runtime-operator-";
 let processing = false;
+const pendingDashboardRefreshRoots = new Set();
 
 function runDashboardBuild(root) {
   const result = spawnSync(process.execPath, ["scripts/build-dashboard.mjs"], {
@@ -17,6 +18,21 @@ function runDashboardBuild(root) {
   });
   if (result.status !== 0) {
     throw new Error(`dashboard refresh failed: ${result.stderr || result.stdout}`);
+  }
+}
+
+function refreshDashboardReadModel({ root, dashboardBuilder, required }) {
+  const refreshRequired = required || pendingDashboardRefreshRoots.has(root);
+  if (!refreshRequired) {
+    return { attempted: false, passed: true };
+  }
+  try {
+    dashboardBuilder(root);
+    pendingDashboardRefreshRoots.delete(root);
+    return { attempted: true, passed: true };
+  } catch (error) {
+    pendingDashboardRefreshRoots.add(root);
+    return { attempted: true, passed: false, error: error.message };
   }
 }
 
@@ -123,7 +139,6 @@ export function processAutonomousJob({ jobId, root = process.cwd(), now = new Da
       now,
       root
     });
-    runDashboardBuild(root);
     return { status: "waiting_approval", job: waiting, auditPath: audit.filePath };
   }
 
@@ -165,7 +180,6 @@ export function processAutonomousJob({ jobId, root = process.cwd(), now = new Da
       now,
       root
     });
-    runDashboardBuild(root);
     return { status: execution.job.status, ...execution, auditPath: audit.filePath };
   } catch (error) {
     const failed = writeJobState(running, root, now, {
@@ -186,12 +200,16 @@ export function processAutonomousJob({ jobId, root = process.cwd(), now = new Da
       now,
       root
     });
-    runDashboardBuild(root);
     return { status: "failed", job: failed, auditPath: audit.filePath, error: error.message };
   }
 }
 
-export function processQueuedJobs({ root = process.cwd(), now = new Date(), runValidation = true } = {}) {
+export function processQueuedJobs({
+  root = process.cwd(),
+  now = new Date(),
+  runValidation = true,
+  dashboardBuilder = runDashboardBuild
+} = {}) {
   if (processing) return { status: "busy", processed: [] };
   processing = true;
   try {
@@ -222,8 +240,12 @@ export function processQueuedJobs({ root = process.cwd(), now = new Date(), runV
         return { status: "failed", job: failed, error: error.message };
       }
     });
-    if (processed.length > 0) runDashboardBuild(root);
-    return { status: "complete", processed };
+    const dashboardRefresh = refreshDashboardReadModel({
+      root,
+      dashboardBuilder,
+      required: processed.length > 0
+    });
+    return { status: "complete", processed, dashboardRefresh };
   } finally {
     processing = false;
   }

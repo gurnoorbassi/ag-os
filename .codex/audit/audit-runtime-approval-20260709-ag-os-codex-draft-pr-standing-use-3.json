@@ -1,0 +1,24 @@
+{
+  "id": "audit-runtime-approval-20260709-ag-os-codex-draft-pr-standing-use-3",
+  "occurredAt": "2026-07-13T21:11:47.702Z",
+  "actor": "agent-codex",
+  "eventType": "standing_approval_used",
+  "summary": "Standing approval approval-20260709-ag-os-codex-draft-pr-standing used for codex branch push and draft PR creation.",
+  "scope": "gurnoorbassi/ag-os:codex/runtime-dashboard-refresh-recovery-20260713",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260709-ag-os-codex-draft-pr-standing"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/137"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Use 3 of 10. Secret scan and all required local gates passed. Merge remains prohibited. Changed files: scripts/lib/runtime/autonomous-runner.mjs, scripts/live-server.mjs, tests/autonomous-runner.test.mjs.",
+  "createdAt": "2026-07-13T21:11:47.702Z"
+}

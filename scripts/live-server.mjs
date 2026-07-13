@@ -28,7 +28,15 @@ const MIME_TYPES = {
 
 function runAutomaticQueue() {
   try {
-    return processQueuedJobs({ root });
+    const result = processQueuedJobs({ root });
+    if (result.dashboardRefresh?.passed === false) {
+      console.error(JSON.stringify({
+        service: "ag-os-coordinator",
+        event: "dashboard-refresh-deferred",
+        detail: result.dashboardRefresh.error
+      }));
+    }
+    return result;
   } catch (error) {
     console.error(JSON.stringify({ service: "ag-os-coordinator", event: "automatic-run-failed", detail: error.message }));
     return { status: "failed", processed: [], error: error.message };

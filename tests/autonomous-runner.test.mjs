@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { processAutonomousJob } from "../scripts/lib/runtime/autonomous-runner.mjs";
+import { processAutonomousJob, processQueuedJobs } from "../scripts/lib/runtime/autonomous-runner.mjs";
 import { submitOwnerCommand } from "../scripts/lib/runtime/live-command-service.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -58,4 +58,42 @@ test("autonomous runner pauses gated work without executing it", async () => {
   assert.equal(result.job.approvalRequired, true);
   assert.match(result.job.blockedReason, /permanent live-action gate/);
   assert.equal(result.executionPath, undefined);
+});
+
+test("dashboard refresh failure never corrupts a correctly paused job and retries on the next tick", async () => {
+  const workspace = tempWorkspace();
+  const command = await submitOwnerCommand({
+    command: "Deploy the dashboard to production",
+    projectId: "project-ag-os-coordinator-runtime",
+    root: workspace,
+    now: new Date("2026-07-13T15:00:00.000Z")
+  });
+
+  const first = processQueuedJobs({
+    root: workspace,
+    now: new Date("2026-07-13T15:01:00.000Z"),
+    runValidation: false,
+    dashboardBuilder: () => {
+      throw new Error("simulated read-model write failure");
+    }
+  });
+  const persisted = JSON.parse(readFileSync(path.join(workspace, `.codex/jobs/${command.jobId}.json`), "utf8"));
+
+  assert.equal(first.processed[0].status, "waiting_approval");
+  assert.equal(first.dashboardRefresh.passed, false);
+  assert.equal(persisted.status, "waiting_approval");
+  assert.match(persisted.blockedReason, /permanent live-action gate/);
+
+  let retryCount = 0;
+  const second = processQueuedJobs({
+    root: workspace,
+    dashboardBuilder: () => {
+      retryCount += 1;
+    }
+  });
+
+  assert.equal(second.processed.length, 0);
+  assert.equal(second.dashboardRefresh.attempted, true);
+  assert.equal(second.dashboardRefresh.passed, true);
+  assert.equal(retryCount, 1);
 });
