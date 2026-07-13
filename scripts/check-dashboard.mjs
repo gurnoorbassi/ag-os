@@ -56,7 +56,23 @@ if (data.aiReceptionist.status !== "active" || data.aiReceptionist.managementMod
 
 const index = existsSync(path.join(root, "dashboard/index.html")) ? read("dashboard/index.html") : "";
 const app = existsSync(path.join(root, "dashboard/app.js")) ? read("dashboard/app.js") : "";
+const styles = existsSync(path.join(root, "dashboard/styles.css")) ? read("dashboard/styles.css") : "";
 const dashboardSource = `${index}\n${app}`;
+
+for (const requiredInterfacePattern of [
+  /color-scheme:\s*dark/,
+  /data-dashboard-view="home"/,
+  /data-dashboard-view="work"/,
+  /data-dashboard-view="intelligence"/,
+  /data-dashboard-view="system"/,
+  /class="nav-workspace"/,
+  /id="view-title"/,
+  /const dashboardViewMeta =/
+]) {
+  if (!requiredInterfacePattern.test(`${dashboardSource}\n${styles}`)) {
+    fail(`dashboard navigation or dark-theme invariant missing: ${requiredInterfacePattern}`);
+  }
+}
 
 for (const forbiddenPattern of [
   /contenteditable/i,

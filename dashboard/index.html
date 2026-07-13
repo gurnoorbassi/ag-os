@@ -10,59 +10,91 @@
     <div class="app-shell">
       <aside class="sidebar" aria-label="Dashboard sections">
         <div class="brand-row">
-        <div class="brand">
-          <div class="brand-mark" aria-hidden="true">AG</div>
-          <div>
-            <p class="brand-title">AG OS</p>
-            <p class="brand-subtitle">Control Center v1</p>
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true">AG</div>
+            <div>
+              <p class="brand-title">AG OS</p>
+              <p class="brand-subtitle">Owner Control Center</p>
+            </div>
           </div>
+          <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="section-nav" aria-label="Open navigation">
+            <span></span><span></span><span></span>
+          </button>
         </div>
-          <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="section-nav">Menu</button>
-        </div>
+
+        <div class="system-presence"><span aria-hidden="true"></span> Private runtime</div>
+
         <nav id="section-nav" class="section-nav">
-          <a class="nav-primary" href="#command-center">Start a job</a>
-          <a class="nav-primary" href="#activation-center">Activation center</a>
-          <a href="#owner-attention">Needs your decision</a>
-          <a href="#projects">Projects</a>
-          <details open>
-            <summary>Operations</summary>
-            <a href="#action-queue">Action queue</a>
-            <a href="#client-management">Clients</a>
-            <a href="#social-media">Social media</a>
-            <a href="#production-social-posting">Production posting</a>
-            <a href="#approvals">Approvals</a>
-            <a href="#connector-proofs">Connectors</a>
-          </details>
-          <details>
-            <summary>Evidence and settings</summary>
-            <a href="#overview">System overview</a>
-            <a href="#registries">Registries</a>
-            <a href="#capabilities">Capabilities</a>
-            <a href="#quality-review">Quality</a>
-            <a href="#unified-memory">Memory and learning</a>
-            <a href="#costs">Costs</a>
-            <a href="#metrics">Metrics</a>
-            <a href="#skills">Skills</a>
-            <a href="#operating-systems">Operating systems</a>
-            <a href="#safe-merge">Safe merge</a>
+          <div class="nav-group" aria-label="Workspaces">
+            <p class="nav-label">Workspace</p>
+            <button class="nav-workspace" type="button" data-dashboard-view="home" aria-pressed="true">
+              <span class="nav-icon" aria-hidden="true">01</span>
+              <span><strong>Home</strong><small>Command and priorities</small></span>
+            </button>
+            <button class="nav-workspace" type="button" data-dashboard-view="work" aria-pressed="false">
+              <span class="nav-icon" aria-hidden="true">02</span>
+              <span><strong>Work</strong><small>Queues and approvals</small></span>
+            </button>
+            <button class="nav-workspace" type="button" data-dashboard-view="intelligence" aria-pressed="false">
+              <span class="nav-icon" aria-hidden="true">03</span>
+              <span><strong>Intelligence</strong><small>Quality, learning, cost</small></span>
+            </button>
+            <button class="nav-workspace" type="button" data-dashboard-view="system" aria-pressed="false">
+              <span class="nav-icon" aria-hidden="true">04</span>
+              <span><strong>System</strong><small>Health and controls</small></span>
+            </button>
+          </div>
+
+          <div class="nav-group nav-shortcuts" aria-label="Quick access">
+            <p class="nav-label">Quick access</p>
+            <a href="#command-center" data-view="home">New command</a>
+            <a href="#owner-attention" data-view="home">Needs your decision</a>
+            <a href="#projects" data-view="home">Projects</a>
+            <a href="#approvals" data-view="work">Approvals</a>
+          </div>
+
+          <details class="nav-more">
+            <summary>All sections</summary>
+            <a href="#activation-center" data-view="home">Activation</a>
+            <a href="#action-queue" data-view="work">Action queue</a>
+            <a href="#client-management" data-view="work">Clients</a>
+            <a href="#social-media" data-view="work">Social media</a>
+            <a href="#production-social-posting" data-view="work">Production posting</a>
+            <a href="#connector-proofs" data-view="work">Connectors</a>
+            <a href="#quality-review" data-view="intelligence">Quality</a>
+            <a href="#unified-memory" data-view="intelligence">Memory and learning</a>
+            <a href="#costs" data-view="intelligence">Costs</a>
+            <a href="#metrics" data-view="intelligence">Metrics</a>
+            <a href="#skills" data-view="intelligence">Skills</a>
+            <a href="#overview" data-view="system">System overview</a>
+            <a href="#registries" data-view="system">Registries</a>
+            <a href="#capabilities" data-view="system">Capabilities</a>
+            <a href="#operating-systems" data-view="system">Operating systems</a>
+            <a href="#safe-merge" data-view="system">Safe merge</a>
           </details>
         </nav>
+
+        <div class="sidebar-footer">
+          <p>Safety boundary</p>
+          <span>External actions stay approval-gated.</span>
+        </div>
       </aside>
 
       <main class="dashboard">
         <header class="topbar">
           <div>
-            <h1>AG OS Control Center</h1>
-            <p>Owner-operated command center backed by source-controlled AG OS evidence.</p>
+            <p class="eyebrow">Owner workspace <span aria-hidden="true">/</span> <span id="view-kicker">Home</span></p>
+            <h1 id="view-title">Command and priorities</h1>
+            <p id="view-description">Start work, check readiness, and see what needs your attention.</p>
           </div>
-          <div id="runtime-mode" class="mode-lock" aria-label="Dashboard mode">Offline evidence</div>
+          <div id="runtime-mode" class="mode-lock" aria-label="Dashboard mode"><span aria-hidden="true"></span> Offline evidence</div>
         </header>
 
         <div class="view-switcher" role="group" aria-label="Dashboard view">
-          <span>Show:</span>
-          <button type="button" data-dashboard-view="daily" aria-pressed="true">Daily work</button>
-          <button type="button" data-dashboard-view="operations" aria-pressed="false">Operations</button>
-          <button type="button" data-dashboard-view="all" aria-pressed="false">All evidence</button>
+          <button type="button" data-dashboard-view="home" aria-pressed="true">Home</button>
+          <button type="button" data-dashboard-view="work" aria-pressed="false">Work</button>
+          <button type="button" data-dashboard-view="intelligence" aria-pressed="false">Intelligence</button>
+          <button type="button" data-dashboard-view="system" aria-pressed="false">System</button>
         </div>
 
         <section id="command-center" class="section-band">

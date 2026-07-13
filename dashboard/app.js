@@ -224,20 +224,50 @@ function renderActivationCenter(connected = false, productionStatus = "private r
 }
 
 const dashboardViews = {
-  daily: new Set(["command-center", "activation-center", "owner-attention", "action-queue", "projects"]),
-  operations: new Set([
-    "command-center", "activation-center", "owner-attention", "action-queue", "projects",
-    "client-management", "social-media", "production-social-posting", "approvals", "connector-proofs"
-  ])
+  home: new Set(["command-center", "activation-center", "owner-attention", "projects"]),
+  work: new Set(["action-queue", "client-management", "social-media", "production-social-posting", "approvals", "connector-proofs"]),
+  intelligence: new Set(["quality-review", "unified-memory", "costs", "metrics", "skills"]),
+  system: new Set(["overview", "registries", "capabilities", "operating-systems", "safe-merge"])
+};
+
+const dashboardViewMeta = {
+  home: {
+    kicker: "Home",
+    title: "Command and priorities",
+    description: "Start work, check readiness, and see what needs your attention."
+  },
+  work: {
+    kicker: "Work",
+    title: "Queues and approvals",
+    description: "Review active work, client operations, connectors, and approval gates."
+  },
+  intelligence: {
+    kicker: "Intelligence",
+    title: "Quality and learning",
+    description: "Track quality, lessons, cost, metrics, and reusable operating knowledge."
+  },
+  system: {
+    kicker: "System",
+    title: "Health and controls",
+    description: "Inspect registries, capabilities, operating systems, and merge safeguards."
+  }
 };
 
 function setDashboardView(view) {
-  document.querySelectorAll(".view-switcher button").forEach((button) => {
-    button.setAttribute("aria-pressed", String(button.dataset.dashboardView === view));
+  const activeView = dashboardViews[view] ? view : "home";
+  document.querySelectorAll("[data-dashboard-view]").forEach((button) => {
+    const active = button.dataset.dashboardView === activeView;
+    button.setAttribute("aria-pressed", String(active));
+    button.classList.toggle("is-current", active);
   });
   document.querySelectorAll("main .section-band").forEach((section) => {
-    section.hidden = view !== "all" && !dashboardViews[view].has(section.id);
+    section.hidden = !dashboardViews[activeView].has(section.id);
   });
+  const meta = dashboardViewMeta[activeView];
+  document.querySelector("#view-kicker").textContent = meta.kicker;
+  document.querySelector("#view-title").textContent = meta.title;
+  document.querySelector("#view-description").textContent = meta.description;
+  document.body.dataset.activeView = activeView;
 }
 
 function initializeNavigation() {
@@ -247,20 +277,27 @@ function initializeNavigation() {
     const open = nav.classList.toggle("is-open");
     toggle.setAttribute("aria-expanded", String(open));
   });
-  document.querySelectorAll(".view-switcher button").forEach((button) => {
-    button.addEventListener("click", () => setDashboardView(button.dataset.dashboardView));
+  document.querySelectorAll("[data-dashboard-view]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setDashboardView(button.dataset.dashboardView);
+      nav.querySelectorAll("a").forEach((item) => item.removeAttribute("aria-current"));
+      nav.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+    });
   });
   nav.querySelectorAll("a[href^='#']").forEach((link) => {
     link.addEventListener("click", () => {
-      const target = document.querySelector(link.getAttribute("href"));
-      if (target?.hidden) setDashboardView("all");
+      setDashboardView(link.dataset.view || "home");
       nav.querySelectorAll("a").forEach((item) => item.removeAttribute("aria-current"));
       link.setAttribute("aria-current", "location");
       nav.classList.remove("is-open");
       toggle.setAttribute("aria-expanded", "false");
     });
   });
-  setDashboardView("daily");
+  const initialLink = [...nav.querySelectorAll("a[href^='#']")]
+    .find((link) => link.getAttribute("href") === window.location.hash);
+  if (initialLink) initialLink.setAttribute("aria-current", "location");
+  setDashboardView(initialLink?.dataset.view || "home");
 }
 
 function renderOwnerAttention() {
@@ -997,7 +1034,9 @@ function runtimeHeaders() {
 function setRuntimeStatus(message, connected = false) {
   document.querySelector("#runtime-status").textContent = message;
   const mode = document.querySelector("#runtime-mode");
-  mode.textContent = connected ? "Owner connected" : "Offline evidence";
+  const dot = document.createElement("span");
+  dot.setAttribute("aria-hidden", "true");
+  mode.replaceChildren(dot, document.createTextNode(connected ? "Owner connected" : "Offline evidence"));
   mode.className = `mode-lock ${connected ? "status-active" : ""}`;
   if (!connected) renderActivationCenter(false);
 }
