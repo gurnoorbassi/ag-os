@@ -28,16 +28,17 @@ Every successful call records the approval use, model, token counts, and compute
 
 ## Local start
 
-1. Generate a long random owner token and store it outside Git and chat.
-2. Set `AG_OS_OWNER_TOKEN` in the shell or a local ignored `.env` loader. If enabling Anthropic planning, set its variables in the same ignored/root-only environment and never paste the key into chat or source control.
-3. Run `npm.cmd run dashboard:build` and `npm.cmd run live:start`.
-4. Open `http://127.0.0.1:8787`, enter the same token, and connect.
+1. Generate a long random owner recovery token and store it outside Git and chat.
+2. Generate a salted scrypt owner-password hash with the reviewed `hashOwnerPassword` helper and store only the resulting `scrypt-v1` value. Never store the plaintext password.
+3. Set `AG_OS_OWNER_TOKEN`, `AG_OS_OWNER_PASSWORD_HASH`, and optionally `AG_OS_OWNER_SESSION_DAYS` (1-30, default 30) in the shell or a local ignored `.env` loader. If enabling Anthropic planning, set its variables in the same ignored/root-only environment and never paste a key or password into chat or source control.
+4. Run `npm.cmd run dashboard:build` and `npm.cmd run live:start`.
+5. Open `http://127.0.0.1:8787` and sign in with the owner password. The password is exchanged once for a signed, HttpOnly, SameSite=Strict session cookie and is never stored by the dashboard. The recovery token remains available as a tab-scoped fallback.
 
-The server refuses to start without `AG_OS_OWNER_TOKEN`. It binds to localhost by default.
+The server refuses to start without `AG_OS_OWNER_TOKEN`, and refuses a malformed configured password hash. Password login is rate-limited to five failed attempts per 15-minute window. Password sessions last no more than 30 days, are invalidated by password-hash or recovery-token rotation, and require a trusted same-origin browser request for state-changing API calls. The coordinator binds to localhost by default.
 
 ## VPS target
 
-The verified first production target is the existing Hetzner VPS using `ops/docker-compose.hetzner.yml`. It runs the pinned Node 20 container on loopback port 8787 and is accessed through an SSH tunnel. This deliberately avoids the host's Node 18 runtime and the production Caddy/n8n Compose stack. Store the owner API token in `/etc/ag-os/ag-os.env` with root-only permissions and never commit it.
+The verified first production target is the existing Hetzner VPS using `ops/docker-compose.hetzner.yml`. It runs the pinned Node 20 container on loopback port 8787 and is accessed through an SSH tunnel. This deliberately avoids the host's Node 18 runtime and the production Caddy/n8n Compose stack. Store the owner recovery token and password hash in `/etc/ag-os/ag-os.env` with root-only permissions and never commit them.
 
 For the first owner-only activation, serve both the dashboard and coordinator through the loopback-only VPS endpoint. A public Netlify copy remains unsuitable for internal operational evidence unless an independently reviewed access-control layer protects it. A Caddy hostname and DNS route are a later, separately approved promotion.
 

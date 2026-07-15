@@ -14,13 +14,30 @@ import { createProject, listProjects } from "./lib/runtime/project-service.mjs";
 import { autonomousExecutionStatus, listAutonomousJobs, processQueuedJobs } from "./lib/runtime/autonomous-runner.mjs";
 import { decideJob } from "./lib/runtime/job-approval-service.mjs";
 import { evaluateOperationalSafeguards } from "./lib/runtime/operational-safeguards.mjs";
+import {
+  buildOwnerSessionCookie,
+  clearOwnerSessionCookie,
+  createLoginRateLimiter,
+  createOwnerSession,
+  isOwnerPasswordHash,
+  sessionCookieValue,
+  verifyOwnerPassword,
+  verifyOwnerSession
+} from "./lib/runtime/owner-auth.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dashboardRoot = path.join(root, "dashboard");
 const host = process.env.AG_OS_HOST || "127.0.0.1";
 const port = Number(process.env.PORT || process.env.AG_OS_PORT || 8787);
 const ownerToken = process.env.AG_OS_OWNER_TOKEN || "";
+const ownerPasswordHash = process.env.AG_OS_OWNER_PASSWORD_HASH || "";
+const configuredSessionDays = Number(process.env.AG_OS_OWNER_SESSION_DAYS || 30);
+const ownerSessionDays = Number.isInteger(configuredSessionDays) && configuredSessionDays >= 1 && configuredSessionDays <= 30
+  ? configuredSessionDays
+  : 30;
+const secureSessionCookie = process.env.AG_OS_OWNER_SESSION_COOKIE_SECURE === "true";
 const allowedOrigin = process.env.AG_OS_ALLOWED_ORIGIN || "";
+const loginRateLimiter = createLoginRateLimiter();
 
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
@@ -80,10 +97,33 @@ function corsHeaders(request) {
   }
   return {
     "access-control-allow-origin": origin,
+    "access-control-allow-credentials": "true",
     "access-control-allow-headers": "authorization, content-type",
     "access-control-allow-methods": "GET, POST, OPTIONS",
     vary: "Origin"
   };
+}
+
+function trustedBrowserOrigin(request, { allowMissing = false } = {}) {
+  const origin = request.headers.origin;
+  if (!origin) return allowMissing;
+  if (allowedOrigin && origin === allowedOrigin) return true;
+  try {
+    const parsed = new URL(origin);
+    return ["http:", "https:"].includes(parsed.protocol) && parsed.host === request.headers.host;
+  } catch {
+    return false;
+  }
+}
+
+function requestAuthentication(request) {
+  if (tokenMatches(ownerToken, suppliedToken(request))) return "recovery_token";
+  const session = sessionCookieValue(request.headers.cookie);
+  return verifyOwnerSession({ value: session, ownerToken, passwordHash: ownerPasswordHash }) ? "password_session" : null;
+}
+
+function loginRateLimitKey(request) {
+  return request.socket.remoteAddress || "unknown-private-client";
 }
 
 async function readJsonBody(request) {
@@ -188,8 +228,81 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  if (url.pathname.startsWith("/api/") && !tokenMatches(ownerToken, suppliedToken(request))) {
+  if (request.method === "GET" && url.pathname === "/api/v1/auth/config") {
+    json(response, 200, {
+      passwordLoginEnabled: isOwnerPasswordHash(ownerPasswordHash),
+      sessionDays: ownerSessionDays,
+      recoveryTokenAvailable: Boolean(ownerToken)
+    }, headers);
+    return;
+  }
+
+  if (request.method === "POST" && url.pathname === "/api/v1/auth/login") {
+    if (!trustedBrowserOrigin(request, { allowMissing: true })) {
+      json(response, 403, { error: "untrusted_origin" }, headers);
+      return;
+    }
+    if (!isOwnerPasswordHash(ownerPasswordHash)) {
+      json(response, 503, { error: "password_login_not_configured" }, headers);
+      return;
+    }
+    const rateLimitKey = loginRateLimitKey(request);
+    if (loginRateLimiter.isBlocked(rateLimitKey)) {
+      json(response, 429, { error: "login_temporarily_locked" }, { ...headers, "retry-after": "900" });
+      return;
+    }
+    let body;
+    try {
+      body = await readJsonBody(request);
+    } catch {
+      json(response, 400, { error: "invalid_login_request" }, headers);
+      return;
+    }
+    loginRateLimiter.recordFailure(rateLimitKey);
+    if (!await verifyOwnerPassword(body.password, ownerPasswordHash)) {
+      json(response, 401, { error: "invalid_credentials" }, headers);
+      return;
+    }
+    loginRateLimiter.reset(rateLimitKey);
+    const session = createOwnerSession({
+      ownerToken,
+      passwordHash: ownerPasswordHash,
+      sessionDays: ownerSessionDays
+    });
+    json(response, 200, {
+      authenticated: true,
+      sessionDays: ownerSessionDays
+    }, {
+      ...headers,
+      "set-cookie": buildOwnerSessionCookie(session.value, {
+        maxAgeSeconds: session.maxAgeSeconds,
+        secure: secureSessionCookie
+      })
+    });
+    return;
+  }
+
+  if (request.method === "POST" && url.pathname === "/api/v1/auth/logout") {
+    if (!trustedBrowserOrigin(request, { allowMissing: true })) {
+      json(response, 403, { error: "untrusted_origin" }, headers);
+      return;
+    }
+    json(response, 200, { authenticated: false }, {
+      ...headers,
+      "set-cookie": clearOwnerSessionCookie({ secure: secureSessionCookie })
+    });
+    return;
+  }
+
+  const authentication = requestAuthentication(request);
+  if (url.pathname.startsWith("/api/") && !authentication) {
     json(response, 401, { error: "unauthorized" }, headers);
+    return;
+  }
+
+  if (url.pathname.startsWith("/api/") && authentication === "password_session" &&
+      !["GET", "HEAD"].includes(request.method) && !trustedBrowserOrigin(request)) {
+    json(response, 403, { error: "untrusted_origin" }, headers);
     return;
   }
 
@@ -203,6 +316,12 @@ const server = createServer(async (request, response) => {
           coordinatorResponding: true,
           publicExposureClaimed: false,
           permissionGrantedByDeployment: false
+        },
+        authentication: {
+          method: authentication,
+          passwordLoginEnabled: isOwnerPasswordHash(ownerPasswordHash),
+          sessionDays: ownerSessionDays,
+          recoveryTokenAvailable: Boolean(ownerToken)
         },
         automation: autonomousExecutionStatus(),
         safeguards: evaluateOperationalSafeguards({ root }),
@@ -299,6 +418,10 @@ const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPat
 if (isMain) {
   if (!ownerToken) {
     console.error("AG_OS_OWNER_TOKEN is required; refusing to start without operator authentication.");
+    process.exit(1);
+  }
+  if (ownerPasswordHash && !isOwnerPasswordHash(ownerPasswordHash)) {
+    console.error("AG_OS_OWNER_PASSWORD_HASH is invalid; refusing to start with broken password authentication.");
     process.exit(1);
   }
   if (!Number.isInteger(port) || port < 1 || port > 65_535) {
