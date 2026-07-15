@@ -67,7 +67,12 @@ for (const requiredInterfacePattern of [
   /data-dashboard-view="intelligence"/,
   /data-dashboard-view="system"/,
   /class="nav-workspace"/,
+  />Command<\/button>/,
+  />Workspaces<\/button>/,
+  />Activity<\/button>/,
   /id="view-title"/,
+  /id="project-create-panel"[^>]*class="project-create-panel"/,
+  /id="projects-go-command"/,
   /const dashboardViewMeta =/
 ]) {
   if (!requiredInterfacePattern.test(`${dashboardSource}\n${styles}`)) {
@@ -407,8 +412,8 @@ if (data.unifiedMemory.skillsGrantPermission !== false) {
 if (data.unifiedMemory.acceptedLessonsLoadedByRuntime !== true) {
   fail("dashboard control center must show accepted lessons are runtime-loadable");
 }
-if (data.unifiedMemory.candidateCount < data.qualityReview.candidateLessonCount) {
-  fail("dashboard control center unified memory must include candidate lesson count");
+if (data.unifiedMemory.candidateCount + data.unifiedMemory.acceptedCount + data.unifiedMemory.rejectedCount < data.qualityReview.candidateLessonCount) {
+  fail("dashboard control center unified memory must account for pending and decided lesson candidates");
 }
 if (data.skills.skillsGrantPermission !== false) {
   fail("dashboard control center must show skillsGrantPermission false");

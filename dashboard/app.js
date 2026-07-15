@@ -3,6 +3,8 @@ let runtimeAiPlanner = null;
 let runtimeAiWorker = null;
 let runtimeAutomation = null;
 let runtimeConnected = false;
+let runtimeOperatingSystems = null;
+let runtimeLessonDecisions = null;
 
 function statusClass(value) {
   const normalized = String(value).toLowerCase();
@@ -16,6 +18,13 @@ function statusClass(value) {
   if (normalized.includes("feature_setup")) return "status-zero";
   if (normalized.includes("reference")) return "status-zero";
   if (normalized.includes("setup needed")) return "status-blocked";
+  if (normalized.includes("setup_needed")) return "status-blocked";
+  if (normalized.includes("operational attention")) return "status-owner-action";
+  if (normalized.includes("operational_attention")) return "status-owner-action";
+  if (normalized.includes("operational")) return "status-active";
+  if (normalized.includes("recommended")) return "status-active";
+  if (normalized.includes("possible duplicate")) return "status-owner-action";
+  if (normalized.includes("possible_duplicate")) return "status-owner-action";
   if (normalized.includes("ready")) return "status-active";
   if (normalized.includes("pass")) return "status-active";
   if (normalized.includes("not_connected")) return "status-disabled";
@@ -54,9 +63,10 @@ function pill(value) {
   return el;
 }
 
-function card({ title, status, metric, detail, meta = [] }) {
+function card({ title, status, metric, detail, meta = [], onActivate = null, actionLabel = "Open details" }) {
   const section = document.createElement("article");
   section.className = "status-card";
+  if (onActivate) section.classList.add("interactive-card");
 
   const header = document.createElement("header");
   const heading = document.createElement("h3");
@@ -79,6 +89,14 @@ function card({ title, status, metric, detail, meta = [] }) {
   });
 
   section.append(header, metricEl, detailEl, list);
+  if (onActivate) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "card-action";
+    button.textContent = actionLabel;
+    button.addEventListener("click", onActivate);
+    section.append(button);
+  }
   return section;
 }
 
@@ -274,18 +292,18 @@ const dashboardViews = {
 
 const dashboardViewMeta = {
   home: {
-    kicker: "Home",
-    title: "What should AG OS do?",
+    kicker: "Command",
+    title: "Tell AG OS what to do",
     description: "Give one clear outcome. AG OS will organize the work and stop only when your approval is required."
   },
   projects: {
-    kicker: "Projects",
-    title: "Your systems and outcomes",
-    description: "Create and manage the durable workspaces behind every command, run, decision, and lesson."
+    kicker: "Workspaces",
+    title: "Your long-running systems",
+    description: "Inspect durable goals, jobs, evidence, decisions, and lessons. Start new work from Command."
   },
   work: {
-    kicker: "Work",
-    title: "Queues and approvals",
+    kicker: "Activity",
+    title: "Runs and approvals",
     description: "Review active work, client operations, connectors, and approval gates."
   },
   intelligence: {
@@ -432,11 +450,95 @@ function renderActionQueue() {
   );
 }
 
+function openWorkspaceDialog({ eyebrow, title, content }) {
+  const dialog = document.querySelector("#workspace-dialog");
+  document.querySelector("#workspace-dialog-eyebrow").textContent = eyebrow;
+  document.querySelector("#workspace-dialog-title").textContent = title;
+  document.querySelector("#workspace-dialog-content").replaceChildren(content);
+  if (!dialog.open) dialog.showModal();
+}
+
+function sectionBlock(title, content) {
+  const section = document.createElement("section");
+  section.className = "workspace-block";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  section.append(heading, content);
+  return section;
+}
+
+async function openProjectWorkspace(project) {
+  if (!runtimeConnected) {
+    document.querySelector(".connection-panel").open = true;
+    setRuntimeStatus("Sign in to open live project workspaces.");
+    return;
+  }
+  const loading = document.createElement("p");
+  loading.textContent = "Loading live project evidence...";
+  openWorkspaceDialog({ eyebrow: "Workspace", title: project.name, content: loading });
+  try {
+    const { response, result } = await runtimeRequest(`/api/v1/projects/${encodeURIComponent(project.id)}`);
+    if (!response.ok) throw new Error(result.detail || result.error || "Project workspace failed to load");
+    const shell = document.createElement("div");
+    shell.className = "workspace-stack";
+    const intro = document.createElement("div");
+    intro.className = "workspace-summary";
+    const goal = document.createElement("p");
+    goal.textContent = result.project.goal;
+    const sensitivity = document.createElement("p");
+    sensitivity.className = "sensitivity-note";
+    sensitivity.append(pill(result.project.sensitivity.label), document.createTextNode(` ${result.project.sensitivity.explanation}`));
+    intro.append(goal, sensitivity);
+    const metrics = document.createElement("div");
+    metrics.className = "workspace-metrics";
+    [
+      ["Jobs", result.progress.jobCount],
+      ["Completed", result.progress.completedJobCount],
+      ["Waiting approval", result.progress.waitingApprovalCount],
+      ["Quality coverage", `${result.progress.qualityCoverage}%`],
+      ["Lesson candidates", result.progress.lessonCandidateCount],
+      ["Recorded cost", `$${result.progress.recordedCostUsd}`]
+    ].forEach(([label, value]) => {
+      const item = document.createElement("div");
+      const strong = document.createElement("strong");
+      strong.textContent = value;
+      const span = document.createElement("span");
+      span.textContent = label;
+      item.append(strong, span);
+      metrics.append(item);
+    });
+    const jobs = result.jobs.length
+      ? table(["Job", "State", "Worker", "Quality / lessons", "Updated"], result.jobs.map((job) => [
+          job.jobId,
+          pill(job.status),
+          job.assignedAgent,
+          job.hasQualityScore ? `Scored; ${job.lessonCandidateCount} candidate(s)` : (job.blockedReason || "Evidence pending"),
+          job.updatedAt ? new Date(job.updatedAt).toLocaleString() : "Not recorded"
+        ]))
+      : itemList(["No jobs recorded for this project yet."]);
+    const evidence = document.createElement("div");
+    evidence.className = "workspace-evidence-grid";
+    evidence.append(
+      sectionBlock("Scope", itemList(result.project.scope)),
+      sectionBlock("Tools", itemList(result.project.stack)),
+      sectionBlock("Quality gates", itemList(result.project.qualityGates)),
+      sectionBlock("Approval boundaries", itemList(result.project.approvalRequiredFor))
+    );
+    shell.append(intro, metrics, sectionBlock("Recent jobs", jobs), evidence);
+    openWorkspaceDialog({ eyebrow: "Workspace", title: result.project.name, content: shell });
+  } catch (error) {
+    const failure = document.createElement("p");
+    failure.textContent = `Could not open project: ${error.message}`;
+    openWorkspaceDialog({ eyebrow: "Workspace", title: project.name, content: failure });
+  }
+}
+
 function renderProjects(projects = data.projectRegistry.projects) {
   const root = clear("#projects-grid");
   projects.forEach((project) => {
     const card = document.createElement("article");
-    card.className = "project-card";
+    card.className = "project-card interactive-card";
+    card.dataset.projectId = project.id;
     const header = document.createElement("header");
     const identity = document.createElement("div");
     const name = document.createElement("strong");
@@ -452,10 +554,20 @@ function renderProjects(projects = data.projectRegistry.projects) {
     const footer = document.createElement("footer");
     const mode = document.createElement("span");
     mode.textContent = `Mode: ${project.managementMode || "managed"}`;
-    const risk = document.createElement("span");
-    risk.textContent = `Risk: ${project.riskLevel || "R1"}`;
-    footer.append(mode, risk);
-    card.append(header, boundary, footer);
+    const sensitivity = project.sensitivity || {
+      label: project.riskLevel === "high" ? "Protected" : (project.riskLevel === "medium" ? "Controlled" : "Routine"),
+      explanation: "Approval sensitivity controls which actions require owner confirmation."
+    };
+    const sensitivityLabel = document.createElement("span");
+    sensitivityLabel.textContent = `Approval sensitivity: ${sensitivity.label}`;
+    sensitivityLabel.title = sensitivity.explanation;
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "card-action";
+    open.textContent = "Open workspace";
+    open.addEventListener("click", () => openProjectWorkspace(project));
+    footer.append(mode, sensitivityLabel);
+    card.append(header, boundary, footer, open);
     root.append(card);
   });
 }
@@ -500,45 +612,40 @@ function renderRegistries() {
   );
 }
 
-function renderOperatingSystems() {
-  const root = clear("#os-grid");
-  root.append(
-    card({
-      title: "Cost OS",
-      status: data.costOs.status,
-      metric: data.costOs.monthlyMax,
-      detail: "Monthly maximum budget",
-      meta: [data.costOs.dailyMax, data.costOs.perTaskMax, data.costOs.paidTools]
-    }),
-    card({
-      title: "Watchdog OS",
-      status: data.watchdog.status,
-      metric: data.watchdog.monitoring,
-      detail: "Dashboard-first alerts; live monitoring disabled",
-      meta: data.watchdog.plannedChecks
-    }),
-    card({
-      title: "Memory OS",
-      status: data.memoryOs.status,
-      metric: `${data.memoryOs.shortTermDays} days`,
-      detail: "Short-term memory window",
-      meta: data.memoryOs.rules
-    }),
-    card({
-      title: "Quality OS",
-      status: data.qualityOs.status,
-      metric: `${data.qualityReview.qualityScoreCount} scores`,
-      detail: "Critiques, scores, and lesson candidates stay advisory unless accepted.",
-      meta: data.qualityOs.rules
-    }),
-    card({
-      title: "Security OS",
-      status: data.securityOs.status,
-      metric: "Blocked by default",
-      detail: "Credentials, production data, and live-service changes remain gated.",
-      meta: data.securityOs.rules
-    })
+function openOperatingSystem(system) {
+  const shell = document.createElement("div");
+  shell.className = "workspace-stack";
+  const summary = document.createElement("p");
+  summary.textContent = system.summary;
+  shell.append(
+    summary,
+    sectionBlock("Working now", itemList(system.working.length ? system.working : ["No capability evidence recorded."])),
+    sectionBlock("Still required", itemList(system.remaining.length ? system.remaining : ["No incomplete internal setup recorded."]))
   );
+  openWorkspaceDialog({ eyebrow: "Operating system", title: system.name, content: shell });
+}
+
+function renderOperatingSystems(systems = runtimeOperatingSystems) {
+  const root = clear("#os-grid");
+  const fallback = [
+    { id: "cost-os", name: "Cost OS", status: "offline evidence", metric: data.costOs.monthlyMax, summary: "Sign in for live runtime status.", working: [data.costOs.dailyMax, data.costOs.perTaskMax, data.costOs.paidTools], remaining: [] },
+    { id: "watchdog-os", name: "Watchdog OS", status: "setup_needed", metric: "Manual checks", summary: "Recurring monitoring is not active.", working: ["Local health and validation checks"], remaining: ["Recurring health monitor"] },
+    { id: "memory-os", name: "Memory OS", status: "offline evidence", metric: `${data.memoryOs.shortTermDays} days`, summary: "Sign in for the active lesson queue.", working: data.memoryOs.rules, remaining: [] },
+    { id: "quality-os", name: "Quality OS", status: "offline evidence", metric: `${data.qualityReview.qualityScoreCount} scores`, summary: "Sign in for completion-proof coverage.", working: data.qualityOs.rules, remaining: [] },
+    { id: "security-os", name: "Security OS", status: "protected", metric: "Fail closed", summary: "Credentials and external actions remain approval-gated.", working: data.securityOs.rules, remaining: [] }
+  ];
+  (systems || fallback).forEach((system) => {
+    const systemCard = card({
+      title: system.name,
+      status: system.status.replaceAll("_", " "),
+      metric: system.metric,
+      detail: system.summary,
+      meta: [...system.working.slice(0, 3), ...system.remaining.slice(0, 1)],
+      onActivate: () => openOperatingSystem(system)
+    });
+    systemCard.dataset.systemId = system.id;
+    root.append(systemCard);
+  });
 }
 
 function renderCapabilities() {
@@ -913,14 +1020,120 @@ function renderQualityReview() {
   );
 }
 
-function renderUnifiedMemory() {
+async function decideLessonCandidates(lessonIds, decision) {
+  assertOwnerSession();
+  const action = decision === "promote" ? "accept as advisory runtime memory" : "reject";
+  if (!window.confirm(`${action} ${lessonIds.length} selected lesson${lessonIds.length === 1 ? "" : "s"}? This records an owner decision and audit evidence.`)) return;
+  let reason = "Owner reviewed this candidate and chose not to retain it.";
+  if (decision === "reject") {
+    const supplied = window.prompt("Why should these lessons be rejected?", reason);
+    if (supplied === null) return;
+    reason = supplied.trim();
+  }
+  setRuntimeStatus(`Recording ${decision} decision for ${lessonIds.length} lesson(s)...`, true);
+  try {
+    const { response, result } = await runtimeRequest("/api/v1/memory/lessons/decision", {
+      method: "POST",
+      body: JSON.stringify({ lessonIds, decision, reason })
+    });
+    if (!response.ok) throw new Error(result.detail || result.error || "Lesson decision failed");
+    runtimeLessonDecisions = result.queue;
+    renderUnifiedMemory(runtimeLessonDecisions);
+    setRuntimeStatus(`${lessonIds.length} lesson decision(s) recorded. Accepted memory remains advisory and grants no permission.`, true);
+  } catch (error) {
+    setRuntimeStatus(`Lesson decision rejected: ${error.message}`, true);
+  }
+}
+
+function lessonDecisionPanel(queue) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "lesson-queue";
+  if (!runtimeConnected) {
+    const note = document.createElement("p");
+    note.textContent = "Sign in to review and decide lesson candidates.";
+    wrapper.append(note);
+    return wrapper;
+  }
+  if (!queue.decisions.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "No lesson candidates need an owner decision.";
+    wrapper.append(empty);
+    return wrapper;
+  }
+  const toolbar = document.createElement("div");
+  toolbar.className = "lesson-toolbar";
+  const selectedCount = document.createElement("span");
+  selectedCount.textContent = "0 selected";
+  const accept = document.createElement("button");
+  accept.type = "button";
+  accept.textContent = "Accept selected";
+  const reject = document.createElement("button");
+  reject.type = "button";
+  reject.className = "secondary-action";
+  reject.textContent = "Reject selected";
+  toolbar.append(selectedCount, accept, reject);
+  const list = document.createElement("div");
+  list.className = "lesson-list";
+  queue.decisions.forEach((item) => {
+    const row = document.createElement("article");
+    row.className = "lesson-row";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = item.lessonId;
+    checkbox.disabled = !item.canPromote && item.recommendation === "blocked_conflict";
+    checkbox.setAttribute("aria-label", `Select ${item.title}`);
+    const body = document.createElement("div");
+    const heading = document.createElement("div");
+    heading.className = "lesson-row-heading";
+    const title = document.createElement("strong");
+    title.textContent = item.title;
+    heading.append(title, pill(item.recommendation.replaceAll("_", " ")));
+    const lesson = document.createElement("p");
+    lesson.textContent = item.lesson;
+    const meta = document.createElement("p");
+    meta.className = "lesson-meta";
+    meta.textContent = `${item.confidence} confidence · ${item.projectId || item.scope} · ${item.appliesTo.join(", ")}`;
+    body.append(heading, lesson, meta);
+    const actions = document.createElement("div");
+    actions.className = "job-actions";
+    const oneAccept = document.createElement("button");
+    oneAccept.type = "button";
+    oneAccept.textContent = "Accept";
+    oneAccept.disabled = !item.canPromote;
+    oneAccept.addEventListener("click", () => decideLessonCandidates([item.lessonId], "promote"));
+    const oneReject = document.createElement("button");
+    oneReject.type = "button";
+    oneReject.className = "job-reject";
+    oneReject.textContent = "Reject";
+    oneReject.addEventListener("click", () => decideLessonCandidates([item.lessonId], "reject"));
+    actions.append(oneAccept, oneReject);
+    row.append(checkbox, body, actions);
+    list.append(row);
+  });
+  const selected = () => [...list.querySelectorAll("input:checked")].map((input) => input.value);
+  list.addEventListener("change", () => { selectedCount.textContent = `${selected().length} selected`; });
+  accept.addEventListener("click", () => selected().length && decideLessonCandidates(selected(), "promote"));
+  reject.addEventListener("click", () => selected().length && decideLessonCandidates(selected(), "reject"));
+  wrapper.append(toolbar, list);
+  return wrapper;
+}
+
+function renderUnifiedMemory(runtimeQueue = runtimeLessonDecisions) {
   const memory = data.unifiedMemory;
+  const queue = runtimeQueue || {
+    acceptedCount: memory.acceptedCount,
+    rejectedCount: memory.rejectedCount,
+    activeCandidateCount: memory.candidateCount,
+    recommendedCount: 0,
+    duplicateCount: 0,
+    decisions: []
+  };
   const root = clear("#unified-memory-grid");
   root.append(
     card({
       title: "Accepted Lessons",
       status: memory.acceptedLessonsLoadedByRuntime ? "ready" : "blocked",
-      metric: memory.acceptedCount,
+      metric: queue.acceptedCount,
       detail: "Accepted lessons may be loaded as advisory runtime guidance.",
       meta: memory.latestAcceptedLessons.length > 0
         ? memory.latestAcceptedLessons.map((lesson) => `${lesson.lessonId}: ${lesson.scope}`)
@@ -929,14 +1142,14 @@ function renderUnifiedMemory() {
     card({
       title: "Candidate Lessons",
       status: memory.candidatesLoadedAsTruth ? "blocked" : "review",
-      metric: memory.candidateCount,
-      detail: `candidatesLoadedAsTruth is ${memory.candidatesLoadedAsTruth}`,
-      meta: memory.latestCandidateLessons.map((lesson) => `${lesson.lessonId}: ${lesson.status}`)
+      metric: queue.activeCandidateCount,
+      detail: "Candidates remain advisory until you accept or reject them.",
+      meta: [`${queue.recommendedCount} recommended`, `${queue.duplicateCount} possible duplicates`]
     }),
     card({
       title: "Rejected Lessons",
       status: memory.rejectedLoadedAsTruth ? "blocked" : "ready",
-      metric: memory.rejectedCount,
+      metric: queue.rejectedCount,
       detail: `rejectedLoadedAsTruth is ${memory.rejectedLoadedAsTruth}`,
       meta: memory.latestRejectedLessons.map((lesson) => `${lesson.lessonId}: ${lesson.status}`)
     }),
@@ -956,25 +1169,16 @@ function renderUnifiedMemory() {
     }),
     card({
       title: "Decision Queue",
-      status: memory.decisionQueueCount > 0 ? "review" : "ready",
-      metric: memory.decisionQueueCount,
-      detail: "Read-only queue for promote, reject, stale review, and conflict decisions.",
-      meta: memory.decisionQueue.slice(0, 5).map((item) => `${item.decisionType}: ${item.status}`)
+      status: queue.activeCandidateCount > 0 ? "owner action" : "ready",
+      metric: queue.activeCandidateCount,
+      detail: runtimeConnected ? "Accept or reject candidates here; every decision is audited." : "Sign in to make owner decisions.",
+      meta: ["Accepted lessons guide future work but never grant permission."]
     })
   );
 
   const panel = clear("#unified-memory-panel");
   panel.append(
-    table(
-      ["Lesson decision", "Status", "Lesson", "Detail", "Record"],
-      memory.decisionQueue.map((item) => [
-        labelStack(item.decisionType, item.id),
-        pill(item.status),
-        item.lessonId,
-        item.detail,
-        item.recordPath
-      ])
-    ),
+    lessonDecisionPanel(queue),
     table(
       ["Scope", "Registry", "Runtime loading", "Sources"],
       memory.scopes.map((scope) => [
@@ -1281,6 +1485,8 @@ async function connectRuntime(options = {}) {
     runtimeAiPlanner = result.aiPlanner;
     runtimeAiWorker = result.aiWorker;
     runtimeAutomation = result.automation;
+    runtimeOperatingSystems = result.operatingSystems;
+    runtimeLessonDecisions = result.lessonDecisions;
     const plannerCheckbox = document.querySelector("#use-ai-planner");
     plannerCheckbox.disabled = !runtimeAiPlanner?.ready;
     document.querySelector("#ai-planner-help").textContent = runtimeAiPlanner?.ready
@@ -1295,6 +1501,8 @@ async function connectRuntime(options = {}) {
     renderRecentCommands(result.recentCommands);
     renderRuntimeJobs(result.jobs);
     renderProjects(result.projects);
+    renderOperatingSystems(runtimeOperatingSystems);
+    renderUnifiedMemory(runtimeLessonDecisions);
     populateProjectSelect(result.projects);
   } catch (error) {
     ownerPasswordField.value = "";
@@ -1341,11 +1549,15 @@ async function createProject(event) {
       throw new Error(result.detail || result.error || "Project creation failed");
     }
     event.currentTarget.reset();
-    status.textContent = `Created ${result.project.name}. It is ready for an owner command; live actions remain approval-gated.`;
+    status.textContent = `Created ${result.project.name}. Returning to Command.`;
     await connectRuntime();
     document.querySelector("#owner-command-project").value = result.project.id;
+    document.querySelector("#project-create-panel").open = false;
+    setDashboardView("home");
+    document.querySelector("#owner-command").focus();
+    setRuntimeStatus(`${result.project.name} workspace created and selected. Tell AG OS the outcome you want.`, true);
   } catch (error) {
-    status.textContent = `Project rejected: ${error.message}`;
+    status.textContent = `Workspace setup failed: ${error.message}`;
   } finally {
     button.disabled = false;
   }
@@ -1392,6 +1604,14 @@ function initializeCommandCenter() {
   document.querySelector("#logout-runtime").addEventListener("click", logoutRuntime);
   document.querySelector("#owner-command-form").addEventListener("submit", submitOwnerCommand);
   document.querySelector("#project-create-form").addEventListener("submit", createProject);
+  document.querySelector("#projects-go-command").addEventListener("click", () => {
+    setDashboardView("home");
+    document.querySelector("#owner-command").focus();
+  });
+  document.querySelector("#workspace-dialog-close").addEventListener("click", () => document.querySelector("#workspace-dialog").close());
+  document.querySelector("#workspace-dialog").addEventListener("click", (event) => {
+    if (event.target === event.currentTarget) event.currentTarget.close();
+  });
   renderRecentCommands();
   renderRuntimeJobs();
   connectRuntime({ restoring: true });

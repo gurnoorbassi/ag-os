@@ -11,9 +11,16 @@ import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-plann
 import { createAnthropicWorkProduct } from "./lib/runtime/anthropic-worker.mjs";
 import { evaluateAnthropicWorkerReadiness } from "./lib/runtime/anthropic-worker-readiness.mjs";
 import { createProject, listProjects } from "./lib/runtime/project-service.mjs";
+import {
+  decideLessons,
+  getOperatingSystems,
+  getProjectWorkspace,
+  listLessonDecisions
+} from "./lib/runtime/control-center-service.mjs";
 import { autonomousExecutionStatus, listAutonomousJobs, processQueuedJobs } from "./lib/runtime/autonomous-runner.mjs";
 import { decideJob } from "./lib/runtime/job-approval-service.mjs";
 import { evaluateOperationalSafeguards } from "./lib/runtime/operational-safeguards.mjs";
+import { startInternalWatchdog } from "./lib/runtime/internal-watchdog.mjs";
 import {
   buildOwnerSessionCookie,
   clearOwnerSessionCookie,
@@ -333,6 +340,8 @@ const server = createServer(async (request, response) => {
         aiPlanner: publicAiPlannerStatus(),
         aiWorker: publicAiWorkerStatus(),
         projects: listProjects({ root }),
+        operatingSystems: getOperatingSystems({ root }),
+        lessonDecisions: listLessonDecisions({ root }),
         jobs: listAutonomousJobs({ root }),
         recentCommands: listRecentOwnerCommands({ root })
       }, headers);
@@ -343,6 +352,37 @@ const server = createServer(async (request, response) => {
       const body = await readJsonBody(request);
       const result = createProject({ input: body, root });
       json(response, 201, result, headers);
+      return;
+    }
+
+    const projectWorkspaceMatch = url.pathname.match(/^\/api\/v1\/projects\/([^/]+)$/);
+    if (request.method === "GET" && projectWorkspaceMatch) {
+      json(response, 200, getProjectWorkspace({
+        projectId: decodeURIComponent(projectWorkspaceMatch[1]),
+        root
+      }), headers);
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/v1/memory/lessons") {
+      json(response, 200, listLessonDecisions({ root }), headers);
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/v1/memory/lessons/decision") {
+      const body = await readJsonBody(request);
+      const result = decideLessons({
+        lessonIds: body.lessonIds,
+        decision: body.decision,
+        reason: body.reason,
+        root
+      });
+      json(response, 200, result, headers);
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/v1/operating-systems") {
+      json(response, 200, { systems: getOperatingSystems({ root }) }, headers);
       return;
     }
 
@@ -434,6 +474,14 @@ if (isMain) {
     if (process.env.AG_OS_AUTOMATION_ENABLED !== "false") {
       setImmediate(runAutomaticQueue);
       setInterval(runAutomaticQueue, 15_000).unref();
+    }
+    if (process.env.AG_OS_INTERNAL_WATCHDOG_ENABLED === "true") {
+      const configuredInterval = Number(process.env.AG_OS_INTERNAL_WATCHDOG_INTERVAL_MS || 60_000);
+      startInternalWatchdog({
+        root,
+        intervalMs: configuredInterval,
+        onError: (error) => console.error(JSON.stringify({ service: "ag-os-coordinator", event: "internal-watchdog-failed", detail: error.message }))
+      });
     }
   });
 }

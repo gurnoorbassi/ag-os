@@ -60,6 +60,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "managementMode": "observe_only",
         "projectType": "product_project",
         "riskLevel": "high",
+        "sensitivity": {
+          "level": "protected",
+          "label": "Protected",
+          "explanation": "Low starting trust keeps external and production actions behind exact owner approval."
+        },
         "owner": "owner-gurnoor-bassi",
         "recordPath": ".codex/projects/lead-generation-system.json",
         "boundary": "No source, VPS, Postgres, n8n, domain, DNS, deployment, credential, production data, or customer data changes."
@@ -71,6 +76,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "managementMode": "active_build",
         "projectType": "product_project",
         "riskLevel": "medium",
+        "sensitivity": {
+          "level": "controlled",
+          "label": "Controlled",
+          "explanation": "Local work can run, while external or production effects remain approval-gated."
+        },
         "owner": "owner-gurnoor-bassi",
         "recordPath": ".codex/projects/ag-digitalz-ai-receptionist.json",
         "boundary": "Separate product project; no live service status inferred beyond repository records."
@@ -82,6 +92,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "managementMode": "managed_staging",
         "projectType": "product_project",
         "riskLevel": "medium",
+        "sensitivity": {
+          "level": "controlled",
+          "label": "Controlled",
+          "explanation": "Local work can run, while external or production effects remain approval-gated."
+        },
         "owner": "owner-gurnoor-bassi",
         "recordPath": ".codex/projects/social-media-management-system-v1.json",
         "boundary": "Do not create or mutate a repository, branch, file set, or pull request outside a separately approved scope."
@@ -93,6 +108,11 @@ window.AG_OS_DASHBOARD_DATA = {
         "managementMode": "managed_staging",
         "projectType": "ag_os_core",
         "riskLevel": "high",
+        "sensitivity": {
+          "level": "protected",
+          "label": "Protected",
+          "explanation": "Low starting trust keeps external and production actions behind exact owner approval."
+        },
         "owner": "owner-gurnoor-bassi",
         "recordPath": ".codex/projects/ag-os-coordinator-runtime.json",
         "boundary": "Do not deploy without exact approval naming the target and source commit."
@@ -106,6 +126,11 @@ window.AG_OS_DASHBOARD_DATA = {
     "managementMode": "observe_only",
     "projectType": "product_project",
     "riskLevel": "high",
+    "sensitivity": {
+      "level": "protected",
+      "label": "Protected",
+      "explanation": "Low starting trust keeps external and production actions behind exact owner approval."
+    },
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/lead-generation-system.json",
     "boundary": "No source, VPS, Postgres, n8n, domain, DNS, deployment, credential, production data, or customer data changes."
@@ -117,6 +142,11 @@ window.AG_OS_DASHBOARD_DATA = {
     "managementMode": "active_build",
     "projectType": "product_project",
     "riskLevel": "medium",
+    "sensitivity": {
+      "level": "controlled",
+      "label": "Controlled",
+      "explanation": "Local work can run, while external or production effects remain approval-gated."
+    },
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/ag-digitalz-ai-receptionist.json",
     "boundary": "Separate product project; no live service status inferred beyond repository records."
@@ -128,6 +158,11 @@ window.AG_OS_DASHBOARD_DATA = {
     "managementMode": "managed_staging",
     "projectType": "product_project",
     "riskLevel": "medium",
+    "sensitivity": {
+      "level": "controlled",
+      "label": "Controlled",
+      "explanation": "Local work can run, while external or production effects remain approval-gated."
+    },
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/social-media-management-system-v1.json",
     "boundary": "Do not create or mutate a repository, branch, file set, or pull request outside a separately approved scope.",
@@ -335,7 +370,7 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "costOs": {
-    "status": "foundation",
+    "status": "operational",
     "monthlyMax": "USD $50",
     "dailyMax": "Daily max: USD $10",
     "perTaskMax": "Per-task max: USD $5",
@@ -769,19 +804,17 @@ window.AG_OS_DASHBOARD_DATA = {
     "blockedCount": 36
   },
   "watchdog": {
-    "status": "foundation",
-    "monitoring": "Disabled",
+    "status": "setup_needed",
+    "monitoring": "Manual checks",
     "plannedChecks": [
-      "local_validation: planned",
-      "ci_status_review: planned",
-      "registry_consistency: planned",
-      "stale_memory_review: planned",
-      "cost_budget_review: planned",
-      "security_policy_review: planned"
+      "Health endpoint",
+      "Boot and validator checks",
+      "Dashboard-visible failures",
+      "Deploy a scoped recurring health monitor with alert routing"
     ]
   },
   "memoryOs": {
-    "status": "foundation",
+    "status": "operational_attention",
     "shortTermDays": 30,
     "rules": [
       "Secrets blocked",
@@ -790,7 +823,7 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "qualityOs": {
-    "status": "foundation",
+    "status": "operational",
     "rules": [
       "Quality rule not recorded",
       "Owner production review not recorded",
@@ -798,7 +831,7 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "securityOs": {
-    "status": "foundation",
+    "status": "protected",
     "rules": [
       "Secrets block merge",
       "Least privilege not recorded",
@@ -3650,11 +3683,11 @@ window.AG_OS_DASHBOARD_DATA = {
     "status": "active",
     "registryPath": ".codex/memory/registry.json",
     "acceptedCount": 1,
-    "candidateCount": 23,
+    "candidateCount": 22,
     "rejectedCount": 0,
     "conflictCount": 0,
     "staleCount": 0,
-    "decisionQueueCount": 23,
+    "decisionQueueCount": 22,
     "candidatesLoadedAsTruth": false,
     "rejectedLoadedAsTruth": false,
     "acceptedLessonsLoadedByRuntime": true,
@@ -3786,20 +3819,20 @@ window.AG_OS_DASHBOARD_DATA = {
         "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-compounding-completion-20260713-02.json"
       },
       {
-        "id": "review-lesson-20260713-runtime-ag-os-compounding-completion-20260713-03",
-        "decisionType": "candidate_lesson_review",
-        "status": "review_needed",
-        "lessonId": "lesson-20260713-runtime-ag-os-compounding-completion-20260713-03",
-        "detail": "Owner can promote, reject, or leave candidate advisory.",
-        "recordPath": ".codex/memory/lessons/candidates/lesson-20260713-runtime-ag-os-compounding-completion-20260713-03.json"
-      },
-      {
         "id": "review-lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01",
         "decisionType": "candidate_lesson_review",
         "status": "review_needed",
         "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01",
         "detail": "Owner can promote, reject, or leave candidate advisory.",
         "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-draft-approval-v1-20260704-01.json"
+      },
+      {
+        "id": "review-lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01",
+        "decisionType": "candidate_lesson_review",
+        "status": "review_needed",
+        "lessonId": "lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01",
+        "detail": "Owner can promote, reject, or leave candidate advisory.",
+        "recordPath": ".codex/memory/lessons/candidates/lesson-20260704-runtime-target-pr-review-ag-digitalz-content-review-v1-20260704-01.json"
       }
     ],
     "scopes": [

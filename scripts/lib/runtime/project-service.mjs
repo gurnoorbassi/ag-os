@@ -80,6 +80,12 @@ function riskLevelForTrust(trustLevel) {
   return "low";
 }
 
+function approvalSensitivity(riskLevel) {
+  if (riskLevel === "high") return { level: "protected", label: "Protected", explanation: "Low starting trust keeps external and production actions behind exact owner approval." };
+  if (riskLevel === "medium") return { level: "controlled", label: "Controlled", explanation: "Local work can run, while external or production effects remain approval-gated." };
+  return { level: "routine", label: "Routine", explanation: "The project has more proven trust, but permanent live-action gates still apply." };
+}
+
 export function validateProjectCreateInput(input = {}) {
   const name = requiredText(input.name, "name");
   if (name.length < 3) {
@@ -110,13 +116,15 @@ export function listProjects({ root = process.cwd() } = {}) {
   const registry = JSON.parse(readFileSync(path.join(root, ".codex/projects/registry.json"), "utf8"));
   return registry.projects.map((entry) => {
     const project = JSON.parse(readFileSync(path.join(root, entry.recordPath), "utf8"));
+    const riskLevel = entry.riskLevel || "not_recorded";
     return {
       id: project.id,
       name: project.name,
       status: project.status,
       managementMode: project.managementMode,
       projectType: project.projectType,
-      riskLevel: entry.riskLevel || "not_recorded",
+      riskLevel,
+      sensitivity: approvalSensitivity(riskLevel),
       owner: project.owner,
       recordPath: entry.recordPath,
       boundary: project.outOfScope?.[0] || "Boundary not recorded."

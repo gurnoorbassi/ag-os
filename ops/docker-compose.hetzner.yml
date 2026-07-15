@@ -13,6 +13,8 @@ services:
       AG_OS_HOST: 0.0.0.0
       AG_OS_PORT: 8787
       AG_OS_ALLOWED_ORIGIN: http://127.0.0.1:8787
+      AG_OS_INTERNAL_WATCHDOG_ENABLED: "true"
+      AG_OS_INTERNAL_WATCHDOG_INTERVAL_MS: "60000"
     ports:
       - "127.0.0.1:8787:8787"
     volumes:
