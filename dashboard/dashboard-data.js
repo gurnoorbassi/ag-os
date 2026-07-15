@@ -1517,8 +1517,8 @@ window.AG_OS_DASHBOARD_DATA = {
           "revocableImmediately": true,
           "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
           "archived": false,
-          "usesRecorded": 5,
-          "remainingUses": 5
+          "usesRecorded": 6,
+          "remainingUses": 4
         }
       ],
       "ownerDecisions": [
@@ -1748,8 +1748,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 5,
-        "remainingUses": 5
+        "usesRecorded": 6,
+        "remainingUses": 4
       }
     ],
     "expiredApprovals": [
@@ -2422,8 +2422,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 5,
-        "remainingUses": 5
+        "usesRecorded": 6,
+        "remainingUses": 4
       }
     ],
     "standingCount": 2,
@@ -2473,8 +2473,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 5,
-        "remainingUses": 5
+        "usesRecorded": 6,
+        "remainingUses": 4
       }
     ]
   },
