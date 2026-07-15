@@ -1,0 +1,24 @@
+{
+  "id": "audit-runtime-approval-20260709-ag-os-codex-draft-pr-standing-use-6",
+  "occurredAt": "2026-07-15T06:15:52.589Z",
+  "actor": "agent-codex",
+  "eventType": "standing_approval_used",
+  "summary": "Standing approval approval-20260709-ag-os-codex-draft-pr-standing used for codex branch push and draft PR creation.",
+  "scope": "gurnoorbassi/ag-os:codex/operational-execution-spine-20260713",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260709-ag-os-codex-draft-pr-standing"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/139"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Use 6 of 10. Secret scan and all required local gates passed. Merge remains prohibited. Changed files: .codex/approvals/archive/approval-20260713-h3-compounding-proof.json, dashboard/app.js, dashboard/dashboard-data.js, dashboard/index.html, dashboard/styles.css, docs/dashboard-control-center-v1.md, schemas/command-intake.schema.json, scripts/check-dashboard.mjs, scripts/lib/runtime/autonomous-runner.mjs, scripts/lib/runtime/command-intake-processor.mjs, scripts/lib/runtime/connector-approval-guard.mjs, scripts/lib/runtime/execution-adapter-registry.mjs, scripts/lib/runtime/execution-request-validator.mjs, scripts/lib/runtime/github-draft-pr-adapter.mjs, scripts/lib/runtime/job-approval-service.mjs, scripts/lib/runtime/n8n-disabled-workflow-adapter.mjs, scripts/lib/runtime/netlify-staging-adapter.mjs, tests/execution-spine.test.mjs.",
+  "createdAt": "2026-07-15T06:15:52.589Z"
+}

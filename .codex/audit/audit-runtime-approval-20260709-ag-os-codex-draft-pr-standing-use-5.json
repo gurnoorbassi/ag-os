@@ -1,0 +1,24 @@
+{
+  "id": "audit-runtime-approval-20260709-ag-os-codex-draft-pr-standing-use-5",
+  "occurredAt": "2026-07-13T23:56:31.591Z",
+  "actor": "agent-codex",
+  "eventType": "standing_approval_used",
+  "summary": "Standing approval approval-20260709-ag-os-codex-draft-pr-standing used for codex branch push and draft PR creation.",
+  "scope": "gurnoorbassi/ag-os:codex/operational-execution-spine-20260713",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260709-ag-os-codex-draft-pr-standing"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/139"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Use 5 of 10. Secret scan and all required local gates passed. Merge remains prohibited. Changed files: dashboard/app.js, dashboard/index.html, dashboard/styles.css, schemas/command-intake.schema.json, schemas/connector-execution.schema.json, schemas/execution-step.schema.json, schemas/job.schema.json, scripts/lib/runtime/anthropic-worker-readiness.mjs, scripts/lib/runtime/anthropic-worker.mjs, scripts/lib/runtime/autonomous-runner.mjs, scripts/lib/runtime/command-intake-processor.mjs, scripts/lib/runtime/execution-adapter-registry.mjs, scripts/lib/runtime/github-draft-pr-adapter.mjs, scripts/lib/runtime/job-approval-service.mjs, scripts/lib/runtime/job-completion-processor.mjs, scripts/lib/runtime/live-command-service.mjs, scripts/lib/runtime/local-work-product-adapter.mjs, scripts/lib/runtime/operational-safeguards.mjs, scripts/lib/runtime/worker-evidence-loader.mjs, scripts/live-server.mjs, tests/anthropic-worker.test.mjs, tests/autonomous-runner.test.mjs, tests/execution-spine.test.mjs, tests/operational-safeguards.test.mjs.",
+  "createdAt": "2026-07-13T23:56:31.591Z"
+}

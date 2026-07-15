@@ -1,0 +1,148 @@
+import process from "node:process";
+
+const ADAPTERS = [
+  {
+    adapterId: "local-work-product",
+    name: "Local work-product worker",
+    kind: "local",
+    requestedAction: "local_work_product_execute",
+    commandPatterns: [],
+    credentialEnvParts: null,
+    capabilities: ["create_files", "run_validation", "score_output", "generate_lessons"],
+    liveServiceTouched: false,
+    approvalRequired: false,
+    implemented: true
+  },
+  {
+    adapterId: "github-draft-pr",
+    name: "GitHub draft pull-request worker",
+    kind: "connector",
+    requestedAction: "github_draft_pr_create",
+    commandPatterns: [/\bgithub\b/i, /\bpull request\b/i, /\bdraft pr\b/i, /\bpush\b[^.]{0,60}\bbranch\b/i],
+    credentialEnvParts: ["AG_OS", "GITHUB", "TOKEN"],
+    capabilities: ["create_branch", "update_files", "run_validation", "open_draft_pull_request", "check_ci"],
+    liveServiceTouched: true,
+    approvalRequired: true,
+    implemented: true
+  },
+  {
+    adapterId: "n8n-disabled-workflow",
+    name: "n8n disabled-workflow worker",
+    kind: "connector",
+    requestedAction: "n8n_disabled_workflow_create",
+    commandPatterns: [/\bn8n\b/i, /\bworkflow\b/i],
+    credentialEnvParts: ["AG_OS", "N8N", "API", "KEY"],
+    capabilities: ["create_disabled_workflow", "validate_workflow", "record_backup_plan"],
+    liveServiceTouched: true,
+    approvalRequired: true,
+    implemented: true
+  },
+  {
+    adapterId: "netlify-staging",
+    name: "Netlify staging-deploy worker",
+    kind: "connector",
+    requestedAction: "netlify_staging_deploy",
+    commandPatterns: [/\bnetlify\b/i, /\bstaging deploy\b/i, /\bpreview deploy\b/i],
+    credentialEnvParts: ["AG_OS", "NETLIFY", "TOKEN"],
+    capabilities: ["build_site", "deploy_staging", "verify_staging", "record_rollback"],
+    liveServiceTouched: true,
+    approvalRequired: true,
+    implemented: true
+  },
+  {
+    adapterId: "production-deployment",
+    name: "Production deployment worker",
+    kind: "connector",
+    requestedAction: "production_deployment",
+    commandPatterns: [/\bdeploy\b[^.]{0,80}\bproduction\b/i, /\bproduction deployment\b/i, /\brestart\b[^.]{0,60}\bservice\b/i],
+    credentialEnvParts: null,
+    capabilities: ["verify_candidate", "backup", "deploy", "healthcheck", "rollback"],
+    liveServiceTouched: true,
+    approvalRequired: true,
+    implemented: false
+  },
+  {
+    adapterId: "social-publishing",
+    name: "Social publishing worker",
+    kind: "connector",
+    requestedAction: "social_publish",
+    commandPatterns: [/\bpost\b[^.]{0,80}\b(?:instagram|facebook|linkedin|social)\b/i, /\bpublish\b/i, /\bschedule\b[^.]{0,60}\bpost\b/i],
+    credentialEnvParts: null,
+    capabilities: ["preflight", "publish", "verify_public_result", "rollback_when_supported"],
+    liveServiceTouched: true,
+    approvalRequired: true,
+    implemented: false
+  },
+  {
+    adapterId: "dns-change",
+    name: "DNS change worker",
+    kind: "connector",
+    requestedAction: "dns_change",
+    commandPatterns: [/\bdns\b/i, /\bdomain\b[^.]{0,80}\b(?:change|point|configure)\b/i],
+    credentialEnvParts: null,
+    capabilities: ["snapshot_records", "apply_change", "verify_resolution", "restore_records"],
+    liveServiceTouched: true,
+    approvalRequired: true,
+    implemented: false
+  }
+];
+
+function publicAdapter(adapter, env) {
+  const credentialEnv = adapter.credentialEnvParts?.join("_");
+  const credentialConfigured = credentialEnv ? Boolean(env[credentialEnv]) : true;
+  const enabled = adapter.kind === "local" || env.AG_OS_LIVE_ADAPTERS_ENABLED === "true";
+  const blockers = [];
+  if (!enabled) blockers.push("live connector adapters are disabled");
+  if (!credentialConfigured) blockers.push(`${adapter.adapterId} private runtime credential is not configured`);
+  if (!adapter.implemented) blockers.push("connector execution transport is not installed yet");
+  return {
+    adapterId: adapter.adapterId,
+    name: adapter.name,
+    kind: adapter.kind,
+    requestedAction: adapter.requestedAction,
+    capabilities: adapter.capabilities,
+    liveServiceTouched: adapter.liveServiceTouched,
+    approvalRequired: adapter.approvalRequired,
+    implemented: adapter.implemented,
+    enabled,
+    credentialConfigured,
+    readyForUngatedWork: adapter.kind === "local" && enabled,
+    executionReady: adapter.implemented && enabled && credentialConfigured,
+    blockers
+  };
+}
+
+export function listExecutionAdapters({ env = process.env } = {}) {
+  return ADAPTERS.map((adapter) => publicAdapter(adapter, env));
+}
+
+export function selectExecutionAdapter({ command, env = process.env } = {}) {
+  const explicitAdapterId = typeof command === "object" ? command?.executionRequest?.adapterId : null;
+  if (explicitAdapterId) {
+    const explicit = ADAPTERS.find((adapter) => adapter.adapterId === explicitAdapterId);
+    if (!explicit) throw new Error(`execution adapter is not registered: ${explicitAdapterId}`);
+    return publicAdapter(explicit, env);
+  }
+  const commandText = typeof command === "string" ? command : command?.rawCommand || command?.normalizedCommand || "";
+  const matched = ADAPTERS.find((adapter) => adapter.commandPatterns.some((pattern) => pattern.test(commandText))) || ADAPTERS[0];
+  const selected = publicAdapter(matched, env);
+  if (matched.adapterId === "github-draft-pr" && typeof command === "object" && !command.executionRequest) {
+    return {
+      ...selected,
+      executionReady: false,
+      blockers: [...selected.blockers, "exact GitHub executionRequest with repository, base commit, branch, and isolated source directory is missing"]
+    };
+  }
+  if (["n8n-disabled-workflow", "netlify-staging"].includes(matched.adapterId) && typeof command === "object" && !command.executionRequest) {
+    return {
+      ...selected,
+      executionReady: false,
+      blockers: [...selected.blockers, `exact ${matched.adapterId} executionRequest is missing`]
+    };
+  }
+  return selected;
+}
+
+export function adapterDefinition(adapterId) {
+  return ADAPTERS.find((adapter) => adapter.adapterId === adapterId) || null;
+}

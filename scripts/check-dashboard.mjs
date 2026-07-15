@@ -62,6 +62,7 @@ const dashboardSource = `${index}\n${app}`;
 for (const requiredInterfacePattern of [
   /color-scheme:\s*dark/,
   /data-dashboard-view="home"/,
+  /data-dashboard-view="projects"/,
   /data-dashboard-view="work"/,
   /data-dashboard-view="intelligence"/,
   /data-dashboard-view="system"/,
@@ -103,12 +104,12 @@ for (const requiredOperatorPattern of [
 
 for (const requiredText of [
   "Constitution",
-  "Owner Command Center",
+  "Ask AG OS to build or operate something",
   "Activation Center",
   "Owner Attention",
   "Dashboard Action Queue",
   "Project Registry",
-  "Projects",
+  "Your long-running systems",
   "Connector Registry",
   "Command Registry",
   "Capability Registry",

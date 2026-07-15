@@ -1,6 +1,6 @@
 {
   "approvalId": "approval-20260713-h3-compounding-proof",
-  "status": "approved",
+  "status": "expired",
   "approvalKind": "single_action",
   "ownerId": "owner-gurnoor-bassi",
   "requestedBy": "agent-codex",
@@ -39,7 +39,7 @@
     "dns_change",
     "external_connector_action"
   ],
-  "revocationPath": "Owner may revoke this one-time approval immediately before completion; stop and mark the lock revoked without promoting or committing further proof.",
+  "revocationPath": "Expired approval lock blocked or would block the mandatory boot sequence. Original expiration: 2026-07-14T09:32:19.851Z. This approval is no longer valid for gated actions. Historical proof remains preserved; any future action requires a new scoped owner approval lock.",
   "evidence": [
     {
       "type": "owner_instruction",
@@ -51,5 +51,5 @@
   "approvedAt": "2026-07-13T09:32:19.851Z",
   "expiresAt": "2026-07-14T09:32:19.851Z",
   "createdAt": "2026-07-13T09:32:19.851Z",
-  "updatedAt": "2026-07-13T09:32:19.851Z"
+  "updatedAt": "2026-07-15T06:10:49.416Z"
 }
