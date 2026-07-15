@@ -766,6 +766,30 @@ td strong {
   gap: 12px;
 }
 
+.connection-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recovery-access {
+  margin: 0 15px 15px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.recovery-access summary {
+  display: block;
+  padding: 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.recovery-access label {
+  max-width: 440px;
+  margin-top: 12px;
+}
+
 .project-form-grid {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr) minmax(210px, 1fr);
@@ -862,6 +886,12 @@ td strong {
 .command-console .button-secondary {
   color: #e2b395;
   background: var(--blue-soft);
+}
+
+.command-console .button-quiet {
+  border-color: var(--border);
+  color: var(--muted);
+  background: transparent;
 }
 
 .command-console button:disabled {

@@ -91,8 +91,11 @@ for (const forbiddenPattern of [
 
 for (const requiredOperatorPattern of [
   /id="owner-command-form"/,
+  /id="owner-password"[^>]*type="password"/,
   /id="owner-token"[^>]*type="password"/,
   /id="use-ai-planner"[^>]*type="checkbox"[^>]*disabled/,
+  /credentials:\s*"include"/,
+  /\/api\/v1\/auth\/login/,
   /authorization:\s*`Bearer \$\{token\}`/,
   /\/api\/v1\/commands/,
   /No live side effect was executed/

@@ -110,19 +110,29 @@
             </div>
           </div>
           <form id="owner-command-form" class="command-console">
-            <details class="connection-panel">
-              <summary><span>Private owner connection</span><small>Required once per browser session</small></summary>
+            <details class="connection-panel" open>
+              <summary><span>Owner sign-in</span><small>Remember this browser for up to 30 days</small></summary>
               <div class="command-connect-row">
-              <label>
-                Coordinator URL
-                <input id="coordinator-url" type="url" placeholder="Same origin or https://your-private-coordinator" autocomplete="url">
-              </label>
-              <label>
-                Owner token
-                <input id="owner-token" type="password" placeholder="Stored for this browser session only" autocomplete="current-password">
-              </label>
-              <button id="connect-runtime" type="button" class="button-secondary">Connect</button>
+                <label>
+                  Coordinator URL
+                  <input id="coordinator-url" type="url" placeholder="Same origin or https://your-private-coordinator" autocomplete="url">
+                </label>
+                <label>
+                  Owner password
+                  <input id="owner-password" type="password" minlength="12" maxlength="128" placeholder="Enter your AG OS password" autocomplete="current-password">
+                </label>
+                <div class="connection-actions">
+                  <button id="connect-runtime" type="button" class="button-secondary">Sign in</button>
+                  <button id="logout-runtime" type="button" class="button-quiet" hidden>Sign out</button>
+                </div>
               </div>
+              <details class="recovery-access">
+                <summary>Use the owner recovery token instead</summary>
+                <label>
+                  Owner recovery token
+                  <input id="owner-token" type="password" placeholder="Recovery use only; kept for this tab" autocomplete="off">
+                </label>
+              </details>
             </details>
             <label>
               Project
@@ -161,7 +171,7 @@
           <div id="activation-grid" class="activation-grid" aria-live="polite"></div>
           <div class="activation-next-step">
             <strong>Fastest path to useful work</strong>
-            <p>Connect with the owner token and enter one outcome. Safe work runs through the local work-product worker; connector actions pause for an exact approval and a ready registered adapter.</p>
+            <p>Sign in once with your owner password and enter one outcome. Safe work runs through the local work-product worker; connector actions pause for an exact approval and a ready registered adapter.</p>
           </div>
         </section>
 

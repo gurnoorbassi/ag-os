@@ -2,6 +2,7 @@ const data = window.AG_OS_DASHBOARD_DATA;
 let runtimeAiPlanner = null;
 let runtimeAiWorker = null;
 let runtimeAutomation = null;
+let runtimeConnected = false;
 
 function statusClass(value) {
   const normalized = String(value).toLowerCase();
@@ -1095,20 +1096,23 @@ function coordinatorBaseUrl() {
 
 function runtimeHeaders() {
   const token = document.querySelector("#owner-token").value;
-  return {
-    authorization: `Bearer ${token}`,
-    "content-type": "application/json"
-  };
+  return token
+    ? { authorization: `Bearer ${token}`, "content-type": "application/json" }
+    : { "content-type": "application/json" };
 }
 
 function clearRuntimeSession() {
   sessionStorage.removeItem("ag-os-owner-token");
   document.querySelector("#owner-token").value = "";
+  document.querySelector("#owner-password").value = "";
+  runtimeConnected = false;
+  document.querySelector("#logout-runtime").hidden = true;
 }
 
 async function runtimeRequest(pathname, options = {}) {
   const response = await fetch(`${coordinatorBaseUrl()}${pathname}`, {
     ...options,
+    credentials: "include",
     headers: { ...runtimeHeaders(), ...(options.headers || {}) }
   });
   let result;
@@ -1120,20 +1124,22 @@ async function runtimeRequest(pathname, options = {}) {
   if (response.status === 401) {
     clearRuntimeSession();
     document.querySelector(".connection-panel").open = true;
-    throw new Error("Owner session is not authorized. Enter the current owner token under Private owner connection, then press Connect.");
+    throw new Error("Owner session is not authorized. Sign in with your owner password.");
   }
   return { response, result };
 }
 
 function assertOwnerSession() {
-  if (!document.querySelector("#owner-token").value.trim()) {
+  if (!runtimeConnected) {
     document.querySelector(".connection-panel").open = true;
-    throw new Error("Connect the private owner session before starting work.");
+    throw new Error("Sign in to the private owner session before starting work.");
   }
 }
 
 function setRuntimeStatus(message, connected = false) {
+  runtimeConnected = connected;
   document.querySelector("#runtime-status").textContent = message;
+  document.querySelector("#logout-runtime").hidden = !connected;
   const mode = document.querySelector("#runtime-mode");
   const dot = document.createElement("span");
   dot.setAttribute("aria-hidden", "true");
@@ -1235,21 +1241,43 @@ async function decideRuntimeJob(job, decision, button) {
   }
 }
 
-async function connectRuntime() {
-  const token = document.querySelector("#owner-token").value;
-  if (!token) {
-    setRuntimeStatus("Enter the owner token to connect.");
-    return;
-  }
-  sessionStorage.setItem("ag-os-owner-token", token);
+async function connectRuntime(options = {}) {
+  const restoring = options?.restoring === true;
+  const ownerPasswordField = document.querySelector("#owner-password");
+  const ownerCredential = ownerPasswordField.value;
+  let token = document.querySelector("#owner-token").value;
   sessionStorage.setItem("ag-os-coordinator-url", document.querySelector("#coordinator-url").value.trim());
   setRuntimeStatus("Connecting...");
   try {
+    if (ownerCredential) {
+      const loginResponse = await fetch(`${coordinatorBaseUrl()}/api/v1/auth/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ["password"]: ownerCredential })
+      });
+      const loginResult = await loginResponse.json().catch(() => ({}));
+      ownerPasswordField.value = "";
+      if (!loginResponse.ok) {
+        if (loginResponse.status === 429) throw new Error("Too many failed attempts. Wait 15 minutes before trying again.");
+        if (loginResponse.status === 503) throw new Error("Password login has not been activated on the private runtime yet.");
+        throw new Error(loginResult.error === "invalid_credentials" ? "That password is incorrect." : (loginResult.error || "Password sign-in failed"));
+      }
+      token = "";
+      document.querySelector("#owner-token").value = "";
+      sessionStorage.removeItem("ag-os-owner-token");
+    }
+    if (token) sessionStorage.setItem("ag-os-owner-token", token);
+    else sessionStorage.removeItem("ag-os-owner-token");
     const { response, result } = await runtimeRequest("/api/v1/status");
     if (!response.ok) {
       throw new Error(result.detail || result.error || "Connection failed");
     }
-    setRuntimeStatus(`Connected. Private runtime is ${result.runtimeDeployment?.status || "live"}; coordinator readiness is ${result.readiness?.coordinator?.passedCheckCount || 0}/${result.readiness?.coordinator?.requiredCheckCount || 0}; operational safeguards are ${result.safeguards?.status || "unknown"}. Gated actions remain approval-controlled.`, true);
+    const authLabel = result.authentication?.method === "password_session"
+      ? `Password session remembered for up to ${result.authentication.sessionDays} days.`
+      : "Recovery-token session active for this tab.";
+    setRuntimeStatus(`Connected. ${authLabel} Private runtime is ${result.runtimeDeployment?.status || "live"}; coordinator readiness is ${result.readiness?.coordinator?.passedCheckCount || 0}/${result.readiness?.coordinator?.requiredCheckCount || 0}; operational safeguards are ${result.safeguards?.status || "unknown"}. Gated actions remain approval-controlled.`, true);
+    document.querySelector(".connection-panel").open = false;
     runtimeAiPlanner = result.aiPlanner;
     runtimeAiWorker = result.aiWorker;
     runtimeAutomation = result.automation;
@@ -1269,7 +1297,23 @@ async function connectRuntime() {
     renderProjects(result.projects);
     populateProjectSelect(result.projects);
   } catch (error) {
-    setRuntimeStatus(`Connection failed: ${error.message}`);
+    ownerPasswordField.value = "";
+    setRuntimeStatus(restoring ? "Sign in once with your owner password to activate this browser." : `Connection failed: ${error.message}`);
+    document.querySelector(".connection-panel").open = true;
+  }
+}
+
+async function logoutRuntime() {
+  try {
+    await fetch(`${coordinatorBaseUrl()}/api/v1/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "content-type": "application/json" }
+    });
+  } finally {
+    clearRuntimeSession();
+    setRuntimeStatus("Signed out. Your password was never stored in the browser.");
+    document.querySelector(".connection-panel").open = true;
   }
 }
 
@@ -1345,13 +1389,12 @@ function initializeCommandCenter() {
   document.querySelector("#owner-token").value = sessionStorage.getItem("ag-os-owner-token") || "";
   document.querySelector("#coordinator-url").value = sessionStorage.getItem("ag-os-coordinator-url") || "";
   document.querySelector("#connect-runtime").addEventListener("click", connectRuntime);
+  document.querySelector("#logout-runtime").addEventListener("click", logoutRuntime);
   document.querySelector("#owner-command-form").addEventListener("submit", submitOwnerCommand);
   document.querySelector("#project-create-form").addEventListener("submit", createProject);
   renderRecentCommands();
   renderRuntimeJobs();
-  if (document.querySelector("#owner-token").value) {
-    connectRuntime();
-  }
+  connectRuntime({ restoring: true });
 }
 
 renderOverview();
