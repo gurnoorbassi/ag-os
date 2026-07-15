@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -9,6 +10,8 @@ import { decideJob } from "../scripts/lib/runtime/job-approval-service.mjs";
 import { processAutonomousJob } from "../scripts/lib/runtime/autonomous-runner.mjs";
 import { submitOwnerCommand } from "../scripts/lib/runtime/live-command-service.mjs";
 import { executeGitHubDraftPr, validateGitHubDraftPrRequest } from "../scripts/lib/runtime/github-draft-pr-adapter.mjs";
+import { validateN8nDisabledWorkflowRequest } from "../scripts/lib/runtime/n8n-disabled-workflow-adapter.mjs";
+import { validateNetlifyStagingRequest } from "../scripts/lib/runtime/netlify-staging-adapter.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BASE_SHA = "a".repeat(40);
@@ -19,6 +22,20 @@ function tempWorkspace() {
     recursive: true,
     filter: (source) => ![".git", "node_modules"].includes(path.basename(source))
   });
+  const approvalsDirectory = path.join(target, ".codex", "approvals");
+  for (const name of readdirSync(approvalsDirectory)) {
+    if (!name.endsWith(".json") || name.endsWith(".template.json")) continue;
+    const approvalPath = path.join(approvalsDirectory, name);
+    const approval = JSON.parse(readFileSync(approvalPath, "utf8"));
+    if (approval.status === "approved" && approval.expiresAt && Date.parse(approval.expiresAt) <= Date.now()) {
+      const archiveDirectory = path.join(approvalsDirectory, "archive");
+      mkdirSync(archiveDirectory, { recursive: true });
+      writeFileSync(path.join(archiveDirectory, name), `${JSON.stringify({ ...approval, status: "expired" }, null, 2)}\n`, "utf8");
+      unlinkSync(approvalPath);
+    }
+  }
+  const dashboardBuild = spawnSync(process.execPath, ["scripts/build-dashboard.mjs"], { cwd: target, encoding: "utf8" });
+  if (dashboardBuild.status !== 0) throw new Error(dashboardBuild.stderr || dashboardBuild.stdout);
   return target;
 }
 
@@ -195,7 +212,7 @@ test("GitHub adapter secret-scans an isolated work product and creates only a co
       `Base commit is exactly ${validated.expectedBaseCommit}.`,
       `Source digest is exactly sha256:${validated.sourceDigest}.`
     ],
-    expiresAt: "2026-07-14T23:30:00.000Z"
+    expiresAt: "2030-07-14T23:30:00.000Z"
   };
   writeFileSync(path.join(workspace, ".codex", "approvals", `${approval.approvalId}.json`), JSON.stringify(approval), "utf8");
   const result = await executeGitHubDraftPr({
@@ -301,4 +318,106 @@ test("GitHub job resumes after exact owner approval and closes completion eviden
   assert.equal(completed.job.safety.credentialsAllowed, true);
   assert.equal(completed.job.safety.liveServicesAllowed, true);
   assert.equal(completed.job.safety.deploymentAllowed, false);
+});
+
+test("n8n adapter creates and verifies only an exact disabled credential-free workflow", async () => {
+  const workspace = tempWorkspace();
+  const executionRequest = {
+    adapterId: "n8n-disabled-workflow",
+    operation: "create_disabled_workflow",
+    baseUrl: "https://n8n.example.test/api/v1",
+    workflow: {
+      name: "AG OS owner review draft",
+      nodes: [{ id: "manual", name: "Manual Trigger", type: "n8n-nodes-base.manualTrigger", typeVersion: 1, position: [0, 0], parameters: {} }],
+      connections: {},
+      settings: {},
+      active: false
+    }
+  };
+  const validated = validateN8nDisabledWorkflowRequest({ request: executionRequest });
+  assert.match(validated.workflowDigest, /^[a-f0-9]{64}$/);
+  const command = await submitOwnerCommand({
+    command: "Create this disabled n8n workflow draft",
+    projectId: "project-ag-os-coordinator-runtime",
+    executionRequest,
+    root: workspace,
+    now: new Date("2026-07-14T01:00:00.000Z")
+  });
+  const waiting = await processAutonomousJob({ jobId: command.jobId, root: workspace, runValidation: false });
+  assert.equal(waiting.adapter.adapterId, "n8n-disabled-workflow");
+  decideJob({ jobId: command.jobId, decision: "approve", confirmation: `APPROVE ${command.jobId}`, root: workspace, now: new Date("2026-07-14T01:01:00.000Z") });
+  const calls = [];
+  const completed = await processAutonomousJob({
+    jobId: command.jobId,
+    root: workspace,
+    env: { AG_OS_LIVE_ADAPTERS_ENABLED: "true", [["AG_OS", "N8N", "API", "KEY"].join("_")]: "configured" },
+    n8nFetch: async (url, options) => {
+      calls.push({ url, options });
+      return { ok: true, status: 200, async json() { return { id: "workflow-42", active: false }; } };
+    },
+    runValidation: false,
+    now: new Date("2026-07-14T01:02:00.000Z")
+  });
+  assert.equal(completed.status, "done", completed.error);
+  assert.equal(completed.record.result.active, false);
+  assert.equal(calls.filter((call) => call.options.method === "POST").length, 1);
+  assert.equal(calls.some((call) => /activate|execute/.test(call.url)), false);
+  assert.equal(JSON.parse(calls[0].options.body).active, undefined);
+  assert.ok(completed.job.completionEvidence.qualityScorePath);
+  assert.throws(() => validateN8nDisabledWorkflowRequest({
+    request: { ...executionRequest, workflow: { ...executionRequest.workflow, nodes: [{ ...executionRequest.workflow.nodes[0], credentials: { smtp: { id: "reference-only" } } }] } }
+  }), /credential references/);
+});
+
+test("Netlify adapter deploys an exact secret-scanned draft preview without production publish", async () => {
+  const workspace = tempWorkspace();
+  const sourceDirectory = ".codex/workspaces/project-ag-os-coordinator-runtime/netlify-preview/deliverables";
+  mkdirSync(path.join(workspace, sourceDirectory), { recursive: true });
+  writeFileSync(path.join(workspace, sourceDirectory, "WORK_PRODUCT.md"), "# Private completion evidence\n", "utf8");
+  writeFileSync(path.join(workspace, sourceDirectory, "index.html"), "<!doctype html><title>Preview</title>\n", "utf8");
+  const executionRequest = {
+    adapterId: "netlify-staging",
+    operation: "create_draft_deploy",
+    siteId: "site-preview-42",
+    branch: "codex/netlify-preview-proof",
+    sourceDirectory,
+    title: "AG OS preview proof",
+    draft: true
+  };
+  const validated = validateNetlifyStagingRequest({ request: executionRequest, root: workspace });
+  assert.equal(validated.source.files.some((file) => file.path === "WORK_PRODUCT.md"), false);
+  const command = await submitOwnerCommand({
+    command: "Create a Netlify staging preview deploy for the dashboard",
+    projectId: "project-ag-os-coordinator-runtime",
+    executionRequest,
+    root: workspace,
+    now: new Date("2026-07-14T01:10:00.000Z")
+  });
+  await processAutonomousJob({ jobId: command.jobId, root: workspace, runValidation: false });
+  decideJob({ jobId: command.jobId, decision: "approve", confirmation: `APPROVE ${command.jobId}`, root: workspace, now: new Date("2026-07-14T01:11:00.000Z") });
+  const calls = [];
+  const completed = await processAutonomousJob({
+    jobId: command.jobId,
+    root: workspace,
+    env: { AG_OS_LIVE_ADAPTERS_ENABLED: "true", [["AG_OS", "NETLIFY", "TOKEN"].join("_")]: "configured" },
+    netlifyFetch: async (url, options) => {
+      calls.push({ url, options });
+      if (options.method === "POST") {
+        const body = JSON.parse(options.body);
+        return { ok: true, status: 200, async json() { return { id: "deploy-42", site_id: "site-preview-42", draft: body.draft, required: Object.values(body.files) }; } };
+      }
+      if (options.method === "PUT") return { ok: true, status: 200, async json() { return { id: "file-42" }; } };
+      return { ok: true, status: 200, async json() { return { id: "deploy-42", site_id: "site-preview-42", draft: true, state: "ready", deploy_ssl_url: "https://deploy-42--preview.netlify.app", published_at: null }; } };
+    },
+    runValidation: false,
+    now: new Date("2026-07-14T01:12:00.000Z")
+  });
+  assert.equal(completed.status, "done", completed.error);
+  assert.equal(completed.record.result.draft, true);
+  assert.equal(completed.record.result.state, "ready");
+  const createBody = JSON.parse(calls.find((call) => call.options.method === "POST").options.body);
+  assert.equal(createBody.draft, true);
+  assert.equal(createBody.production, undefined);
+  assert.equal(calls.some((call) => /restore|rollback|publish/.test(call.url)), false);
+  assert.ok(completed.job.completionEvidence.lessonCandidatePaths.length > 0);
 });

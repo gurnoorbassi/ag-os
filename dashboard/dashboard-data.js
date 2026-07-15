@@ -1698,8 +1698,8 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "approvals": {
-    "activeCount": 3,
-    "expiredCount": 25,
+    "activeCount": 2,
+    "expiredCount": 26,
     "blockedCount": 0,
     "staleWarningCount": 0,
     "activeApprovals": [
@@ -1750,10 +1750,12 @@ window.AG_OS_DASHBOARD_DATA = {
         "archived": false,
         "usesRecorded": 5,
         "remainingUses": 5
-      },
+      }
+    ],
+    "expiredApprovals": [
       {
         "approvalId": "approval-20260713-h3-compounding-proof",
-        "status": "approved",
+        "status": "expired",
         "riskLevel": "R2",
         "expiresAt": "2026-07-14T09:32:19.851Z",
         "approvedBy": "owner-gurnoor-bassi",
@@ -1769,13 +1771,9 @@ window.AG_OS_DASHBOARD_DATA = {
           "commit_exact_milestone_proof_sets"
         ],
         "revocableImmediately": false,
-        "recordPath": ".codex/approvals/approval-20260713-h3-compounding-proof.json",
-        "archived": false,
-        "usesRecorded": 0,
-        "remainingUses": null
-      }
-    ],
-    "expiredApprovals": [
+        "recordPath": ".codex/approvals/archive/approval-20260713-h3-compounding-proof.json",
+        "archived": true
+      },
       {
         "approvalId": "approval-20260705-ag-digitalz-manual-posting-pack-v1",
         "status": "expired",
@@ -2426,29 +2424,6 @@ window.AG_OS_DASHBOARD_DATA = {
         "archived": false,
         "usesRecorded": 5,
         "remainingUses": 5
-      },
-      {
-        "approvalId": "approval-20260713-h3-compounding-proof",
-        "status": "approved",
-        "riskLevel": "R2",
-        "expiresAt": "2026-07-14T09:32:19.851Z",
-        "approvedBy": "owner-gurnoor-bassi",
-        "approvalKind": "single_action",
-        "actionClass": null,
-        "maxUses": null,
-        "budget": null,
-        "target": "gurnoorbassi/ag-os local accepted memory and milestone proof records",
-        "approvedActions": [
-          "promote_named_lesson",
-          "create_followup_reuse_proof",
-          "create_draft_archetype_proposal",
-          "commit_exact_milestone_proof_sets"
-        ],
-        "revocableImmediately": false,
-        "recordPath": ".codex/approvals/approval-20260713-h3-compounding-proof.json",
-        "archived": false,
-        "usesRecorded": 0,
-        "remainingUses": null
       }
     ],
     "standingCount": 2,

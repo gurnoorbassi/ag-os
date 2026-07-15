@@ -14,7 +14,7 @@
             <div class="brand-mark" aria-hidden="true">AG</div>
             <div>
               <p class="brand-title">AG OS</p>
-              <p class="brand-subtitle">Owner Control Center</p>
+              <p class="brand-subtitle">Owner workspace</p>
             </div>
           </div>
           <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="section-nav" aria-label="Open navigation">
@@ -28,41 +28,44 @@
           <div class="nav-group" aria-label="Workspaces">
             <p class="nav-label">Workspace</p>
             <button class="nav-workspace" type="button" data-dashboard-view="home" aria-pressed="true">
-              <span class="nav-icon" aria-hidden="true">01</span>
-              <span><strong>Home</strong><small>Command and priorities</small></span>
+              <span class="nav-icon" aria-hidden="true">H</span>
+              <span><strong>Home</strong><small>Ask AG OS and follow work</small></span>
+            </button>
+            <button class="nav-workspace" type="button" data-dashboard-view="projects" aria-pressed="false">
+              <span class="nav-icon" aria-hidden="true">P</span>
+              <span><strong>Projects</strong><small>Your systems and outcomes</small></span>
             </button>
             <button class="nav-workspace" type="button" data-dashboard-view="work" aria-pressed="false">
-              <span class="nav-icon" aria-hidden="true">02</span>
-              <span><strong>Work</strong><small>Queues and approvals</small></span>
+              <span class="nav-icon" aria-hidden="true">W</span>
+              <span><strong>Work</strong><small>Runs, reviews, and approvals</small></span>
             </button>
             <button class="nav-workspace" type="button" data-dashboard-view="intelligence" aria-pressed="false">
-              <span class="nav-icon" aria-hidden="true">03</span>
-              <span><strong>Intelligence</strong><small>Quality, learning, cost</small></span>
+              <span class="nav-icon" aria-hidden="true">M</span>
+              <span><strong>Memory</strong><small>Quality, lessons, and cost</small></span>
             </button>
             <button class="nav-workspace" type="button" data-dashboard-view="system" aria-pressed="false">
-              <span class="nav-icon" aria-hidden="true">04</span>
+              <span class="nav-icon" aria-hidden="true">S</span>
               <span><strong>System</strong><small>Health and controls</small></span>
             </button>
           </div>
 
           <div class="nav-group nav-shortcuts" aria-label="Quick access">
             <p class="nav-label">Quick access</p>
-            <a href="#command-center" data-view="home">New command</a>
-                <a href="#owner-attention" data-view="home">Status and protections</a>
-            <a href="#projects" data-view="home">Projects</a>
-            <a href="#approvals" data-view="work">Approvals</a>
+            <a href="#command-center" data-view="home">Ask AG OS</a>
+            <a href="#projects" data-view="projects">Your projects</a>
+            <a href="#approvals" data-view="work">Reviews and approvals</a>
           </div>
 
           <details class="nav-more">
             <summary>All sections</summary>
-            <a href="#activation-center" data-view="home">Activation</a>
+            <a href="#activation-center" data-view="home">Runtime status</a>
             <a href="#action-queue" data-view="work">Action queue</a>
             <a href="#client-management" data-view="work">Clients</a>
             <a href="#social-media" data-view="work">Social media</a>
             <a href="#production-social-posting" data-view="work">Production posting</a>
             <a href="#connector-proofs" data-view="work">Connectors</a>
             <a href="#quality-review" data-view="intelligence">Quality</a>
-            <a href="#unified-memory" data-view="intelligence">Memory and learning</a>
+            <a href="#unified-memory" data-view="intelligence">Lessons</a>
             <a href="#costs" data-view="intelligence">Costs</a>
             <a href="#metrics" data-view="intelligence">Metrics</a>
             <a href="#skills" data-view="intelligence">Skills</a>
@@ -84,28 +87,32 @@
         <header class="topbar">
           <div>
             <p class="eyebrow">Owner workspace <span aria-hidden="true">/</span> <span id="view-kicker">Home</span></p>
-            <h1 id="view-title">Command and priorities</h1>
-            <p id="view-description">Start work, check readiness, and see what needs your attention.</p>
+            <h1 id="view-title">What should AG OS do?</h1>
+            <p id="view-description">Give one clear outcome. AG OS will organize the work and stop only when your approval is required.</p>
           </div>
           <div id="runtime-mode" class="mode-lock" aria-label="Dashboard mode"><span aria-hidden="true"></span> Offline evidence</div>
         </header>
 
         <div class="view-switcher" role="group" aria-label="Dashboard view">
           <button type="button" data-dashboard-view="home" aria-pressed="true">Home</button>
+          <button type="button" data-dashboard-view="projects" aria-pressed="false">Projects</button>
           <button type="button" data-dashboard-view="work" aria-pressed="false">Work</button>
-          <button type="button" data-dashboard-view="intelligence" aria-pressed="false">Intelligence</button>
+          <button type="button" data-dashboard-view="intelligence" aria-pressed="false">Memory</button>
           <button type="button" data-dashboard-view="system" aria-pressed="false">System</button>
         </div>
 
         <section id="command-center" class="section-band">
           <div class="section-heading">
             <div>
-              <h2>Owner Command Center</h2>
-              <p>Give AG OS one outcome. The coordinator will classify, route, plan, execute through a registered worker, validate, score, learn, and stop at exact approval gates.</p>
+              <p class="section-kicker">New command</p>
+              <h2>Ask AG OS to build or operate something</h2>
+              <p>Describe the result you want in plain language. AG OS handles the work package, evidence, quality score, lessons, and approval pauses.</p>
             </div>
           </div>
           <form id="owner-command-form" class="command-console">
-            <div class="command-connect-row">
+            <details class="connection-panel">
+              <summary><span>Private owner connection</span><small>Required once per browser session</small></summary>
+              <div class="command-connect-row">
               <label>
                 Coordinator URL
                 <input id="coordinator-url" type="url" placeholder="Same origin or https://your-private-coordinator" autocomplete="url">
@@ -115,7 +122,8 @@
                 <input id="owner-token" type="password" placeholder="Stored for this browser session only" autocomplete="current-password">
               </label>
               <button id="connect-runtime" type="button" class="button-secondary">Connect</button>
-            </div>
+              </div>
+            </details>
             <label>
               Project
               <select id="owner-command-project">
@@ -123,8 +131,8 @@
               </select>
             </label>
             <label>
-              What do you want AG OS to accomplish?
-              <textarea id="owner-command" rows="5" maxlength="10000" required placeholder="Example: Build and operate a professional lead follow-up system for AG Digitalz. Keep all sends waiting for my approval."></textarea>
+              What should AG OS accomplish?
+              <textarea id="owner-command" rows="5" maxlength="10000" required placeholder="Build a professional lead follow-up system for AG Digitalz. Keep every message waiting for my approval."></textarea>
             </label>
             <label class="ai-planner-option">
               <input id="use-ai-planner" type="checkbox" disabled>
@@ -136,7 +144,7 @@
             </label>
             <div class="command-actions">
               <p id="runtime-status" role="status">Not connected. Existing evidence remains available below.</p>
-              <button type="submit">Create work package</button>
+              <button type="submit">Start work <span aria-hidden="true">→</span></button>
             </div>
           </form>
           <div id="recent-command-panel" class="stack-panel"></div>
@@ -184,8 +192,14 @@
 
         <section id="projects" class="section-band">
           <div class="section-heading">
-            <h2>Projects</h2>
-            <p>Create a production-clean project, then send it an owner command. Live actions remain separately approval-gated.</p>
+            <p class="section-kicker">Projects</p>
+            <h2>Your long-running systems</h2>
+            <p>Home is where you give commands. Projects are the durable workspaces that keep each system’s goal, jobs, evidence, quality, and history together.</p>
+          </div>
+          <div class="project-explainer" aria-label="Home and Projects difference">
+            <article><span>Home</span><strong>Tell AG OS what to do now</strong><p>Start a command, see current work, and handle immediate attention.</p></article>
+            <div aria-hidden="true">→</div>
+            <article><span>Projects</span><strong>Manage what AG OS is building over time</strong><p>Keep scope, status, runs, evidence, lessons, and progress in one place.</p></article>
           </div>
           <form id="project-create-form" class="command-console project-create-form">
             <div class="project-form-grid">
@@ -228,20 +242,7 @@
               <button type="submit">Create project</button>
             </div>
           </form>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Project</th>
-                  <th>Status</th>
-                  <th>Mode</th>
-                  <th>Risk</th>
-                  <th>Boundary</th>
-                </tr>
-              </thead>
-              <tbody id="projects-table"></tbody>
-            </table>
-          </div>
+          <div id="projects-grid" class="projects-grid" aria-live="polite"></div>
         </section>
 
         <section id="registries" class="section-band">

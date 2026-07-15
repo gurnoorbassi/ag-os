@@ -1,6 +1,7 @@
 const data = window.AG_OS_DASHBOARD_DATA;
 let runtimeAiPlanner = null;
 let runtimeAiWorker = null;
+let runtimeAutomation = null;
 
 function statusClass(value) {
   const normalized = String(value).toLowerCase();
@@ -205,6 +206,8 @@ function renderOverview() {
 
 function renderActivationCenter(connected = false, productionStatus = "private runtime", aiPlanner = runtimeAiPlanner) {
   const root = clear("#activation-grid");
+  const n8nAdapter = runtimeAutomation?.adapters?.find((adapter) => adapter.adapterId === "n8n-disabled-workflow");
+  const netlifyAdapter = runtimeAutomation?.adapters?.find((adapter) => adapter.adapterId === "netlify-staging");
   const items = [
     {
       title: "Private coordinator",
@@ -229,14 +232,23 @@ function renderActivationCenter(connected = false, productionStatus = "private r
         : "Needs the Anthropic key, token pricing, enable flag, and a scoped paid-planning approval."
     },
     {
-      title: "Remote access",
-      status: "private",
-      detail: "Use the SSH tunnel. Public web access, Caddy, and DNS are intentionally unchanged."
+      title: "n8n workflow drafts",
+      status: n8nAdapter?.executionReady ? "ready when approved" : "setup needed",
+      detail: n8nAdapter?.executionReady
+        ? "Can create and verify an exact disabled, credential-free workflow after one-job approval."
+        : n8nAdapter?.blockers?.join("; ") || "Connect first to verify the disabled-workflow adapter."
     },
     {
-      title: "External actions",
+      title: "Netlify previews",
+      status: netlifyAdapter?.executionReady ? "ready when approved" : "setup needed",
+      detail: netlifyAdapter?.executionReady
+        ? "Can create secret-scanned draft previews without publishing to production."
+        : netlifyAdapter?.blockers?.join("; ") || "Connect first to verify the draft-preview adapter."
+    },
+    {
+      title: "Safety boundary",
       status: "approval gated",
-      detail: "Posting, messaging, spending, credentials, DNS, and production changes need separate approval."
+      detail: "Activation, production publishing, posting, messaging, spending, credentials, DNS, and production changes remain separate decisions."
     }
   ];
   items.forEach((item) => {
@@ -252,7 +264,8 @@ function renderActivationCenter(connected = false, productionStatus = "private r
 }
 
 const dashboardViews = {
-  home: new Set(["command-center", "activation-center", "owner-attention", "projects"]),
+  home: new Set(["command-center", "activation-center", "owner-attention"]),
+  projects: new Set(["projects"]),
   work: new Set(["action-queue", "client-management", "social-media", "production-social-posting", "approvals", "connector-proofs"]),
   intelligence: new Set(["quality-review", "unified-memory", "costs", "metrics", "skills"]),
   system: new Set(["overview", "registries", "capabilities", "operating-systems", "safe-merge"])
@@ -261,8 +274,13 @@ const dashboardViews = {
 const dashboardViewMeta = {
   home: {
     kicker: "Home",
-    title: "Command and priorities",
-    description: "Start work, check readiness, and see what needs your attention."
+    title: "What should AG OS do?",
+    description: "Give one clear outcome. AG OS will organize the work and stop only when your approval is required."
+  },
+  projects: {
+    kicker: "Projects",
+    title: "Your systems and outcomes",
+    description: "Create and manage the durable workspaces behind every command, run, decision, and lesson."
   },
   work: {
     kicker: "Work",
@@ -270,8 +288,8 @@ const dashboardViewMeta = {
     description: "Review active work, client operations, connectors, and approval gates."
   },
   intelligence: {
-    kicker: "Intelligence",
-    title: "Quality and learning",
+    kicker: "Memory",
+    title: "Quality, lessons, and cost",
     description: "Track quality, lessons, cost, metrics, and reusable operating knowledge."
   },
   system: {
@@ -414,33 +432,30 @@ function renderActionQueue() {
 }
 
 function renderProjects(projects = data.projectRegistry.projects) {
-  const tbody = document.querySelector("#projects-table");
-  tbody.replaceChildren();
+  const root = clear("#projects-grid");
   projects.forEach((project) => {
-    const row = document.createElement("tr");
-
-    const nameCell = document.createElement("td");
+    const card = document.createElement("article");
+    card.className = "project-card";
+    const header = document.createElement("header");
+    const identity = document.createElement("div");
     const name = document.createElement("strong");
+    name.className = "project-card-name";
     name.textContent = project.name;
     const id = document.createElement("span");
     id.className = "project-id";
     id.textContent = project.id;
-    nameCell.append(name, id);
-
-    const statusCell = document.createElement("td");
-    statusCell.append(pill(project.status));
-
-    const modeCell = document.createElement("td");
-    modeCell.append(pill(project.managementMode));
-
-    const riskCell = document.createElement("td");
-    riskCell.textContent = project.riskLevel;
-
-    const boundaryCell = document.createElement("td");
-    boundaryCell.textContent = project.boundary;
-
-    row.append(nameCell, statusCell, modeCell, riskCell, boundaryCell);
-    tbody.append(row);
+    identity.append(name, id);
+    header.append(identity, pill(project.status));
+    const boundary = document.createElement("p");
+    boundary.textContent = project.boundary || "This project keeps its work, evidence, decisions, and lessons together.";
+    const footer = document.createElement("footer");
+    const mode = document.createElement("span");
+    mode.textContent = `Mode: ${project.managementMode || "managed"}`;
+    const risk = document.createElement("span");
+    risk.textContent = `Risk: ${project.riskLevel || "R1"}`;
+    footer.append(mode, risk);
+    card.append(header, boundary, footer);
+    root.append(card);
   });
 }
 
@@ -1086,6 +1101,37 @@ function runtimeHeaders() {
   };
 }
 
+function clearRuntimeSession() {
+  sessionStorage.removeItem("ag-os-owner-token");
+  document.querySelector("#owner-token").value = "";
+}
+
+async function runtimeRequest(pathname, options = {}) {
+  const response = await fetch(`${coordinatorBaseUrl()}${pathname}`, {
+    ...options,
+    headers: { ...runtimeHeaders(), ...(options.headers || {}) }
+  });
+  let result;
+  try {
+    result = await response.json();
+  } catch {
+    result = { error: `Coordinator returned HTTP ${response.status}` };
+  }
+  if (response.status === 401) {
+    clearRuntimeSession();
+    document.querySelector(".connection-panel").open = true;
+    throw new Error("Owner session is not authorized. Enter the current owner token under Private owner connection, then press Connect.");
+  }
+  return { response, result };
+}
+
+function assertOwnerSession() {
+  if (!document.querySelector("#owner-token").value.trim()) {
+    document.querySelector(".connection-panel").open = true;
+    throw new Error("Connect the private owner session before starting work.");
+  }
+}
+
 function setRuntimeStatus(message, connected = false) {
   document.querySelector("#runtime-status").textContent = message;
   const mode = document.querySelector("#runtime-mode");
@@ -1168,15 +1214,14 @@ async function decideRuntimeJob(job, decision, button) {
   button.disabled = true;
   setRuntimeStatus(`${decision === "approve" ? "Approving" : (decision === "revoke" ? "Revoking" : "Rejecting")} ${job.jobId}...`, true);
   try {
-    const response = await fetch(`${coordinatorBaseUrl()}/api/v1/jobs/${encodeURIComponent(job.jobId)}/decision`, {
+    assertOwnerSession();
+    const { response, result } = await runtimeRequest(`/api/v1/jobs/${encodeURIComponent(job.jobId)}/decision`, {
       method: "POST",
-      headers: runtimeHeaders(),
       body: JSON.stringify({
         decision,
         confirmation: `${decision.toUpperCase()} ${job.jobId}`
       })
     });
-    const result = await response.json();
     if (!response.ok) throw new Error(result.detail || result.error || "Decision failed");
     setRuntimeStatus(decision === "approve"
       ? `${job.jobId} approved once and re-queued. Its registered adapter must still pass every readiness gate.`
@@ -1200,14 +1245,14 @@ async function connectRuntime() {
   sessionStorage.setItem("ag-os-coordinator-url", document.querySelector("#coordinator-url").value.trim());
   setRuntimeStatus("Connecting...");
   try {
-    const response = await fetch(`${coordinatorBaseUrl()}/api/v1/status`, { headers: runtimeHeaders() });
-    const result = await response.json();
+    const { response, result } = await runtimeRequest("/api/v1/status");
     if (!response.ok) {
       throw new Error(result.detail || result.error || "Connection failed");
     }
     setRuntimeStatus(`Connected. Private runtime is ${result.runtimeDeployment?.status || "live"}; coordinator readiness is ${result.readiness?.coordinator?.passedCheckCount || 0}/${result.readiness?.coordinator?.requiredCheckCount || 0}; operational safeguards are ${result.safeguards?.status || "unknown"}. Gated actions remain approval-controlled.`, true);
     runtimeAiPlanner = result.aiPlanner;
     runtimeAiWorker = result.aiWorker;
+    runtimeAutomation = result.automation;
     const plannerCheckbox = document.querySelector("#use-ai-planner");
     plannerCheckbox.disabled = !runtimeAiPlanner?.ready;
     document.querySelector("#ai-planner-help").textContent = runtimeAiPlanner?.ready
@@ -1235,9 +1280,9 @@ async function createProject(event) {
   button.disabled = true;
   status.textContent = "Creating the project record, registry entry, and audit evidence...";
   try {
-    const response = await fetch(`${coordinatorBaseUrl()}/api/v1/projects`, {
+    assertOwnerSession();
+    const { response, result } = await runtimeRequest("/api/v1/projects", {
       method: "POST",
-      headers: runtimeHeaders(),
       body: JSON.stringify({
         name: document.querySelector("#project-name").value,
         goal: document.querySelector("#project-goal").value,
@@ -1248,7 +1293,6 @@ async function createProject(event) {
         managementMode: "active_build"
       })
     });
-    const result = await response.json();
     if (!response.ok) {
       throw new Error(result.detail || result.error || "Project creation failed");
     }
@@ -1269,9 +1313,9 @@ async function submitOwnerCommand(event) {
   button.disabled = true;
   setRuntimeStatus("Creating the gated work package...", true);
   try {
-    const response = await fetch(`${coordinatorBaseUrl()}/api/v1/commands`, {
+    assertOwnerSession();
+    const { response, result } = await runtimeRequest("/api/v1/commands", {
       method: "POST",
-      headers: runtimeHeaders(),
       body: JSON.stringify({
         command: document.querySelector("#owner-command").value,
         projectId: document.querySelector("#owner-command-project").value || undefined,
@@ -1279,7 +1323,6 @@ async function submitOwnerCommand(event) {
         useAiWorker: document.querySelector("#use-ai-worker").checked
       })
     });
-    const result = await response.json();
     if (!response.ok) {
       throw new Error(result.detail || result.error || "Command failed");
     }

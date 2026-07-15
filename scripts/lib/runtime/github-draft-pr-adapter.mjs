@@ -149,7 +149,7 @@ export async function executeGitHubDraftPr({ request, job, plan, adapter, approv
   const validated = validateGitHubDraftPrRequest({ request, root });
   assertApproval({ approval, job, adapter, validated });
   const mutate = async (method, pathname, body) => {
-    assertApprovalStillActive({ approvalId: approval.approvalId, root });
+    assertApprovalStillActive({ approvalId: approval.approvalId, root, now });
     return github(fetchImpl, token, method, pathname, body);
   };
   const repoPath = `/repos/${encodeURIComponent(validated.owner)}/${encodeURIComponent(validated.repo)}`;

@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { DEFAULT_PROJECT_ID, isoTimestamp, normalizeRunId, slugify, writeJson } from "./common.mjs";
-import { validateGitHubDraftPrRequest } from "./github-draft-pr-adapter.mjs";
+import { validateExecutionRequest } from "./execution-request-validator.mjs";
 
 // Product type detection is a deterministic hint, not understanding. Real
 // understanding comes from the worker block; these matchers only pick a
@@ -215,7 +215,7 @@ export function buildCommandIntakeRecord({ command, projectId, runId, understand
     assertUnderstandingShape(understanding);
   }
   if (executionRequest) {
-    validateGitHubDraftPrRequest({ request: executionRequest, root });
+    validateExecutionRequest({ request: executionRequest, root });
   }
 
   const normalizedRunId = normalizeRunId(runId || command);

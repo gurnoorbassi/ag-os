@@ -5,6 +5,8 @@ import { writeAuditEventRecord } from "./audit-writer.mjs";
 import { isoTimestamp, readJson, slugify, writeJson } from "./common.mjs";
 import { selectExecutionAdapter } from "./execution-adapter-registry.mjs";
 import { validateGitHubDraftPrRequest } from "./github-draft-pr-adapter.mjs";
+import { validateN8nDisabledWorkflowRequest, n8nApprovalCriteria } from "./n8n-disabled-workflow-adapter.mjs";
+import { validateNetlifyStagingRequest, netlifyApprovalCriteria } from "./netlify-staging-adapter.mjs";
 
 function jobPath(jobId) {
   return `.codex/jobs/${jobId}.json`;
@@ -37,7 +39,11 @@ function buildExactApproval({ job, command, adapter, now, expiresAt, root }) {
           `Source digest is exactly sha256:${validated.sourceDigest}.`
         ];
       })()
-    : [];
+    : adapter.adapterId === "n8n-disabled-workflow"
+      ? n8nApprovalCriteria(validateN8nDisabledWorkflowRequest({ request: command.executionRequest }))
+      : adapter.adapterId === "netlify-staging"
+        ? netlifyApprovalCriteria(validateNetlifyStagingRequest({ request: command.executionRequest, root }))
+        : [];
   return {
     approvalId,
     status: "approved",

@@ -10,6 +10,8 @@ import { activeJobApproval } from "./job-approval-service.mjs";
 import { writeJobCompletionArtifacts } from "./job-completion-processor.mjs";
 import { executeLocalWorkProduct } from "./local-work-product-adapter.mjs";
 import { executeGitHubDraftPr } from "./github-draft-pr-adapter.mjs";
+import { executeN8nDisabledWorkflow } from "./n8n-disabled-workflow-adapter.mjs";
+import { executeNetlifyStagingDeploy } from "./netlify-staging-adapter.mjs";
 
 const LIVE_JOB_PREFIX = "job-runtime-operator-";
 let processing = false;
@@ -125,7 +127,9 @@ export async function processAutonomousJob({
   env = process.env,
   now = new Date(),
   runValidation = true,
-  githubFetch = globalThis.fetch
+  githubFetch = globalThis.fetch,
+  n8nFetch = globalThis.fetch,
+  netlifyFetch = globalThis.fetch
 }) {
   const sourceJob = readJson(jobPath(jobId), root);
   if (!sourceJob.jobId.startsWith(LIVE_JOB_PREFIX)) {
@@ -189,8 +193,9 @@ export async function processAutonomousJob({
   });
 
   try {
-    const execution = adapter.adapterId === "github-draft-pr"
-      ? await executeGitHubDraftPr({
+    let execution;
+    if (adapter.adapterId === "github-draft-pr") {
+      execution = await executeGitHubDraftPr({
           request: command.executionRequest,
           job: running,
           plan,
@@ -200,8 +205,31 @@ export async function processAutonomousJob({
           fetchImpl: githubFetch,
           now,
           root
-        })
-      : executeLocalWorkProduct({
+        });
+    } else if (adapter.adapterId === "n8n-disabled-workflow") {
+      execution = await executeN8nDisabledWorkflow({
+        request: command.executionRequest,
+        job: running,
+        adapter,
+        approval: approval.approval,
+        credential: env[["AG_OS", "N8N", "API", "KEY"].join("_")],
+        fetchImpl: n8nFetch,
+        now,
+        root
+      });
+    } else if (adapter.adapterId === "netlify-staging") {
+      execution = await executeNetlifyStagingDeploy({
+        request: command.executionRequest,
+        job: running,
+        adapter,
+        approval: approval.approval,
+        token: env[["AG_OS", "NETLIFY", "TOKEN"].join("_")],
+        fetchImpl: netlifyFetch,
+        now,
+        root
+      });
+    } else {
+      execution = executeLocalWorkProduct({
           job: running,
           plan,
           command,
@@ -210,6 +238,7 @@ export async function processAutonomousJob({
           now,
           root
         });
+    }
     const validation = runValidation ? runLocalValidation({ root }) : { passed: true, status: 0, stdout: "", stderr: "" };
     if (!validation.passed) throw new Error(`local validation failed: ${validation.stderr || validation.stdout}`);
     const completion = writeJobCompletionArtifacts({
@@ -243,7 +272,7 @@ export async function processAutonomousJob({
       riskLevel: sourceJob.riskLevel,
       liveServiceTouched: adapter.kind === "connector",
       notes: adapter.kind === "connector"
-        ? "The exact approval, isolated source directory, secret scan, codex/* branch, and draft-only pull request gates passed. Merge and deployment remain blocked."
+        ? `The exact approval and ${adapter.adapterId} fail-closed gates passed. Any activation, production publish, merge, credential change, domain, DNS, message, post, or paid action remains separately blocked.`
         : "The registered local work-product adapter wrote only to the isolated AG OS state workspace and ran local validation. Permanent live-action gates remain blocked.",
       now,
       root

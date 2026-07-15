@@ -35,7 +35,7 @@ const ADAPTERS = [
     capabilities: ["create_disabled_workflow", "validate_workflow", "record_backup_plan"],
     liveServiceTouched: true,
     approvalRequired: true,
-    implemented: false
+    implemented: true
   },
   {
     adapterId: "netlify-staging",
@@ -47,7 +47,7 @@ const ADAPTERS = [
     capabilities: ["build_site", "deploy_staging", "verify_staging", "record_rollback"],
     liveServiceTouched: true,
     approvalRequired: true,
-    implemented: false
+    implemented: true
   },
   {
     adapterId: "production-deployment",
@@ -131,6 +131,13 @@ export function selectExecutionAdapter({ command, env = process.env } = {}) {
       ...selected,
       executionReady: false,
       blockers: [...selected.blockers, "exact GitHub executionRequest with repository, base commit, branch, and isolated source directory is missing"]
+    };
+  }
+  if (["n8n-disabled-workflow", "netlify-staging"].includes(matched.adapterId) && typeof command === "object" && !command.executionRequest) {
+    return {
+      ...selected,
+      executionReady: false,
+      blockers: [...selected.blockers, `exact ${matched.adapterId} executionRequest is missing`]
     };
   }
   return selected;

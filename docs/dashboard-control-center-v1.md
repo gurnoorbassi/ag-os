@@ -1,6 +1,26 @@
 # Dashboard Control Center v1
 
-Dashboard Control Center v1 is the read-only operating view for AG OS.
+Dashboard Control Center v1 is the private owner operating view for AG OS. Source-controlled evidence stays read-only while authenticated command, project, and approval controls call the coordinator API.
+
+## Owner workspace model
+
+- **Home** is the immediate command cockpit. The owner connects the private session, states one outcome, watches current runs, and handles only immediate attention.
+- **Projects** are durable system workspaces. They hold a system's goal, scope, jobs, evidence, quality history, lessons, and operating status across many Home commands.
+- **Work** contains runs, reviews, connector activity, and exact approvals.
+- **Memory** contains quality, lessons, cost, and reusable operating knowledge.
+- **System** contains health, registries, capabilities, and safeguards.
+
+The visual hierarchy keeps Home quiet and command-first. Project creation and project history no longer compete with the owner command composer.
+
+## Private owner session
+
+The owner token remains browser-session-only. A missing or mismatched token is handled before command submission and produces an explicit reconnect instruction; authentication is never bypassed or silently downgraded.
+
+## Registered draft-only connector transports
+
+- n8n can create one exact disabled, credential-free workflow after an immutable one-job approval. It verifies the saved workflow remains inactive and does not execute it.
+- Netlify can create one exact secret-scanned draft preview after an immutable one-job approval. It verifies the deploy remains draft-only and does not publish to production.
+- Workflow activation, production publish, domains, DNS, environment changes, credentials, messaging, posting, and paid actions remain separate approval classes.
 
 It turns source-controlled AG OS records into a practical status surface for:
 
