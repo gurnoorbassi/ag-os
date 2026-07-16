@@ -19,6 +19,6 @@
   "riskLevel": "medium",
   "dataClassification": "internal",
   "liveServiceTouched": true,
-  "notes": "Use 9 of 10. Full validation, dashboard, boot, 216 tests, diff checks, and secret scanning passed. Merge, live state remediation, and deployment remain prohibited. Changed files: ops/repair-lesson-promotion-ids.mjs, scripts/lib/runtime/control-center-service.mjs, scripts/lib/runtime/lesson-promotion-approval.mjs, tests/control-center-service.test.mjs, tests/lesson-promotion-approval.test.mjs.",
+  "notes": "Use 9 of 10. Full validation, dashboard, boot, 216 tests, diff checks, and secret scanning passed. Merge, live state remediation, and deployment remain prohibited. Changed files: dashboard/dashboard-data.js, ops/repair-lesson-promotion-ids.mjs, scripts/lib/runtime/control-center-service.mjs, scripts/lib/runtime/lesson-promotion-approval.mjs, tests/control-center-service.test.mjs, tests/lesson-promotion-approval.test.mjs.",
   "createdAt": "2026-07-16T08:36:06.848Z"
 }
