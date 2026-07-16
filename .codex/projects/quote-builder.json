@@ -1,0 +1,71 @@
+{
+  "id": "project-quote-builder",
+  "name": "Quote Builder",
+  "status": "active",
+  "owner": "owner-gurnoor-bassi",
+  "projectType": "product_project",
+  "managementMode": "production_managed",
+  "goal": "Operate and improve the live Foreman contractor quote builder as a durable owner product.",
+  "knownFacts": [
+    "The live product is available at https://foreman-quote-studio.netlify.app/.",
+    "The local product workspace is a structured Next.js application backed by Supabase.",
+    "The Netlify site is linked and live.",
+    "The product does not yet have an isolated Git repository and dedicated remote."
+  ],
+  "scope": [
+    "Create, edit, price, and export contractor quotes through the live product.",
+    "Track product work, evidence, quality, cost, and lessons in this AG OS workspace.",
+    "Route owner commands explicitly to Quote Builder.",
+    "Prepare a dedicated source-control connection before AG OS performs repository automation."
+  ],
+  "outOfScope": [
+    "Do not deploy, access credentials, use customer or production data, or run paid AI actions without exact owner approval.",
+    "Do not treat the unrelated parent repository as the Quote Builder source repository.",
+    "Do not weaken the live application's frame or authentication protections."
+  ],
+  "trustLevel": 2,
+  "stack": ["Next.js", "Supabase", "Netlify"],
+  "risks": [
+    {
+      "risk": "The live app is not backed by an isolated Git repository and dedicated remote.",
+      "mitigation": "Show source control as setup needed and block repository execution until a reviewed repository connection exists."
+    },
+    {
+      "risk": "Quote records can contain sensitive business and customer information.",
+      "mitigation": "Keep customer and production data outside AG OS evidence unless separately authorized."
+    }
+  ],
+  "approvalRequiredFor": [
+    "source repository creation or connection",
+    "deployment or Netlify mutation",
+    "credential access or storage",
+    "customer or production data access",
+    "paid AI calls",
+    "DNS or production changes"
+  ],
+  "qualityGates": [
+    "Every completed AG OS job records quality and lesson evidence.",
+    "Application validation passes before any deployment candidate.",
+    "Secret scanning passes before repository publication.",
+    "Live changes use an exact, reversible owner-approved deployment."
+  ],
+  "securityReview": "The live application keeps its existing authentication and anti-framing protections. AG OS opens it separately and does not proxy customer data.",
+  "costTracking": "Record estimated and actual task cost. Paid actions require a matching approval and budget.",
+  "deploymentPlan": "The current Netlify deployment remains unchanged. Future deployment requires a dedicated source repository, exact candidate verification, and separate owner approval.",
+  "ownerWorkspace": {
+    "summary": "Build and run professional contractor quotes, pricing, templates, and PDFs.",
+    "liveUrl": "https://foreman-quote-studio.netlify.app/",
+    "liveLabel": "Open Quote Builder",
+    "previewMode": "new_tab",
+    "previewReason": "The live product intentionally blocks iframe embedding. AG OS keeps your workspace open and launches the secure full app in a separate tab.",
+    "sourceControlStatus": "setup_needed",
+    "sourceControlDetail": "Structured local application found, but no isolated Git repository or dedicated remote is connected.",
+    "operations": [
+      "Open the full live quote product.",
+      "Give AG OS a command targeted to Quote Builder.",
+      "Review project jobs, evidence, quality, lessons, and cost."
+    ]
+  },
+  "createdAt": "2026-07-16T01:09:20.530Z",
+  "updatedAt": "2026-07-16T01:09:20.530Z"
+}

@@ -59,6 +59,30 @@
     "securityReview": { "type": "string", "minLength": 1 },
     "costTracking": { "type": "string", "minLength": 1 },
     "deploymentPlan": { "type": "string", "minLength": 1 },
+    "ownerWorkspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "liveUrl",
+        "liveLabel",
+        "previewMode",
+        "previewReason",
+        "sourceControlStatus",
+        "sourceControlDetail",
+        "operations"
+      ],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "liveUrl": { "type": "string", "format": "uri" },
+        "liveLabel": { "type": "string", "minLength": 1 },
+        "previewMode": { "type": "string", "enum": ["new_tab", "embedded"] },
+        "previewReason": { "type": "string", "minLength": 1 },
+        "sourceControlStatus": { "type": "string", "enum": ["connected", "setup_needed"] },
+        "sourceControlDetail": { "type": "string", "minLength": 1 },
+        "operations": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    },
     "createdAt": { "type": "string", "format": "date-time" },
     "updatedAt": { "type": "string", "format": "date-time" }
   }

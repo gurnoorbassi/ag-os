@@ -47,11 +47,14 @@ if (data.constitution.status !== "Active Constitution v1.0.") {
 if (data.projectRegistry.status !== "active") {
   fail("dashboard must show active Project Registry status");
 }
-if (data.leadGenerationSystem.status !== "complete" || data.leadGenerationSystem.managementMode !== "observe_only") {
-  fail("dashboard must show Lead Generation System as complete and observe_only");
+const ownerProjectIds = data.projectRegistry.projects.map((project) => project.id);
+if (JSON.stringify(ownerProjectIds) !== JSON.stringify(["project-quote-builder", "project-ai-lead-command-center"])) {
+  fail("dashboard must expose exactly Quote Builder and AI Lead Command Center as owner projects");
 }
-if (data.aiReceptionist.status !== "active" || data.aiReceptionist.managementMode !== "active_build") {
-  fail("dashboard must show AI Receptionist as active and active_build");
+for (const project of data.projectRegistry.projects) {
+  if (project.status !== "active" || !project.ownerWorkspace?.liveUrl || !project.ownerWorkspace?.operations?.length) {
+    fail(`owner project must be active and operationally structured: ${project.id}`);
+  }
 }
 
 const index = existsSync(path.join(root, "dashboard/index.html")) ? read("dashboard/index.html") : "";
@@ -68,10 +71,10 @@ for (const requiredInterfacePattern of [
   /data-dashboard-view="system"/,
   /class="nav-workspace"/,
   />Command<\/button>/,
-  />Workspaces<\/button>/,
+  />Projects<\/button>/,
   />Activity<\/button>/,
   /id="view-title"/,
-  /id="project-create-panel"[^>]*class="project-create-panel"/,
+  /id="owner-command-projects"[^>]*class="project-picker-grid"/,
   /id="projects-go-command"/,
   /const dashboardViewMeta =/
 ]) {
@@ -117,7 +120,7 @@ for (const requiredText of [
   "Owner Attention",
   "Dashboard Action Queue",
   "Project Registry",
-  "Your long-running systems",
+  "Your projects",
   "Connector Registry",
   "Command Registry",
   "Capability Registry",
@@ -138,6 +141,22 @@ for (const requiredText of [
 ]) {
   if (!dashboardSource.includes(requiredText)) {
     fail(`dashboard missing required visible section: ${requiredText}`);
+  }
+}
+
+for (const forbiddenOwnerUx of [
+  "Auto-detect from command",
+  "Create a new workspace",
+  "Level 2 - reviewed staging"
+]) {
+  if (dashboardSource.includes(forbiddenOwnerUx)) {
+    fail(`dashboard must not expose legacy or staging owner UX: ${forbiddenOwnerUx}`);
+  }
+}
+
+for (const liveUrl of ["https://foreman-quote-studio.netlify.app/", "https://app.agdigitalz.net/"]) {
+  if (!JSON.stringify(data.projectRegistry.projects).includes(liveUrl)) {
+    fail(`dashboard owner project missing verified live URL: ${liveUrl}`);
   }
 }
 

@@ -164,12 +164,12 @@ test("keeps unknown product types as explicit archetype gaps", () => {
 test("uses an explicit registered-project target without changing product classification", () => {
   const record = buildCommandIntakeRecord({
     command: "Improve the internal dashboard navigation",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     runId: "coordinator-dashboard-target",
     now: fixedNow
   });
 
-  assert.equal(record.projectId, "project-ag-os-coordinator-runtime");
+  assert.equal(record.projectId, "project-quote-builder");
   assert.equal(record.productContext.archetypeId, "archetype-dashboard");
 });
 

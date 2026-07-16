@@ -39,25 +39,14 @@ window.AG_OS_DASHBOARD_DATA = {
   },
   "projectRegistry": {
     "status": "active",
-    "count": 4,
+    "count": 2,
     "source": ".codex/projects/registry.json",
     "projects": [
       {
-        "id": "project-ag-os",
-        "name": "AG OS",
+        "id": "project-quote-builder",
+        "name": "Quote Builder",
         "status": "active",
-        "managementMode": "core_operating_system",
-        "projectType": "operating_system",
-        "riskLevel": "medium",
-        "owner": "owner-gurnoor-bassi",
-        "recordPath": "README.md",
-        "boundary": "Canonical AG OS source-of-truth repository and dashboard/control-plane records."
-      },
-      {
-        "id": "project-lead-generation-system",
-        "name": "Lead Generation System",
-        "status": "complete",
-        "managementMode": "observe_only",
+        "managementMode": "production_managed",
         "projectType": "product_project",
         "riskLevel": "high",
         "sensitivity": {
@@ -66,47 +55,29 @@ window.AG_OS_DASHBOARD_DATA = {
           "explanation": "Low starting trust keeps external and production actions behind exact owner approval."
         },
         "owner": "owner-gurnoor-bassi",
-        "recordPath": ".codex/projects/lead-generation-system.json",
-        "boundary": "No source, VPS, Postgres, n8n, domain, DNS, deployment, credential, production data, or customer data changes."
+        "recordPath": ".codex/projects/quote-builder.json",
+        "boundary": "Do not deploy, access credentials, use customer or production data, or run paid AI actions without exact owner approval.",
+        "ownerWorkspace": {
+          "summary": "Build and run professional contractor quotes, pricing, templates, and PDFs.",
+          "liveUrl": "https://foreman-quote-studio.netlify.app/",
+          "liveLabel": "Open Quote Builder",
+          "previewMode": "new_tab",
+          "previewReason": "The live product intentionally blocks iframe embedding. AG OS keeps your workspace open and launches the secure full app in a separate tab.",
+          "sourceControlStatus": "setup_needed",
+          "sourceControlDetail": "Structured local application found, but no isolated Git repository or dedicated remote is connected.",
+          "operations": [
+            "Open the full live quote product.",
+            "Give AG OS a command targeted to Quote Builder.",
+            "Review project jobs, evidence, quality, lessons, and cost."
+          ]
+        }
       },
       {
-        "id": "project-ag-digitalz-ai-receptionist",
-        "name": "AG Digitalz AI Receptionist",
+        "id": "project-ai-lead-command-center",
+        "name": "AI Lead Command Center",
         "status": "active",
-        "managementMode": "active_build",
+        "managementMode": "production_managed",
         "projectType": "product_project",
-        "riskLevel": "medium",
-        "sensitivity": {
-          "level": "controlled",
-          "label": "Controlled",
-          "explanation": "Local work can run, while external or production effects remain approval-gated."
-        },
-        "owner": "owner-gurnoor-bassi",
-        "recordPath": ".codex/projects/ag-digitalz-ai-receptionist.json",
-        "boundary": "Separate product project; no live service status inferred beyond repository records."
-      },
-      {
-        "id": "project-social-media-management-system-v1",
-        "name": "Social Media Management System v1",
-        "status": "active",
-        "managementMode": "managed_staging",
-        "projectType": "product_project",
-        "riskLevel": "medium",
-        "sensitivity": {
-          "level": "controlled",
-          "label": "Controlled",
-          "explanation": "Local work can run, while external or production effects remain approval-gated."
-        },
-        "owner": "owner-gurnoor-bassi",
-        "recordPath": ".codex/projects/social-media-management-system-v1.json",
-        "boundary": "Do not create or mutate a repository, branch, file set, or pull request outside a separately approved scope."
-      },
-      {
-        "id": "project-ag-os-coordinator-runtime",
-        "name": "AG OS Coordinator Runtime",
-        "status": "active",
-        "managementMode": "managed_staging",
-        "projectType": "ag_os_core",
         "riskLevel": "high",
         "sensitivity": {
           "level": "protected",
@@ -114,8 +85,22 @@ window.AG_OS_DASHBOARD_DATA = {
           "explanation": "Low starting trust keeps external and production actions behind exact owner approval."
         },
         "owner": "owner-gurnoor-bassi",
-        "recordPath": ".codex/projects/ag-os-coordinator-runtime.json",
-        "boundary": "Do not deploy without exact approval naming the target and source commit."
+        "recordPath": ".codex/projects/ai-lead-command-center.json",
+        "boundary": "Do not change the production application, database, n8n, proxy, credentials, customer data, messages, DNS, or deployment without exact owner approval.",
+        "ownerWorkspace": {
+          "summary": "Operate the protected lead pipeline, workflows, and command center.",
+          "liveUrl": "https://app.agdigitalz.net/",
+          "liveLabel": "Open AI Lead Command Center",
+          "previewMode": "new_tab",
+          "previewReason": "The protected console intentionally blocks iframe embedding. AG OS keeps your workspace open and launches the secure full app in a separate tab.",
+          "sourceControlStatus": "setup_needed",
+          "sourceControlDetail": "The live VPS application is structured and running, but its deployed source is not connected to a canonical Git remote.",
+          "operations": [
+            "Open the full protected lead console.",
+            "Give AG OS a command targeted to the AI Lead Command Center.",
+            "Review project jobs, evidence, quality, lessons, and cost."
+          ]
+        }
       }
     ]
   },
@@ -133,7 +118,8 @@ window.AG_OS_DASHBOARD_DATA = {
     },
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/lead-generation-system.json",
-    "boundary": "No source, VPS, Postgres, n8n, domain, DNS, deployment, credential, production data, or customer data changes."
+    "boundary": "No source, VPS, Postgres, n8n, domain, DNS, deployment, credential, production data, or customer data changes.",
+    "ownerWorkspace": null
   },
   "aiReceptionist": {
     "id": "project-ag-digitalz-ai-receptionist",
@@ -149,7 +135,8 @@ window.AG_OS_DASHBOARD_DATA = {
     },
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/ag-digitalz-ai-receptionist.json",
-    "boundary": "Separate product project; no live service status inferred beyond repository records."
+    "boundary": "Separate product project; no live service status inferred beyond repository records.",
+    "ownerWorkspace": null
   },
   "socialMediaSystem": {
     "id": "project-social-media-management-system-v1",
@@ -166,6 +153,7 @@ window.AG_OS_DASHBOARD_DATA = {
     "owner": "owner-gurnoor-bassi",
     "recordPath": ".codex/projects/social-media-management-system-v1.json",
     "boundary": "Do not create or mutate a repository, branch, file set, or pull request outside a separately approved scope.",
+    "ownerWorkspace": null,
     "currentVersion": "v1.8 manual posting pack",
     "lifecycleStatus": "Manual posting pack merged and staged; OAuth and AG OS automated posting remain blocked",
     "targetRepo": "gurnoorbassi/ag-social-media-management-system",
@@ -3951,21 +3939,10 @@ window.AG_OS_DASHBOARD_DATA = {
     },
     "scaledOperations": {
       "evidenceType": "registered_project_plans_within_five_minutes",
-      "concurrentProjectPairCount": 1,
-      "projectsInConcurrentBatches": [
-        "project-ag-os-coordinator-runtime",
-        "project-social-media-management-system-v1"
-      ],
-      "concurrentPlanningProven": true,
-      "latestPairs": [
-        {
-          "firstPlanId": "plan-runtime-ag-os-compounding-completion-20260713",
-          "firstProjectId": "project-ag-os-coordinator-runtime",
-          "secondPlanId": "plan-runtime-social-doc-consolidation-20260713",
-          "secondProjectId": "project-social-media-management-system-v1",
-          "deltaSeconds": 0
-        }
-      ]
+      "concurrentProjectPairCount": 0,
+      "projectsInConcurrentBatches": [],
+      "concurrentPlanningProven": false,
+      "latestPairs": []
     },
     "limitations": [
       "Metrics are computed only from source-controlled AG OS records.",

@@ -96,6 +96,7 @@ export function getProjectWorkspace({ projectId, root = process.cwd() }) {
       risks: project.risks ?? [],
       qualityGates: project.qualityGates ?? [],
       approvalRequiredFor: project.approvalRequiredFor ?? [],
+      ownerWorkspace: project.ownerWorkspace ?? null,
       sensitivity: approvalSensitivity(entry.riskLevel)
     },
     progress: {

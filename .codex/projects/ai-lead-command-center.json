@@ -1,0 +1,72 @@
+{
+  "id": "project-ai-lead-command-center",
+  "name": "AI Lead Command Center",
+  "status": "active",
+  "owner": "owner-gurnoor-bassi",
+  "projectType": "product_project",
+  "managementMode": "production_managed",
+  "goal": "Operate and improve the live AI Lead Command Center as a durable owner product.",
+  "knownFacts": [
+    "The protected live console is available at https://app.agdigitalz.net/.",
+    "The production application runs in its existing isolated VPS stack.",
+    "The production web, API, proxy, database, and n8n containers are currently separate from AG OS.",
+    "The deployed source directory does not currently contain Git metadata."
+  ],
+  "scope": [
+    "Open and operate the protected lead command center.",
+    "Track product work, evidence, quality, cost, and lessons in this AG OS workspace.",
+    "Route owner commands explicitly to the AI Lead Command Center.",
+    "Prepare a canonical source repository before AG OS performs code or deployment automation."
+  ],
+  "outOfScope": [
+    "Do not change the production application, database, n8n, proxy, credentials, customer data, messages, DNS, or deployment without exact owner approval.",
+    "Do not weaken the live application's frame, password, or network protections.",
+    "Do not claim repository automation is ready until a canonical source remote is connected."
+  ],
+  "trustLevel": 2,
+  "stack": ["Web application", "API", "Postgres", "n8n", "Docker", "Caddy", "Hetzner VPS"],
+  "risks": [
+    {
+      "risk": "The live product handles production services and may contain customer lead data.",
+      "mitigation": "Keep data and production mutations behind exact approvals and expose only safe operational metadata in AG OS."
+    },
+    {
+      "risk": "The deployed source is not connected to a canonical Git repository.",
+      "mitigation": "Show source control as setup needed and block automated code or deployment actions until repository reconciliation is complete."
+    }
+  ],
+  "approvalRequiredFor": [
+    "source repository creation or connection",
+    "VPS or deployment mutation",
+    "database or n8n mutation",
+    "credential access or storage",
+    "customer or production data access",
+    "messaging or external connector execution",
+    "DNS or production changes"
+  ],
+  "qualityGates": [
+    "Every completed AG OS job records quality and lesson evidence.",
+    "Application and infrastructure validation pass before any deployment candidate.",
+    "Secret scanning passes before repository publication.",
+    "Live changes use a fresh backup, exact candidate, verification, and rollback plan."
+  ],
+  "securityReview": "The protected production console keeps its existing password and anti-framing protections. AG OS opens it separately and does not ingest customer data.",
+  "costTracking": "Record estimated and actual task cost. Paid actions require a matching approval and budget.",
+  "deploymentPlan": "The current VPS stack remains unchanged. Future deployment requires a canonical source repository, exact candidate verification, backup, rollback, and separate owner approval.",
+  "ownerWorkspace": {
+    "summary": "Operate the protected lead pipeline, workflows, and command center.",
+    "liveUrl": "https://app.agdigitalz.net/",
+    "liveLabel": "Open AI Lead Command Center",
+    "previewMode": "new_tab",
+    "previewReason": "The protected console intentionally blocks iframe embedding. AG OS keeps your workspace open and launches the secure full app in a separate tab.",
+    "sourceControlStatus": "setup_needed",
+    "sourceControlDetail": "The live VPS application is structured and running, but its deployed source is not connected to a canonical Git remote.",
+    "operations": [
+      "Open the full protected lead console.",
+      "Give AG OS a command targeted to the AI Lead Command Center.",
+      "Review project jobs, evidence, quality, lessons, and cost."
+    ]
+  },
+  "createdAt": "2026-07-16T01:09:20.530Z",
+  "updatedAt": "2026-07-16T01:09:20.530Z"
+}

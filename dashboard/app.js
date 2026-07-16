@@ -283,9 +283,9 @@ function renderActivationCenter(connected = false, productionStatus = "private r
 }
 
 const dashboardViews = {
-  home: new Set(["command-center", "activation-center", "owner-attention"]),
+  home: new Set(["command-center"]),
   projects: new Set(["projects"]),
-  work: new Set(["action-queue", "client-management", "social-media", "production-social-posting", "approvals", "connector-proofs"]),
+  work: new Set(["action-queue", "approvals", "connector-proofs"]),
   intelligence: new Set(["quality-review", "unified-memory", "costs", "metrics", "skills"]),
   system: new Set(["overview", "registries", "capabilities", "operating-systems", "safe-merge"])
 };
@@ -297,9 +297,9 @@ const dashboardViewMeta = {
     description: "Give one clear outcome. AG OS will organize the work and stop only when your approval is required."
   },
   projects: {
-    kicker: "Workspaces",
-    title: "Your long-running systems",
-    description: "Inspect durable goals, jobs, evidence, decisions, and lessons. Start new work from Command."
+    kicker: "Projects",
+    title: "Your two live systems",
+    description: "Open a product, control it through AG OS, or launch its secure full application."
   },
   work: {
     kicker: "Activity",
@@ -483,12 +483,36 @@ async function openProjectWorkspace(project) {
     shell.className = "workspace-stack";
     const intro = document.createElement("div");
     intro.className = "workspace-summary";
+    const ownerWorkspace = result.project.ownerWorkspace;
     const goal = document.createElement("p");
-    goal.textContent = result.project.goal;
-    const sensitivity = document.createElement("p");
-    sensitivity.className = "sensitivity-note";
-    sensitivity.append(pill(result.project.sensitivity.label), document.createTextNode(` ${result.project.sensitivity.explanation}`));
-    intro.append(goal, sensitivity);
+    goal.textContent = ownerWorkspace?.summary || result.project.goal;
+    const actions = document.createElement("div");
+    actions.className = "workspace-primary-actions";
+    const workHere = document.createElement("button");
+    workHere.type = "button";
+    workHere.className = "button-primary";
+    workHere.textContent = "Work on this project";
+    workHere.addEventListener("click", () => {
+      selectOwnerProject(result.project.id);
+      document.querySelector("#workspace-dialog").close();
+      setDashboardView("home");
+      document.querySelector("#owner-command").focus();
+      setRuntimeStatus(`${result.project.name} selected. Tell AG OS what outcome you want.`, runtimeConnected);
+    });
+    actions.append(workHere);
+    if (ownerWorkspace?.liveUrl) {
+      const openLive = document.createElement("a");
+      openLive.className = "button-secondary live-app-link";
+      openLive.href = ownerWorkspace.liveUrl;
+      openLive.target = "_blank";
+      openLive.rel = "noopener noreferrer";
+      openLive.textContent = `${ownerWorkspace.liveLabel} ↗`;
+      actions.append(openLive);
+    }
+    const accessNote = document.createElement("p");
+    accessNote.className = "workspace-access-note";
+    accessNote.textContent = ownerWorkspace?.previewReason || "The full application opens securely in a separate tab while AG OS stays open.";
+    intro.append(goal, actions, accessNote);
     const metrics = document.createElement("div");
     metrics.className = "workspace-metrics";
     [
@@ -519,10 +543,10 @@ async function openProjectWorkspace(project) {
     const evidence = document.createElement("div");
     evidence.className = "workspace-evidence-grid";
     evidence.append(
-      sectionBlock("Scope", itemList(result.project.scope)),
+      sectionBlock("What you can do", itemList(ownerWorkspace?.operations || result.project.scope)),
+      sectionBlock("Source control", itemList([ownerWorkspace?.sourceControlStatus === "connected" ? "Connected" : "Setup needed", ownerWorkspace?.sourceControlDetail || "Not recorded"])),
       sectionBlock("Tools", itemList(result.project.stack)),
-      sectionBlock("Quality gates", itemList(result.project.qualityGates)),
-      sectionBlock("Approval boundaries", itemList(result.project.approvalRequiredFor))
+      sectionBlock("Protected actions", itemList(result.project.approvalRequiredFor))
     );
     shell.append(intro, metrics, sectionBlock("Recent jobs", jobs), evidence);
     openWorkspaceDialog({ eyebrow: "Workspace", title: result.project.name, content: shell });
@@ -548,41 +572,53 @@ function renderProjects(projects = data.projectRegistry.projects) {
     id.className = "project-id";
     id.textContent = project.id;
     identity.append(name, id);
-    header.append(identity, pill(project.status));
+    header.append(identity, pill(project.status === "active" ? "live" : project.status));
     const boundary = document.createElement("p");
-    boundary.textContent = project.boundary || "This project keeps its work, evidence, decisions, and lessons together.";
+    boundary.textContent = project.ownerWorkspace?.summary || project.boundary || "This project keeps its work, evidence, decisions, and lessons together.";
     const footer = document.createElement("footer");
-    const mode = document.createElement("span");
-    mode.textContent = `Mode: ${project.managementMode || "managed"}`;
-    const sensitivity = project.sensitivity || {
-      label: project.riskLevel === "high" ? "Protected" : (project.riskLevel === "medium" ? "Controlled" : "Routine"),
-      explanation: "Approval sensitivity controls which actions require owner confirmation."
-    };
-    const sensitivityLabel = document.createElement("span");
-    sensitivityLabel.textContent = `Approval sensitivity: ${sensitivity.label}`;
-    sensitivityLabel.title = sensitivity.explanation;
+    const liveStatus = document.createElement("span");
+    liveStatus.textContent = "Live app connected";
+    const sourceStatus = document.createElement("span");
+    sourceStatus.textContent = project.ownerWorkspace?.sourceControlStatus === "connected" ? "Source connected" : "Source setup needed";
     const open = document.createElement("button");
     open.type = "button";
     open.className = "card-action";
     open.textContent = "Open workspace";
     open.addEventListener("click", () => openProjectWorkspace(project));
-    footer.append(mode, sensitivityLabel);
+    footer.append(liveStatus, sourceStatus);
     card.append(header, boundary, footer, open);
     root.append(card);
   });
 }
 
 function populateProjectSelect(projects = data.projectRegistry.projects) {
-  const projectSelect = document.querySelector("#owner-command-project");
-  projectSelect.querySelectorAll("option:not(:first-child)").forEach((option) => option.remove());
-  projects
-    .filter((project) => project.id !== "project-ag-os")
-    .forEach((project) => {
-      const option = document.createElement("option");
-      option.value = project.id;
-      option.textContent = project.name;
-      projectSelect.append(option);
-    });
+  const root = clear("#owner-command-projects");
+  const current = document.querySelector("#owner-command-project").value;
+  projects.forEach((project) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "project-choice";
+    button.dataset.projectId = project.id;
+    button.setAttribute("aria-pressed", "false");
+    const name = document.createElement("strong");
+    name.textContent = project.name;
+    const detail = document.createElement("span");
+    detail.textContent = project.ownerWorkspace?.summary || "Open project workspace";
+    button.append(name, detail);
+    button.addEventListener("click", () => selectOwnerProject(project.id));
+    root.append(button);
+  });
+  selectOwnerProject(projects.some((project) => project.id === current) ? current : projects[0]?.id);
+}
+
+function selectOwnerProject(projectId) {
+  const input = document.querySelector("#owner-command-project");
+  input.value = projectId || "";
+  document.querySelectorAll("#owner-command-projects .project-choice").forEach((button) => {
+    const selected = button.dataset.projectId === input.value;
+    button.setAttribute("aria-pressed", String(selected));
+    button.classList.toggle("is-selected", selected);
+  });
 }
 
 function renderRegistries() {
@@ -1525,44 +1561,6 @@ async function logoutRuntime() {
   }
 }
 
-async function createProject(event) {
-  event.preventDefault();
-  const button = event.currentTarget.querySelector("button[type='submit']");
-  const status = document.querySelector("#project-create-status");
-  button.disabled = true;
-  status.textContent = "Creating the project record, registry entry, and audit evidence...";
-  try {
-    assertOwnerSession();
-    const { response, result } = await runtimeRequest("/api/v1/projects", {
-      method: "POST",
-      body: JSON.stringify({
-        name: document.querySelector("#project-name").value,
-        goal: document.querySelector("#project-goal").value,
-        scope: document.querySelector("#project-scope").value,
-        stack: document.querySelector("#project-stack").value,
-        projectType: document.querySelector("#project-type").value,
-        trustLevel: Number(document.querySelector("#project-trust-level").value),
-        managementMode: "active_build"
-      })
-    });
-    if (!response.ok) {
-      throw new Error(result.detail || result.error || "Project creation failed");
-    }
-    event.currentTarget.reset();
-    status.textContent = `Created ${result.project.name}. Returning to Command.`;
-    await connectRuntime();
-    document.querySelector("#owner-command-project").value = result.project.id;
-    document.querySelector("#project-create-panel").open = false;
-    setDashboardView("home");
-    document.querySelector("#owner-command").focus();
-    setRuntimeStatus(`${result.project.name} workspace created and selected. Tell AG OS the outcome you want.`, true);
-  } catch (error) {
-    status.textContent = `Workspace setup failed: ${error.message}`;
-  } finally {
-    button.disabled = false;
-  }
-}
-
 async function submitOwnerCommand(event) {
   event.preventDefault();
   const button = event.currentTarget.querySelector("button[type='submit']");
@@ -1574,7 +1572,7 @@ async function submitOwnerCommand(event) {
       method: "POST",
       body: JSON.stringify({
         command: document.querySelector("#owner-command").value,
-        projectId: document.querySelector("#owner-command-project").value || undefined,
+        projectId: document.querySelector("#owner-command-project").value,
         useAiPlanner: document.querySelector("#use-ai-planner").checked,
         useAiWorker: document.querySelector("#use-ai-worker").checked
       })
@@ -1603,7 +1601,6 @@ function initializeCommandCenter() {
   document.querySelector("#connect-runtime").addEventListener("click", connectRuntime);
   document.querySelector("#logout-runtime").addEventListener("click", logoutRuntime);
   document.querySelector("#owner-command-form").addEventListener("submit", submitOwnerCommand);
-  document.querySelector("#project-create-form").addEventListener("submit", createProject);
   document.querySelector("#projects-go-command").addEventListener("click", () => {
     setDashboardView("home");
     document.querySelector("#owner-command").focus();

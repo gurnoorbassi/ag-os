@@ -10,7 +10,7 @@ import { createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
 import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-planner-readiness.mjs";
 import { createAnthropicWorkProduct } from "./lib/runtime/anthropic-worker.mjs";
 import { evaluateAnthropicWorkerReadiness } from "./lib/runtime/anthropic-worker-readiness.mjs";
-import { createProject, listProjects } from "./lib/runtime/project-service.mjs";
+import { listProjects } from "./lib/runtime/project-service.mjs";
 import {
   decideLessons,
   getOperatingSystems,
@@ -345,13 +345,6 @@ const server = createServer(async (request, response) => {
         jobs: listAutonomousJobs({ root }),
         recentCommands: listRecentOwnerCommands({ root })
       }, headers);
-      return;
-    }
-
-    if (request.method === "POST" && url.pathname === "/api/v1/projects") {
-      const body = await readJsonBody(request);
-      const result = createProject({ input: body, root });
-      json(response, 201, result, headers);
       return;
     }
 
