@@ -5,36 +5,20 @@
   "status": "active",
   "projects": [
     {
-      "projectId": "project-lead-generation-system",
-      "recordPath": ".codex/projects/lead-generation-system.json",
-      "status": "complete",
-      "owner": "owner-gurnoor-bassi",
-      "riskLevel": "high",
-      "lastReviewedAt": "2026-07-03T11:32:35Z"
-    },
-    {
-      "projectId": "project-ag-digitalz-ai-receptionist",
-      "recordPath": ".codex/projects/ag-digitalz-ai-receptionist.json",
-      "status": "active",
-      "owner": "owner-gurnoor-bassi",
-      "riskLevel": "medium",
-      "lastReviewedAt": "2026-07-03T11:32:35Z"
-    },
-    {
-      "projectId": "project-social-media-management-system-v1",
-      "recordPath": ".codex/projects/social-media-management-system-v1.json",
-      "status": "active",
-      "owner": "owner-gurnoor-bassi",
-      "riskLevel": "medium",
-      "lastReviewedAt": "2026-07-09T20:06:25.029Z"
-    },
-    {
-      "projectId": "project-ag-os-coordinator-runtime",
-      "recordPath": ".codex/projects/ag-os-coordinator-runtime.json",
+      "projectId": "project-quote-builder",
+      "recordPath": ".codex/projects/quote-builder.json",
       "status": "active",
       "owner": "owner-gurnoor-bassi",
       "riskLevel": "high",
-      "lastReviewedAt": "2026-07-12T05:18:39.000Z"
+      "lastReviewedAt": "2026-07-16T01:09:20.530Z"
+    },
+    {
+      "projectId": "project-ai-lead-command-center",
+      "recordPath": ".codex/projects/ai-lead-command-center.json",
+      "status": "active",
+      "owner": "owner-gurnoor-bassi",
+      "riskLevel": "high",
+      "lastReviewedAt": "2026-07-16T01:09:20.530Z"
     }
   ],
   "rules": {

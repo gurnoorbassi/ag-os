@@ -127,7 +127,8 @@ export function listProjects({ root = process.cwd() } = {}) {
       sensitivity: approvalSensitivity(riskLevel),
       owner: project.owner,
       recordPath: entry.recordPath,
-      boundary: project.outOfScope?.[0] || "Boundary not recorded."
+      boundary: project.outOfScope?.[0] || "Boundary not recorded.",
+      ownerWorkspace: project.ownerWorkspace ?? null
     };
   });
 }

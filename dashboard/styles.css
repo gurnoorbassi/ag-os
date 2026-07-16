@@ -1104,6 +1104,50 @@ td strong {
   font-size: 13px;
 }
 
+.project-picker {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.project-picker legend {
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.project-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.command-console .project-choice {
+  display: grid;
+  gap: 5px;
+  min-height: 86px;
+  border-color: var(--border);
+  padding: 15px;
+  color: var(--text);
+  background: var(--surface-raised);
+  text-align: left;
+}
+
+.command-console .project-choice span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.command-console .project-choice.is-selected {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(223, 160, 120, 0.12);
+  color: #f4c4a4;
+  background: var(--blue-soft);
+}
+
 .section-heading > .button-secondary {
   flex: 0 0 auto;
   border: 1px solid var(--blue);
@@ -1171,6 +1215,49 @@ td strong {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+}
+
+.workspace-primary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0 12px;
+}
+
+.workspace-primary-actions .button-primary,
+.workspace-primary-actions .button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 11px 15px;
+  color: #21170f;
+  background: #dfa078;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.workspace-primary-actions .button-secondary {
+  color: #e2b395;
+  background: var(--blue-soft);
+}
+
+.workspace-access-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .project-picker-grid,
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .project-card h3 {

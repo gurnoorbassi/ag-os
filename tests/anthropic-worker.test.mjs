@@ -48,7 +48,7 @@ test("Anthropic worker requests a bounded schema and validates safe file output"
   const result = await createAnthropicWorkProduct({
     command: { rawCommand: "Build a private operations dashboard" },
     plan: {
-      projectId: "project-ag-os-coordinator-runtime",
+      projectId: "project-quote-builder",
       summary: "Build the dashboard.",
       tasks: [],
       expectedOutput: "Dashboard files",
@@ -116,8 +116,8 @@ test("Anthropic worker rejects traversal, hidden files, invalid JSON, and oversi
 test("Anthropic worker cannot write paid work-product evidence without an exact approval id", () => {
   const root = tempWorkspace();
   const options = {
-    job: { jobId: "job-worker-test", projectId: "project-ag-os-coordinator-runtime", riskLevel: "R1" },
-    plan: { planId: "plan-worker-test", jobId: "job-worker-test", projectId: "project-ag-os-coordinator-runtime", expectedOutput: "Files", riskLevel: "R1" },
+    job: { jobId: "job-worker-test", projectId: "project-quote-builder", riskLevel: "R1" },
+    plan: { planId: "plan-worker-test", jobId: "job-worker-test", projectId: "project-quote-builder", expectedOutput: "Files", riskLevel: "R1" },
     command: { rawCommand: "Build files" },
     result: { workProduct: safeWorkProduct() },
     root,
@@ -160,7 +160,7 @@ test("owner command closes the real file, score, lesson, cost, and audit loop wi
   const approvalId = "approval-20260713-anthropic-builder-test";
   const result = await submitOwnerCommand({
     command: "Build a private operations dashboard",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     useAiWorker: true,
     aiWorkerReadiness: {
       ready: true,
@@ -204,7 +204,7 @@ test("builder completion never bypasses a separate external-action approval gate
   const root = tempWorkspace();
   const result = await submitOwnerCommand({
     command: "Build and deploy a private operations dashboard to production",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     useAiWorker: true,
     aiWorkerReadiness: {
       ready: true,
@@ -244,7 +244,7 @@ test("concurrent paid calls cannot consume the same approval before its usage au
   };
   const first = submitOwnerCommand({
     command: "Build a private operations dashboard",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     useAiWorker: true,
     aiWorkerReadiness: readiness,
     workProductProvider: async () => {
@@ -256,7 +256,7 @@ test("concurrent paid calls cannot consume the same approval before its usage au
   });
   await assert.rejects(() => submitOwnerCommand({
     command: "Build another private operations dashboard",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     useAiWorker: true,
     aiWorkerReadiness: readiness,
     workProductProvider: async () => ({ workProduct: safeWorkProduct(), model: "claude-sonnet-5", usage: {} }),

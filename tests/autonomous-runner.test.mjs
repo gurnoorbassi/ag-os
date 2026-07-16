@@ -22,7 +22,7 @@ test("autonomous runner completes safe owner-console work with quality and lesso
   const workspace = tempWorkspace();
   const command = await submitOwnerCommand({
     command: "Create a professional dashboard for internal operations",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     root: workspace,
     now: new Date("2026-07-13T13:00:00.000Z")
   });
@@ -48,7 +48,7 @@ test("autonomous runner pauses gated work without executing it", async () => {
   const workspace = tempWorkspace();
   const command = await submitOwnerCommand({
     command: "Deploy the dashboard to production",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     root: workspace,
     now: new Date("2026-07-13T14:00:00.000Z")
   });
@@ -64,7 +64,7 @@ test("dashboard refresh failure never corrupts a correctly paused job and retrie
   const workspace = tempWorkspace();
   const command = await submitOwnerCommand({
     command: "Deploy the dashboard to production",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     root: workspace,
     now: new Date("2026-07-13T15:00:00.000Z")
   });

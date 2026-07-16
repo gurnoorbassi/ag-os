@@ -31,8 +31,9 @@ test("owner commands require non-empty bounded input", () => {
 });
 
 test("explicit project targeting accepts registered projects and rejects unknown ids", () => {
+  assert.throws(() => assertRegisteredProject({ root }), /choose a project/);
   assert.doesNotThrow(() => assertRegisteredProject({
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     root
   }));
   assert.throws(() => assertRegisteredProject({
@@ -45,7 +46,7 @@ test("authenticated command service creates a complete gated work package", asyn
   const workspace = tempWorkspace();
   const result = await submitOwnerCommand({
     command: "Build a dashboard for my internal operations",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     root: workspace,
     now: new Date("2026-07-11T12:00:00.000Z")
   });
@@ -58,7 +59,7 @@ test("authenticated command service creates a complete gated work package", asyn
   }
 
   const plan = JSON.parse(readFileSync(path.join(workspace, `.codex/plans/${result.planId}.json`), "utf8"));
-  assert.equal(plan.projectId, "project-ag-os-coordinator-runtime");
+  assert.equal(plan.projectId, "project-quote-builder");
   assert.equal(plan.safety.executionAuthorized, false);
   assert.ok(plan.approvalGates.some((gate) => gate.gateId === "approval-preview-or-production-deploy"));
 });
@@ -67,6 +68,7 @@ test("authenticated command service uses an approved AI plan and audits cost wit
   const workspace = tempWorkspace();
   const result = await submitOwnerCommand({
     command: "Build a dashboard for my internal operations",
+    projectId: "project-quote-builder",
     useAiPlanner: true,
     aiPlannerReadiness: {
       ready: true,

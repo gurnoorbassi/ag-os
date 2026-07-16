@@ -67,7 +67,8 @@ function projectRecord(entry) {
     sensitivity,
     owner: project.owner,
     recordPath: entry.recordPath,
-    boundary: projectBoundary(project)
+    boundary: projectBoundary(project),
+    ownerWorkspace: project.ownerWorkspace ?? null
   };
 }
 
@@ -1095,19 +1096,20 @@ export function collectDashboardData() {
   const securityPolicy = readJson(".codex/security/policy.json");
 
   const projects = projectRegistry.projects.map(projectRecord);
-  const leadGen = projects.find((project) => project.id === "project-lead-generation-system");
-  const aiReceptionist = projects.find((project) => project.id === "project-ag-digitalz-ai-receptionist");
-  const socialMedia = projects.find((project) => project.id === "project-social-media-management-system-v1");
-
-  if (!leadGen) {
-    throw new Error("Dashboard data missing Lead Generation System project record.");
-  }
-  if (!aiReceptionist) {
-    throw new Error("Dashboard data missing AG Digitalz AI Receptionist project record.");
-  }
-  if (!socialMedia) {
-    throw new Error("Dashboard data missing Social Media Management System v1 project record.");
-  }
+  // Historical project records still feed evidence read models, but they are no
+  // longer owner workspaces. Only the active registry is rendered as projects.
+  const leadGen = projectRecord({
+    recordPath: ".codex/projects/lead-generation-system.json",
+    riskLevel: "high"
+  });
+  const aiReceptionist = projectRecord({
+    recordPath: ".codex/projects/ag-digitalz-ai-receptionist.json",
+    riskLevel: "medium"
+  });
+  const socialMedia = projectRecord({
+    recordPath: ".codex/projects/social-media-management-system-v1.json",
+    riskLevel: "medium"
+  });
 
   const connectorExecutions = collectConnectorExecutions();
   const netlifyRecords = connectorExecutions
@@ -1248,20 +1250,7 @@ export function collectDashboardData() {
       status: projectRegistry.status,
       count: projectRegistry.projects.length,
       source: ".codex/projects/registry.json",
-      projects: [
-        {
-          id: "project-ag-os",
-          name: "AG OS",
-          status: "active",
-          managementMode: "core_operating_system",
-          projectType: "operating_system",
-          riskLevel: "medium",
-          owner: "owner-gurnoor-bassi",
-          recordPath: "README.md",
-          boundary: "Canonical AG OS source-of-truth repository and dashboard/control-plane records."
-        },
-        ...projects
-      ]
+      projects
     },
     leadGenerationSystem: leadGen,
     aiReceptionist,

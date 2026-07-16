@@ -129,7 +129,7 @@ test("live coordinator supports remembered password login and recovery-token fal
   assert.equal(sessionStatus.status, 200);
   assert.equal((await sessionStatus.json()).authentication.method, "password_session");
 
-  const csrfBlocked = await fetch(`${baseUrl}/api/v1/projects`, {
+  const csrfBlocked = await fetch(`${baseUrl}/api/v1/commands`, {
     method: "POST",
     headers: { cookie, "content-type": "application/json" },
     body: "{}"

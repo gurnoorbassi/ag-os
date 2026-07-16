@@ -1,70 +1,30 @@
-# Project Registry
+# Owner Project Registry
 
 ## Purpose
 
-The Project Registry is the source-controlled index of AG Digitalz OS project records. It exists so future projects can be discovered, reviewed, and validated without connecting to live services.
+The active registry is the owner-facing list of real products AG OS can target. It is not a list of AG OS internals, historical proofs, staging packages, or every repository ever observed.
 
-## Current Status
+The source of truth is `.codex/projects/registry.json`, validated against `schemas/project-registry.schema.json`. Each active entry points to a structured project record validated against `schemas/project.schema.json`.
 
-The registry is active. It contains production-clean project records approved through scoped PRs.
+## Active owner projects
 
-Current registry file:
+| Project | Live application | Source control | Record |
+| --- | --- | --- | --- |
+| Quote Builder | `https://foreman-quote-studio.netlify.app/` | Setup needed: structured local application, no isolated repository/remote | `.codex/projects/quote-builder.json` |
+| AI Lead Command Center | `https://app.agdigitalz.net/` | Setup needed: live VPS application, no canonical Git remote attached to deployed source | `.codex/projects/ai-lead-command-center.json` |
 
-```text
-.codex/projects/registry.json
-```
+These are the only active owner projects. AG OS core, Lead Generation System, AI Receptionist, and Social Media Management records remain historical evidence, not selectable owner workspaces.
 
-Current schema:
+## Owner workspace rules
 
-```text
-schemas/project-registry.schema.json
-```
+- A project must be real, structured, and explicitly registered.
+- The Command screen requires the owner to choose a project; AG OS does not guess.
+- The Projects screen must expose a working full-app link and a project-targeted command control.
+- A live app may open in a new tab when its security policy blocks embedding. AG OS must not weaken `frame-ancestors` or `X-Frame-Options` to simulate an inline preview.
+- Source-control status must be honest. `setup_needed` blocks repository and deployment automation until a canonical source is connected.
+- Historical records may continue to support audits and read models without appearing as active owner projects.
+- Credentials, customer or production data, deployments, messaging, paid actions, DNS, and other permanent live-action gates still require their exact approvals.
 
-## Registry Rules
+## Adding another project
 
-The registry must stay production-clean:
-
-- No example project records
-- No fake project records
-- No demo project records
-- No customer records
-- No product records until explicitly approved in a scoped PR
-- No lead generation records until explicitly approved in a scoped PR
-- No AI receptionist records until explicitly approved in a scoped PR
-- No credentials
-- No live service connection details
-- No deployment instructions
-
-## Registered Projects
-
-Current registered projects:
-
-| Project ID | Name | Status | Management Mode | Record |
-| --- | --- | --- | --- | --- |
-| `project-lead-generation-system` | Lead Generation System | `complete` | `observe_only` | `.codex/projects/lead-generation-system.json` |
-| `project-ag-digitalz-ai-receptionist` | AG Digitalz AI Receptionist | `active` | `active_build` | `.codex/projects/ag-digitalz-ai-receptionist.json` |
-| `project-social-media-management-system-v1` | Social Media Management System v1 | `active` | `managed_staging` | `.codex/projects/social-media-management-system-v1.json` |
-
-The Lead Generation System record is observe-only. AG OS must not touch source code, VPS, Postgres, n8n workflows, domain or DNS, deployments, credentials, production data, or customer data.
-
-The AG Digitalz AI Receptionist record marks it as a separate product project, not AG OS core. AG OS must not infer live service status beyond known repository records.
-
-The Social Media Management System v1 record reflects owner acceptance of the H2 staged product and operating package. It remains draft/staging only: acceptance does not authorize OAuth, posting, scheduling, analytics, DMs/comments, n8n activation, credentials, paid tools, production deployment, domain/DNS, or production/customer data.
-
-## Adding A Future Project
-
-A future project registry change must be its own reviewed PR unless a later operating rule explicitly allows a larger scoped PR.
-
-Before a project can be added:
-
-1. Create or update the project record under `.codex/projects/`.
-2. Validate the project record against `schemas/project.schema.json`.
-3. Add the project to `.codex/projects/registry.json`.
-4. Run `npm run validate`.
-5. Include approval context in the PR body when the project touches production-sensitive systems.
-
-Protected product projects such as Lead Gen and AI Receptionist must follow `docs/product-project-policy.md`.
-
-## Foundation Lock
-
-While `status` is `foundation`, validation requires `projects` to stay empty. When `status` is `active`, validation requires each project entry to point to an existing project record that validates against `schemas/project.schema.json`.
+There is no generic dashboard project-creation control. A third project requires a reviewed source change that provides its real structure, live-access posture, source-control state, boundaries, quality gates, and owner workspace metadata.

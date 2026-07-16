@@ -43,7 +43,7 @@ test("registered local worker creates a real work product before product scoring
   const workspace = tempWorkspace();
   const command = await submitOwnerCommand({
     command: "Create a professional internal operations dashboard for AG OS",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     root: workspace,
     now: new Date("2026-07-13T23:10:00.000Z")
   });
@@ -67,7 +67,7 @@ test("exact owner approval requeues one job but an unavailable live adapter rema
   const workspace = tempWorkspace();
   const command = await submitOwnerCommand({
     command: "Deploy the AG OS dashboard to production",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     root: workspace,
     now: new Date("2026-07-13T23:20:00.000Z")
   });
@@ -128,7 +128,7 @@ test("owner can immediately revoke an exact queued adapter approval", async () =
   const workspace = tempWorkspace();
   const command = await submitOwnerCommand({
     command: "Deploy the AG OS dashboard to production",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     root: workspace,
     now: new Date("2026-07-13T23:24:00.000Z")
   });
@@ -155,7 +155,7 @@ test("owner can immediately revoke an exact queued adapter approval", async () =
 
 test("GitHub adapter secret-scans an isolated work product and creates only a codex branch plus draft PR", async () => {
   const workspace = tempWorkspace();
-  const sourceDirectory = ".codex/workspaces/project-ag-os-coordinator-runtime/job-source/deliverables";
+  const sourceDirectory = ".codex/workspaces/project-quote-builder/job-source/deliverables";
   mkdirSync(path.join(workspace, sourceDirectory), { recursive: true });
   writeFileSync(path.join(workspace, sourceDirectory, "WORK_PRODUCT.md"), "# Complete work product\n", "utf8");
   writeFileSync(path.join(workspace, sourceDirectory, "app.js"), "export const ready = true;\n", "utf8");
@@ -195,7 +195,7 @@ test("GitHub adapter secret-scans an isolated work product and creates only a co
   });
   const job = {
     jobId: "job-github-runtime-proof",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     riskLevel: "R3"
   };
   const approval = {
@@ -260,7 +260,7 @@ test("GitHub adapter secret-scans an isolated work product and creates only a co
 
 test("GitHub job resumes after exact owner approval and closes completion evidence", async () => {
   const workspace = tempWorkspace();
-  const sourceDirectory = ".codex/workspaces/project-ag-os-coordinator-runtime/job-pr-source/deliverables";
+  const sourceDirectory = ".codex/workspaces/project-quote-builder/job-pr-source/deliverables";
   mkdirSync(path.join(workspace, sourceDirectory), { recursive: true });
   writeFileSync(path.join(workspace, sourceDirectory, "WORK_PRODUCT.md"), "# Reviewed source candidate\n", "utf8");
   writeFileSync(path.join(workspace, sourceDirectory, "README.md"), "# AG OS candidate\n", "utf8");
@@ -276,7 +276,7 @@ test("GitHub job resumes after exact owner approval and closes completion eviden
   };
   const command = await submitOwnerCommand({
     command: "Open a GitHub draft PR for the completed dashboard work product",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     executionRequest,
     root: workspace,
     now: new Date("2026-07-13T23:35:00.000Z")
@@ -338,7 +338,7 @@ test("n8n adapter creates and verifies only an exact disabled credential-free wo
   assert.match(validated.workflowDigest, /^[a-f0-9]{64}$/);
   const command = await submitOwnerCommand({
     command: "Create this disabled n8n workflow draft",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     executionRequest,
     root: workspace,
     now: new Date("2026-07-14T01:00:00.000Z")
@@ -371,7 +371,7 @@ test("n8n adapter creates and verifies only an exact disabled credential-free wo
 
 test("Netlify adapter deploys an exact secret-scanned draft preview without production publish", async () => {
   const workspace = tempWorkspace();
-  const sourceDirectory = ".codex/workspaces/project-ag-os-coordinator-runtime/netlify-preview/deliverables";
+  const sourceDirectory = ".codex/workspaces/project-quote-builder/netlify-preview/deliverables";
   mkdirSync(path.join(workspace, sourceDirectory), { recursive: true });
   writeFileSync(path.join(workspace, sourceDirectory, "WORK_PRODUCT.md"), "# Private completion evidence\n", "utf8");
   writeFileSync(path.join(workspace, sourceDirectory, "index.html"), "<!doctype html><title>Preview</title>\n", "utf8");
@@ -388,7 +388,7 @@ test("Netlify adapter deploys an exact secret-scanned draft preview without prod
   assert.equal(validated.source.files.some((file) => file.path === "WORK_PRODUCT.md"), false);
   const command = await submitOwnerCommand({
     command: "Create a Netlify staging preview deploy for the dashboard",
-    projectId: "project-ag-os-coordinator-runtime",
+    projectId: "project-quote-builder",
     executionRequest,
     root: workspace,
     now: new Date("2026-07-14T01:10:00.000Z")

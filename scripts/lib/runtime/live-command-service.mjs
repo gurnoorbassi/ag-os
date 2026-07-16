@@ -47,7 +47,7 @@ export function assertOwnerCommand(command) {
 
 export function assertRegisteredProject({ projectId, root = process.cwd() }) {
   if (!projectId) {
-    return;
+    throw new Error("choose a project before starting work");
   }
   const registry = JSON.parse(readFileSync(path.join(root, ".codex/projects/registry.json"), "utf8"));
   if (!(registry.projects ?? []).some((project) => project.projectId === projectId)) {
