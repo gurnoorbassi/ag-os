@@ -2,7 +2,7 @@
   "$schema": "../../schemas/watchdog-policy.schema.json",
   "policyVersion": 1,
   "policyType": "watchdog-os-policy",
-  "status": "foundation",
+  "status": "active",
   "defaults": {
     "monitoringEnabled": false,
     "liveChecksAllowed": false,
@@ -39,5 +39,5 @@
     "mutate_external_systems",
     "trigger_paid_monitoring"
   ],
-  "notes": "Foundation policy only. Watchdog checks are documented but disabled by default; no live monitoring, scraping, pings, notifications, paid monitoring, or mutations are authorized."
+  "notes": "The built-in internal watchdog is implemented and enabled by the private coordinator deployment configuration. Source defaults remain fail-closed: no external monitoring, production pings, scraping, notifications, paid monitoring, or mutations are authorized."
 }

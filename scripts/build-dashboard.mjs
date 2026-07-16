@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { listDirectJson, readJson } from "./lib/runtime/common.mjs";
 import { computeOperationalMetrics } from "./lib/runtime/metrics-processor.mjs";
 import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
+import { summarizeSafeMergeRuntime } from "./lib/runtime/safe-merge-runtime.mjs";
 
 const root = process.cwd();
 
@@ -115,6 +116,7 @@ function summarizeCapability(capability) {
     status: capability.status,
     riskTier: capability.riskTier,
     approvalRequired: capability.approvalRequired,
+    approvalRequirement: capability.approvalRequired ? "Exact owner approval required" : "Available for local safe work",
     lastProvenDate: capability.lastProvenDate,
     proofRecords: capability.proofRecords ?? [],
     blockedCapabilities: capability.blockedCapabilities ?? [],
@@ -674,10 +676,10 @@ function collectOperatingSystemStatuses(unifiedMemory) {
   return {
     "cost-os": { status: "operational" },
     "watchdog-os": {
-      status: "setup_needed",
-      metric: "Manual checks",
-      working: ["Health endpoint", "Boot and validator checks", "Dashboard-visible failures"],
-      remaining: ["Deploy a scoped recurring health monitor with alert routing"]
+      status: "configured",
+      metric: "Built-in 60-second checks",
+      working: ["Health and boot readiness", "Action and budget monitoring", "Local watchdog evidence"],
+      remaining: ["Sign in to confirm the current private-runtime heartbeat"]
     },
     "memory-os": { status: unifiedMemory.candidateCount > 0 ? "operational_attention" : "operational" },
     "quality-os": { status: completionProofCount === policyEraCompletedJobs.length ? "operational" : "operational_attention" },
@@ -694,6 +696,14 @@ function collectSkills() {
         name: record.name,
         status: record.status,
         category: record.category,
+        appliesTo: record.appliesTo ?? [],
+        procedure: record.procedure ?? [],
+        qualityChecklist: record.qualityChecklist ?? [],
+        commonFailures: record.commonFailures ?? [],
+        proofRecordCount: record.evidence?.proofRecords?.length ?? 0,
+        timesApplied: record.evidence?.timesApplied ?? 0,
+        lastAppliedDate: record.evidence?.lastAppliedDate ?? null,
+        riskNotes: record.riskNotes ?? "Procedural guidance only; never a permission grant.",
         recordPath
       };
     });
@@ -1129,6 +1139,7 @@ export function collectDashboardData() {
   const runtimeOperatingSystems = collectOperatingSystemStatuses(unifiedMemory);
   const costReadModel = collectCosts(costBudget);
   const operationalMetrics = computeOperationalMetrics({ root });
+  const safeMergeRuntime = summarizeSafeMergeRuntime({ root });
   const skills = collectSkills();
   const clientManagement = collectClientManagement();
   const firstClientReadiness = collectFirstClientReadiness(clientManagement);
@@ -1363,6 +1374,9 @@ export function collectDashboardData() {
     commandRegistry: {
       status: commandRegistry.status,
       categoryCount: commandRegistry.categories.length,
+      localCategories: commandRegistry.categories
+        .filter((category) => !category.requiresOwnerApproval)
+        .map((category) => `${category.id}: ${category.executionMode}`),
       gatedCategories: commandRegistry.categories
         .filter((category) => category.requiresOwnerApproval)
         .map((category) => `${category.id}: approval-gated`)
@@ -1382,6 +1396,10 @@ export function collectDashboardData() {
       allowedTypes: capabilityRegistry.allowedCapabilityTypes.map(capabilityTypeLabel),
       proven: capabilities.filter((capability) => capability.status === "proven"),
       provenCount: capabilities.filter((capability) => capability.status === "proven").length,
+      availableNow: capabilities.filter((capability) => capability.status === "proven" && !capability.approvalRequired),
+      availableNowCount: capabilities.filter((capability) => capability.status === "proven" && !capability.approvalRequired).length,
+      approvalGated: capabilities.filter((capability) => capability.status === "proven" && capability.approvalRequired),
+      approvalGatedCount: capabilities.filter((capability) => capability.status === "proven" && capability.approvalRequired).length,
       draftOnly: capabilities.filter(isDraftOnlyCapability),
       draftOnlyCount: capabilities.filter(isDraftOnlyCapability).length,
       blocked: unique(capabilities.flatMap((capability) => capability.blockedCapabilities)),
@@ -1443,10 +1461,12 @@ export function collectDashboardData() {
     metrics: operationalMetrics,
     skills,
     safeMerge: {
-      status: "conditional",
-      mode: "Policy-gated",
-      summary: "Allowed only after CI, local validation, safety review, clear scope, and no blocked risk conditions.",
-      sources: ["docs/safe-merge-policy.md", "docs/action-matrix.md"],
+      ...safeMergeRuntime,
+      mode: "Gate checker",
+      summary: safeMergeRuntime.candidateCount === 0
+        ? "Safe Merge is operational and waiting for a real PR candidate. It never merges by itself."
+        : `${safeMergeRuntime.readyCount} ready, ${safeMergeRuntime.blockedCount} blocked, ${safeMergeRuntime.invalidCount} invalid candidate record(s).`,
+      sources: ["scripts/check-safe-merge.mjs", "scripts/lib/runtime/safe-merge-runtime.mjs", "docs/safe-merge-policy.md", "docs/action-matrix.md"],
       requiredChecks: [
         "GitHub CI succeeds",
         "npm.cmd run validate passes",

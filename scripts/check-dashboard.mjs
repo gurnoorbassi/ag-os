@@ -190,7 +190,22 @@ if (data.capabilityRegistry.provenCount < 1) {
   fail("dashboard control center must show proven capabilities");
 }
 if (data.capabilityRegistry.blockedCount < 1) {
-  fail("dashboard control center must show blocked capabilities");
+  fail("dashboard control center must show protected capability boundaries");
+}
+if (data.capabilityRegistry.availableNowCount + data.capabilityRegistry.approvalGatedCount !== data.capabilityRegistry.provenCount) {
+  fail("dashboard must classify every proven capability as available now or approval-gated");
+}
+if (data.commandRegistry.status !== "active" || data.commandRegistry.localCategories.length < 1) {
+  fail("dashboard must show the active command router and its local-safe categories");
+}
+if (data.skills.activeCount < 1 || data.skills.skills.some((skill) => !skill.procedure.length || !skill.qualityChecklist.length)) {
+  fail("dashboard must expose active skills with their procedures and quality checklists");
+}
+if (data.watchdog.status !== "configured" || !data.watchdog.monitoring.includes("60-second")) {
+  fail("dashboard must show the configured built-in watchdog without fabricating a live heartbeat");
+}
+if (data.safeMerge.mergeExecuted !== false || data.safeMerge.invalidCount !== 0) {
+  fail("safe merge dashboard state must be valid and must never claim that the checker executed a merge");
 }
 // --- Growth-safe invariants --------------------------------------------
 // These checks verify correctness rules that stay true as the business

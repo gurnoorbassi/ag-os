@@ -22,6 +22,7 @@ function statusClass(value) {
   if (normalized.includes("operational attention")) return "status-owner-action";
   if (normalized.includes("operational_attention")) return "status-owner-action";
   if (normalized.includes("operational")) return "status-active";
+  if (normalized.includes("configured")) return "status-active";
   if (normalized.includes("recommended")) return "status-active";
   if (normalized.includes("possible duplicate")) return "status-owner-action";
   if (normalized.includes("possible_duplicate")) return "status-owner-action";
@@ -721,14 +722,14 @@ function renderRegistries() {
       title: "Command Registry",
       status: data.commandRegistry.status,
       metric: `${data.commandRegistry.categoryCount} categories`,
-      detail: "Execution categories and approval posture",
-      meta: data.commandRegistry.gatedCategories
+      detail: `${data.commandRegistry.localCategories.length} local-safe routes; ${data.commandRegistry.gatedCategories.length} exact-approval routes`,
+      meta: [...data.commandRegistry.localCategories, ...data.commandRegistry.gatedCategories].slice(0, 8)
     }),
     card({
       title: "Capability Registry",
       status: data.capabilityRegistry.status,
       metric: `${data.capabilityRegistry.count} registered`,
-      detail: `${data.capabilityRegistry.provenCount} proven, ${data.capabilityRegistry.blockedCount} blocked areas tracked`,
+      detail: `${data.capabilityRegistry.availableNowCount} available now; ${data.capabilityRegistry.approvalGatedCount} available with approval`,
       meta: data.capabilityRegistry.allowedTypes
     })
   );
@@ -751,7 +752,7 @@ function renderOperatingSystems(systems = runtimeOperatingSystems) {
   const root = clear("#os-grid");
   const fallback = [
     { id: "cost-os", name: "Cost OS", status: "offline evidence", metric: data.costOs.monthlyMax, summary: "Sign in for live runtime status.", working: [data.costOs.dailyMax, data.costOs.perTaskMax, data.costOs.paidTools], remaining: [] },
-    { id: "watchdog-os", name: "Watchdog OS", status: "setup_needed", metric: "Manual checks", summary: "Recurring monitoring is not active.", working: ["Local health and validation checks"], remaining: ["Recurring health monitor"] },
+    { id: "watchdog-os", name: "Watchdog OS", status: data.watchdog.status, metric: data.watchdog.monitoring, summary: "Built-in private runtime monitoring is configured; sign in for the current heartbeat.", working: data.watchdog.plannedChecks, remaining: [] },
     { id: "memory-os", name: "Memory OS", status: "offline evidence", metric: `${data.memoryOs.shortTermDays} days`, summary: "Sign in for the active lesson queue.", working: data.memoryOs.rules, remaining: [] },
     { id: "quality-os", name: "Quality OS", status: "offline evidence", metric: `${data.qualityReview.qualityScoreCount} scores`, summary: "Sign in for completion-proof coverage.", working: data.qualityOs.rules, remaining: [] },
     { id: "security-os", name: "Security OS", status: "protected", metric: "Fail closed", summary: "Credentials and external actions remain approval-gated.", working: data.securityOs.rules, remaining: [] }
@@ -772,21 +773,31 @@ function renderOperatingSystems(systems = runtimeOperatingSystems) {
 
 function renderCapabilities() {
   const root = clear("#capabilities-panel");
-  const proven = table(
-    ["Capability", "Status", "Risk", "Last proven", "Proof records"],
-    data.capabilityRegistry.proven.map((capability) => [
+  const availableNow = table(
+    ["Available now", "Status", "Risk", "Last proven", "Proof records"],
+    data.capabilityRegistry.availableNow.map((capability) => [
       labelStack(capability.name, capability.id),
-      pill(capability.status),
+      pill("available now"),
       capability.riskTier,
       capability.lastProvenDate,
       `${capability.proofRecords.length} record(s)`
     ])
   );
-  const blocked = card({
-    title: "Blocked Capabilities",
-    status: "blocked",
+  const approvalGated = table(
+    ["Available with approval", "Status", "Risk", "Last proven", "Proof records"],
+    data.capabilityRegistry.approvalGated.map((capability) => [
+      labelStack(capability.name, capability.id),
+      pill("approval gated"),
+      capability.riskTier,
+      capability.lastProvenDate,
+      `${capability.proofRecords.length} record(s)`
+    ])
+  );
+  const protectedBoundaries = card({
+    title: "Protected Boundaries",
+    status: "protected",
     metric: `${data.capabilityRegistry.blockedCount} tracked`,
-    detail: "These remain unproven or owner-gated.",
+    detail: "These are intentional Constitution gates, not broken features.",
     meta: data.capabilityRegistry.blocked.slice(0, 12)
   });
   const draftOnly = card({
@@ -796,7 +807,7 @@ function renderCapabilities() {
     detail: "Draft, candidate, or advisory outputs do not grant permission.",
     meta: data.capabilityRegistry.draftOnly.map((capability) => capability.name)
   });
-  root.append(proven, blocked, draftOnly);
+  root.append(availableNow, approvalGated, protectedBoundaries, draftOnly);
 }
 
 function renderClientManagement() {
@@ -1340,17 +1351,44 @@ function renderCosts() {
   );
 }
 
+function openSkill(skill) {
+  const shell = document.createElement("div");
+  shell.className = "workspace-stack";
+  const summary = document.createElement("p");
+  summary.textContent = `${skill.category} procedure applied ${skill.timesApplied} time(s); last applied ${skill.lastAppliedDate || "not recorded"}.`;
+  shell.append(
+    summary,
+    sectionBlock("Procedure", itemList(skill.procedure)),
+    sectionBlock("Quality checklist", itemList(skill.qualityChecklist)),
+    sectionBlock("Common failures", itemList(skill.commonFailures)),
+    sectionBlock("Permission boundary", itemList([skill.riskNotes, "Skills guide execution but never grant permission."])),
+    sectionBlock("Source record", itemList([skill.recordPath]))
+  );
+  openWorkspaceDialog({ eyebrow: "Active skill", title: skill.name, content: shell });
+}
+
 function renderSkills() {
   const root = clear("#skills-panel");
   root.append(
     card({
       title: "Skills Library",
-      status: data.skills.skillsGrantPermission ? "blocked" : "draft",
-      metric: `${data.skills.draftCount} draft`,
-      detail: `${data.skills.activeCount} active; skillsGrantPermission is ${data.skills.skillsGrantPermission}`,
-      meta: data.skills.skills.map((skill) => `${skill.name}: ${skill.status}`)
+      status: data.skills.activeCount > 0 ? "active" : "zero",
+      metric: `${data.skills.activeCount} active`,
+      detail: `${data.skills.draftCount} draft; procedural guidance never grants permission`,
+      meta: ["Open a skill to see its procedure, checklist, proof, and safety boundary."]
     })
   );
+  data.skills.skills.forEach((skill) => {
+    root.append(card({
+      title: skill.name,
+      status: skill.status,
+      metric: `${skill.timesApplied} applications`,
+      detail: `${skill.proofRecordCount} proof record(s); ${skill.category}`,
+      meta: [skill.riskNotes],
+      onActivate: () => openSkill(skill),
+      actionLabel: "Open skill"
+    }));
+  });
 }
 
 function renderMetrics() {
@@ -1401,10 +1439,6 @@ function renderMetrics() {
 
 function renderSafeMerge() {
   const root = clear("#safe-merge-panel");
-  const heading = document.createElement("h3");
-  heading.textContent = `${data.safeMerge.mode}: ${data.safeMerge.status}`;
-  const summary = document.createElement("p");
-  summary.textContent = data.safeMerge.summary;
   const checks = document.createElement("ul");
   checks.className = "policy-checks";
   data.safeMerge.requiredChecks.forEach((item) => {
@@ -1412,7 +1446,31 @@ function renderSafeMerge() {
     li.textContent = item;
     checks.append(li);
   });
-  root.append(heading, summary, checks);
+  root.append(
+    card({
+      title: "Safe Merge gate checker",
+      status: data.safeMerge.status,
+      metric: `${data.safeMerge.candidateCount} candidates`,
+      detail: data.safeMerge.summary,
+      meta: [
+        `${data.safeMerge.readyCount} ready`,
+        `${data.safeMerge.blockedCount} blocked`,
+        `${data.safeMerge.invalidCount} invalid`,
+        `Merge executed: ${data.safeMerge.mergeExecuted}`
+      ]
+    }),
+    sectionBlock("Required checks", checks),
+    table(
+      ["Candidate", "Status", "PR", "Commit", "Reason"],
+      data.safeMerge.candidates.map((candidate) => [
+        candidate.safeMergeRuntimeId,
+        pill(candidate.status),
+        candidate.prNumber,
+        candidate.commitSha,
+        candidate.blockingReasons.join("; ") || "All gates passed"
+      ])
+    )
+  );
 }
 
 function coordinatorBaseUrl() {
