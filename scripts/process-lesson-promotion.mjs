@@ -151,10 +151,41 @@ export function detectLessonConflicts({ candidatePath, candidate, root = process
   return conflicts;
 }
 
-function assertOwnerApproval({ approvalId, approvedBy, evidence }) {
+export function assertOwnerApproval({ approvalId, approvedBy, evidence, candidateLessonId, root = process.cwd(), now = new Date() }) {
   if (!approvalId || !approvedBy || !Array.isArray(evidence) || evidence.length === 0) {
     throw new Error("owner approval is required before promoting a lesson candidate");
   }
+  const approvalPath = path.join(root, ".codex", "approvals", `${approvalId}.json`);
+  if (!existsSync(approvalPath)) throw new Error(`owner approval record does not exist: ${approvalId}`);
+  const approval = readJsonFromPath(approvalPath, root);
+  if (approval.approvalId !== approvalId) throw new Error("owner approval record ID does not match the requested approval");
+  if (approval.status !== "approved") throw new Error("owner approval is not active");
+  const expiresAt = Date.parse(approval.expiresAt);
+  if (!Number.isFinite(expiresAt) || expiresAt <= now.getTime()) throw new Error("owner approval is expired or has an invalid expiration");
+  if (approval.approvedBy !== approvedBy || approval.ownerId !== approvedBy) throw new Error("owner approval identity does not match the promotion request");
+  const ownerPath = path.join(root, ".codex", "owners", `${approvedBy}.json`);
+  if (!existsSync(ownerPath)) throw new Error(`approved owner record does not exist: ${approvedBy}`);
+  const owner = readJsonFromPath(ownerPath, root);
+  if (owner.id !== approvedBy || owner.status !== "active" || owner.authorityLevel !== "final") {
+    throw new Error("approvedBy must match the active final owner record");
+  }
+  if (!approval.approvalRequiredFor?.includes("lesson_promotion") || !approval.approvedActions?.includes("promote_named_lesson")) {
+    throw new Error("owner approval does not authorize lesson promotion");
+  }
+  const approvalScope = [approval.requestedAction, approval.target, approval.scope, approval.approvalText].filter(Boolean).join(" ");
+  if (!candidateLessonId || !approvalScope.includes(candidateLessonId)) {
+    throw new Error("owner approval does not name this lesson candidate");
+  }
+  if (!approval.evidence?.some((item) => item?.verified === true)) throw new Error("owner approval has no verified evidence");
+  for (const evidencePath of evidence) {
+    if (typeof evidencePath !== "string" || !evidencePath.trim()) throw new Error("lesson promotion evidence paths must be non-empty strings");
+    const absoluteEvidence = path.resolve(root, evidencePath);
+    const relativeEvidence = path.relative(root, absoluteEvidence);
+    if (relativeEvidence.startsWith("..") || path.isAbsolute(relativeEvidence) || !existsSync(absoluteEvidence)) {
+      throw new Error(`lesson promotion evidence path does not exist inside AG OS: ${evidencePath}`);
+    }
+  }
+  return approval;
 }
 
 export function promoteLessonCandidate({
@@ -169,12 +200,11 @@ export function promoteLessonCandidate({
   if (!candidatePath) {
     throw new Error("candidatePath is required");
   }
-  assertOwnerApproval({ approvalId, approvedBy, evidence });
-
   const candidate = readJsonFromPath(candidatePath, root);
   if (candidate.status !== "candidate") {
     throw new Error("only candidate lessons can be promoted");
   }
+  assertOwnerApproval({ approvalId, approvedBy, evidence, candidateLessonId: candidate.lessonId, root, now });
 
   const conflicts = detectLessonConflicts({ candidatePath, candidate, root, now });
   if (conflicts.length > 0) {

@@ -16,6 +16,10 @@ Every promotion requires:
 - safety scan
 - reviewed PR before source-of-truth merge
 
+The processor must verify the claim mechanically before writing accepted memory. The named approval record must exist in the active approval directory, remain `approved` and unexpired, identify the active final owner, authorize `lesson_promotion` and `promote_named_lesson`, and name the exact lesson. Every promotion evidence path must resolve to an existing file inside the AG OS workspace.
+
+An authenticated control-center promotion creates an exact single-use approval lock and audit record, performs the promotion against that record, and immediately archives the consumed approval as expired so it cannot be reused. Supplying approval-like strings on the CLI is never sufficient.
+
 Promotion creates an accepted lesson record under `.codex/memory/accepted/`.
 
 ## Rejection Requirements

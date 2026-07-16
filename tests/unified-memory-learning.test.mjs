@@ -58,6 +58,44 @@ function baseLesson(overrides = {}) {
   };
 }
 
+function writePromotionApproval(root, { lessonId, approvalId, evidencePath, expiresAt = "2026-07-07T19:30:00.000Z" }) {
+  writeJson(root, ".codex/owners/owner-gurnoor-bassi.json", {
+    id: "owner-gurnoor-bassi",
+    name: "Gurnoor Bassi",
+    role: "business_owner",
+    authorityLevel: "final",
+    status: "active",
+    responsibilities: ["Final owner authority."],
+    approvalScopes: ["memory"],
+    createdAt: "2026-07-06T18:00:00.000Z",
+    updatedAt: "2026-07-06T18:00:00.000Z"
+  });
+  writeJson(root, evidencePath, { id: path.basename(evidencePath, ".json"), eventType: "approval_granted" });
+  writeJson(root, `.codex/approvals/${approvalId}.json`, {
+    approvalId,
+    status: "approved",
+    approvalKind: "single_action",
+    ownerId: "owner-gurnoor-bassi",
+    requestedBy: "ag-os-test",
+    approvedBy: "owner-gurnoor-bassi",
+    commandCategory: "build",
+    requestedAction: `Promote the exact named lesson ${lessonId}.`,
+    target: `.codex/memory/lessons/candidates/${lessonId}.json`,
+    scope: `Only ${lessonId} may be promoted.`,
+    riskLevel: "R1",
+    dataClass: "internal",
+    approvalRequiredFor: ["lesson_promotion"],
+    approvedActions: ["promote_named_lesson"],
+    prohibitedActions: ["approval_bypass"],
+    revocationPath: "Owner may revoke before use.",
+    evidence: [{ type: "owner_instruction", reference: `Owner named ${lessonId}.`, verified: true }],
+    approvedAt: "2026-07-06T19:00:00.000Z",
+    expiresAt,
+    createdAt: "2026-07-06T19:00:00.000Z",
+    updatedAt: "2026-07-06T19:00:00.000Z"
+  });
+}
+
 test("accepted lesson loader excludes candidates and rejected lessons from runtime truth", () => withTempDir((root) => {
   writeJson(root, ".codex/memory/lessons/lesson-accepted.json", baseLesson({
     lessonId: "lesson-accepted",
@@ -99,12 +137,28 @@ test("lesson promotion requires owner approval and preserves candidate source ev
     /owner approval is required/
   );
 
+  const evidencePath = ".codex/audit/audit-lesson-promotion-owner-approved.json";
+  assert.throws(() => promoteLessonCandidate({
+    candidatePath,
+    root,
+    approvalId: "approval-20260706-fabricated-promotion",
+    approvedBy: "owner-gurnoor-bassi",
+    evidence: [evidencePath],
+    now: new Date("2026-07-06T19:30:00Z")
+  }), /approval record does not exist/);
+
+  writePromotionApproval(root, {
+    lessonId: "lesson-safe-candidate",
+    approvalId: "approval-20260706-promote-safe-candidate",
+    evidencePath
+  });
+
   const result = promoteLessonCandidate({
     candidatePath,
     root,
     approvalId: "approval-20260706-promote-safe-candidate",
     approvedBy: "owner-gurnoor-bassi",
-    evidence: [".codex/audit/audit-lesson-promotion-owner-approved.json"],
+    evidence: [evidencePath],
     now: new Date("2026-07-06T19:30:00Z")
   });
 
@@ -149,13 +203,20 @@ test("conflicting accepted lessons block promotion and produce conflict evidence
   assert.equal(conflicts[0].candidateLessonId, "lesson-conflicting-review");
   assert.equal(conflicts[0].existingLessonId, "lesson-static-output-review");
 
+  writePromotionApproval(root, {
+    lessonId: "lesson-conflicting-review",
+    approvalId: "approval-20260706-promote-conflicting-review",
+    evidencePath: ".codex/audit/audit-lesson-promotion-owner-approved.json"
+  });
+
   assert.throws(
     () => promoteLessonCandidate({
       candidatePath,
       root,
       approvalId: "approval-20260706-promote-conflicting-review",
       approvedBy: "owner-gurnoor-bassi",
-      evidence: [".codex/audit/audit-lesson-promotion-owner-approved.json"]
+      evidence: [".codex/audit/audit-lesson-promotion-owner-approved.json"],
+      now: new Date("2026-07-06T19:40:00Z")
     }),
     /conflicting accepted lesson/
   );

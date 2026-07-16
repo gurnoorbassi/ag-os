@@ -3,8 +3,9 @@ import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
 import { buildAuditEventRecord, writeAuditEventRecord } from "./audit-writer.mjs";
+import { buildApprovalLockRecord, writeApprovalLockWithAudit } from "./approval-lock-runtime.mjs";
+import { DEFAULT_OWNER_ID, isoTimestamp, listDirectJson, readJson, slugify, writeJson } from "./common.mjs";
 import { lessonPromotionApprovalId } from "./lesson-promotion-approval.mjs";
-import { DEFAULT_OWNER_ID, listDirectJson, readJson, slugify } from "./common.mjs";
 import { detectLessonConflicts, promoteLessonCandidate, rejectLessonCandidate } from "../../process-lesson-promotion.mjs";
 import { jobDeliverableSummary } from "./deliverable-service.mjs";
 
@@ -177,6 +178,47 @@ function removeOutput(relativePath, root) {
   if (existsSync(absolute)) unlinkSync(absolute);
 }
 
+function buildLessonDecisionApproval({ item, now }) {
+  const expiresAt = new Date(now.getTime() + 10 * 60 * 1000).toISOString();
+  return {
+    ...buildApprovalLockRecord({
+    slug: `lesson-promotion-${item.lessonId}-${isoTimestamp(now)}`,
+    requestedBy: "ag-os-control-center",
+    approvedBy: DEFAULT_OWNER_ID,
+    commandCategory: "build",
+    requestedAction: `Promote the exact named lesson ${item.lessonId} into accepted AG OS runtime memory.`,
+    target: item.recordPath,
+    scope: `Only ${item.lessonId} may be promoted from ${item.recordPath}.`,
+    riskLevel: "R1",
+    approvalRequiredFor: ["lesson_promotion"],
+    approvedActions: ["promote_named_lesson"],
+    prohibitedActions: ["live_action", "approval_bypass", "credential_handling", "deployment", "paid_action"],
+    revocationPath: "The owner may revoke this single-use lesson approval before promotion completes.",
+    evidence: [{
+      type: "owner_instruction",
+      reference: `Authenticated owner decision for ${item.lessonId} in the AG OS control center.`,
+      verified: true
+    }],
+    approvalText: `Authenticated owner approval to promote only ${item.lessonId} as advisory memory. No live-action permission is granted.`,
+    expiresAt,
+      now
+    }),
+    approvalId: lessonPromotionApprovalId(item.lessonId, now)
+  };
+}
+
+function archiveConsumedLessonApproval({ approval, root, now }) {
+  const archivePath = `.codex/approvals/archive/${approval.approvalId}.json`;
+  writeJson(archivePath, {
+    ...approval,
+    status: "expired",
+    revocationPath: `Consumed by the exact lesson promotion at ${isoTimestamp(now)}. Historical approval evidence is preserved; reuse is prohibited.`,
+    updatedAt: isoTimestamp(now)
+  }, root);
+  removeOutput(`.codex/approvals/${approval.approvalId}.json`, root);
+  return archivePath;
+}
+
 export function decideLessons({ lessonIds, decision, reason, root = process.cwd(), now = new Date() }) {
   const ids = [...new Set((Array.isArray(lessonIds) ? lessonIds : [lessonIds]).filter(Boolean))];
   if (!ids.length || ids.length > 50) throw new Error("choose between 1 and 50 lessons");
@@ -191,42 +233,44 @@ export function decideLessons({ lessonIds, decision, reason, root = process.cwd(
   try {
     for (const item of selected) {
       const actionSlug = slugify(`${decision}-${item.lessonId}-${now.toISOString()}`);
-      const approvalId = decision === "promote" ? lessonPromotionApprovalId(item.lessonId, now) : null;
+      if (decision === "promote") {
+        const approval = buildLessonDecisionApproval({ item, now });
+        const approvalResult = writeApprovalLockWithAudit({ approval, runId: actionSlug, now, root });
+        outputs.push(approvalResult.approvalPath, approvalResult.auditPath);
+        const result = promoteLessonCandidate({
+          candidatePath: item.recordPath,
+          root,
+          approvalId: approval.approvalId,
+          approvedBy: DEFAULT_OWNER_ID,
+          evidence: [item.recordPath, approvalResult.auditPath],
+          now
+        });
+        outputs.push(result.filePath);
+        const archivePath = archiveConsumedLessonApproval({ approval, root, now });
+        outputs.splice(outputs.indexOf(approvalResult.approvalPath), 1, archivePath);
+        continue;
+      }
       const audit = buildAuditEventRecord({
         runId: `lesson-${actionSlug}`,
-        eventType: decision === "promote" ? "approval_granted" : "approval_rejected",
-        summary: `Owner ${decision === "promote" ? "accepted" : "rejected"} lesson ${item.lessonId} in the authenticated control center.`,
+        eventType: "approval_rejected",
+        summary: `Owner rejected lesson ${item.lessonId} in the authenticated control center.`,
         scope: item.recordPath,
         source: "owner_instruction",
-        relatedArtifacts: [
-          ...(approvalId ? [{ type: "approval", reference: approvalId }] : []),
-          { type: "other", reference: item.recordPath }
-        ],
+        relatedArtifacts: [{ type: "other", reference: item.recordPath }],
         riskLevel: "R1",
         liveServiceTouched: false,
-        notes: decision === "promote"
-          ? "Acceptance makes the lesson advisory runtime memory. It grants no live-action permission."
-          : `Rejection reason: ${String(reason).trim()}`,
+        notes: `Rejection reason: ${String(reason).trim()}`,
         now
       });
       const auditResult = writeAuditEventRecord({ auditEvent: audit, root });
       outputs.push(auditResult.filePath);
-      const result = decision === "promote"
-        ? promoteLessonCandidate({
-            candidatePath: item.recordPath,
-            root,
-            approvalId,
-            approvedBy: DEFAULT_OWNER_ID,
-            evidence: [item.recordPath, auditResult.filePath],
-            now
-          })
-        : rejectLessonCandidate({
-            candidatePath: item.recordPath,
-            root,
-            rejectedBy: DEFAULT_OWNER_ID,
-            reason: String(reason).trim(),
-            now
-          });
+      const result = rejectLessonCandidate({
+        candidatePath: item.recordPath,
+        root,
+        rejectedBy: DEFAULT_OWNER_ID,
+        reason: String(reason).trim(),
+        now
+      });
       outputs.push(result.filePath);
     }
     refreshDashboard(root);
