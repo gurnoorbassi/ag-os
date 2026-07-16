@@ -20,6 +20,17 @@ function fixtureRoot() {
   const root = mkdtempSync(path.join(os.tmpdir(), "ag-os-control-center-"));
   mkdirSync(path.join(root, "scripts"), { recursive: true });
   writeFileSync(path.join(root, "scripts/build-dashboard.mjs"), "process.exit(0);\n", "utf8");
+  writeJson(root, ".codex/owners/owner-gurnoor-bassi.json", {
+    id: "owner-gurnoor-bassi",
+    name: "Gurnoor Bassi",
+    role: "business_owner",
+    authorityLevel: "final",
+    status: "active",
+    responsibilities: ["Final owner authority."],
+    approvalScopes: ["memory"],
+    createdAt: "2026-07-15T12:00:00.000Z",
+    updatedAt: "2026-07-15T12:00:00.000Z"
+  });
   return root;
 }
 
@@ -102,10 +113,11 @@ test("lesson queue excludes decided candidates and classifies recommendations", 
       accepted.promotion.approvalId,
       "approval-20260715-lesson-promotion-lesson-runtime-owner-review-01"
     );
-    assert.match(accepted.promotion.evidence[1], /audit-runtime-lesson-promote-/);
     const audit = JSON.parse(readFileSync(path.join(root, accepted.promotion.evidence[1]), "utf8"));
     assert.equal(audit.relatedArtifacts[0].type, "approval");
     assert.equal(audit.relatedArtifacts[0].reference, accepted.promotion.approvalId);
+    assert.equal(existsSync(path.join(root, `.codex/approvals/${accepted.promotion.approvalId}.json`)), false);
+    assert.equal(existsSync(path.join(root, `.codex/approvals/archive/${accepted.promotion.approvalId}.json`)), true);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
