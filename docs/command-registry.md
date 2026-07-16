@@ -4,7 +4,7 @@
 
 The Command Registry defines owner command categories, approval levels, execution modes, and default safety rules for AG Digitalz OS.
 
-It is a policy registry only. It does not execute commands, connect services, store credentials, deploy, send messages, activate workflows, or change domains.
+It is the active routing registry used to classify owner commands and select the allowed execution posture. Execution remains the responsibility of the coordinator and its adapters; the registry itself never grants credentials, deployment, messaging, workflow activation, or domain authority.
 
 ## Command-Driven Execution
 
@@ -26,7 +26,7 @@ schemas/command-registry.schema.json
 
 ## Command Categories
 
-The foundation registry defines these categories:
+The active registry defines these categories:
 
 - `discuss_only`
 - `plan_only`
@@ -83,4 +83,4 @@ The canonical execution decision table is `docs/action-matrix.md`.
 - High-risk categories require owner approval.
 - Production deployment, service connection, domain change, and message-sending categories are not allowed by default.
 
-This validation remains offline and does not contact live services.
+This validation remains offline and does not contact live services. Remote branch pushes and pull-request creation remain separate approval-gated actions even when the local `build` category is selected.

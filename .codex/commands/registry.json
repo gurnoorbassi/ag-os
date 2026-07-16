@@ -2,7 +2,7 @@
   "$schema": "../../schemas/command-registry.schema.json",
   "registryVersion": 1,
   "registryType": "command-registry",
-  "status": "foundation",
+  "status": "active",
   "categories": [
     {
       "id": "discuss_only",
@@ -56,7 +56,7 @@
       "allowedActions": [
         "edit_repo_files",
         "run_local_validation",
-        "create_pull_request"
+        "prepare_pull_request_package"
       ],
       "blockedActions": [
         "credentials",
@@ -64,9 +64,10 @@
         "deployments",
         "workflow_activation",
         "external_messages",
-        "domain_changes"
+        "domain_changes",
+        "unapproved_pull_request_creation"
       ],
-      "executionRule": "Keep changes local and source-controlled. Do not connect services, deploy, activate workflows, or send messages."
+      "executionRule": "Keep changes local and source-controlled. A remote branch push or pull request requires a matching scoped approval. Do not connect services, deploy, activate workflows, or send messages."
     },
     {
       "id": "deploy_staging",

@@ -5,7 +5,7 @@ import path from "node:path";
 import process from "node:process";
 import { writeAuditEventRecord } from "./audit-writer.mjs";
 import { writeBootRunRecord } from "./boot-runner-processor.mjs";
-import { writeCommandIntakeRecord } from "./command-intake-processor.mjs";
+import { routeCommandCategory, writeCommandIntakeRecord } from "./command-intake-processor.mjs";
 import { writeConnectorDryRunGateRecords } from "./connector-dry-run-gates.mjs";
 import { writeCostLedgerRecord } from "./cost-ledger-writer.mjs";
 import { writeJobRecord } from "./job-queue-processor.mjs";
@@ -126,7 +126,17 @@ export async function submitOwnerCommand({
     throw new Error(`AG OS boot is blocked: ${boot.record.summary.blockedReasons.join("; ")}`);
   }
 
-  const intake = writeCommandIntakeRecord({ command: command.trim(), projectId: resolvedProjectId, understanding, executionRequest, runId, now, root });
+  const commandCategory = routeCommandCategory({ command: command.trim(), executionRequest, root });
+  const intake = writeCommandIntakeRecord({
+    command: command.trim(),
+    projectId: resolvedProjectId,
+    understanding,
+    executionRequest,
+    commandCategory: commandCategory.id,
+    runId,
+    now,
+    root
+  });
   const job = writeJobRecord({ commandIntake: intake.record, runId, now, root });
   const route = writeTaskRouteRecord({ job: job.record, commandIntake: intake.record, runId, now, root });
   const aiPlanning = useAiPlanner

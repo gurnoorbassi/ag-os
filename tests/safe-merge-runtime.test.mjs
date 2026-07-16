@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import {
   buildSafeMergeRuntimeRecord,
+  summarizeSafeMergeRuntime,
   validateSafeMergeRuntimeRecord,
   writeSafeMergeRuntimeRecord
 } from "../scripts/lib/runtime/safe-merge-runtime.mjs";
@@ -160,6 +161,25 @@ test("writes safe-merge runtime records to a local workspace only", () => {
     assert.equal(result.filePath, ".codex/merges/safe-merge-runtime-construction-website-repo-pr-53.json");
     const writtenRecord = JSON.parse(readFileSync(path.join(root, result.filePath), "utf8"));
     assert.equal(writtenRecord.safety.executesMerge, false);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("safe-merge summary reports a clean no-candidate state without executing a merge", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "ag-os-safe-merge-summary-"));
+
+  try {
+    assert.deepEqual(summarizeSafeMergeRuntime({ root }), {
+      status: "ready",
+      candidateCount: 0,
+      readyCount: 0,
+      blockedCount: 0,
+      invalidCount: 0,
+      mergeExecuted: false,
+      latestCandidate: null,
+      candidates: []
+    });
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

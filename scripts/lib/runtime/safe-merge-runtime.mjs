@@ -1,5 +1,5 @@
 import process from "node:process";
-import { isoTimestamp, normalizeRunId, writeJson } from "./common.mjs";
+import { isoTimestamp, listDirectJson, normalizeRunId, readJson, writeJson } from "./common.mjs";
 
 const SAFE_MERGE_RISK_LEVELS = new Set(["R0", "R1", "R2"]);
 
@@ -151,4 +151,37 @@ export function writeSafeMergeRuntimeRecord({ record, root = process.cwd() }) {
   const filePath = `.codex/merges/${record.safeMergeRuntimeId}.json`;
   writeJson(filePath, record, root);
   return { filePath, record };
+}
+
+export function summarizeSafeMergeRuntime({ root = process.cwd() } = {}) {
+  const candidates = listDirectJson(".codex/merges", { root }).map((recordPath) => {
+    const record = readJson(recordPath, root);
+    const validation = validateSafeMergeRuntimeRecord(record);
+    return {
+      safeMergeRuntimeId: record.safeMergeRuntimeId ?? "invalid-record",
+      prNumber: record.prNumber ?? null,
+      commitSha: record.commitSha ?? null,
+      status: validation.valid ? record.status : "invalid",
+      blockingReasons: validation.valid ? record.blockingReasons : validation.errors,
+      updatedAt: record.updatedAt ?? record.createdAt ?? null,
+      recordPath
+    };
+  });
+  const ordered = [...candidates].sort((left, right) =>
+    String(right.updatedAt ?? "").localeCompare(String(left.updatedAt ?? ""))
+  );
+  const readyCount = candidates.filter((candidate) => candidate.status === "ready").length;
+  const blockedCount = candidates.filter((candidate) => candidate.status === "blocked").length;
+  const invalidCount = candidates.filter((candidate) => candidate.status === "invalid").length;
+
+  return {
+    status: invalidCount > 0 ? "review" : blockedCount > 0 ? "owner_action" : "ready",
+    candidateCount: candidates.length,
+    readyCount,
+    blockedCount,
+    invalidCount,
+    mergeExecuted: false,
+    latestCandidate: ordered[0] ?? null,
+    candidates: ordered
+  };
 }

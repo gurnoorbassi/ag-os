@@ -14,6 +14,7 @@
     "memory:load": "node scripts/load-accepted-lessons.mjs",
     "lessons:promote": "node scripts/process-lesson-promotion.mjs",
     "archetypes:propose": "node scripts/process-archetype-update-proposal.mjs",
+    "safe-merge:check": "node scripts/check-safe-merge.mjs",
     "security:scan": "node scripts/scan-secrets.mjs",
     "production:check": "node scripts/check-production-readiness.mjs",
     "production:check:coordinator": "node scripts/check-production-readiness.mjs --record .codex/production/production-readiness-ag-os-coordinator-v1.json",

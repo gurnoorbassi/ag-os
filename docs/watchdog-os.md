@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Watchdog OS defines how AG Digitalz OS will eventually check local state, CI status, registries, stale memory, cost budgets, and security policy drift.
+Watchdog OS checks AG Digitalz OS local runtime health, boot readiness, action monitoring, stale approvals, budget posture, and validation state on a recurring schedule.
 
-This foundation is policy only. It does not monitor, scrape, ping, notify, mutate, deploy, or trigger paid monitoring.
+The built-in watchdog runs inside the private coordinator every 60 seconds when `AG_OS_INTERNAL_WATCHDOG_ENABLED=true`. It writes local evidence only. It does not scrape, ping external services, notify, mutate, deploy, or trigger paid monitoring.
 
 ## Current Policy
 
@@ -20,7 +20,7 @@ schemas/watchdog-policy.schema.json
 
 ## Defaults
 
-Watchdog OS is disabled by default:
+External Watchdog actions remain disabled by default:
 
 - Monitoring enabled: `false`
 - Live checks allowed: `false`
@@ -37,11 +37,11 @@ Watchdog OS is disabled by default:
 - `cost_budget_review`
 - `security_policy_review`
 
-These are planned categories only. They do not activate live monitoring.
+The private coordinator uses the implemented local subset. CI review and all external or production-target monitoring stay approval-gated.
 
 ## Approval Rules
 
-Owner approval is required before any:
+Owner approval is still required before any:
 
 - Live monitoring
 - External notification
@@ -71,6 +71,6 @@ Watchdog must avoid alert spam by grouping repeated alerts and making owner acti
 - Notifications are disabled by default.
 - Live monitoring and external notifications require owner approval.
 
-This validation is local and offline.
+This validation is local and offline. Runtime freshness is derived from `.codex/watchdog/watchdog-runtime-internal-state.json`; generated dashboard data does not fabricate that evidence.
 
 See also `docs/watchdog-alert-policy.md`.

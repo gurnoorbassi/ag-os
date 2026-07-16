@@ -88,6 +88,45 @@ const COMMAND_SLUG_STOP_WORDS = new Set([
   "system", "please", "want", "need"
 ]);
 
+const ADAPTER_COMMAND_CATEGORIES = {
+  "github-draft-pr": "build",
+  "n8n-disabled-workflow": "connect_service",
+  "n8n-workflow-control": "connect_service",
+  "netlify-staging": "deploy_staging",
+  "production-deployment": "deploy_production"
+};
+
+export function routeCommandCategory({ command, executionRequest, root = process.cwd() }) {
+  const registry = JSON.parse(readFileSync(path.join(root, ".codex/commands/registry.json"), "utf8"));
+  if (registry.status !== "active") {
+    throw new Error("command registry is not active");
+  }
+
+  const adapterCategory = executionRequest?.adapterId
+    ? ADAPTER_COMMAND_CATEGORIES[executionRequest.adapterId]
+    : null;
+  const text = String(command ?? "").toLowerCase();
+  const categoryId = adapterCategory ?? (
+    /\b(?:stop|halt|pause|disable)\s+(?:all|automation|workflow|operations?)\b/.test(text) ? "stop_all" :
+      /\b(?:rollback|roll back|revert|restore)\b/.test(text) ? "rollback" :
+        /\b(?:dns|domain|public url|routing change)\b/.test(text) ? "change_domain" :
+          /\b(?:send|email|text|sms|message)\s+(?:to|the|my|a|an)\b/.test(text) ? "send_message" :
+            /\b(?:deploy|publish|go live)\b.*\b(?:production|live)\b|\bproduction deploy(?:ment)?\b/.test(text) ? "deploy_production" :
+              /\b(?:deploy|publish)\b.*\b(?:staging|preview)\b|\bstaging deploy(?:ment)?\b/.test(text) ? "deploy_staging" :
+                /\b(?:deploy|publish|go live)\b/.test(text) ? "deploy_staging" :
+                /\b(?:connect|integrate|authenticate|configure credentials?)\b/.test(text) ? "connect_service" :
+                  /\b(?:audit|inspect|security review|validate)\b/.test(text) ? "audit" :
+                    /\b(?:build|create|make|implement|code|design|redesign|write|fix|improve|update|change)\b/.test(text) ? "build" :
+                      /\b(?:plan|outline|research)\b/.test(text) ? "plan_only" :
+                        "discuss_only"
+  );
+  const category = registry.categories.find((item) => item.id === categoryId);
+  if (!category) {
+    throw new Error(`command category is not registered: ${categoryId}`);
+  }
+  return category;
+}
+
 // Unknown product types keep a slug derived from the command's own words
 // instead of collapsing into a weak generic name like "request".
 function deriveCommandSlug(command) {
@@ -206,7 +245,7 @@ export function assertUnderstandingShape(understanding) {
   }
 }
 
-export function buildCommandIntakeRecord({ command, projectId, runId, understanding, executionRequest, now = new Date(), root = process.cwd() }) {
+export function buildCommandIntakeRecord({ command, projectId, runId, understanding, executionRequest, commandCategory, now = new Date(), root = process.cwd() }) {
   if (!command || typeof command !== "string" || command.trim().length === 0) {
     throw new Error("command is required");
   }
@@ -221,6 +260,13 @@ export function buildCommandIntakeRecord({ command, projectId, runId, understand
   const normalizedRunId = normalizeRunId(runId || command);
   const timestamp = isoTimestamp(now);
   const classification = classifyCommand(command.trim(), root);
+  const selectedCategory = commandCategory
+    ? routeCommandCategory({ command: command.trim(), executionRequest, root })
+    : null;
+  if (commandCategory && selectedCategory.id !== commandCategory) {
+    throw new Error(`command category mismatch: expected ${selectedCategory.id}, received ${commandCategory}`);
+  }
+  const routedCategory = selectedCategory?.id ?? "plan_only";
   const selectedProjectId = typeof projectId === "string" && projectId.trim().length > 0
     ? projectId.trim()
     : classification.projectId;
@@ -232,14 +278,14 @@ export function buildCommandIntakeRecord({ command, projectId, runId, understand
     status: "classified",
     rawCommand: command.trim(),
     normalizedCommand: classification.normalizedCommand,
-    commandCategory: "plan_only",
+    commandCategory: routedCategory,
     projectId: selectedProjectId,
-    riskLevel: executionRequest ? "R3" : classification.riskLevel,
-    classification: executionRequest ? {
+    riskLevel: executionRequest || selectedCategory?.requiresOwnerApproval ? "R3" : classification.riskLevel,
+    classification: {
       ...classification.classification,
-      requiresApproval: true,
-      requiresLiveService: true
-    } : classification.classification,
+      requiresApproval: executionRequest ? true : selectedCategory?.requiresOwnerApproval ?? classification.classification.requiresApproval,
+      requiresLiveService: executionRequest ? true : classification.classification.requiresLiveService
+    },
     productContext: classification.productContext,
     plannedOutput: classification.plannedOutput,
     nextRecord: {
@@ -257,8 +303,8 @@ export function buildCommandIntakeRecord({ command, projectId, runId, understand
   };
 }
 
-export function writeCommandIntakeRecord({ command, projectId, runId, understanding, executionRequest, now, root = process.cwd() }) {
-  const record = buildCommandIntakeRecord({ command, projectId, runId, understanding, executionRequest, now, root });
+export function writeCommandIntakeRecord({ command, projectId, runId, understanding, executionRequest, commandCategory, now, root = process.cwd() }) {
+  const record = buildCommandIntakeRecord({ command, projectId, runId, understanding, executionRequest, commandCategory, now, root });
   const filePath = `.codex/commands/${record.commandIntakeId}.json`;
   writeJson(filePath, record, root);
   return { filePath, record };

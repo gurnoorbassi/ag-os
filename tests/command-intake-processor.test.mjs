@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import {
   buildCommandIntakeRecord,
+  routeCommandCategory,
   writeCommandIntakeRecord
 } from "../scripts/lib/runtime/command-intake-processor.mjs";
 
@@ -159,6 +160,23 @@ test("keeps unknown product types as explicit archetype gaps", () => {
   assert.equal(record.productContext.archetypeRegistered, false);
   assert.equal(record.productContext.archetypeGap, "no_product_type_match");
   assert.equal(record.projectId, "project-unregistered-vendor-scheduling-hub");
+});
+
+test("active command registry routes live owner intent into the correct execution posture", () => {
+  assert.equal(routeCommandCategory({ command: "Build me a client portal" }).id, "build");
+  assert.equal(routeCommandCategory({ command: "Audit the security policy" }).id, "audit");
+  assert.equal(routeCommandCategory({ command: "Deploy this preview to staging" }).id, "deploy_staging");
+  assert.equal(routeCommandCategory({ command: "Deploy the approved release to production" }).id, "deploy_production");
+  assert.equal(routeCommandCategory({ command: "Connect the n8n integration" }).id, "connect_service");
+  assert.equal(routeCommandCategory({ command: "Rollback the last release" }).id, "rollback");
+  assert.equal(routeCommandCategory({ command: "Stop all automation" }).id, "stop_all");
+});
+
+test("structured adapter requests route through the registry and inherit approval posture", () => {
+  const executionRequest = { adapterId: "production-deployment" };
+  const category = routeCommandCategory({ command: "Ship the approved release", executionRequest });
+  assert.equal(category.id, "deploy_production");
+  assert.equal(category.requiresOwnerApproval, true);
 });
 
 test("uses an explicit registered-project target without changing product classification", () => {
