@@ -5,6 +5,7 @@ let runtimeAutomation = null;
 let runtimeConnected = false;
 let runtimeOperatingSystems = null;
 let runtimeLessonDecisions = null;
+let runtimeSafeguards = null;
 
 function statusClass(value) {
   const normalized = String(value).toLowerCase();
@@ -735,6 +736,57 @@ function renderRegistries() {
   );
 }
 
+function watchdogFindingControl(finding) {
+  const article = document.createElement("article");
+  article.className = "watchdog-finding";
+  const heading = document.createElement("h4");
+  heading.textContent = finding.findingType === "failed_job" ? "Failed job" : "Blocked connector attempt";
+  const identifier = document.createElement("code");
+  identifier.textContent = finding.findingId;
+  const detail = document.createElement("p");
+  detail.textContent = finding.detail;
+  const reason = document.createElement("input");
+  reason.type = "text";
+  reason.placeholder = "Why is this historical alert resolved?";
+  reason.setAttribute("aria-label", `Resolution reason for ${finding.findingId}`);
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "button-secondary";
+  button.textContent = "Acknowledge as resolved";
+  button.addEventListener("click", async () => {
+    const resolutionReason = reason.value.trim();
+    if (resolutionReason.length < 8) {
+      setRuntimeStatus("Add a short reason before resolving this Watchdog alert.", true);
+      reason.focus();
+      return;
+    }
+    if (!window.confirm(`Acknowledge ${finding.findingId} as resolved? The original failure stays in history and nothing will be retried.`)) return;
+    button.disabled = true;
+    try {
+      assertOwnerSession();
+      const { response, result } = await runtimeRequest(`/api/v1/watchdog/findings/${encodeURIComponent(finding.findingId)}/resolve`, {
+        method: "POST",
+        body: JSON.stringify({
+          reason: resolutionReason,
+          confirmation: `RESOLVE ${finding.findingId}`
+        })
+      });
+      if (!response.ok) throw new Error(result.detail || result.error || "Watchdog resolution failed");
+      runtimeSafeguards = result.safeguards;
+      runtimeOperatingSystems = result.operatingSystems;
+      renderOperatingSystems(runtimeOperatingSystems);
+      setRuntimeStatus(`${finding.findingId} acknowledged. Its original evidence remains preserved and no action was retried.`, true);
+      const updated = runtimeOperatingSystems.find((item) => item.id === "watchdog-os");
+      openOperatingSystem(updated);
+    } catch (error) {
+      setRuntimeStatus(`Watchdog resolution rejected: ${error.message}`, true);
+      button.disabled = false;
+    }
+  });
+  article.append(heading, identifier, detail, reason, button);
+  return article;
+}
+
 function openOperatingSystem(system) {
   const shell = document.createElement("div");
   shell.className = "workspace-stack";
@@ -745,6 +797,19 @@ function openOperatingSystem(system) {
     sectionBlock("Working now", itemList(system.working.length ? system.working : ["No capability evidence recorded."])),
     sectionBlock("Still required", itemList(system.remaining.length ? system.remaining : ["No incomplete internal setup recorded."]))
   );
+  if (system.id === "watchdog-os") {
+    const findings = runtimeSafeguards?.internalActionMonitoring?.findings ?? [];
+    const findingList = document.createElement("div");
+    findingList.className = "watchdog-finding-list";
+    if (findings.length === 0) {
+      const empty = document.createElement("p");
+      empty.textContent = "No unresolved historical job or connector alerts.";
+      findingList.append(empty);
+    } else {
+      findings.forEach((finding) => findingList.append(watchdogFindingControl(finding)));
+    }
+    shell.append(sectionBlock("Owner-resolvable alerts", findingList));
+  }
   openWorkspaceDialog({ eyebrow: "Operating system", title: system.name, content: shell });
 }
 
@@ -1753,6 +1818,7 @@ async function connectRuntime(options = {}) {
     runtimeAiPlanner = result.aiPlanner;
     runtimeAiWorker = result.aiWorker;
     runtimeAutomation = result.automation;
+    runtimeSafeguards = result.safeguards;
     runtimeOperatingSystems = result.operatingSystems;
     runtimeLessonDecisions = result.lessonDecisions;
     document.querySelector("#worker-routing-help").textContent = runtimeAiWorker?.ready
