@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { listRecentOwnerCommands, submitOwnerCommand } from "./lib/runtime/live-command-service.mjs";
+import { commandRequiresBuilder, listRecentOwnerCommands, submitOwnerCommand } from "./lib/runtime/live-command-service.mjs";
 import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
 import { createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
 import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-planner-readiness.mjs";
@@ -21,6 +21,7 @@ import { autonomousExecutionStatus, listAutonomousJobs, processQueuedJobs } from
 import { decideJob } from "./lib/runtime/job-approval-service.mjs";
 import { evaluateOperationalSafeguards } from "./lib/runtime/operational-safeguards.mjs";
 import { startInternalWatchdog } from "./lib/runtime/internal-watchdog.mjs";
+import { getJobDeliverable } from "./lib/runtime/deliverable-service.mjs";
 import {
   buildOwnerSessionCookie,
   clearOwnerSessionCookie,
@@ -424,17 +425,33 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    const jobDeliverableMatch = url.pathname.match(/^\/api\/v1\/jobs\/([^/]+)\/deliverable$/);
+    if (request.method === "GET" && jobDeliverableMatch) {
+      json(response, 200, getJobDeliverable({
+        jobId: decodeURIComponent(jobDeliverableMatch[1]),
+        root,
+        includeContent: true
+      }), headers);
+      return;
+    }
+
     if (request.method === "POST" && url.pathname === "/api/v1/commands") {
       const body = await readJsonBody(request);
       const plannerReadiness = aiPlannerReadiness();
       const workerReadiness = aiWorkerReadiness();
+      const builderRequired = !body.executionRequest && commandRequiresBuilder(body.command);
+      const useAiWorker = body.useAiWorker === true || builderRequired;
+      const useAiPlanner = body.useAiPlanner === true || (builderRequired && plannerReadiness.ready);
+      if (builderRequired && !workerReadiness.ready) {
+        throw new Error(`This command requests a real deliverable, but the professional builder is not active: ${workerReadiness.blockers.join("; ")}. AG OS did not create a plan-only job or claim completion.`);
+      }
       const result = await submitOwnerCommand({
         command: body.command,
         projectId: body.projectId,
         understanding: body.understanding,
         executionRequest: body.executionRequest,
-        useAiPlanner: body.useAiPlanner === true,
-        useAiWorker: body.useAiWorker === true,
+        useAiPlanner,
+        useAiWorker,
         aiPlannerReadiness: plannerReadiness,
         aiWorkerReadiness: workerReadiness,
         planDraftProvider: (input) => createAnthropicPlanDraft({

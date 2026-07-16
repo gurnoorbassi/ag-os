@@ -158,6 +158,13 @@ export function writeAnthropicWorkProduct({ job, plan, command, result, runId, r
       productionDataAllowed: false,
       paidActionAllowed: true
     },
+    deliverable: {
+      kind: written.some((recordPath) => recordPath.endsWith("/index.html")) ? "website" : "files",
+      ownerUsable: true,
+      previewAvailable: written.some((recordPath) => recordPath.endsWith("/index.html")),
+      entryFile: written.find((recordPath) => recordPath.endsWith("/index.html"))?.slice(`${workspace}/`.length) || "",
+      files: written
+    },
     createdAt: timestamp,
     updatedAt: timestamp
   };
@@ -177,5 +184,5 @@ export function writeAnthropicWorkProduct({ job, plan, command, result, runId, r
     ""
   ].join("\n");
   writeFileSync(path.join(root, manifestPath), manifest, "utf8");
-  return { executionPath, executionStep, workProductPath: manifestPath, workProductPaths: [manifestPath, ...written] };
+  return { executionPath, executionStep, workProductPath: manifestPath, workProductPaths: [manifestPath, ...written], deliverable: executionStep.deliverable };
 }

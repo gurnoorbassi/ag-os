@@ -44,6 +44,7 @@ export function writeJobCompletionArtifacts({
   commandRecordPath,
   executionRecordPath,
   workProductPath,
+  deliverable,
   root = process.cwd(),
   now = new Date()
 }) {
@@ -109,6 +110,12 @@ export function writeJobCompletionArtifacts({
       policyVersion: JOB_COMPLETION_POLICY_VERSION,
       qualityScorePath: qualityScore.filePath.replaceAll("\\", "/"),
       lessonCandidatePaths,
+      deliverable: deliverable ?? {
+        kind: "evidence_only",
+        ownerUsable: false,
+        previewAvailable: false,
+        entryFile: ""
+      },
       generatedBy: SCRIPT_ID
     }
   };

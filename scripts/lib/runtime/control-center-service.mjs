@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 import { buildAuditEventRecord, writeAuditEventRecord } from "./audit-writer.mjs";
 import { DEFAULT_OWNER_ID, listDirectJson, readJson, slugify } from "./common.mjs";
 import { detectLessonConflicts, promoteLessonCandidate, rejectLessonCandidate } from "../../process-lesson-promotion.mjs";
+import { jobDeliverableSummary } from "./deliverable-service.mjs";
 
 const JOB_COMPLETION_POLICY_ACTIVATED_AT = "2026-07-09T20:06:25.029Z";
 
@@ -27,7 +28,7 @@ function approvalSensitivity(riskLevel) {
   return { level: "routine", label: "Routine", explanation: "The project has more proven trust, but permanent live-action gates still apply." };
 }
 
-function safeJob(job) {
+function safeJob(job, root) {
   return {
     jobId: job.jobId,
     status: job.status,
@@ -39,7 +40,8 @@ function safeJob(job) {
     completedAt: job.queueTimestamps?.completedAt,
     updatedAt: job.updatedAt,
     hasQualityScore: Boolean(job.completionEvidence?.qualityScorePath),
-    lessonCandidateCount: job.completionEvidence?.lessonCandidatePaths?.length ?? 0
+    lessonCandidateCount: job.completionEvidence?.lessonCandidatePaths?.length ?? 0,
+    deliverable: jobDeliverableSummary({ job, root })
   };
 }
 
@@ -50,7 +52,7 @@ export function getProjectWorkspace({ projectId, root = process.cwd() }) {
   const project = readJson(entry.recordPath, root);
   const matching = (relativeDir) => records(relativeDir, root)
     .filter(({ record }) => record.projectId === projectId || record.scope?.projectId === projectId || record.task?.projectId === projectId);
-  const jobs = matching(".codex/jobs").map(({ record }) => safeJob(record));
+  const jobs = matching(".codex/jobs").map(({ record }) => safeJob(record, root));
   const quality = matching(".codex/quality-scores").map(({ record }) => ({
     scoreId: record.scoreId,
     status: record.status,

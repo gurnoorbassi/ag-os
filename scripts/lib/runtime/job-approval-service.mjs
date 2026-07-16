@@ -9,6 +9,8 @@ import { githubPrivateRepositoryApprovalCriteria, validateGitHubPrivateRepositor
 import { validateN8nDisabledWorkflowRequest, n8nApprovalCriteria } from "./n8n-disabled-workflow-adapter.mjs";
 import { validateNetlifyStagingRequest, netlifyApprovalCriteria } from "./netlify-staging-adapter.mjs";
 import { netlifyContinuousDeploymentApprovalCriteria, validateNetlifyContinuousDeploymentRequest } from "./netlify-continuous-deployment-adapter.mjs";
+import { n8nWorkflowControlApprovalCriteria, validateN8nWorkflowControlRequest } from "./n8n-workflow-control-adapter.mjs";
+import { productionDeploymentApprovalCriteria, validateProductionDeploymentRequest } from "./production-deployment-adapter.mjs";
 
 function jobPath(jobId) {
   return `.codex/jobs/${jobId}.json`;
@@ -45,10 +47,14 @@ function buildExactApproval({ job, command, adapter, now, expiresAt, root }) {
       })()
     : adapter.adapterId === "n8n-disabled-workflow"
       ? n8nApprovalCriteria(validateN8nDisabledWorkflowRequest({ request: command.executionRequest }))
+      : adapter.adapterId === "n8n-workflow-control"
+        ? n8nWorkflowControlApprovalCriteria(validateN8nWorkflowControlRequest({ request: command.executionRequest }))
       : adapter.adapterId === "netlify-staging"
         ? netlifyApprovalCriteria(validateNetlifyStagingRequest({ request: command.executionRequest, root }))
         : adapter.adapterId === "netlify-continuous-deployment"
           ? netlifyContinuousDeploymentApprovalCriteria(validateNetlifyContinuousDeploymentRequest({ request: command.executionRequest, root }))
+        : adapter.adapterId === "production-deployment"
+          ? productionDeploymentApprovalCriteria(validateProductionDeploymentRequest({ request: command.executionRequest }))
         : [];
   return {
     approvalId,

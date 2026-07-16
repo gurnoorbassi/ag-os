@@ -139,14 +139,9 @@
               What should AG OS accomplish?
               <textarea id="owner-command" rows="5" maxlength="10000" required placeholder="Build a professional lead follow-up system for AG Digitalz. Keep every message waiting for my approval."></textarea>
             </label>
-            <label class="ai-planner-option">
-              <input id="use-ai-planner" type="checkbox" disabled>
-              <span><strong>Use Anthropic planning worker</strong><small id="ai-planner-help">Connect first to verify the key, budget, and scoped approval.</small></span>
-            </label>
-            <label class="ai-planner-option">
-              <input id="use-ai-worker" type="checkbox" disabled>
-              <span><strong>Create professional work-product files</strong><small id="ai-worker-help">Requires a separate usage-limited Anthropic builder approval.</small></span>
-            </label>
+            <div class="ai-planner-option worker-routing-note">
+              <span><strong>AG OS chooses the workers and tools</strong><small id="worker-routing-help">Tell AG OS the outcome. It will use a real builder when files are required and will never call a plan a finished product.</small></span>
+            </div>
             <div class="command-actions">
               <p id="runtime-status" role="status">Not connected. Existing evidence remains available below.</p>
               <button type="submit">Start work <span aria-hidden="true">→</span></button>

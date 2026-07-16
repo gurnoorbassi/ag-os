@@ -6,6 +6,10 @@ Projects turn ideas into controlled work. A project should be small enough to re
 
 ## Project Intake Flow
 
+The owner control center asks the owner only for a project name and the outcome that should exist when the project succeeds. AG OS derives the initial scope, stack, repository name, trust level, and safety boundaries. Those derived fields remain visible as evidence, but they are not owner setup chores.
+
+Commands may also target `project-one-off`. One-off work receives the same job, approval, cost, quality, lesson, and deliverable evidence without creating a durable project or repository.
+
 1. Capture the idea in `.codex/ideas/`.
 2. Classify the idea by domain, expected value, risk, urgency, and dependencies.
 3. Decide whether it should become a project.

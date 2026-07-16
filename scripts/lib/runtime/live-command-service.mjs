@@ -19,6 +19,14 @@ import { isoTimestamp, writeJson } from "./common.mjs";
 
 const MAX_COMMAND_LENGTH = 10_000;
 const inFlightAiApprovals = new Set();
+export const ONE_OFF_PROJECT_ID = "project-one-off";
+
+export function commandRequiresBuilder(command) {
+  const text = String(command || "").trim();
+  if (!text || /\b(?:plan|outline|research|audit|review|explain|analy[sz]e)\b/i.test(text)) return false;
+  return /\b(?:build|create|make|implement|code|design|redesign|write)\b/i.test(text) &&
+    /\b(?:website|site|app|application|dashboard|page|component|code|file|document|tool|system|workflow)\b/i.test(text);
+}
 
 function artifact(type, reference) {
   return { type, reference };
@@ -46,9 +54,8 @@ export function assertOwnerCommand(command) {
 }
 
 export function assertRegisteredProject({ projectId, root = process.cwd() }) {
-  if (!projectId) {
-    throw new Error("choose a project before starting work");
-  }
+  if (projectId === ONE_OFF_PROJECT_ID) return;
+  if (!projectId) throw new Error("project selection is missing");
   const registry = JSON.parse(readFileSync(path.join(root, ".codex/projects/registry.json"), "utf8"));
   if (!(registry.projects ?? []).some((project) => project.projectId === projectId)) {
     throw new Error(`project is not registered: ${projectId}`);
@@ -94,7 +101,8 @@ export async function submitOwnerCommand({
   now = new Date()
 }) {
   assertOwnerCommand(command);
-  assertRegisteredProject({ projectId, root });
+  const resolvedProjectId = projectId || ONE_OFF_PROJECT_ID;
+  assertRegisteredProject({ projectId: resolvedProjectId, root });
   if (useAiPlanner && (!aiPlannerReadiness?.ready || typeof planDraftProvider !== "function")) {
     throw new Error(`AI planner is not ready: ${(aiPlannerReadiness?.blockers || ["planner provider unavailable"]).join("; ")}`);
   }
@@ -117,7 +125,7 @@ export async function submitOwnerCommand({
     throw new Error(`AG OS boot is blocked: ${boot.record.summary.blockedReasons.join("; ")}`);
   }
 
-  const intake = writeCommandIntakeRecord({ command: command.trim(), projectId, understanding, executionRequest, runId, now, root });
+  const intake = writeCommandIntakeRecord({ command: command.trim(), projectId: resolvedProjectId, understanding, executionRequest, runId, now, root });
   const job = writeJobRecord({ commandIntake: intake.record, runId, now, root });
   const route = writeTaskRouteRecord({ job: job.record, commandIntake: intake.record, runId, now, root });
   const aiPlanning = useAiPlanner
@@ -194,6 +202,7 @@ export async function submitOwnerCommand({
       commandRecordPath: intake.filePath,
       executionRecordPath: workerExecution.executionPath,
       workProductPath: workerExecution.workProductPath,
+      deliverable: workerExecution.deliverable,
       root,
       now
     });

@@ -79,10 +79,16 @@
         "detail": "The production n8n endpoint is registered for disabled-workflow creation only after exact owner approval."
       },
       {
-        "adapterId": "production-deployment",
+        "adapterId": "n8n-workflow-control",
         "status": "approval_required",
+        "target": "https://n8n.agdigitalz.net/api/v1",
+        "detail": "AG OS can activate or deactivate one exact verified workflow after a single-job owner approval. Manual execution and messaging remain separately gated."
+      },
+      {
+        "adapterId": "production-deployment",
+        "status": "setup_required",
         "target": "root@5.78.87.188:/opt/ai-lead-command-center",
-        "detail": "Production deployment is registered but remains commit-pinned, backup-first, and separately approval-gated."
+        "detail": "The exact-commit transport and private allowlisted runner are implemented. The root-owned loopback runner still requires a separately approved VPS activation before deployment jobs can execute."
       }
     ],
     "operations": [

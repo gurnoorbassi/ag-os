@@ -98,6 +98,29 @@
   padding: 1.4rem;
 }
 
+.deliverable-preview {
+  width: 100%;
+  min-height: 620px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.deliverable-source {
+  max-height: 420px;
+  overflow: auto;
+  white-space: pre-wrap;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #11110f;
+  color: var(--text-soft);
+}
+
+.worker-routing-note {
+  cursor: default;
+}
+
 .workspace-stack,
 .lesson-queue,
 .lesson-list {

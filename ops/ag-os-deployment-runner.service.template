@@ -1,0 +1,22 @@
+[Unit]
+Description=AG OS allowlisted private deployment runner
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/ag-os
+EnvironmentFile=/etc/ag-os/deployment-runner.env
+ExecStart=/usr/bin/node /opt/ag-os/ops/deployment-runner.mjs
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/opt /var/lib/ag-os /var/backups/ag-os /run/docker.sock
+
+[Install]
+WantedBy=multi-user.target
