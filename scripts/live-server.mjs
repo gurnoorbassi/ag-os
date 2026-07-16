@@ -19,7 +19,7 @@ import {
 } from "./lib/runtime/control-center-service.mjs";
 import { autonomousExecutionStatus, listAutonomousJobs, processQueuedJobs } from "./lib/runtime/autonomous-runner.mjs";
 import { decideJob } from "./lib/runtime/job-approval-service.mjs";
-import { evaluateOperationalSafeguards } from "./lib/runtime/operational-safeguards.mjs";
+import { evaluateOperationalSafeguards, resolveOperationalFinding } from "./lib/runtime/operational-safeguards.mjs";
 import { startInternalWatchdog } from "./lib/runtime/internal-watchdog.mjs";
 import { getJobDeliverable } from "./lib/runtime/deliverable-service.mjs";
 import {
@@ -401,6 +401,26 @@ const server = createServer(async (request, response) => {
 
     if (request.method === "GET" && url.pathname === "/api/v1/operating-systems") {
       json(response, 200, { systems: getOperatingSystems({ root }) }, headers);
+      return;
+    }
+
+    const watchdogResolutionMatch = url.pathname.match(/^\/api\/v1\/watchdog\/findings\/([^/]+)\/resolve$/);
+    if (request.method === "POST" && watchdogResolutionMatch) {
+      const body = await readJsonBody(request);
+      const result = resolveOperationalFinding({
+        findingId: decodeURIComponent(watchdogResolutionMatch[1]),
+        reason: body.reason,
+        confirmation: body.confirmation,
+        root
+      });
+      json(response, 200, {
+        status: "resolved",
+        findingId: result.finding.findingId,
+        resolutionPath: result.recordPath,
+        auditPath: result.auditPath,
+        safeguards: evaluateOperationalSafeguards({ root }),
+        operatingSystems: getOperatingSystems({ root })
+      }, headers);
       return;
     }
 
