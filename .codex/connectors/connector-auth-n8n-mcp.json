@@ -3,10 +3,10 @@
   "recordType": "connector-auth-status",
   "connectorId": "connector-n8n-mcp",
   "authStatus": "authenticated",
-  "lastObservedAt": "2026-07-13T22:26:28Z",
-  "lastAuthenticatedAt": "2026-07-13T22:26:28Z",
+  "lastObservedAt": "2026-07-16T02:40:00Z",
+  "lastAuthenticatedAt": "2026-07-16T02:40:00Z",
   "observationSource": "gated_execution_record",
-  "observationEvidence": "A read-only n8n connector project search returned the connected personal project. No workflow was created, updated, published, activated, executed, or archived.",
+  "observationEvidence": "A read-only VPS preflight confirmed the root-only AG OS n8n API credential is configured and the existing AI Lead n8n and n8n-db containers are running. No workflow or database content was read or mutated.",
   "grantsPermission": false,
   "liveCallsUsed": false,
   "notes": [
@@ -15,5 +15,5 @@
     "n8n activation remains blocked regardless of auth status; this record never authorizes workflow activation."
   ],
   "createdAt": "2026-07-07T00:00:00Z",
-  "updatedAt": "2026-07-13T22:26:28Z"
+  "updatedAt": "2026-07-16T02:40:00Z"
 }

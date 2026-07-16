@@ -10,18 +10,18 @@
     "The protected live console is available at https://app.agdigitalz.net/.",
     "The production application runs in its existing isolated VPS stack.",
     "The production web, API, proxy, database, and n8n containers are currently separate from AG OS.",
-    "The deployed source directory does not currently contain Git metadata."
+    "The canonical private source repository is https://github.com/gurnoorbassi/AI-Lead-Command-Center."
   ],
   "scope": [
     "Open and operate the protected lead command center.",
     "Track product work, evidence, quality, cost, and lessons in this AG OS workspace.",
     "Route owner commands explicitly to the AI Lead Command Center.",
-    "Prepare a canonical source repository before AG OS performs code or deployment automation."
+    "Use the canonical private GitHub repository for reviewed code and production candidates."
   ],
   "outOfScope": [
     "Do not change the production application, database, n8n, proxy, credentials, customer data, messages, DNS, or deployment without exact owner approval.",
     "Do not weaken the live application's frame, password, or network protections.",
-    "Do not claim repository automation is ready until a canonical source remote is connected."
+    "Do not deploy a candidate whose exact commit, backup, rollback, and verification scope are not approved."
   ],
   "trustLevel": 2,
   "stack": ["Web application", "API", "Postgres", "n8n", "Docker", "Caddy", "Hetzner VPS"],
@@ -31,12 +31,12 @@
       "mitigation": "Keep data and production mutations behind exact approvals and expose only safe operational metadata in AG OS."
     },
     {
-      "risk": "The deployed source is not connected to a canonical Git repository.",
-      "mitigation": "Show source control as setup needed and block automated code or deployment actions until repository reconciliation is complete."
+      "risk": "The running VPS source can drift from the canonical repository if production deployments are not commit-pinned.",
+      "mitigation": "Require an exact repository commit, backup, verification, and rollback evidence for every production deployment."
     }
   ],
   "approvalRequiredFor": [
-    "source repository creation or connection",
+    "repository settings changes",
     "VPS or deployment mutation",
     "database or n8n mutation",
     "credential access or storage",
@@ -52,15 +52,39 @@
   ],
   "securityReview": "The protected production console keeps its existing password and anti-framing protections. AG OS opens it separately and does not ingest customer data.",
   "costTracking": "Record estimated and actual task cost. Paid actions require a matching approval and budget.",
-  "deploymentPlan": "The current VPS stack remains unchanged. Future deployment requires a canonical source repository, exact candidate verification, backup, rollback, and separate owner approval.",
+  "deploymentPlan": "Deploy only exact commits from gurnoorbassi/AI-Lead-Command-Center with a fresh backup, environment-preserving Compose command, health verification, and rollback under separate owner approval.",
   "ownerWorkspace": {
     "summary": "Operate the protected lead pipeline, workflows, and command center.",
     "liveUrl": "https://app.agdigitalz.net/",
     "liveLabel": "Open AI Lead Command Center",
     "previewMode": "new_tab",
     "previewReason": "The protected console intentionally blocks iframe embedding. AG OS keeps your workspace open and launches the secure full app in a separate tab.",
-    "sourceControlStatus": "setup_needed",
-    "sourceControlDetail": "The live VPS application is structured and running, but its deployed source is not connected to a canonical Git remote.",
+    "sourceControlStatus": "connected",
+    "sourceControlDetail": "Canonical private GitHub repository connected and verified. n8n and production transports remain exact-approval gated.",
+    "repositoryUrl": "https://github.com/gurnoorbassi/AI-Lead-Command-Center",
+    "repositoryFullName": "gurnoorbassi/AI-Lead-Command-Center",
+    "repositoryVisibility": "private",
+    "defaultBranch": "main",
+    "adapters": [
+      {
+        "adapterId": "github-draft-pr",
+        "status": "ready",
+        "target": "gurnoorbassi/AI-Lead-Command-Center",
+        "detail": "Exact branch and draft pull-request work is available after owner approval."
+      },
+      {
+        "adapterId": "n8n-disabled-workflow",
+        "status": "ready",
+        "target": "https://n8n.agdigitalz.net",
+        "detail": "The production n8n endpoint is registered for disabled-workflow creation only after exact owner approval."
+      },
+      {
+        "adapterId": "production-deployment",
+        "status": "approval_required",
+        "target": "root@5.78.87.188:/opt/ai-lead-command-center",
+        "detail": "Production deployment is registered but remains commit-pinned, backup-first, and separately approval-gated."
+      }
+    ],
     "operations": [
       "Open the full protected lead console.",
       "Give AG OS a command targeted to the AI Lead Command Center.",
@@ -68,5 +92,5 @@
     ]
   },
   "createdAt": "2026-07-16T01:09:20.530Z",
-  "updatedAt": "2026-07-16T01:09:20.530Z"
+  "updatedAt": "2026-07-16T02:25:00.000Z"
 }

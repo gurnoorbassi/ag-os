@@ -10,8 +10,10 @@ import { activeJobApproval } from "./job-approval-service.mjs";
 import { writeJobCompletionArtifacts } from "./job-completion-processor.mjs";
 import { executeLocalWorkProduct } from "./local-work-product-adapter.mjs";
 import { executeGitHubDraftPr } from "./github-draft-pr-adapter.mjs";
+import { executeGitHubPrivateRepository } from "./github-private-repository-adapter.mjs";
 import { executeN8nDisabledWorkflow } from "./n8n-disabled-workflow-adapter.mjs";
 import { executeNetlifyStagingDeploy } from "./netlify-staging-adapter.mjs";
+import { executeNetlifyContinuousDeployment } from "./netlify-continuous-deployment-adapter.mjs";
 
 const LIVE_JOB_PREFIX = "job-runtime-operator-";
 let processing = false;
@@ -194,7 +196,18 @@ export async function processAutonomousJob({
 
   try {
     let execution;
-    if (adapter.adapterId === "github-draft-pr") {
+    if (adapter.adapterId === "github-private-repository") {
+      execution = await executeGitHubPrivateRepository({
+          request: command.executionRequest,
+          job: running,
+          adapter,
+          approval: approval.approval,
+          token: env[["AG_OS", "GITHUB", "TOKEN"].join("_")],
+          fetchImpl: githubFetch,
+          now,
+          root
+        });
+    } else if (adapter.adapterId === "github-draft-pr") {
       execution = await executeGitHubDraftPr({
           request: command.executionRequest,
           job: running,
@@ -219,6 +232,17 @@ export async function processAutonomousJob({
       });
     } else if (adapter.adapterId === "netlify-staging") {
       execution = await executeNetlifyStagingDeploy({
+        request: command.executionRequest,
+        job: running,
+        adapter,
+        approval: approval.approval,
+        token: env[["AG_OS", "NETLIFY", "TOKEN"].join("_")],
+        fetchImpl: netlifyFetch,
+        now,
+        root
+      });
+    } else if (adapter.adapterId === "netlify-continuous-deployment") {
+      execution = await executeNetlifyContinuousDeployment({
         request: command.executionRequest,
         job: running,
         adapter,

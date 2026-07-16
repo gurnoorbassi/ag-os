@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260716-foreman-netlify-continuous-deployment-used",
+  "occurredAt": "2026-07-16T02:37:06.580Z",
+  "actor": "codex",
+  "eventType": "standing_approval_used",
+  "summary": "The one-use Foreman Netlify continuous-deployment approval linked the existing site to its canonical GitHub repository and was consumed.",
+  "scope": "foreman-quote-studio:gurnoorbassi/Foreman-Quote-Maker:main",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260715-foreman-netlify-continuous-deployment"
+    },
+    {
+      "type": "other",
+      "reference": "Netlify link attempt and failed deploy 6a5843bcdd7fdd3599d11e1c"
+    },
+    {
+      "type": "commit",
+      "reference": "7beb3d07e476234340bfeef79650070c0791af81"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Netlify returned provider github, repository gurnoorbassi/Foreman-Quote-Maker, and branch main. No domain, DNS, environment variable, credential, paid, customer-data, n8n, messaging, or posting change was requested.",
+  "createdAt": "2026-07-16T02:37:06.580Z"
+}

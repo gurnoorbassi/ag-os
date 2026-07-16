@@ -3,10 +3,10 @@
   "recordType": "connector-auth-status",
   "connectorId": "connector-netlify-mcp",
   "authStatus": "authenticated",
-  "lastObservedAt": "2026-07-13T22:26:28Z",
-  "lastAuthenticatedAt": "2026-07-13T22:26:28Z",
+  "lastObservedAt": "2026-07-16T02:40:00Z",
+  "lastAuthenticatedAt": "2026-07-16T02:40:00Z",
   "observationSource": "gated_execution_record",
-  "observationEvidence": "A read-only Netlify connector lookup returned the current user account. No project, deployment, environment variable, access-control, form, extension, or domain mutation was requested or performed.",
+  "observationEvidence": "Netlify authentication and the Foreman site were verified. The approved Git binding failed repository-access verification, was unlinked, and the existing published deployment was preserved.",
   "grantsPermission": false,
   "liveCallsUsed": false,
   "notes": [
@@ -15,5 +15,5 @@
     "Authenticated status records connectivity evidence only and does not authorize deployment or project mutations."
   ],
   "createdAt": "2026-07-07T00:00:00Z",
-  "updatedAt": "2026-07-13T22:26:28Z"
+  "updatedAt": "2026-07-16T02:40:00Z"
 }

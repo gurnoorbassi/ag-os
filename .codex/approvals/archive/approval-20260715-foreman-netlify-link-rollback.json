@@ -1,0 +1,38 @@
+{
+  "approvalId": "approval-20260715-foreman-netlify-link-rollback",
+  "status": "expired",
+  "approvalKind": "single_action",
+  "actionClass": "netlify_continuous_deployment_rollback",
+  "inclusionCriteria": [
+    "Netlify site is exactly fa4f3001-ecac-4b9a-9eb0-16de7f254b11.",
+    "Remove only the failed GitHub repository binding.",
+    "Preserve the currently published ready deployment, domains, and environment variables."
+  ],
+  "maxUses": 1,
+  "usageAuditRequired": true,
+  "revocableImmediately": true,
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "codex",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-quote-builder",
+  "commandCategory": "rollback",
+  "requestedAction": "Restore the Foreman Netlify site to its pre-link repository configuration after the approved link failed verification.",
+  "target": "netlify:fa4f3001-ecac-4b9a-9eb0-16de7f254b11:repository-binding",
+  "scope": "One failure-recovery PATCH removing only the unsuccessful GitHub repository binding from foreman-quote-studio, followed by read-only verification.",
+  "riskLevel": "R5",
+  "dataClass": "internal",
+  "budget": { "required": false, "maxUsd": 0 },
+  "approvalRequiredFor": ["netlify_continuous_deployment_rollback"],
+  "approvedActions": ["netlify_continuous_deployment_rollback"],
+  "prohibitedActions": ["deploy_production", "domain_change", "dns_change", "environment_variable_change", "credential_change", "paid_action", "customer_data_access"],
+  "revocationPath": "Consumed after the one rollback use at 2026-07-16T02:39:00.000Z. No further Netlify mutation is authorized.",
+  "evidence": [
+    { "type": "owner_instruction", "reference": "The owner requested Netlify continuous deployment; safe failure recovery restores the prior state when exact verification fails.", "verified": true },
+    { "type": "other", "reference": "Netlify deploy 6a5843bcdd7fdd3599d11e1c failed preparing the repository because repository access was unavailable.", "verified": true }
+  ],
+  "approvalText": "Restore only the failed Foreman Netlify repository binding; do not deploy or change domains, DNS, environment variables, credentials, data, or paid settings.",
+  "approvedAt": "2026-07-16T02:38:00.000Z",
+  "expiresAt": "2026-07-17T02:38:00.000Z",
+  "createdAt": "2026-07-16T02:38:00.000Z",
+  "updatedAt": "2026-07-16T02:39:00.000Z"
+}

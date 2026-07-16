@@ -5,8 +5,10 @@ import { writeAuditEventRecord } from "./audit-writer.mjs";
 import { isoTimestamp, readJson, slugify, writeJson } from "./common.mjs";
 import { selectExecutionAdapter } from "./execution-adapter-registry.mjs";
 import { validateGitHubDraftPrRequest } from "./github-draft-pr-adapter.mjs";
+import { githubPrivateRepositoryApprovalCriteria, validateGitHubPrivateRepositoryRequest } from "./github-private-repository-adapter.mjs";
 import { validateN8nDisabledWorkflowRequest, n8nApprovalCriteria } from "./n8n-disabled-workflow-adapter.mjs";
 import { validateNetlifyStagingRequest, netlifyApprovalCriteria } from "./netlify-staging-adapter.mjs";
+import { netlifyContinuousDeploymentApprovalCriteria, validateNetlifyContinuousDeploymentRequest } from "./netlify-continuous-deployment-adapter.mjs";
 
 function jobPath(jobId) {
   return `.codex/jobs/${jobId}.json`;
@@ -29,7 +31,9 @@ function buildExactApproval({ job, command, adapter, now, expiresAt, root }) {
     throw new Error("job approval expiry must be within the next 24 hours");
   }
   const approvalId = `approval-${timestamp.slice(0, 10).replaceAll("-", "")}-${slugify(job.jobId.replace(/^job-/, ""))}`;
-  const adapterCriteria = adapter.adapterId === "github-draft-pr"
+  const adapterCriteria = adapter.adapterId === "github-private-repository"
+    ? githubPrivateRepositoryApprovalCriteria(validateGitHubPrivateRepositoryRequest({ request: command.executionRequest, root }))
+    : adapter.adapterId === "github-draft-pr"
     ? (() => {
         const validated = validateGitHubDraftPrRequest({ request: command.executionRequest, root });
         return [
@@ -43,6 +47,8 @@ function buildExactApproval({ job, command, adapter, now, expiresAt, root }) {
       ? n8nApprovalCriteria(validateN8nDisabledWorkflowRequest({ request: command.executionRequest }))
       : adapter.adapterId === "netlify-staging"
         ? netlifyApprovalCriteria(validateNetlifyStagingRequest({ request: command.executionRequest, root }))
+        : adapter.adapterId === "netlify-continuous-deployment"
+          ? netlifyContinuousDeploymentApprovalCriteria(validateNetlifyContinuousDeploymentRequest({ request: command.executionRequest, root }))
         : [];
   return {
     approvalId,

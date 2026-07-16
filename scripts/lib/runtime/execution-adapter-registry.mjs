@@ -2,6 +2,30 @@ import process from "node:process";
 
 const ADAPTERS = [
   {
+    adapterId: "netlify-continuous-deployment",
+    name: "Netlify Git continuous-deployment linker",
+    kind: "connector",
+    requestedAction: "netlify_continuous_deployment_link",
+    commandPatterns: [/\bnetlify\b[^.]{0,100}\bcontinuous deployment\b/i, /\blink\b[^.]{0,80}\bnetlify\b[^.]{0,80}\brepositor(?:y|ies)\b/i],
+    credentialEnvParts: ["AG_OS", "NETLIFY", "TOKEN"],
+    capabilities: ["link_github_repository", "configure_build", "verify_repository_binding"],
+    liveServiceTouched: true,
+    approvalRequired: true,
+    implemented: true
+  },
+  {
+    adapterId: "github-private-repository",
+    name: "GitHub private-repository provisioner",
+    kind: "connector",
+    requestedAction: "github_private_repository_create",
+    commandPatterns: [/\bprivate\b[^.]{0,60}\brepositor(?:y|ies)\b/i, /\bcreate\b[^.]{0,60}\brepo\b/i],
+    credentialEnvParts: ["AG_OS", "GITHUB", "TOKEN"],
+    capabilities: ["create_private_repository", "verify_private_visibility", "bind_project_repository"],
+    liveServiceTouched: true,
+    approvalRequired: true,
+    implemented: true
+  },
+  {
     adapterId: "local-work-product",
     name: "Local work-product worker",
     kind: "local",
@@ -124,7 +148,7 @@ export function selectExecutionAdapter({ command, env = process.env } = {}) {
     return publicAdapter(explicit, env);
   }
   const commandText = typeof command === "string" ? command : command?.rawCommand || command?.normalizedCommand || "";
-  const matched = ADAPTERS.find((adapter) => adapter.commandPatterns.some((pattern) => pattern.test(commandText))) || ADAPTERS[0];
+  const matched = ADAPTERS.find((adapter) => adapter.commandPatterns.some((pattern) => pattern.test(commandText))) || ADAPTERS.find((adapter) => adapter.adapterId === "local-work-product");
   const selected = publicAdapter(matched, env);
   if (matched.adapterId === "github-draft-pr" && typeof command === "object" && !command.executionRequest) {
     return {
@@ -133,7 +157,7 @@ export function selectExecutionAdapter({ command, env = process.env } = {}) {
       blockers: [...selected.blockers, "exact GitHub executionRequest with repository, base commit, branch, and isolated source directory is missing"]
     };
   }
-  if (["n8n-disabled-workflow", "netlify-staging"].includes(matched.adapterId) && typeof command === "object" && !command.executionRequest) {
+  if (["github-private-repository", "n8n-disabled-workflow", "netlify-staging", "netlify-continuous-deployment"].includes(matched.adapterId) && typeof command === "object" && !command.executionRequest) {
     return {
       ...selected,
       executionReady: false,

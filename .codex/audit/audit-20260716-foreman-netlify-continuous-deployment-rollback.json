@@ -1,0 +1,19 @@
+{
+  "id": "audit-20260716-foreman-netlify-continuous-deployment-rollback",
+  "occurredAt": "2026-07-16T02:39:00.000Z",
+  "actor": "codex",
+  "eventType": "rollback_completed",
+  "summary": "The failed Foreman Netlify Git repository binding was removed and the existing published deployment was preserved.",
+  "scope": "netlify:fa4f3001-ecac-4b9a-9eb0-16de7f254b11:repository-binding",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    { "type": "approval", "reference": "approval-20260715-foreman-netlify-link-rollback" },
+    { "type": "other", "reference": "Netlify failed deploy 6a5843bcdd7fdd3599d11e1c" },
+    { "type": "other", "reference": "Netlify preserved published deploy 6a55a444a9c1267ae18b297d" }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "The repository was unlinked through Netlify's unlink_repo endpoint after clone verification failed. The live published site remains current. A future link requires GitHub App installation or a separately approved deploy key.",
+  "createdAt": "2026-07-16T02:39:00.000Z"
+}
