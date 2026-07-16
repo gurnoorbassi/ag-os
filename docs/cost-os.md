@@ -55,6 +55,18 @@ By default, AG OS may not:
 - Deploy
 - Trigger paid actions
 
+## Anthropic Runtime Circuit Breaker
+
+Every Anthropic planning or builder request performs a fail-closed budget check before the network call. The check:
+
+- reads the source-controlled monthly, daily, and per-task caps;
+- totals recorded actual spend plus active call reservations;
+- reserves the estimated input and maximum-output token cost before calling Anthropic;
+- records a `blocked_budget` cost-ledger result and skips the API call when any cap is at or over its limit;
+- independently stops after `AG_OS_ANTHROPIC_DAILY_CALL_LIMIT` attempts per UTC day (default `20`).
+
+Successful calls retain an archived reservation as call-count evidence and write actual token cost through the normal cost ledger. An interrupted call leaves its reservation active so later work fails closed until the evidence is reconciled.
+
 ## Validation
 
 `npm run validate` checks that:

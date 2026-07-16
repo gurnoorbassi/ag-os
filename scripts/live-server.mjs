@@ -458,13 +458,23 @@ const server = createServer(async (request, response) => {
           ...input,
           apiKey: process.env.ANTHROPIC_API_KEY,
           model: plannerReadiness.model,
-          baseUrl: process.env.ANTHROPIC_BASE_URL
+          baseUrl: process.env.ANTHROPIC_BASE_URL,
+          inputCostPerMillionUsd: plannerReadiness.inputCostPerMillionUsd,
+          outputCostPerMillionUsd: plannerReadiness.outputCostPerMillionUsd,
+          approvalId: plannerReadiness.approvalId,
+          approvalMaxUsd: plannerReadiness.approval?.budget?.maxUsd,
+          root
         }),
         workProductProvider: (input) => createAnthropicWorkProduct({
           ...input,
           apiKey: process.env.ANTHROPIC_API_KEY,
           model: workerReadiness.model,
-          baseUrl: process.env.ANTHROPIC_BASE_URL
+          baseUrl: process.env.ANTHROPIC_BASE_URL,
+          inputCostPerMillionUsd: workerReadiness.inputCostPerMillionUsd,
+          outputCostPerMillionUsd: workerReadiness.outputCostPerMillionUsd,
+          approvalId: workerReadiness.approvalId,
+          approvalMaxUsd: workerReadiness.approval?.budget?.maxUsd,
+          root
         }),
         root
       });

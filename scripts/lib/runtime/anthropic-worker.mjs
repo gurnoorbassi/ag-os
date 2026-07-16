@@ -4,6 +4,7 @@ import process from "node:process";
 import { isoTimestamp, normalizeRunId, slugify, writeJson } from "./common.mjs";
 import { toAnthropicStructuredOutputSchema } from "./anthropic-planner.mjs";
 import { loadWorkerEvidence } from "./worker-evidence-loader.mjs";
+import { finalizeAnthropicBudgetReservation, reserveAnthropicBudget } from "./anthropic-budget-guard.mjs";
 
 const DEFAULT_BASE_URL = "https://api.anthropic.com";
 const ANTHROPIC_VERSION = "2023-06-01";
@@ -11,6 +12,7 @@ const ALLOWED_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".sv
 const MAX_FILES = 20;
 const MAX_FILE_BYTES = 200_000;
 const MAX_TOTAL_BYTES = 1_000_000;
+export const ANTHROPIC_WORKER_MAX_TOKENS = 8000;
 
 export const WORK_PRODUCT_SCHEMA = {
   type: "object",
@@ -74,53 +76,72 @@ export function assertWorkProductShape(workProduct) {
   return { totalBytes, paths: [...paths] };
 }
 
-export async function createAnthropicWorkProduct({ command, plan, apiKey, model, baseUrl = DEFAULT_BASE_URL, fetchImpl = globalThis.fetch, root = process.cwd() }) {
+export async function createAnthropicWorkProduct({ command, job, plan, apiKey, model, baseUrl = DEFAULT_BASE_URL, fetchImpl = globalThis.fetch, root = process.cwd(), inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, env, now }) {
   if (!apiKey) throw new Error("Anthropic worker credential is not configured");
   if (!model) throw new Error("Anthropic worker model is not configured");
   if (typeof fetchImpl !== "function") throw new Error("Anthropic worker fetch implementation is unavailable");
   const workerEvidence = loadWorkerEvidence({ plan, root });
-  const response = await fetchImpl(`${baseUrl.replace(/\/$/, "")}/v1/messages`, {
+  const requestBody = {
+    model,
+    max_tokens: ANTHROPIC_WORKER_MAX_TOKENS,
+    system: "You are the AG OS builder worker. Produce professional work-product files that satisfy the approved plan. Work only inside the isolated artifact workspace. Never include secrets, credentials, customer data, production data, deployment commands, messages, posts, paid actions, DNS changes, or claims that an external action occurred. Return complete usable file contents, not placeholders.",
+    messages: [{
+      role: "user",
+      content: JSON.stringify({
+        ownerOutcome: command.rawCommand,
+        projectId: plan.projectId,
+        planSummary: plan.summary,
+        tasks: plan.tasks,
+        expectedOutput: plan.expectedOutput,
+        qualityBar: plan.basis?.qualityBar || [],
+        relevantLessons: workerEvidence.lessons,
+        qualityExamples: workerEvidence.examples,
+        evidenceStrategy: workerEvidence.strategy,
+        evidenceGrantsPermission: false,
+        stopConditions: plan.stopConditions
+      })
+    }],
+    output_config: {
+      format: {
+        type: "json_schema",
+        schema: toAnthropicStructuredOutputSchema(WORK_PRODUCT_SCHEMA)
+      }
+    }
+  };
+  const budgetReservation = reserveAnthropicBudget({
+    kind: "worker",
+    job,
+    requestBody,
+    maxTokens: ANTHROPIC_WORKER_MAX_TOKENS,
+    inputCostPerMillionUsd,
+    outputCostPerMillionUsd,
+    approvalId,
+    approvalMaxUsd,
+    root,
+    env,
+    now
+  });
+  try {
+    const response = await fetchImpl(`${baseUrl.replace(/\/$/, "")}/v1/messages`, {
     method: "POST",
     headers: {
       "anthropic-version": ANTHROPIC_VERSION,
       "content-type": "application/json",
       "x-api-key": apiKey
     },
-    body: JSON.stringify({
-      model,
-      max_tokens: 8000,
-      system: "You are the AG OS builder worker. Produce professional work-product files that satisfy the approved plan. Work only inside the isolated artifact workspace. Never include secrets, credentials, customer data, production data, deployment commands, messages, posts, paid actions, DNS changes, or claims that an external action occurred. Return complete usable file contents, not placeholders.",
-      messages: [{
-        role: "user",
-        content: JSON.stringify({
-          ownerOutcome: command.rawCommand,
-          projectId: plan.projectId,
-          planSummary: plan.summary,
-          tasks: plan.tasks,
-          expectedOutput: plan.expectedOutput,
-          qualityBar: plan.basis?.qualityBar || [],
-          relevantLessons: workerEvidence.lessons,
-          qualityExamples: workerEvidence.examples,
-          evidenceStrategy: workerEvidence.strategy,
-          evidenceGrantsPermission: false,
-          stopConditions: plan.stopConditions
-        })
-      }],
-      output_config: {
-        format: {
-          type: "json_schema",
-          schema: toAnthropicStructuredOutputSchema(WORK_PRODUCT_SCHEMA)
-        }
-      }
-    })
-  });
-  if (!response.ok) throw new Error(`Anthropic worker request failed with HTTP ${response.status}`);
-  const payload = await response.json();
-  const text = payload.content?.find((block) => block.type === "text")?.text;
-  if (!text) throw new Error("Anthropic worker returned no structured work product");
-  const workProduct = JSON.parse(text);
-  const validation = assertWorkProductShape(workProduct);
-  return { workProduct, validation, model: payload.model || model, usage: payload.usage || {} };
+      body: JSON.stringify(requestBody)
+    });
+    if (!response.ok) throw new Error(`Anthropic worker request failed with HTTP ${response.status}`);
+    const payload = await response.json();
+    const text = payload.content?.find((block) => block.type === "text")?.text;
+    if (!text) throw new Error("Anthropic worker returned no structured work product");
+    const workProduct = JSON.parse(text);
+    const validation = assertWorkProductShape(workProduct);
+    return { workProduct, validation, model: payload.model || model, usage: payload.usage || {}, budgetReservation };
+  } catch (error) {
+    finalizeAnthropicBudgetReservation({ reservation: budgetReservation, consumed: false, root, now });
+    throw error;
+  }
 }
 
 export function writeAnthropicWorkProduct({ job, plan, command, result, runId, root = process.cwd(), now = new Date() }) {

@@ -44,9 +44,11 @@ function safeWorkProduct() {
 }
 
 test("Anthropic worker requests a bounded schema and validates safe file output", async () => {
+  const root = tempWorkspace();
   let request;
   const result = await createAnthropicWorkProduct({
     command: { rawCommand: "Build a private operations dashboard" },
+    job: { jobId: "job-anthropic-worker-test", projectId: "project-quote-builder" },
     plan: {
       projectId: "project-quote-builder",
       summary: "Build the dashboard.",
@@ -64,6 +66,12 @@ test("Anthropic worker requests a bounded schema and validates safe file output"
     apiKey: "test-only-key",
     model: "claude-sonnet-5",
     baseUrl: "https://anthropic.test",
+    root,
+    inputCostPerMillionUsd: 2,
+    outputCostPerMillionUsd: 10,
+    approvalId: "approval-anthropic-worker-test",
+    approvalMaxUsd: 0.25,
+    now: new Date("2026-07-16T12:00:00.000Z"),
     fetchImpl: async (url, options) => {
       request = { url, options };
       return {
