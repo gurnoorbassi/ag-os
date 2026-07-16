@@ -98,6 +98,14 @@ test("lesson queue excludes decided candidates and classifies recommendations", 
     assert.equal(decision.queue.activeCandidateCount, 1);
     const accepted = JSON.parse(readFileSync(path.join(root, ".codex/memory/accepted/lesson-runtime-owner-review-01.json"), "utf8"));
     assert.equal(accepted.runtimeUse.grantsPermission, false);
+    assert.equal(
+      accepted.promotion.approvalId,
+      "approval-20260715-lesson-promotion-lesson-runtime-owner-review-01"
+    );
+    assert.match(accepted.promotion.evidence[1], /audit-runtime-lesson-promote-/);
+    const audit = JSON.parse(readFileSync(path.join(root, accepted.promotion.evidence[1]), "utf8"));
+    assert.equal(audit.relatedArtifacts[0].type, "approval");
+    assert.equal(audit.relatedArtifacts[0].reference, accepted.promotion.approvalId);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

@@ -3,6 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
 import { buildAuditEventRecord, writeAuditEventRecord } from "./audit-writer.mjs";
+import { lessonPromotionApprovalId } from "./lesson-promotion-approval.mjs";
 import { DEFAULT_OWNER_ID, listDirectJson, readJson, slugify } from "./common.mjs";
 import { detectLessonConflicts, promoteLessonCandidate, rejectLessonCandidate } from "../../process-lesson-promotion.mjs";
 import { jobDeliverableSummary } from "./deliverable-service.mjs";
@@ -190,13 +191,17 @@ export function decideLessons({ lessonIds, decision, reason, root = process.cwd(
   try {
     for (const item of selected) {
       const actionSlug = slugify(`${decision}-${item.lessonId}-${now.toISOString()}`);
+      const approvalId = decision === "promote" ? lessonPromotionApprovalId(item.lessonId, now) : null;
       const audit = buildAuditEventRecord({
         runId: `lesson-${actionSlug}`,
         eventType: decision === "promote" ? "approval_granted" : "approval_rejected",
         summary: `Owner ${decision === "promote" ? "accepted" : "rejected"} lesson ${item.lessonId} in the authenticated control center.`,
         scope: item.recordPath,
         source: "owner_instruction",
-        relatedArtifacts: [{ type: "other", reference: item.recordPath }],
+        relatedArtifacts: [
+          ...(approvalId ? [{ type: "approval", reference: approvalId }] : []),
+          { type: "other", reference: item.recordPath }
+        ],
         riskLevel: "R1",
         liveServiceTouched: false,
         notes: decision === "promote"
@@ -210,7 +215,7 @@ export function decideLessons({ lessonIds, decision, reason, root = process.cwd(
         ? promoteLessonCandidate({
             candidatePath: item.recordPath,
             root,
-            approvalId: audit.id,
+            approvalId,
             approvedBy: DEFAULT_OWNER_ID,
             evidence: [item.recordPath, auditResult.filePath],
             now
