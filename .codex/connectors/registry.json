@@ -2,7 +2,7 @@
   "$schema": "../../schemas/connector-registry.schema.json",
   "registryVersion": 1,
   "registryType": "connector-registry",
-  "status": "foundation",
+  "status": "active",
   "connectors": [
     {
       "id": "connector-github-mcp",
@@ -13,11 +13,13 @@
       "verificationSource": "Codex tool metadata exposed GitHub MCP tools.",
       "allowedCapabilities": [
         "repository_metadata_read",
+        "private_repository_create",
         "pull_request_create",
         "pull_request_status_read",
         "pull_request_safe_merge"
       ],
       "approvalRequiredFor": [
+        "repository_create",
         "branch_deletion",
         "repository_settings_changes",
         "secret_management",
@@ -54,7 +56,7 @@
         "production_workflow_execution",
         "unapproved_workflow_activation"
       ],
-      "notes": "Default use is design and validation only. Do not create, update, archive, unpublish, or activate workflows without explicit approval."
+      "notes": "The AI Lead production endpoint is registered for authenticated preflight and disabled-workflow creation. Update, archive, publish, execute, or activate operations remain separately approval-gated."
     },
     {
       "id": "connector-netlify-mcp",
@@ -68,6 +70,7 @@
         "project_metadata_read",
         "team_metadata_read",
         "deploy_metadata_read"
+        ,"continuous_deployment_link"
       ],
       "approvalRequiredFor": [
         "site_deploy",
@@ -82,7 +85,7 @@
         "unapproved_deployment",
         "unapproved_domain_changes"
       ],
-      "notes": "Default use is read-only context and metadata. Do not deploy, change project settings, change environment variables, or touch domains without explicit approval."
+      "notes": "Foreman Quote Studio and AG Digitalz site metadata are registered. Repository linking and every production deploy remain exact-approval gated."
     }
   ],
   "availableButNotConnected": [

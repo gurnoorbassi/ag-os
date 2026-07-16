@@ -64,10 +64,6 @@
       "additionalProperties": false,
       "required": [
         "summary",
-        "liveUrl",
-        "liveLabel",
-        "previewMode",
-        "previewReason",
         "sourceControlStatus",
         "sourceControlDetail",
         "operations"
@@ -78,8 +74,26 @@
         "liveLabel": { "type": "string", "minLength": 1 },
         "previewMode": { "type": "string", "enum": ["new_tab", "embedded"] },
         "previewReason": { "type": "string", "minLength": 1 },
-        "sourceControlStatus": { "type": "string", "enum": ["connected", "setup_needed"] },
+        "sourceControlStatus": { "type": "string", "enum": ["connected", "approval_required", "setup_needed"] },
         "sourceControlDetail": { "type": "string", "minLength": 1 },
+        "repositoryUrl": { "type": "string", "format": "uri" },
+        "repositoryFullName": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+        "repositoryVisibility": { "type": "string", "enum": ["private", "public"] },
+        "defaultBranch": { "type": "string", "minLength": 1 },
+        "adapters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["adapterId", "status", "target", "detail"],
+            "properties": {
+              "adapterId": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+              "status": { "type": "string", "enum": ["connected", "ready", "approval_required", "setup_required", "blocked"] },
+              "target": { "type": "string", "minLength": 1 },
+              "detail": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
         "operations": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
       }
     },

@@ -98,6 +98,8 @@ export function validateProjectCreateInput(input = {}) {
   const projectType = input.projectType || "internal_project";
   const managementMode = input.managementMode || "active_build";
   const trustLevel = input.trustLevel === undefined ? 1 : Number(input.trustLevel);
+  const repositoryName = String(input.repositoryName || slugify(name)).trim();
+  const repositoryOwner = String(input.repositoryOwner || "gurnoorbassi").trim();
 
   if (!PROJECT_TYPES.has(projectType)) {
     throw new Error(`unsupported projectType: ${projectType}`);
@@ -108,8 +110,14 @@ export function validateProjectCreateInput(input = {}) {
   if (!Number.isInteger(trustLevel) || trustLevel < 0 || trustLevel > 4) {
     throw new Error("trustLevel must be an integer from 0 to 4");
   }
+  if (!/^[A-Za-z0-9_.-]{1,100}$/.test(repositoryName) || repositoryName === "." || repositoryName === "..") {
+    throw new Error("repositoryName must be a safe GitHub repository name");
+  }
+  if (!/^[A-Za-z0-9_.-]{1,100}$/.test(repositoryOwner) || repositoryOwner === "." || repositoryOwner === "..") {
+    throw new Error("repositoryOwner must be a safe GitHub account name");
+  }
 
-  return { name, goal, scope, stack, knownFacts, projectType, managementMode, trustLevel };
+  return { name, goal, scope, stack, knownFacts, projectType, managementMode, trustLevel, repositoryName, repositoryOwner };
 }
 
 export function listProjects({ root = process.cwd() } = {}) {
@@ -192,6 +200,25 @@ export function createProject({ input, root = process.cwd(), now = new Date() })
     securityReview: "Required before any live service, credential, production data, or external connector is activated.",
     costTracking: "Record estimated and actual cost for every run; paid actions require a matching approval and budget.",
     deploymentPlan: "No deployment is authorized by project creation. Use a separately approved, verified, and reversible deployment plan.",
+    ownerWorkspace: {
+      summary: values.goal,
+      sourceControlStatus: "approval_required",
+      sourceControlDetail: `Private GitHub repository ${values.repositoryName} is queued behind one exact owner approval.`,
+      repositoryFullName: `${values.repositoryOwner}/${values.repositoryName}`,
+      repositoryVisibility: "private",
+      defaultBranch: "main",
+      adapters: [{
+        adapterId: "github-private-repository",
+        status: "approval_required",
+        target: `${values.repositoryOwner}/${values.repositoryName}`,
+        detail: "Approve the generated repository-provisioning job once; AG OS then creates and binds the private repository."
+      }],
+      operations: [
+        "Give AG OS commands targeted to this project.",
+        "Approve the exact private-repository provisioning job.",
+        "Review jobs, evidence, quality, lessons, and cost."
+      ]
+    },
     createdAt: timestamp,
     updatedAt: timestamp
   };
@@ -245,6 +272,7 @@ export function createProject({ input, root = process.cwd(), now = new Date() })
   return {
     status: "created",
     project,
+    repositoryName: values.repositoryName,
     registryEntry: nextRegistry.projects.at(-1),
     recordsCreated: [projectRecordPath, ".codex/projects/registry.json", auditRecordPath],
     safety: {

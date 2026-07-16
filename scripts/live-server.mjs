@@ -10,7 +10,7 @@ import { createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
 import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-planner-readiness.mjs";
 import { createAnthropicWorkProduct } from "./lib/runtime/anthropic-worker.mjs";
 import { evaluateAnthropicWorkerReadiness } from "./lib/runtime/anthropic-worker-readiness.mjs";
-import { listProjects } from "./lib/runtime/project-service.mjs";
+import { createProject, listProjects } from "./lib/runtime/project-service.mjs";
 import {
   decideLessons,
   getOperatingSystems,
@@ -354,6 +354,30 @@ const server = createServer(async (request, response) => {
         projectId: decodeURIComponent(projectWorkspaceMatch[1]),
         root
       }), headers);
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/v1/projects") {
+      const body = await readJsonBody(request);
+      const repositoryOwner = process.env.AG_OS_GITHUB_OWNER || "gurnoorbassi";
+      const created = createProject({ input: { ...body, repositoryOwner }, root });
+      const provisioning = await submitOwnerCommand({
+        command: `Create the private GitHub repository ${repositoryOwner}/${created.repositoryName} and bind it to ${created.project.id}.`,
+        projectId: created.project.id,
+        executionRequest: {
+          adapterId: "github-private-repository",
+          operation: "create_private_repository",
+          repository: { owner: repositoryOwner, name: created.repositoryName },
+          projectId: created.project.id,
+          projectRecordPath: created.registryEntry.recordPath,
+          description: `Private source repository for ${created.project.name}`
+        },
+        useAiPlanner: false,
+        useAiWorker: false,
+        root
+      });
+      json(response, 201, { ...created, repositoryProvisioning: provisioning }, headers);
+      setImmediate(runAutomaticQueue);
       return;
     }
 

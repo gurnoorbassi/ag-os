@@ -1,0 +1,61 @@
+{
+  "approvalId": "approval-20260715-foreman-netlify-continuous-deployment",
+  "status": "expired",
+  "approvalKind": "single_action",
+  "actionClass": "netlify_continuous_deployment_link",
+  "inclusionCriteria": [
+    "Netlify site is exactly fa4f3001-ecac-4b9a-9eb0-16de7f254b11.",
+    "Repository is exactly gurnoorbassi/Foreman-Quote-Maker.",
+    "GitHub repository id is exactly 1302187689.",
+    "Branch is exactly main.",
+    "Build command is exactly npm run build.",
+    "Publish directory is exactly .next.",
+    "Source commit at approval time is exactly 7beb3d07e476234340bfeef79650070c0791af81.",
+    "Stop if Netlify cannot preserve existing domains and environment variables."
+  ],
+  "maxUses": 1,
+  "usageAuditRequired": true,
+  "revocableImmediately": true,
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "codex",
+  "approvedBy": "owner-gurnoor-bassi",
+  "projectId": "project-quote-builder",
+  "commandCategory": "connect_service",
+  "requestedAction": "Link the existing Foreman Quote Studio Netlify site to the canonical GitHub repository for continuous deployment.",
+  "target": "project-quote-builder:job-runtime-operator-foreman-netlify-cd-20260716:netlify-continuous-deployment",
+  "scope": "One Netlify site-settings mutation linking foreman-quote-studio to gurnoorbassi/Foreman-Quote-Maker main with npm run build and .next, followed by read-only verification and non-secret audit evidence.",
+  "riskLevel": "R5",
+  "dataClass": "internal",
+  "budget": { "required": false, "maxUsd": 0 },
+  "approvalRequiredFor": ["netlify_continuous_deployment_link"],
+  "approvedActions": ["netlify_continuous_deployment_link"],
+  "prohibitedActions": [
+    "domain_change",
+    "dns_change",
+    "environment_variable_change",
+    "credential_change",
+    "paid_action",
+    "customer_data_access",
+    "n8n_mutation",
+    "messaging",
+    "posting"
+  ],
+  "revocationPath": "Consumed after its one approved use at 2026-07-16T02:37:06.580Z. No further Netlify mutation is authorized by this record.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Current owner instruction: connect Netlify continuous deployment and bind the canonical repository URLs inside AG OS.",
+      "verified": true
+    },
+    {
+      "type": "validation_output",
+      "reference": "AG OS Foundation validation and focused adapter tests passed immediately before execution.",
+      "verified": true
+    }
+  ],
+  "approvalText": "Approve one exact Foreman Quote Studio Netlify continuous-deployment link to gurnoorbassi/Foreman-Quote-Maker main; no domain, DNS, environment, credential, data, paid, n8n, messaging, or posting change.",
+  "approvedAt": "2026-07-16T02:35:46.413Z",
+  "expiresAt": "2026-07-17T02:35:46.413Z",
+  "createdAt": "2026-07-16T02:35:46.413Z",
+  "updatedAt": "2026-07-16T02:37:06.580Z"
+}

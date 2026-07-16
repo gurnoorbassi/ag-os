@@ -1,0 +1,24 @@
+{
+  "id": "audit-runtime-approval-20260709-ag-os-codex-draft-pr-standing-use-7",
+  "occurredAt": "2026-07-16T00:22:00.000Z",
+  "actor": "agent-codex",
+  "eventType": "standing_approval_used",
+  "summary": "Standing approval approval-20260709-ag-os-codex-draft-pr-standing used for codex branch push and draft PR creation.",
+  "scope": "gurnoorbassi/ag-os:codex/repository-connector-activation-20260716",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260709-ag-os-codex-draft-pr-standing"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/144"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Use 7 of 10. Secret scan and all required local gates passed. Merge remains prohibited. Changed files: .codex/approvals/archive/approval-20260715-foreman-netlify-continuous-deployment.json, .codex/approvals/archive/approval-20260715-foreman-netlify-link-rollback.json, .codex/audit/audit-20260716-foreman-netlify-continuous-deployment-rollback.json, .codex/audit/audit-20260716-foreman-netlify-continuous-deployment-used.json, .codex/connectors/connector-auth-n8n-mcp.json, .codex/connectors/connector-auth-netlify-mcp.json, .codex/connectors/registry.json, .codex/projects/ai-lead-command-center.json, .codex/projects/quote-builder.json, dashboard/app.js, dashboard/dashboard-data.js, dashboard/index.html, dashboard/styles.css, docs/repository-and-adapter-operations.md, schemas/project.schema.json, scripts/lib/runtime/autonomous-runner.mjs, scripts/lib/runtime/execution-adapter-registry.mjs, scripts/lib/runtime/github-private-repository-adapter.mjs, scripts/lib/runtime/job-approval-service.mjs, scripts/lib/runtime/netlify-continuous-deployment-adapter.mjs, scripts/lib/runtime/project-service.mjs, scripts/live-server.mjs, tests/github-private-repository-adapter.test.mjs, tests/netlify-continuous-deployment-adapter.test.mjs.",
+  "createdAt": "2026-07-16T00:22:00.000Z"
+}

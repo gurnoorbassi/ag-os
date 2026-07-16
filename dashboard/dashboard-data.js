@@ -63,8 +63,26 @@ window.AG_OS_DASHBOARD_DATA = {
           "liveLabel": "Open Quote Builder",
           "previewMode": "new_tab",
           "previewReason": "The live product intentionally blocks iframe embedding. AG OS keeps your workspace open and launches the secure full app in a separate tab.",
-          "sourceControlStatus": "setup_needed",
-          "sourceControlDetail": "Structured local application found, but no isolated Git repository or dedicated remote is connected.",
+          "sourceControlStatus": "connected",
+          "sourceControlDetail": "Canonical GitHub repository connected and verified. Netlify Git continuous deployment is the remaining deployment binding.",
+          "repositoryUrl": "https://github.com/gurnoorbassi/Foreman-Quote-Maker",
+          "repositoryFullName": "gurnoorbassi/Foreman-Quote-Maker",
+          "repositoryVisibility": "public",
+          "defaultBranch": "main",
+          "adapters": [
+            {
+              "adapterId": "github-draft-pr",
+              "status": "ready",
+              "target": "gurnoorbassi/Foreman-Quote-Maker",
+              "detail": "Exact branch and draft pull-request work is available after owner approval."
+            },
+            {
+              "adapterId": "netlify-continuous-deployment",
+              "status": "setup_required",
+              "target": "foreman-quote-studio:main",
+              "detail": "Netlify GitHub repository authorization is required. The attempted unauthenticated binding was rolled back and the existing published site remains current."
+            }
+          ],
           "operations": [
             "Open the full live quote product.",
             "Give AG OS a command targeted to Quote Builder.",
@@ -93,8 +111,32 @@ window.AG_OS_DASHBOARD_DATA = {
           "liveLabel": "Open AI Lead Command Center",
           "previewMode": "new_tab",
           "previewReason": "The protected console intentionally blocks iframe embedding. AG OS keeps your workspace open and launches the secure full app in a separate tab.",
-          "sourceControlStatus": "setup_needed",
-          "sourceControlDetail": "The live VPS application is structured and running, but its deployed source is not connected to a canonical Git remote.",
+          "sourceControlStatus": "connected",
+          "sourceControlDetail": "Canonical private GitHub repository connected and verified. n8n and production transports remain exact-approval gated.",
+          "repositoryUrl": "https://github.com/gurnoorbassi/AI-Lead-Command-Center",
+          "repositoryFullName": "gurnoorbassi/AI-Lead-Command-Center",
+          "repositoryVisibility": "private",
+          "defaultBranch": "main",
+          "adapters": [
+            {
+              "adapterId": "github-draft-pr",
+              "status": "ready",
+              "target": "gurnoorbassi/AI-Lead-Command-Center",
+              "detail": "Exact branch and draft pull-request work is available after owner approval."
+            },
+            {
+              "adapterId": "n8n-disabled-workflow",
+              "status": "ready",
+              "target": "https://n8n.agdigitalz.net",
+              "detail": "The production n8n endpoint is registered for disabled-workflow creation only after exact owner approval."
+            },
+            {
+              "adapterId": "production-deployment",
+              "status": "approval_required",
+              "target": "root@5.78.87.188:/opt/ai-lead-command-center",
+              "detail": "Production deployment is registered but remains commit-pinned, backup-first, and separately approval-gated."
+            }
+          ],
           "operations": [
             "Open the full protected lead console.",
             "Give AG OS a command targeted to the AI Lead Command Center.",
@@ -336,7 +378,7 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "connectorRegistry": {
-    "status": "foundation",
+    "status": "active",
     "connectedCount": 3,
     "connectors": [
       "GitHub MCP: connected",
@@ -1247,14 +1289,14 @@ window.AG_OS_DASHBOARD_DATA = {
       {
         "connectorId": "connector-n8n-mcp",
         "authStatus": "authenticated",
-        "lastObservedAt": "2026-07-13T22:26:28Z",
+        "lastObservedAt": "2026-07-16T02:40:00Z",
         "observationSource": "gated_execution_record",
         "recordPath": ".codex/connectors/connector-auth-n8n-mcp.json"
       },
       {
         "connectorId": "connector-netlify-mcp",
         "authStatus": "authenticated",
-        "lastObservedAt": "2026-07-13T22:26:28Z",
+        "lastObservedAt": "2026-07-16T02:40:00Z",
         "observationSource": "gated_execution_record",
         "recordPath": ".codex/connectors/connector-auth-netlify-mcp.json"
       }
@@ -1538,8 +1580,8 @@ window.AG_OS_DASHBOARD_DATA = {
           "revocableImmediately": true,
           "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
           "archived": false,
-          "usesRecorded": 6,
-          "remainingUses": 4
+          "usesRecorded": 7,
+          "remainingUses": 3
         }
       ],
       "ownerDecisions": [
@@ -1720,7 +1762,7 @@ window.AG_OS_DASHBOARD_DATA = {
   },
   "approvals": {
     "activeCount": 2,
-    "expiredCount": 26,
+    "expiredCount": 28,
     "blockedCount": 0,
     "staleWarningCount": 0,
     "activeApprovals": [
@@ -1769,11 +1811,53 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 6,
-        "remainingUses": 4
+        "usesRecorded": 7,
+        "remainingUses": 3
       }
     ],
     "expiredApprovals": [
+      {
+        "approvalId": "approval-20260715-foreman-netlify-link-rollback",
+        "status": "expired",
+        "riskLevel": "R5",
+        "expiresAt": "2026-07-17T02:38:00.000Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": "netlify_continuous_deployment_rollback",
+        "maxUses": 1,
+        "budget": {
+          "required": false,
+          "maxUsd": 0
+        },
+        "target": "netlify:fa4f3001-ecac-4b9a-9eb0-16de7f254b11:repository-binding",
+        "approvedActions": [
+          "netlify_continuous_deployment_rollback"
+        ],
+        "revocableImmediately": true,
+        "recordPath": ".codex/approvals/archive/approval-20260715-foreman-netlify-link-rollback.json",
+        "archived": true
+      },
+      {
+        "approvalId": "approval-20260715-foreman-netlify-continuous-deployment",
+        "status": "expired",
+        "riskLevel": "R5",
+        "expiresAt": "2026-07-17T02:35:46.413Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": "netlify_continuous_deployment_link",
+        "maxUses": 1,
+        "budget": {
+          "required": false,
+          "maxUsd": 0
+        },
+        "target": "project-quote-builder:job-runtime-operator-foreman-netlify-cd-20260716:netlify-continuous-deployment",
+        "approvedActions": [
+          "netlify_continuous_deployment_link"
+        ],
+        "revocableImmediately": true,
+        "recordPath": ".codex/approvals/archive/approval-20260715-foreman-netlify-continuous-deployment.json",
+        "archived": true
+      },
       {
         "approvalId": "approval-20260713-h3-compounding-proof",
         "status": "expired",
@@ -2443,8 +2527,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 6,
-        "remainingUses": 4
+        "usesRecorded": 7,
+        "remainingUses": 3
       }
     ],
     "standingCount": 2,
@@ -2494,8 +2578,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 6,
-        "remainingUses": 4
+        "usesRecorded": 7,
+        "remainingUses": 3
       }
     ]
   },

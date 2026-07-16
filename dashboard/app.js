@@ -509,6 +509,15 @@ async function openProjectWorkspace(project) {
       openLive.textContent = `${ownerWorkspace.liveLabel} ↗`;
       actions.append(openLive);
     }
+    if (ownerWorkspace?.repositoryUrl) {
+      const openRepository = document.createElement("a");
+      openRepository.className = "button-secondary live-app-link";
+      openRepository.href = ownerWorkspace.repositoryUrl;
+      openRepository.target = "_blank";
+      openRepository.rel = "noopener noreferrer";
+      openRepository.textContent = "Open repository ↗";
+      actions.append(openRepository);
+    }
     const accessNote = document.createElement("p");
     accessNote.className = "workspace-access-note";
     accessNote.textContent = ownerWorkspace?.previewReason || "The full application opens securely in a separate tab while AG OS stays open.";
@@ -544,7 +553,12 @@ async function openProjectWorkspace(project) {
     evidence.className = "workspace-evidence-grid";
     evidence.append(
       sectionBlock("What you can do", itemList(ownerWorkspace?.operations || result.project.scope)),
-      sectionBlock("Source control", itemList([ownerWorkspace?.sourceControlStatus === "connected" ? "Connected" : "Setup needed", ownerWorkspace?.sourceControlDetail || "Not recorded"])),
+      sectionBlock("Source control", itemList([
+        ownerWorkspace?.sourceControlStatus === "connected" ? "Connected" : ownerWorkspace?.sourceControlStatus === "approval_required" ? "Approval required" : "Setup needed",
+        ownerWorkspace?.repositoryFullName || "Repository not bound yet",
+        ownerWorkspace?.sourceControlDetail || "Not recorded"
+      ])),
+      sectionBlock("Operational adapters", itemList((ownerWorkspace?.adapters || []).map((adapter) => `${adapter.adapterId}: ${adapter.status} — ${adapter.detail}`))),
       sectionBlock("Tools", itemList(result.project.stack)),
       sectionBlock("Protected actions", itemList(result.project.approvalRequiredFor))
     );
@@ -555,6 +569,75 @@ async function openProjectWorkspace(project) {
     failure.textContent = `Could not open project: ${error.message}`;
     openWorkspaceDialog({ eyebrow: "Workspace", title: project.name, content: failure });
   }
+}
+
+function formField(labelText, control) {
+  const label = document.createElement("label");
+  const labelNode = document.createElement("span");
+  labelNode.textContent = labelText;
+  label.append(labelNode, control);
+  return label;
+}
+
+function openNewProjectDialog() {
+  if (!runtimeConnected) {
+    document.querySelector(".connection-panel").open = true;
+    setRuntimeStatus("Sign in before starting a project.");
+    return;
+  }
+  const form = document.createElement("form");
+  form.className = "workspace-form";
+  const intro = document.createElement("p");
+  intro.textContent = "AG OS creates the workspace immediately, then queues one exact approval to create and bind its private GitHub repository.";
+  const name = document.createElement("input");
+  name.required = true;
+  name.minLength = 3;
+  name.placeholder = "Project name";
+  const repositoryName = document.createElement("input");
+  repositoryName.placeholder = "Private repository name (optional)";
+  const goal = document.createElement("textarea");
+  goal.required = true;
+  goal.placeholder = "What successful completion looks like";
+  const scope = document.createElement("textarea");
+  scope.required = true;
+  scope.placeholder = "One scope item per line";
+  const stack = document.createElement("input");
+  stack.required = true;
+  stack.placeholder = "Tools, comma separated";
+  const submit = document.createElement("button");
+  submit.type = "submit";
+  submit.className = "button-primary";
+  submit.textContent = "Create project + queue private repo";
+  form.append(intro, formField("Project name", name), formField("Repository name", repositoryName), formField("Goal", goal), formField("Scope", scope), formField("Stack or tools", stack), submit);
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    submit.disabled = true;
+    try {
+      const { response, result } = await runtimeRequest("/api/v1/projects", {
+        method: "POST",
+        body: JSON.stringify({
+          name: name.value,
+          repositoryName: repositoryName.value || undefined,
+          goal: goal.value,
+          scope: scope.value,
+          stack: stack.value,
+          projectType: "product_project",
+          managementMode: "active_build",
+          trustLevel: 1
+        })
+      });
+      if (!response.ok) throw new Error(result.detail || result.error || "Project creation failed");
+      document.querySelector("#workspace-dialog").close();
+      setRuntimeStatus(`Created ${result.project.name}. Approve ${result.repositoryProvisioning.jobId} once to create and bind the private repository.`, true);
+      await connectRuntime();
+      setDashboardView("work");
+    } catch (error) {
+      setRuntimeStatus(`Project rejected: ${error.message}`);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+  openWorkspaceDialog({ eyebrow: "New project", title: "Start a real project", content: form });
 }
 
 function renderProjects(projects = data.projectRegistry.projects) {
@@ -1605,6 +1688,7 @@ function initializeCommandCenter() {
     setDashboardView("home");
     document.querySelector("#owner-command").focus();
   });
+  document.querySelector("#projects-new").addEventListener("click", openNewProjectDialog);
   document.querySelector("#workspace-dialog-close").addEventListener("click", () => document.querySelector("#workspace-dialog").close());
   document.querySelector("#workspace-dialog").addEventListener("click", (event) => {
     if (event.target === event.currentTarget) event.currentTarget.close();

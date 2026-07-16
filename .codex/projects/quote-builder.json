@@ -9,26 +9,30 @@
   "knownFacts": [
     "The live product is available at https://foreman-quote-studio.netlify.app/.",
     "The local product workspace is a structured Next.js application backed by Supabase.",
-    "The Netlify site is linked and live.",
-    "The product does not yet have an isolated Git repository and dedicated remote."
+    "The Netlify site is live as foreman-quote-studio.",
+    "The canonical source repository is https://github.com/gurnoorbassi/Foreman-Quote-Maker."
   ],
   "scope": [
     "Create, edit, price, and export contractor quotes through the live product.",
     "Track product work, evidence, quality, cost, and lessons in this AG OS workspace.",
     "Route owner commands explicitly to Quote Builder.",
-    "Prepare a dedicated source-control connection before AG OS performs repository automation."
+    "Use the canonical GitHub repository for reviewed product work and deployment candidates."
   ],
   "outOfScope": [
     "Do not deploy, access credentials, use customer or production data, or run paid AI actions without exact owner approval.",
-    "Do not treat the unrelated parent repository as the Quote Builder source repository.",
+    "Do not use any repository other than gurnoorbassi/Foreman-Quote-Maker for Quote Builder source work.",
     "Do not weaken the live application's frame or authentication protections."
   ],
   "trustLevel": 2,
-  "stack": ["Next.js", "Supabase", "Netlify"],
+  "stack": [
+    "Next.js",
+    "Supabase",
+    "Netlify"
+  ],
   "risks": [
     {
-      "risk": "The live app is not backed by an isolated Git repository and dedicated remote.",
-      "mitigation": "Show source control as setup needed and block repository execution until a reviewed repository connection exists."
+      "risk": "The Netlify site is not yet linked to the canonical GitHub repository for continuous deployment.",
+      "mitigation": "Keep production deployment approval-gated until the exact Netlify repository binding is recorded and verified."
     },
     {
       "risk": "Quote records can contain sensitive business and customer information.",
@@ -36,7 +40,7 @@
     }
   ],
   "approvalRequiredFor": [
-    "source repository creation or connection",
+    "repository settings changes",
     "deployment or Netlify mutation",
     "credential access or storage",
     "customer or production data access",
@@ -51,15 +55,33 @@
   ],
   "securityReview": "The live application keeps its existing authentication and anti-framing protections. AG OS opens it separately and does not proxy customer data.",
   "costTracking": "Record estimated and actual task cost. Paid actions require a matching approval and budget.",
-  "deploymentPlan": "The current Netlify deployment remains unchanged. Future deployment requires a dedicated source repository, exact candidate verification, and separate owner approval.",
+  "deploymentPlan": "Use gurnoorbassi/Foreman-Quote-Maker as source of truth. Netlify continuous deployment must be bound to main through an exact approval and verified before automatic production builds are trusted.",
   "ownerWorkspace": {
     "summary": "Build and run professional contractor quotes, pricing, templates, and PDFs.",
     "liveUrl": "https://foreman-quote-studio.netlify.app/",
     "liveLabel": "Open Quote Builder",
     "previewMode": "new_tab",
     "previewReason": "The live product intentionally blocks iframe embedding. AG OS keeps your workspace open and launches the secure full app in a separate tab.",
-    "sourceControlStatus": "setup_needed",
-    "sourceControlDetail": "Structured local application found, but no isolated Git repository or dedicated remote is connected.",
+    "sourceControlStatus": "connected",
+    "sourceControlDetail": "Canonical GitHub repository connected and verified. Netlify Git continuous deployment is the remaining deployment binding.",
+    "repositoryUrl": "https://github.com/gurnoorbassi/Foreman-Quote-Maker",
+    "repositoryFullName": "gurnoorbassi/Foreman-Quote-Maker",
+    "repositoryVisibility": "public",
+    "defaultBranch": "main",
+    "adapters": [
+      {
+        "adapterId": "github-draft-pr",
+        "status": "ready",
+        "target": "gurnoorbassi/Foreman-Quote-Maker",
+        "detail": "Exact branch and draft pull-request work is available after owner approval."
+      },
+      {
+        "adapterId": "netlify-continuous-deployment",
+        "status": "setup_required",
+        "target": "foreman-quote-studio:main",
+        "detail": "Netlify GitHub repository authorization is required. The attempted unauthenticated binding was rolled back and the existing published site remains current."
+      }
+    ],
     "operations": [
       "Open the full live quote product.",
       "Give AG OS a command targeted to Quote Builder.",
@@ -67,5 +89,5 @@
     ]
   },
   "createdAt": "2026-07-16T01:09:20.530Z",
-  "updatedAt": "2026-07-16T01:09:20.530Z"
+  "updatedAt": "2026-07-16T02:39:00.000Z"
 }
