@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
+import { cpSync, mkdirSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 import {
   PLAN_DRAFT_SCHEMA,
   calculateAnthropicCostUsd,
@@ -13,8 +17,16 @@ const commandIntake = {
   classification: { commandCategory: "build", requiresApproval: false },
   productContext: { productType: "dashboard" }
 };
-const job = { projectId: "project-ag-os" };
+const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const job = { jobId: "job-anthropic-planner-test", projectId: "project-ag-os" };
 const route = { riskLevel: "R2", assignedAgent: "planner-foundation" };
+
+function budgetRoot() {
+  const root = mkdtempSync(path.join(tmpdir(), "ag-os-planner-budget-"));
+  mkdirSync(path.join(root, ".codex", "costs"), { recursive: true });
+  cpSync(path.join(sourceRoot, ".codex", "costs", "budget.json"), path.join(root, ".codex", "costs", "budget.json"));
+  return root;
+}
 
 test("Anthropic planner requests schema-constrained plans without exposing the key", async () => {
   let request;
@@ -51,7 +63,13 @@ test("Anthropic planner requests schema-constrained plans without exposing the k
     apiKey: "test-key-never-logged",
     model: "claude-sonnet-5",
     baseUrl: "https://anthropic.test",
-    fetchImpl
+    fetchImpl,
+    inputCostPerMillionUsd: 2,
+    outputCostPerMillionUsd: 10,
+    approvalId: "approval-anthropic-planner-test",
+    approvalMaxUsd: 0.25,
+    root: budgetRoot(),
+    now: new Date("2026-07-16T12:00:00.000Z")
   });
   assert.equal(request.url, "https://anthropic.test/v1/messages");
   assert.equal(request.options.headers["x-api-key"], "test-key-never-logged");
@@ -85,7 +103,13 @@ test("Anthropic planner fails closed on missing credentials and HTTP failures", 
     route,
     apiKey: "present",
     model: "claude-sonnet-5",
-    fetchImpl: async () => ({ ok: false, status: 429 })
+    fetchImpl: async () => ({ ok: false, status: 429 }),
+    inputCostPerMillionUsd: 2,
+    outputCostPerMillionUsd: 10,
+    approvalId: "approval-anthropic-planner-test",
+    approvalMaxUsd: 0.25,
+    root: budgetRoot(),
+    now: new Date("2026-07-16T12:00:00.000Z")
   }), /HTTP 429/);
 });
 

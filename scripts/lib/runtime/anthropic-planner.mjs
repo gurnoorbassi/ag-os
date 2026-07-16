@@ -1,7 +1,9 @@
 import { assertPlanDraftShape } from "./planner-processor.mjs";
+import { finalizeAnthropicBudgetReservation, reserveAnthropicBudget } from "./anthropic-budget-guard.mjs";
 
 const DEFAULT_BASE_URL = "https://api.anthropic.com";
 const ANTHROPIC_VERSION = "2023-06-01";
+export const ANTHROPIC_PLANNER_MAX_TOKENS = 2500;
 const UNSUPPORTED_STRUCTURED_OUTPUT_CONSTRAINTS = new Set([
   "maximum",
   "minimum",
@@ -92,44 +94,70 @@ export async function createAnthropicPlanDraft({
   apiKey,
   model,
   baseUrl = DEFAULT_BASE_URL,
-  fetchImpl = globalThis.fetch
+  fetchImpl = globalThis.fetch,
+  inputCostPerMillionUsd,
+  outputCostPerMillionUsd,
+  approvalId,
+  approvalMaxUsd,
+  root,
+  env,
+  now
 }) {
   if (!apiKey) throw new Error("Anthropic planner credential is not configured");
   if (!model) throw new Error("Anthropic planner model is not configured");
   if (typeof fetchImpl !== "function") throw new Error("Anthropic planner fetch implementation is unavailable");
 
-  const response = await fetchImpl(`${baseUrl.replace(/\/$/, "")}/v1/messages`, {
+  const requestBody = {
+    model,
+    max_tokens: ANTHROPIC_PLANNER_MAX_TOKENS,
+    system: "You are the AG OS planner worker. Produce a professional, implementation-ready plan only. Never claim permission to use credentials, deploy, publish, message, spend, change DNS, or touch production/customer data. Put every such action behind an explicit approval gate and stop condition.",
+    messages: [{ role: "user", content: JSON.stringify(plannerInput({ commandIntake, job, route })) }],
+    output_config: {
+      format: {
+        type: "json_schema",
+        schema: toAnthropicStructuredOutputSchema(PLAN_DRAFT_SCHEMA)
+      }
+    }
+  };
+  const budgetReservation = reserveAnthropicBudget({
+    kind: "planner",
+    job,
+    requestBody,
+    maxTokens: ANTHROPIC_PLANNER_MAX_TOKENS,
+    inputCostPerMillionUsd,
+    outputCostPerMillionUsd,
+    approvalId,
+    approvalMaxUsd,
+    root,
+    env,
+    now
+  });
+  let response;
+  try {
+    response = await fetchImpl(`${baseUrl.replace(/\/$/, "")}/v1/messages`, {
     method: "POST",
     headers: {
       "anthropic-version": ANTHROPIC_VERSION,
       "content-type": "application/json",
       "x-api-key": apiKey
     },
-    body: JSON.stringify({
-      model,
-      max_tokens: 2500,
-      system: "You are the AG OS planner worker. Produce a professional, implementation-ready plan only. Never claim permission to use credentials, deploy, publish, message, spend, change DNS, or touch production/customer data. Put every such action behind an explicit approval gate and stop condition.",
-      messages: [{ role: "user", content: JSON.stringify(plannerInput({ commandIntake, job, route })) }],
-      output_config: {
-        format: {
-          type: "json_schema",
-          schema: toAnthropicStructuredOutputSchema(PLAN_DRAFT_SCHEMA)
-        }
-      }
-    })
-  });
+      body: JSON.stringify(requestBody)
+    });
 
-  if (!response.ok) {
-    throw new Error(`Anthropic planner request failed with HTTP ${response.status}`);
+    if (!response.ok) throw new Error(`Anthropic planner request failed with HTTP ${response.status}`);
+    const payload = await response.json();
+    const text = payload.content?.find((block) => block.type === "text")?.text;
+    if (!text) throw new Error("Anthropic planner returned no structured plan");
+    const planDraft = JSON.parse(text);
+    assertPlanDraftShape(planDraft);
+    return {
+      planDraft,
+      model: payload.model || model,
+      usage: payload.usage || {},
+      budgetReservation
+    };
+  } catch (error) {
+    finalizeAnthropicBudgetReservation({ reservation: budgetReservation, consumed: false, root, now });
+    throw error;
   }
-  const payload = await response.json();
-  const text = payload.content?.find((block) => block.type === "text")?.text;
-  if (!text) throw new Error("Anthropic planner returned no structured plan");
-  const planDraft = JSON.parse(text);
-  assertPlanDraftShape(planDraft);
-  return {
-    planDraft,
-    model: payload.model || model,
-    usage: payload.usage || {}
-  };
 }

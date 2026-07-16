@@ -13,6 +13,7 @@ import { writePlanRecord } from "./planner-processor.mjs";
 import { writeTaskRouteRecord } from "./task-router-processor.mjs";
 import { calculateAnthropicCostUsd } from "./anthropic-planner.mjs";
 import { writeAnthropicWorkProduct } from "./anthropic-worker.mjs";
+import { finalizeAnthropicBudgetReservation } from "./anthropic-budget-guard.mjs";
 import { runLocalValidation } from "./execution-dry-run-processor.mjs";
 import { writeJobCompletionArtifacts } from "./job-completion-processor.mjs";
 import { isoTimestamp, writeJson } from "./common.mjs";
@@ -131,6 +132,13 @@ export async function submitOwnerCommand({
   const aiPlanning = useAiPlanner
     ? await planDraftProvider({ commandIntake: intake.record, job: job.record, route: route.record })
     : null;
+  const actualAiCostUsd = aiPlanning
+    ? calculateAnthropicCostUsd({
+        usage: aiPlanning.usage,
+        inputCostPerMillionUsd: aiPlannerReadiness.inputCostPerMillionUsd,
+        outputCostPerMillionUsd: aiPlannerReadiness.outputCostPerMillionUsd
+      })
+    : 0;
   const plan = writePlanRecord({
     route: route.record,
     job: job.record,
@@ -140,16 +148,27 @@ export async function submitOwnerCommand({
     now,
     root
   });
+  let cost = null;
+  if (aiPlanning) {
+    cost = writeCostLedgerRecord({
+      job: job.record,
+      plan: plan.record,
+      runId,
+      now,
+      estimatedCostUsd: plan.record.estimatedCostUsd,
+      actualCostUsd: actualAiCostUsd,
+      usesPaidService: true,
+      usesLiveApi: true,
+      root
+    });
+    finalizeAnthropicBudgetReservation({ reservation: aiPlanning.budgetReservation, consumed: true, root, now });
+    if (actualAiCostUsd > aiPlannerReadiness.approval.budget.maxUsd) {
+      throw new Error("AI planning call exceeded the approved budget");
+    }
+  }
   const aiWork = useAiWorker
     ? await workProductProvider({ command: intake.record, job: job.record, plan: plan.record, root })
     : null;
-  const actualAiCostUsd = aiPlanning
-    ? calculateAnthropicCostUsd({
-        usage: aiPlanning.usage,
-        inputCostPerMillionUsd: aiPlannerReadiness.inputCostPerMillionUsd,
-        outputCostPerMillionUsd: aiPlannerReadiness.outputCostPerMillionUsd
-      })
-    : 0;
   const actualWorkerCostUsd = aiWork
     ? calculateAnthropicCostUsd({
         usage: aiWork.usage,
@@ -157,14 +176,8 @@ export async function submitOwnerCommand({
         outputCostPerMillionUsd: aiWorkerReadiness.outputCostPerMillionUsd
       })
     : 0;
-  if (aiPlanning && actualAiCostUsd > aiPlannerReadiness.approval.budget.maxUsd) {
-    throw new Error("AI planning call exceeded the approved budget");
-  }
-  if (aiWork && actualWorkerCostUsd > aiWorkerReadiness.approval.budget.maxUsd) {
-    throw new Error("AI builder call exceeded the approved budget");
-  }
   const totalActualAiCostUsd = Number((actualAiCostUsd + actualWorkerCostUsd).toFixed(6));
-  const cost = writeCostLedgerRecord({
+  cost = writeCostLedgerRecord({
     job: job.record,
     plan: plan.record,
     runId,
@@ -175,6 +188,12 @@ export async function submitOwnerCommand({
     usesLiveApi: Boolean(aiPlanning || aiWork),
     root
   });
+  if (aiWork) {
+    finalizeAnthropicBudgetReservation({ reservation: aiWork.budgetReservation, consumed: true, root, now });
+    if (actualWorkerCostUsd > aiWorkerReadiness.approval.budget.maxUsd) {
+      throw new Error("AI builder call exceeded the approved budget");
+    }
+  }
   const connectorGates = writeConnectorDryRunGateRecords({ plan: plan.record, runId, now, root });
   let workerExecution = null;
   let workerCompletion = null;
