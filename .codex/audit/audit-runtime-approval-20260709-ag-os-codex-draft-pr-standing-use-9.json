@@ -1,0 +1,24 @@
+{
+  "id": "audit-runtime-approval-20260709-ag-os-codex-draft-pr-standing-use-9",
+  "occurredAt": "2026-07-16T08:36:06.848Z",
+  "actor": "agent-codex",
+  "eventType": "standing_approval_used",
+  "summary": "Standing approval approval-20260709-ag-os-codex-draft-pr-standing used for codex branch push and draft PR creation.",
+  "scope": "gurnoorbassi/ag-os:codex/lesson-promotion-integrity-20260716",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260709-ag-os-codex-draft-pr-standing"
+    },
+    {
+      "type": "other",
+      "reference": "codex/lesson-promotion-integrity-20260716"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Use 9 of 10. Full validation, dashboard, boot, 216 tests, diff checks, and secret scanning passed. Merge, live state remediation, and deployment remain prohibited. Changed files: ops/repair-lesson-promotion-ids.mjs, scripts/lib/runtime/control-center-service.mjs, scripts/lib/runtime/lesson-promotion-approval.mjs, tests/control-center-service.test.mjs, tests/lesson-promotion-approval.test.mjs.",
+  "createdAt": "2026-07-16T08:36:06.848Z"
+}
