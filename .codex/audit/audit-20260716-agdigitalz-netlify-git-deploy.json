@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260716-agdigitalz-netlify-git-deploy",
+  "occurredAt": "2026-07-16T05:00:40.040Z",
+  "actor": "agent-codex",
+  "eventType": "registry_change",
+  "summary": "AG Digitalz repository binding was activated and verified through a successful Netlify Git production deploy.",
+  "scope": "agdigitalz:gurnoorbassi/AG-Digitalz-Website:main",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260716-agdigitalz-netlify-git-deploy"
+    },
+    {
+      "type": "commit",
+      "reference": "f7a9a535c6e3a5ed458cf9f63c9baa6b18a3b4f7"
+    },
+    {
+      "type": "other",
+      "reference": "Netlify deploy 6a58647c3338676aac08e4d9"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "The authorized GitHub App connection built and published the exact private main commit. Netlify returned ready; the existing agdigitalz.com domain and environment configuration were preserved.",
+  "createdAt": "2026-07-16T05:00:40.040Z"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "audit-runtime-approval-20260709-ag-os-codex-draft-pr-standing-use-8",
+  "occurredAt": "2026-07-16T05:02:00.000Z",
+  "actor": "agent-codex",
+  "eventType": "standing_approval_used",
+  "summary": "Standing approval approval-20260709-ag-os-codex-draft-pr-standing used for codex branch push and draft PR creation.",
+  "scope": "gurnoorbassi/ag-os:codex/netlify-activation-evidence-20260716",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260709-ag-os-codex-draft-pr-standing"
+    },
+    {
+      "type": "pull_request",
+      "reference": "https://github.com/gurnoorbassi/ag-os/pull/145"
+    }
+  ],
+  "riskLevel": "medium",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "Use 8 of 10. Secret scan and all required local gates passed. Merge remains prohibited. Changed files: .codex/approvals/archive/approval-20260716-agdigitalz-netlify-git-deploy.json, .codex/approvals/archive/approval-20260716-foreman-netlify-git-deploy.json, .codex/audit/audit-20260716-agdigitalz-netlify-git-deploy.json, .codex/audit/audit-20260716-foreman-netlify-git-deploy.json, .codex/projects/quote-builder.json, dashboard/dashboard-data.js.",
+  "createdAt": "2026-07-16T05:02:00.000Z"
+}

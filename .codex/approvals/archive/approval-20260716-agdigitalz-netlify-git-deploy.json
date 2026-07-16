@@ -1,0 +1,65 @@
+{
+  "approvalId": "approval-20260716-agdigitalz-netlify-git-deploy",
+  "status": "expired",
+  "approvalKind": "single_action",
+  "actionClass": "netlify_continuous_deployment_activation",
+  "inclusionCriteria": [
+    "Netlify site is exactly 5658564d-6e64-428d-9168-f2c8154c794c.",
+    "Repository is exactly gurnoorbassi/AG-Digitalz-Website.",
+    "Branch is exactly main.",
+    "Source commit is exactly f7a9a535c6e3a5ed458cf9f63c9baa6b18a3b4f7.",
+    "The existing agdigitalz.com domain and environment configuration remain unchanged."
+  ],
+  "maxUses": 1,
+  "usageAuditRequired": true,
+  "revocableImmediately": true,
+  "ownerId": "owner-gurnoor-bassi",
+  "requestedBy": "agent-codex",
+  "approvedBy": "owner-gurnoor-bassi",
+  "commandCategory": "deploy_production",
+  "requestedAction": "Connect AG Digitalz Netlify GitHub continuous deployment and publish the verified main build.",
+  "target": "agdigitalz:gurnoorbassi/AG-Digitalz-Website:main",
+  "scope": "One GitHub App repository connection and one production build of exact main commit f7a9a535c6e3a5ed458cf9f63c9baa6b18a3b4f7.",
+  "riskLevel": "R5",
+  "dataClass": "internal",
+  "budget": {
+    "required": false,
+    "maxUsd": 0
+  },
+  "approvalRequiredFor": [
+    "netlify_continuous_deployment_activation",
+    "netlify_production_deploy"
+  ],
+  "approvedActions": [
+    "netlify_continuous_deployment_activation",
+    "netlify_production_deploy"
+  ],
+  "prohibitedActions": [
+    "domain_change",
+    "dns_change",
+    "environment_variable_change",
+    "credential_change",
+    "customer_data_access",
+    "paid_action",
+    "messaging",
+    "posting"
+  ],
+  "revocationPath": "Consumed after successful deploy 6a58647c3338676aac08e4d9; no future Netlify mutation is authorized by this record.",
+  "evidence": [
+    {
+      "type": "owner_instruction",
+      "reference": "Owner instructed Codex to deploy after authorizing the Netlify GitHub App in the active AG OS task.",
+      "verified": true
+    },
+    {
+      "type": "other",
+      "reference": "Netlify deploy 6a58647c3338676aac08e4d9 reached ready for commit f7a9a535c6e3a5ed458cf9f63c9baa6b18a3b4f7.",
+      "verified": true
+    }
+  ],
+  "approvalText": "Approve the exact AG Digitalz Netlify GitHub connection and production deployment requested in the active task.",
+  "approvedAt": "2026-07-16T04:43:00.000Z",
+  "expiresAt": "2026-07-17T04:43:00.000Z",
+  "createdAt": "2026-07-16T04:43:00.000Z",
+  "updatedAt": "2026-07-16T05:00:40.040Z"
+}

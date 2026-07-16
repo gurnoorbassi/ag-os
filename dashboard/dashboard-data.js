@@ -64,7 +64,7 @@ window.AG_OS_DASHBOARD_DATA = {
           "previewMode": "new_tab",
           "previewReason": "The live product intentionally blocks iframe embedding. AG OS keeps your workspace open and launches the secure full app in a separate tab.",
           "sourceControlStatus": "connected",
-          "sourceControlDetail": "Canonical GitHub repository connected and verified. Netlify Git continuous deployment is the remaining deployment binding.",
+          "sourceControlDetail": "Canonical GitHub repository and Netlify continuous deployment are connected and verified on main.",
           "repositoryUrl": "https://github.com/gurnoorbassi/Foreman-Quote-Maker",
           "repositoryFullName": "gurnoorbassi/Foreman-Quote-Maker",
           "repositoryVisibility": "public",
@@ -78,9 +78,9 @@ window.AG_OS_DASHBOARD_DATA = {
             },
             {
               "adapterId": "netlify-continuous-deployment",
-              "status": "setup_required",
+              "status": "connected",
               "target": "foreman-quote-studio:main",
-              "detail": "Netlify GitHub repository authorization is required. The attempted unauthenticated binding was rolled back and the existing published site remains current."
+              "detail": "Connected through the authorized Netlify GitHub App. Production deploy 6a5863ffc544a86cad46626c built commit 7beb3d07e476234340bfeef79650070c0791af81 successfully."
             }
           ],
           "operations": [
@@ -1586,8 +1586,8 @@ window.AG_OS_DASHBOARD_DATA = {
           "revocableImmediately": true,
           "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
           "archived": false,
-          "usesRecorded": 7,
-          "remainingUses": 3
+          "usesRecorded": 8,
+          "remainingUses": 2
         }
       ],
       "ownerDecisions": [
@@ -1768,7 +1768,7 @@ window.AG_OS_DASHBOARD_DATA = {
   },
   "approvals": {
     "activeCount": 2,
-    "expiredCount": 28,
+    "expiredCount": 30,
     "blockedCount": 0,
     "staleWarningCount": 0,
     "activeApprovals": [
@@ -1817,11 +1817,55 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 7,
-        "remainingUses": 3
+        "usesRecorded": 8,
+        "remainingUses": 2
       }
     ],
     "expiredApprovals": [
+      {
+        "approvalId": "approval-20260716-agdigitalz-netlify-git-deploy",
+        "status": "expired",
+        "riskLevel": "R5",
+        "expiresAt": "2026-07-17T04:43:00.000Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": "netlify_continuous_deployment_activation",
+        "maxUses": 1,
+        "budget": {
+          "required": false,
+          "maxUsd": 0
+        },
+        "target": "agdigitalz:gurnoorbassi/AG-Digitalz-Website:main",
+        "approvedActions": [
+          "netlify_continuous_deployment_activation",
+          "netlify_production_deploy"
+        ],
+        "revocableImmediately": true,
+        "recordPath": ".codex/approvals/archive/approval-20260716-agdigitalz-netlify-git-deploy.json",
+        "archived": true
+      },
+      {
+        "approvalId": "approval-20260716-foreman-netlify-git-deploy",
+        "status": "expired",
+        "riskLevel": "R5",
+        "expiresAt": "2026-07-17T04:43:00.000Z",
+        "approvedBy": "owner-gurnoor-bassi",
+        "approvalKind": "single_action",
+        "actionClass": "netlify_continuous_deployment_activation",
+        "maxUses": 1,
+        "budget": {
+          "required": false,
+          "maxUsd": 0
+        },
+        "target": "foreman-quote-studio:gurnoorbassi/Foreman-Quote-Maker:main",
+        "approvedActions": [
+          "netlify_continuous_deployment_activation",
+          "netlify_production_deploy"
+        ],
+        "revocableImmediately": true,
+        "recordPath": ".codex/approvals/archive/approval-20260716-foreman-netlify-git-deploy.json",
+        "archived": true
+      },
       {
         "approvalId": "approval-20260715-foreman-netlify-link-rollback",
         "status": "expired",
@@ -2533,8 +2577,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 7,
-        "remainingUses": 3
+        "usesRecorded": 8,
+        "remainingUses": 2
       }
     ],
     "standingCount": 2,
@@ -2584,8 +2628,8 @@ window.AG_OS_DASHBOARD_DATA = {
         "revocableImmediately": true,
         "recordPath": ".codex/approvals/approval-20260709-ag-os-codex-draft-pr-standing.json",
         "archived": false,
-        "usesRecorded": 7,
-        "remainingUses": 3
+        "usesRecorded": 8,
+        "remainingUses": 2
       }
     ]
   },
