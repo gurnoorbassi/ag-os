@@ -51,13 +51,20 @@ function projectBoundary(project) {
 
 function projectRecord(entry) {
   const project = readJson(entry.recordPath);
+  const riskLevel = entry.riskLevel ?? "not_recorded";
+  const sensitivity = riskLevel === "high"
+    ? { level: "protected", label: "Protected", explanation: "Low starting trust keeps external and production actions behind exact owner approval." }
+    : riskLevel === "medium"
+      ? { level: "controlled", label: "Controlled", explanation: "Local work can run, while external or production effects remain approval-gated." }
+      : { level: "routine", label: "Routine", explanation: "The project has more proven trust, but permanent live-action gates still apply." };
   return {
     id: project.id,
     name: project.name,
     status: project.status,
     managementMode: project.managementMode,
     projectType: project.projectType,
-    riskLevel: entry.riskLevel ?? "not_recorded",
+    riskLevel,
+    sensitivity,
     owner: project.owner,
     recordPath: entry.recordPath,
     boundary: projectBoundary(project)
@@ -572,13 +579,14 @@ function collectUnifiedMemory() {
     .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"))
     .map(lessonSummary)
     .filter((lesson) => lesson.status === "accepted"), "updatedAt");
-  const candidateLessons = latestBy(listDirectJson(".codex/memory/lessons/candidates")
-    .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"))
-    .map(lessonSummary)
-    .filter((lesson) => lesson.status === "candidate"), "updatedAt");
   const rejectedLessons = latestBy(listDirectJson(".codex/memory/rejected")
     .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"))
     .map(lessonSummary), "updatedAt");
+  const decidedLessonIds = new Set([...acceptedLessons, ...rejectedLessons].map((lesson) => lesson.lessonId));
+  const candidateLessons = latestBy(listDirectJson(".codex/memory/lessons/candidates")
+    .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"))
+    .map(lessonSummary)
+    .filter((lesson) => lesson.status === "candidate" && !decidedLessonIds.has(lesson.lessonId)), "updatedAt");
   const conflicts = latestBy(listDirectJson(".codex/memory/conflicts")
     .filter((recordPath) => path.basename(recordPath).startsWith("lesson-"))
     .map((recordPath) => {
@@ -649,6 +657,30 @@ function collectUnifiedMemory() {
       "scripts/load-accepted-lessons.mjs",
       "scripts/process-lesson-promotion.mjs"
     ]
+  };
+}
+
+function collectOperatingSystemStatuses(unifiedMemory) {
+  const activation = "2026-07-09T20:06:25.029Z";
+  const policyEraCompletedJobs = listDirectJson(".codex/jobs")
+    .map((recordPath) => readJson(recordPath))
+    .filter((job) => job.status === "done" && (
+      typeof job.queueTimestamps?.completedAt !== "string" || job.queueTimestamps.completedAt >= activation
+    ));
+  const completionProofCount = policyEraCompletedJobs.filter((job) =>
+    job.completionEvidence?.qualityScorePath && job.completionEvidence?.lessonCandidatePaths?.length > 0
+  ).length;
+  return {
+    "cost-os": { status: "operational" },
+    "watchdog-os": {
+      status: "setup_needed",
+      metric: "Manual checks",
+      working: ["Health endpoint", "Boot and validator checks", "Dashboard-visible failures"],
+      remaining: ["Deploy a scoped recurring health monitor with alert routing"]
+    },
+    "memory-os": { status: unifiedMemory.candidateCount > 0 ? "operational_attention" : "operational" },
+    "quality-os": { status: completionProofCount === policyEraCompletedJobs.length ? "operational" : "operational_attention" },
+    "security-os": { status: "protected" }
   };
 }
 
@@ -1092,6 +1124,7 @@ export function collectDashboardData() {
   const qualityReview = collectQualityReview();
   const connectorAuth = collectConnectorAuth();
   const unifiedMemory = collectUnifiedMemory();
+  const runtimeOperatingSystems = collectOperatingSystemStatuses(unifiedMemory);
   const costReadModel = collectCosts(costBudget);
   const operationalMetrics = computeOperationalMetrics({ root });
   const skills = collectSkills();
@@ -1346,7 +1379,7 @@ export function collectDashboardData() {
         .map((category) => `${category.id}: approval-gated`)
     },
     costOs: {
-      status: costBudget.status,
+      status: runtimeOperatingSystems["cost-os"].status,
       monthlyMax: money(costBudget.limits.monthlyMaxUsd, costBudget.currency),
       dailyMax: `Daily max: ${money(costBudget.limits.dailyMaxUsd, costBudget.currency)}`,
       perTaskMax: `Per-task max: ${money(costBudget.limits.perTaskMaxUsd, costBudget.currency)}`,
@@ -1366,12 +1399,12 @@ export function collectDashboardData() {
       blockedCount: unique(capabilities.flatMap((capability) => capability.blockedCapabilities)).length
     },
     watchdog: {
-      status: watchdogPolicy.status,
-      monitoring: watchdogPolicy.defaults.monitoringEnabled ? "Enabled" : "Disabled",
-      plannedChecks: watchdogPolicy.plannedCheckTypes.map((type) => `${type}: planned`)
+      status: runtimeOperatingSystems["watchdog-os"].status,
+      monitoring: runtimeOperatingSystems["watchdog-os"].metric,
+      plannedChecks: [...runtimeOperatingSystems["watchdog-os"].working, ...runtimeOperatingSystems["watchdog-os"].remaining]
     },
     memoryOs: {
-      status: memoryPolicy.status,
+      status: runtimeOperatingSystems["memory-os"].status,
       shortTermDays: memoryPolicy.windows.shortTermDays,
       rules: [
         memoryPolicy.rules.secretsAllowed ? "Secrets allowed" : "Secrets blocked",
@@ -1380,7 +1413,7 @@ export function collectDashboardData() {
       ]
     },
     qualityOs: {
-      status: qualityPolicy.status,
+      status: runtimeOperatingSystems["quality-os"].status,
       rules: [
         qualityPolicy.rules?.qualityOverQuantity ? "Quality over quantity" : "Quality rule not recorded",
         qualityPolicy.rules?.ownerReviewRequiredBeforeProduction ? "Owner review before production" : "Owner production review not recorded",
@@ -1388,7 +1421,7 @@ export function collectDashboardData() {
       ]
     },
     securityOs: {
-      status: securityPolicy.status,
+      status: runtimeOperatingSystems["security-os"].status,
       rules: [
         securityPolicy.rules?.secretsFindingBlocksMerge ? "Secrets block merge" : "Secrets merge block not recorded",
         securityPolicy.rules?.leastPrivilegeRequired ? "Least privilege required" : "Least privilege not recorded",

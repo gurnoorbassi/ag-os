@@ -14,7 +14,7 @@
             <div class="brand-mark" aria-hidden="true">AG</div>
             <div>
               <p class="brand-title">AG OS</p>
-              <p class="brand-subtitle">Owner workspace</p>
+              <p class="brand-subtitle">Owner control center</p>
             </div>
           </div>
           <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="section-nav" aria-label="Open navigation">
@@ -26,18 +26,18 @@
 
         <nav id="section-nav" class="section-nav">
           <div class="nav-group" aria-label="Workspaces">
-            <p class="nav-label">Workspace</p>
+            <p class="nav-label">Operate</p>
             <button class="nav-workspace" type="button" data-dashboard-view="home" aria-pressed="true">
               <span class="nav-icon" aria-hidden="true">H</span>
-              <span><strong>Home</strong><small>Ask AG OS and follow work</small></span>
+              <span><strong>Command</strong><small>Tell AG OS what to do</small></span>
             </button>
             <button class="nav-workspace" type="button" data-dashboard-view="projects" aria-pressed="false">
               <span class="nav-icon" aria-hidden="true">P</span>
-              <span><strong>Projects</strong><small>Your systems and outcomes</small></span>
+              <span><strong>Workspaces</strong><small>Inspect long-running systems</small></span>
             </button>
             <button class="nav-workspace" type="button" data-dashboard-view="work" aria-pressed="false">
               <span class="nav-icon" aria-hidden="true">W</span>
-              <span><strong>Work</strong><small>Runs, reviews, and approvals</small></span>
+              <span><strong>Activity</strong><small>Runs, reviews, and approvals</small></span>
             </button>
             <button class="nav-workspace" type="button" data-dashboard-view="intelligence" aria-pressed="false">
               <span class="nav-icon" aria-hidden="true">M</span>
@@ -51,8 +51,8 @@
 
           <div class="nav-group nav-shortcuts" aria-label="Quick access">
             <p class="nav-label">Quick access</p>
-            <a href="#command-center" data-view="home">Ask AG OS</a>
-            <a href="#projects" data-view="projects">Your projects</a>
+            <a href="#command-center" data-view="home">New command</a>
+            <a href="#projects" data-view="projects">Workspaces</a>
             <a href="#approvals" data-view="work">Reviews and approvals</a>
           </div>
 
@@ -86,17 +86,17 @@
       <main class="dashboard">
         <header class="topbar">
           <div>
-            <p class="eyebrow">Owner workspace <span aria-hidden="true">/</span> <span id="view-kicker">Home</span></p>
-            <h1 id="view-title">What should AG OS do?</h1>
+            <p class="eyebrow">Owner control center <span aria-hidden="true">/</span> <span id="view-kicker">Command</span></p>
+            <h1 id="view-title">Tell AG OS what to do</h1>
             <p id="view-description">Give one clear outcome. AG OS will organize the work and stop only when your approval is required.</p>
           </div>
           <div id="runtime-mode" class="mode-lock" aria-label="Dashboard mode"><span aria-hidden="true"></span> Offline evidence</div>
         </header>
 
         <div class="view-switcher" role="group" aria-label="Dashboard view">
-          <button type="button" data-dashboard-view="home" aria-pressed="true">Home</button>
-          <button type="button" data-dashboard-view="projects" aria-pressed="false">Projects</button>
-          <button type="button" data-dashboard-view="work" aria-pressed="false">Work</button>
+          <button type="button" data-dashboard-view="home" aria-pressed="true">Command</button>
+          <button type="button" data-dashboard-view="projects" aria-pressed="false">Workspaces</button>
+          <button type="button" data-dashboard-view="work" aria-pressed="false">Activity</button>
           <button type="button" data-dashboard-view="intelligence" aria-pressed="false">Memory</button>
           <button type="button" data-dashboard-view="system" aria-pressed="false">System</button>
         </div>
@@ -135,7 +135,7 @@
               </details>
             </details>
             <label>
-              Project
+              Workspace (optional)
               <select id="owner-command-project">
                 <option value="">Auto-detect from command</option>
               </select>
@@ -202,23 +202,24 @@
 
         <section id="projects" class="section-band">
           <div class="section-heading">
-            <p class="section-kicker">Projects</p>
-            <h2>Your long-running systems</h2>
-            <p>Home is where you give commands. Projects are the durable workspaces that keep each system’s goal, jobs, evidence, quality, and history together.</p>
+            <div>
+              <p class="section-kicker">Workspaces</p>
+              <h2>Your long-running systems</h2>
+              <p>Open a workspace to inspect its goal, jobs, evidence, quality, lessons, and cost. Start all new work from Command.</p>
+            </div>
+            <button id="projects-go-command" class="button-secondary" type="button">Give AG OS a command</button>
           </div>
-          <div class="project-explainer" aria-label="Home and Projects difference">
-            <article><span>Home</span><strong>Tell AG OS what to do now</strong><p>Start a command, see current work, and handle immediate attention.</p></article>
-            <div aria-hidden="true">→</div>
-            <article><span>Projects</span><strong>Manage what AG OS is building over time</strong><p>Keep scope, status, runs, evidence, lessons, and progress in one place.</p></article>
-          </div>
+          <details id="project-create-panel" class="project-create-panel">
+            <summary>Create a new workspace</summary>
+            <p class="project-create-help">Only create one when the work needs its own lasting goal, history, evidence, and lessons. After creation, you will return to Command.</p>
           <form id="project-create-form" class="command-console project-create-form">
             <div class="project-form-grid">
               <label>
-                Project name
+                Workspace name
                 <input id="project-name" maxlength="120" required placeholder="Example: AG Digitalz client onboarding">
               </label>
               <label>
-                Project type
+                Workspace type
                 <select id="project-type">
                   <option value="internal_project">Internal project</option>
                   <option value="product_project">Product project</option>
@@ -248,10 +249,11 @@
               </label>
             </div>
             <div class="command-actions">
-              <p id="project-create-status" role="status">Connect with the owner token before creating a project.</p>
-              <button type="submit">Create project</button>
+              <p id="project-create-status" role="status">Sign in with your owner password before creating a project.</p>
+              <button type="submit">Create workspace</button>
             </div>
           </form>
+          </details>
           <div id="projects-grid" class="projects-grid" aria-live="polite"></div>
         </section>
 
@@ -356,7 +358,7 @@
         <section id="operating-systems" class="section-band">
           <div class="section-heading">
             <h2>Operating Systems</h2>
-            <p>Cost, memory, and watchdog posture.</p>
+            <p>Live capability status derived from runtime evidence. Open any card for details.</p>
           </div>
           <div id="os-grid" class="status-grid"></div>
         </section>
@@ -370,6 +372,19 @@
         </section>
       </main>
     </div>
+
+    <dialog id="workspace-dialog" class="workspace-dialog" aria-labelledby="workspace-dialog-title">
+      <div class="workspace-dialog-shell">
+        <header class="workspace-dialog-header">
+          <div>
+            <span id="workspace-dialog-eyebrow" class="eyebrow">AG OS</span>
+            <h2 id="workspace-dialog-title">Workspace</h2>
+          </div>
+          <button id="workspace-dialog-close" class="dialog-close" type="button" aria-label="Close">Close</button>
+        </header>
+        <div id="workspace-dialog-content" class="workspace-dialog-content"></div>
+      </div>
+    </dialog>
 
     <script src="./dashboard-data.js"></script>
     <script src="./app.js"></script>
