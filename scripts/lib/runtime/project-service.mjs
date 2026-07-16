@@ -92,8 +92,14 @@ export function validateProjectCreateInput(input = {}) {
     throw new Error("name must be at least 3 characters");
   }
   const goal = requiredText(input.goal, "goal");
-  const scope = stringList(input.scope, "scope");
-  const stack = stringList(input.stack, "stack");
+  const scope = optionalStringList(input.scope, "scope") ?? [
+    "Deliver the owner-requested outcome.",
+    "Validate the result against explicit acceptance criteria.",
+    "Record the deliverable, quality score, cost, and reusable lessons."
+  ];
+  const stack = optionalStringList(input.stack, "stack") ?? [
+    "AG OS selects the implementation stack from the requested outcome and project evidence."
+  ];
   const knownFacts = optionalStringList(input.knownFacts, "knownFacts");
   const projectType = input.projectType || "internal_project";
   const managementMode = input.managementMode || "active_build";

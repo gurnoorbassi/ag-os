@@ -83,10 +83,17 @@ export function executeLocalWorkProduct({ job, plan, command, adapter, runId, ro
       productionDataAllowed: false,
       paidActionAllowed: false
     },
+    deliverable: {
+      kind: "plan_evidence",
+      ownerUsable: false,
+      previewAvailable: false,
+      entryFile: "",
+      files: [workProductPath]
+    },
     createdAt: timestamp,
     updatedAt: timestamp
   };
   const executionPath = `.codex/execution/${executionStep.executionStepId}.json`;
   writeJson(executionPath, executionStep, root);
-  return { adapter, executionPath, executionStep, workProductPath, workProductPaths: [workProductPath], reusedEvidence: evidence };
+  return { adapter, executionPath, executionStep, workProductPath, workProductPaths: [workProductPath], deliverable: executionStep.deliverable, reusedEvidence: evidence };
 }

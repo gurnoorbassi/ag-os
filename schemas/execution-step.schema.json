@@ -99,6 +99,21 @@
     "rollbackPlan": {
       "type": "string"
     },
+    "deliverable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ownerUsable", "previewAvailable", "entryFile"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "ownerUsable": { "type": "boolean" },
+        "previewAvailable": { "type": "boolean" },
+        "entryFile": { "type": "string" },
+        "files": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
     "safety": {
       "type": "object",
       "additionalProperties": false,

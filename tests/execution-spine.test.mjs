@@ -15,6 +15,15 @@ import { validateNetlifyStagingRequest } from "../scripts/lib/runtime/netlify-st
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BASE_SHA = "a".repeat(40);
+const DEPLOYMENT_REQUEST = {
+  adapterId: "production-deployment",
+  operation: "deploy_exact_commit",
+  profileId: "ag-os-coordinator",
+  repository: "gurnoorbassi/ag-os",
+  commitSha: BASE_SHA,
+  targetEnvironment: "production",
+  expectedService: "ag-os-coordinator"
+};
 
 function tempWorkspace() {
   const target = mkdtempSync(path.join(tmpdir(), "ag-os-execution-spine-"));
@@ -68,6 +77,7 @@ test("exact owner approval requeues one job but an unavailable live adapter rema
   const command = await submitOwnerCommand({
     command: "Deploy the AG OS dashboard to production",
     projectId: "project-quote-builder",
+    executionRequest: DEPLOYMENT_REQUEST,
     root: workspace,
     now: new Date("2026-07-13T23:20:00.000Z")
   });
@@ -95,7 +105,7 @@ test("exact owner approval requeues one job but an unavailable live adapter rema
   });
   assert.equal(stillWaiting.status, "waiting_approval");
   assert.equal(stillWaiting.job.approvalRequired, false);
-  assert.match(stillWaiting.job.blockedReason, /transport is not installed/);
+  assert.match(stillWaiting.job.blockedReason, /credential is not configured|runtime endpoint is not configured/);
 
   const rejected = decideJob({
     jobId: command.jobId,
@@ -129,6 +139,7 @@ test("owner can immediately revoke an exact queued adapter approval", async () =
   const command = await submitOwnerCommand({
     command: "Deploy the AG OS dashboard to production",
     projectId: "project-quote-builder",
+    executionRequest: DEPLOYMENT_REQUEST,
     root: workspace,
     now: new Date("2026-07-13T23:24:00.000Z")
   });

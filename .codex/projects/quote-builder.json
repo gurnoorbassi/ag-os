@@ -10,7 +10,8 @@
     "The live product is available at https://foreman-quote-studio.netlify.app/.",
     "The local product workspace is a structured Next.js application backed by Supabase.",
     "The Netlify site is live as foreman-quote-studio.",
-    "The canonical source repository is https://github.com/gurnoorbassi/Foreman-Quote-Maker."
+    "The canonical source repository is https://github.com/gurnoorbassi/Foreman-Quote-Maker.",
+    "Netlify continuous deployment is connected to gurnoorbassi/Foreman-Quote-Maker main and the first Git-based production deploy succeeded."
   ],
   "scope": [
     "Create, edit, price, and export contractor quotes through the live product.",
@@ -31,8 +32,8 @@
   ],
   "risks": [
     {
-      "risk": "The Netlify site is not yet linked to the canonical GitHub repository for continuous deployment.",
-      "mitigation": "Keep production deployment approval-gated until the exact Netlify repository binding is recorded and verified."
+      "risk": "A reviewed merge to main can trigger a production Netlify build.",
+      "mitigation": "Keep GitHub changes review-gated, require passing validation, and retain Netlify deploy rollback evidence."
     },
     {
       "risk": "Quote records can contain sensitive business and customer information.",
@@ -63,7 +64,7 @@
     "previewMode": "new_tab",
     "previewReason": "The live product intentionally blocks iframe embedding. AG OS keeps your workspace open and launches the secure full app in a separate tab.",
     "sourceControlStatus": "connected",
-    "sourceControlDetail": "Canonical GitHub repository connected and verified. Netlify Git continuous deployment is the remaining deployment binding.",
+    "sourceControlDetail": "Canonical GitHub repository and Netlify continuous deployment are connected and verified on main.",
     "repositoryUrl": "https://github.com/gurnoorbassi/Foreman-Quote-Maker",
     "repositoryFullName": "gurnoorbassi/Foreman-Quote-Maker",
     "repositoryVisibility": "public",
@@ -77,9 +78,9 @@
       },
       {
         "adapterId": "netlify-continuous-deployment",
-        "status": "setup_required",
+        "status": "connected",
         "target": "foreman-quote-studio:main",
-        "detail": "Netlify GitHub repository authorization is required. The attempted unauthenticated binding was rolled back and the existing published site remains current."
+        "detail": "Connected through the authorized Netlify GitHub App. Production deploy 6a5863ffc544a86cad46626c built commit 7beb3d07e476234340bfeef79650070c0791af81 successfully."
       }
     ],
     "operations": [
@@ -89,5 +90,5 @@
     ]
   },
   "createdAt": "2026-07-16T01:09:20.530Z",
-  "updatedAt": "2026-07-16T02:39:00.000Z"
+  "updatedAt": "2026-07-16T05:00:40.040Z"
 }

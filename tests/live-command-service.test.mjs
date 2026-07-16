@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { assertOwnerCommand, assertRegisteredProject, submitOwnerCommand } from "../scripts/lib/runtime/live-command-service.mjs";
+import { assertOwnerCommand, assertRegisteredProject, ONE_OFF_PROJECT_ID, submitOwnerCommand } from "../scripts/lib/runtime/live-command-service.mjs";
 import { tokenMatches } from "../scripts/live-server.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -31,7 +31,7 @@ test("owner commands require non-empty bounded input", () => {
 });
 
 test("explicit project targeting accepts registered projects and rejects unknown ids", () => {
-  assert.throws(() => assertRegisteredProject({ root }), /choose a project/);
+  assert.doesNotThrow(() => assertRegisteredProject({ projectId: ONE_OFF_PROJECT_ID, root }));
   assert.doesNotThrow(() => assertRegisteredProject({
     projectId: "project-quote-builder",
     root
@@ -40,6 +40,17 @@ test("explicit project targeting accepts registered projects and rejects unknown
     projectId: "project-not-registered",
     root
   }), /project is not registered/);
+});
+
+test("owner command can run as one-off work without a durable project", async () => {
+  const workspace = tempWorkspace();
+  const result = await submitOwnerCommand({
+    command: "Write a plan for an internal process review",
+    root: workspace,
+    now: new Date("2026-07-16T04:00:00.000Z")
+  });
+  const command = JSON.parse(readFileSync(path.join(workspace, `.codex/commands/${result.commandIntakeId}.json`), "utf8"));
+  assert.equal(command.projectId, ONE_OFF_PROJECT_ID);
 });
 
 test("authenticated command service creates a complete gated work package", async () => {

@@ -50,6 +50,18 @@ const ADAPTERS = [
     implemented: true
   },
   {
+    adapterId: "n8n-workflow-control",
+    name: "n8n workflow activation controller",
+    kind: "connector",
+    requestedAction: "n8n_workflow_activation_change",
+    commandPatterns: [/\b(?:activate|deactivate|enable|disable)\b[^.]{0,100}\b(?:n8n|workflow)\b/i, /\bn8n\b[^.]{0,100}\b(?:activate|deactivate|enable|disable)\b/i],
+    credentialEnvParts: ["AG_OS", "N8N", "API", "KEY"],
+    capabilities: ["verify_exact_workflow", "activate_workflow", "deactivate_workflow", "verify_runtime_state", "rollback_activation"],
+    liveServiceTouched: true,
+    approvalRequired: true,
+    implemented: true
+  },
+  {
     adapterId: "n8n-disabled-workflow",
     name: "n8n disabled-workflow worker",
     kind: "connector",
@@ -79,11 +91,12 @@ const ADAPTERS = [
     kind: "connector",
     requestedAction: "production_deployment",
     commandPatterns: [/\bdeploy\b[^.]{0,80}\bproduction\b/i, /\bproduction deployment\b/i, /\brestart\b[^.]{0,60}\bservice\b/i],
-    credentialEnvParts: null,
+    credentialEnvParts: ["AG_OS", "DEPLOYMENT", "RUNNER", "TOKEN"],
+    configEnvParts: ["AG_OS", "DEPLOYMENT", "RUNNER", "URL"],
     capabilities: ["verify_candidate", "backup", "deploy", "healthcheck", "rollback"],
     liveServiceTouched: true,
     approvalRequired: true,
-    implemented: false
+    implemented: true
   },
   {
     adapterId: "social-publishing",
@@ -113,11 +126,14 @@ const ADAPTERS = [
 
 function publicAdapter(adapter, env) {
   const credentialEnv = adapter.credentialEnvParts?.join("_");
+  const configEnv = adapter.configEnvParts?.join("_");
   const credentialConfigured = credentialEnv ? Boolean(env[credentialEnv]) : true;
+  const runtimeConfigured = configEnv ? Boolean(env[configEnv]) : true;
   const enabled = adapter.kind === "local" || env.AG_OS_LIVE_ADAPTERS_ENABLED === "true";
   const blockers = [];
   if (!enabled) blockers.push("live connector adapters are disabled");
   if (!credentialConfigured) blockers.push(`${adapter.adapterId} private runtime credential is not configured`);
+  if (!runtimeConfigured) blockers.push(`${adapter.adapterId} runtime endpoint is not configured`);
   if (!adapter.implemented) blockers.push("connector execution transport is not installed yet");
   return {
     adapterId: adapter.adapterId,
@@ -131,7 +147,8 @@ function publicAdapter(adapter, env) {
     enabled,
     credentialConfigured,
     readyForUngatedWork: adapter.kind === "local" && enabled,
-    executionReady: adapter.implemented && enabled && credentialConfigured,
+    runtimeConfigured,
+    executionReady: adapter.implemented && enabled && credentialConfigured && runtimeConfigured,
     blockers
   };
 }
@@ -157,7 +174,7 @@ export function selectExecutionAdapter({ command, env = process.env } = {}) {
       blockers: [...selected.blockers, "exact GitHub executionRequest with repository, base commit, branch, and isolated source directory is missing"]
     };
   }
-  if (["github-private-repository", "n8n-disabled-workflow", "netlify-staging", "netlify-continuous-deployment"].includes(matched.adapterId) && typeof command === "object" && !command.executionRequest) {
+  if (["github-private-repository", "n8n-disabled-workflow", "n8n-workflow-control", "netlify-staging", "netlify-continuous-deployment", "production-deployment"].includes(matched.adapterId) && typeof command === "object" && !command.executionRequest) {
     return {
       ...selected,
       executionReady: false,

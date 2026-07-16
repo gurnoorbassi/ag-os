@@ -541,11 +541,13 @@ async function openProjectWorkspace(project) {
       metrics.append(item);
     });
     const jobs = result.jobs.length
-      ? table(["Job", "State", "Worker", "Quality / lessons", "Updated"], result.jobs.map((job) => [
+      ? table(["Job", "State", "Worker", "Result", "Updated"], result.jobs.map((job) => [
           job.jobId,
-          pill(job.status),
+          pill(job.status === "done" && job.deliverable?.kind === "plan_evidence" ? "plan only" : job.status),
           job.assignedAgent,
-          job.hasQualityScore ? `Scored; ${job.lessonCandidateCount} candidate(s)` : (job.blockedReason || "Evidence pending"),
+          job.deliverable?.ownerUsable || job.deliverable?.kind === "plan_evidence"
+            ? deliverableControls(job)
+            : (job.blockedReason || (job.hasQualityScore ? `Scored; ${job.lessonCandidateCount} candidate(s)` : "Evidence pending")),
           job.updatedAt ? new Date(job.updatedAt).toLocaleString() : "Not recorded"
         ]))
       : itemList(["No jobs recorded for this project yet."]);
@@ -588,27 +590,19 @@ function openNewProjectDialog() {
   const form = document.createElement("form");
   form.className = "workspace-form";
   const intro = document.createElement("p");
-  intro.textContent = "AG OS creates the workspace immediately, then queues one exact approval to create and bind its private GitHub repository.";
+  intro.textContent = "Give AG OS the project name and outcome. AG OS chooses the scope, tools, and private repository name, then queues the exact approval it needs.";
   const name = document.createElement("input");
   name.required = true;
   name.minLength = 3;
   name.placeholder = "Project name";
-  const repositoryName = document.createElement("input");
-  repositoryName.placeholder = "Private repository name (optional)";
   const goal = document.createElement("textarea");
   goal.required = true;
   goal.placeholder = "What successful completion looks like";
-  const scope = document.createElement("textarea");
-  scope.required = true;
-  scope.placeholder = "One scope item per line";
-  const stack = document.createElement("input");
-  stack.required = true;
-  stack.placeholder = "Tools, comma separated";
   const submit = document.createElement("button");
   submit.type = "submit";
   submit.className = "button-primary";
   submit.textContent = "Create project + queue private repo";
-  form.append(intro, formField("Project name", name), formField("Repository name", repositoryName), formField("Goal", goal), formField("Scope", scope), formField("Stack or tools", stack), submit);
+  form.append(intro, formField("Project name", name), formField("What should this project accomplish?", goal), submit);
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     submit.disabled = true;
@@ -617,10 +611,7 @@ function openNewProjectDialog() {
         method: "POST",
         body: JSON.stringify({
           name: name.value,
-          repositoryName: repositoryName.value || undefined,
           goal: goal.value,
-          scope: scope.value,
-          stack: stack.value,
           projectType: "product_project",
           managementMode: "active_build",
           trustLevel: 1
@@ -677,6 +668,18 @@ function renderProjects(projects = data.projectRegistry.projects) {
 function populateProjectSelect(projects = data.projectRegistry.projects) {
   const root = clear("#owner-command-projects");
   const current = document.querySelector("#owner-command-project").value;
+  const oneOff = document.createElement("button");
+  oneOff.type = "button";
+  oneOff.className = "project-choice";
+  oneOff.dataset.projectId = "project-one-off";
+  oneOff.setAttribute("aria-pressed", "false");
+  const oneOffName = document.createElement("strong");
+  oneOffName.textContent = "One-off work";
+  const oneOffDetail = document.createElement("span");
+  oneOffDetail.textContent = "Do this once without adding it to a project";
+  oneOff.append(oneOffName, oneOffDetail);
+  oneOff.addEventListener("click", () => selectOwnerProject("project-one-off"));
+  root.append(oneOff);
   projects.forEach((project) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -691,7 +694,7 @@ function populateProjectSelect(projects = data.projectRegistry.projects) {
     button.addEventListener("click", () => selectOwnerProject(project.id));
     root.append(button);
   });
-  selectOwnerProject(projects.some((project) => project.id === current) ? current : projects[0]?.id);
+  selectOwnerProject(current === "project-one-off" || projects.some((project) => project.id === current) ? current : "project-one-off");
 }
 
 function selectOwnerProject(projectId) {
@@ -1502,19 +1505,107 @@ function renderRuntimeJobs(jobs = []) {
     return;
   }
   root.append(table(
-    ["Job", "Project", "Worker", "State", "Quality / learning", "Decision", "Updated"],
+    ["Job", "Workspace", "Worker", "State", "Result", "Decision", "Updated"],
     jobs.map((job) => [
       labelStack(job.jobId, job.assignedAgent),
-      job.projectId,
+      job.projectId === "project-one-off" ? "One-off work" : job.projectId,
       labelStack(job.adapter?.name || "Unassigned", job.adapter?.adapterId || "No adapter"),
-      pill(job.status),
-      job.qualityScorePath
-        ? `Scored; ${job.lessonCandidatePaths.length} lesson candidate(s)`
-        : job.blockedReason || "In progress",
+      pill(job.status === "done" && job.deliverable?.kind === "plan_evidence" ? "plan only" : job.status),
+      job.deliverable?.ownerUsable
+        ? deliverableControls(job)
+        : job.deliverable?.kind === "plan_evidence"
+          ? deliverableControls(job)
+          : (job.blockedReason || "In progress"),
       runtimeJobDecisionControls(job),
       new Date(job.updatedAt).toLocaleString()
     ])
   ));
+}
+
+function deliverableControls(job) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "job-actions";
+  const summary = document.createElement("span");
+  summary.textContent = job.deliverable.ownerUsable
+    ? `${job.deliverable.fileCount} deliverable file(s)`
+    : "Plan only — no finished product";
+  const open = document.createElement("button");
+  open.type = "button";
+  open.className = job.deliverable.ownerUsable ? "job-approve" : "secondary-action";
+  open.textContent = job.deliverable.ownerUsable ? "Open result" : "View plan";
+  open.addEventListener("click", () => openJobDeliverable(job));
+  wrapper.append(summary, open);
+  return wrapper;
+}
+
+function inlineWebsitePreview(deliverable) {
+  const index = deliverable.files.find((file) => file.path === deliverable.entryFile);
+  if (!index) return "<p>Preview entry file is missing.</p>";
+  const parser = new DOMParser();
+  const documentCopy = parser.parseFromString(index.content, "text/html");
+  const byPath = new Map(deliverable.files.map((file) => [file.path.replace(/^\.\//, ""), file]));
+  documentCopy.querySelectorAll("link[rel='stylesheet'][href]").forEach((link) => {
+    const file = byPath.get(link.getAttribute("href").replace(/^\.\//, ""));
+    if (!file) return;
+    const style = documentCopy.createElement("style");
+    style.textContent = file.content;
+    link.replaceWith(style);
+  });
+  documentCopy.querySelectorAll("script[src]").forEach((script) => {
+    const file = byPath.get(script.getAttribute("src").replace(/^\.\//, ""));
+    if (!file) return script.remove();
+    const inline = documentCopy.createElement("script");
+    inline.textContent = file.content;
+    script.replaceWith(inline);
+  });
+  documentCopy.querySelectorAll("form").forEach((form) => form.addEventListener("submit", (event) => event.preventDefault()));
+  return `<!doctype html>${documentCopy.documentElement.outerHTML}`;
+}
+
+async function openJobDeliverable(job) {
+  assertOwnerSession();
+  const loading = document.createElement("p");
+  loading.textContent = "Loading the recorded result...";
+  openWorkspaceDialog({ eyebrow: "Result", title: job.jobId, content: loading });
+  try {
+    const { response, result } = await runtimeRequest(`/api/v1/jobs/${encodeURIComponent(job.jobId)}/deliverable`);
+    if (!response.ok) throw new Error(result.detail || result.error || "Deliverable failed to load");
+    const shell = document.createElement("div");
+    shell.className = "workspace-stack";
+    const notice = document.createElement("p");
+    notice.className = "workspace-access-note";
+    notice.textContent = result.ownerUsable
+      ? "This is the real recorded output from the worker. The preview is sandboxed inside AG OS."
+      : "This run produced planning evidence only. It did not produce a website or other finished deliverable.";
+    shell.append(notice);
+    if (result.previewAvailable) {
+      const frame = document.createElement("iframe");
+      frame.className = "deliverable-preview";
+      frame.setAttribute("sandbox", "allow-scripts");
+      frame.setAttribute("title", `Preview of ${job.jobId}`);
+      frame.srcdoc = inlineWebsitePreview(result);
+      shell.append(frame);
+    }
+    const fileList = document.createElement("ul");
+    fileList.className = "policy-checks";
+    result.files.forEach((file) => {
+      const item = document.createElement("li");
+      item.textContent = `${file.path} (${file.bytes} bytes)`;
+      fileList.append(item);
+    });
+    shell.append(sectionBlock("Files", fileList));
+    if (!result.ownerUsable && result.files[0]?.content) {
+      const source = document.createElement("pre");
+      source.className = "deliverable-source";
+      source.textContent = result.files[0].content;
+      shell.append(sectionBlock("Plan evidence", source));
+    }
+    openWorkspaceDialog({ eyebrow: result.ownerUsable ? "Deliverable" : "Plan only", title: job.jobId, content: shell });
+  } catch (error) {
+    const failure = document.createElement("p");
+    failure.textContent = `Could not open result: ${error.message}`;
+    openWorkspaceDialog({ eyebrow: "Result", title: job.jobId, content: failure });
+  }
 }
 
 function runtimeJobDecisionControls(job) {
@@ -1606,16 +1697,9 @@ async function connectRuntime(options = {}) {
     runtimeAutomation = result.automation;
     runtimeOperatingSystems = result.operatingSystems;
     runtimeLessonDecisions = result.lessonDecisions;
-    const plannerCheckbox = document.querySelector("#use-ai-planner");
-    plannerCheckbox.disabled = !runtimeAiPlanner?.ready;
-    document.querySelector("#ai-planner-help").textContent = runtimeAiPlanner?.ready
-      ? `${runtimeAiPlanner.model} is ready. Each use is costed and audited.`
-      : runtimeAiPlanner?.blockers?.join("; ") || "Anthropic planning worker is not ready.";
-    const workerCheckbox = document.querySelector("#use-ai-worker");
-    workerCheckbox.disabled = !runtimeAiWorker?.ready;
-    document.querySelector("#ai-worker-help").textContent = runtimeAiWorker?.ready
-      ? `${runtimeAiWorker.model} is ready to create bounded files. Each use is separately costed and audited.`
-      : runtimeAiWorker?.blockers?.join("; ") || "Anthropic builder worker is not ready.";
+    document.querySelector("#worker-routing-help").textContent = runtimeAiWorker?.ready
+      ? `Professional builder ${runtimeAiWorker.model} is ready. AG OS automatically uses it when the outcome requires files; every paid use remains costed and approval-limited.`
+      : `Planning is available, but real file generation needs builder activation. AG OS will stop with a clear setup message instead of claiming a plan is a finished product.`;
     renderActivationCenter(true, result.production.status, runtimeAiPlanner);
     renderRecentCommands(result.recentCommands);
     renderRuntimeJobs(result.jobs);
@@ -1655,9 +1739,7 @@ async function submitOwnerCommand(event) {
       method: "POST",
       body: JSON.stringify({
         command: document.querySelector("#owner-command").value,
-        projectId: document.querySelector("#owner-command-project").value,
-        useAiPlanner: document.querySelector("#use-ai-planner").checked,
-        useAiWorker: document.querySelector("#use-ai-worker").checked
+        projectId: document.querySelector("#owner-command-project").value
       })
     });
     if (!response.ok) {

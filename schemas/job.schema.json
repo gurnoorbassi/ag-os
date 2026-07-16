@@ -124,6 +124,21 @@
             "minLength": 1
           }
         },
+        "deliverable": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "ownerUsable", "previewAvailable", "entryFile"],
+          "properties": {
+            "kind": { "type": "string", "minLength": 1 },
+            "ownerUsable": { "type": "boolean" },
+            "previewAvailable": { "type": "boolean" },
+            "entryFile": { "type": "string" },
+            "files": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
         "generatedBy": {
           "type": "string",
           "const": "scripts/lib/runtime/job-completion-processor.mjs"

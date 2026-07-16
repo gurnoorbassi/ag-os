@@ -28,9 +28,10 @@ const validInput = {
   trustLevel: 1
 };
 
-test("project creation input requires real scope and stack", () => {
-  assert.throws(() => validateProjectCreateInput({ ...validInput, scope: [] }), /scope requires/);
-  assert.throws(() => validateProjectCreateInput({ ...validInput, stack: "" }), /stack requires/);
+test("project creation derives scope and stack when the owner supplies only name and outcome", () => {
+  const values = validateProjectCreateInput({ name: validInput.name, goal: validInput.goal });
+  assert.equal(values.scope.length, 3);
+  assert.match(values.stack[0], /AG OS selects/);
 });
 
 test("authenticated project service creates a production-clean registry transaction", () => {

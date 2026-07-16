@@ -14,6 +14,9 @@ import { executeGitHubPrivateRepository } from "./github-private-repository-adap
 import { executeN8nDisabledWorkflow } from "./n8n-disabled-workflow-adapter.mjs";
 import { executeNetlifyStagingDeploy } from "./netlify-staging-adapter.mjs";
 import { executeNetlifyContinuousDeployment } from "./netlify-continuous-deployment-adapter.mjs";
+import { jobDeliverableSummary } from "./deliverable-service.mjs";
+import { executeN8nWorkflowControl } from "./n8n-workflow-control-adapter.mjs";
+import { executeProductionDeployment } from "./production-deployment-adapter.mjs";
 
 const LIVE_JOB_PREFIX = "job-runtime-operator-";
 let processing = false;
@@ -111,6 +114,7 @@ export function listAutonomousJobs({ root = process.cwd(), env = process.env, li
       expectedOutput: job.expectedOutput,
       qualityScorePath: job.completionEvidence?.qualityScorePath,
       lessonCandidatePaths: job.completionEvidence?.lessonCandidatePaths || [],
+      deliverable: jobDeliverableSummary({ job, root }),
       adapter,
       approvalId: job.approvalId,
       approvalValid: approval.valid,
@@ -131,7 +135,8 @@ export async function processAutonomousJob({
   runValidation = true,
   githubFetch = globalThis.fetch,
   n8nFetch = globalThis.fetch,
-  netlifyFetch = globalThis.fetch
+  netlifyFetch = globalThis.fetch,
+  deploymentFetch = globalThis.fetch
 }) {
   const sourceJob = readJson(jobPath(jobId), root);
   if (!sourceJob.jobId.startsWith(LIVE_JOB_PREFIX)) {
@@ -230,6 +235,17 @@ export async function processAutonomousJob({
         now,
         root
       });
+    } else if (adapter.adapterId === "n8n-workflow-control") {
+      execution = await executeN8nWorkflowControl({
+        request: command.executionRequest,
+        job: running,
+        adapter,
+        approval: approval.approval,
+        credential: env[["AG_OS", "N8N", "API", "KEY"].join("_")],
+        fetchImpl: n8nFetch,
+        now,
+        root
+      });
     } else if (adapter.adapterId === "netlify-staging") {
       execution = await executeNetlifyStagingDeploy({
         request: command.executionRequest,
@@ -249,6 +265,18 @@ export async function processAutonomousJob({
         approval: approval.approval,
         token: env[["AG_OS", "NETLIFY", "TOKEN"].join("_")],
         fetchImpl: netlifyFetch,
+        now,
+        root
+      });
+    } else if (adapter.adapterId === "production-deployment") {
+      execution = await executeProductionDeployment({
+        request: command.executionRequest,
+        job: running,
+        adapter,
+        approval: approval.approval,
+        runnerUrl: env.AG_OS_DEPLOYMENT_RUNNER_URL,
+        runnerToken: env.AG_OS_DEPLOYMENT_RUNNER_TOKEN,
+        fetchImpl: deploymentFetch,
         now,
         root
       });
@@ -272,6 +300,7 @@ export async function processAutonomousJob({
       commandRecordPath,
       executionRecordPath: execution.executionPath || execution.filePath,
       workProductPath: execution.workProductPath,
+      deliverable: execution.deliverable,
       root,
       now
     });
@@ -283,7 +312,9 @@ export async function processAutonomousJob({
     const audit = writeAuditEventRecord({
       runId: `${sourceJob.jobId}-automatic-completion`,
       eventType: "validation_run",
-      summary: `Autonomous local job ${sourceJob.jobId} created a real isolated work product and completed with mandatory quality and lesson evidence.`,
+      summary: execution.deliverable?.ownerUsable
+        ? `Autonomous job ${sourceJob.jobId} created an owner-usable deliverable and completed with mandatory quality and lesson evidence.`
+        : `Autonomous job ${sourceJob.jobId} completed planning evidence only with mandatory quality and lesson evidence; no finished product was claimed.`,
       scope: sourceJob.jobId,
       source: "ag_os_coordinator",
       relatedArtifacts: [

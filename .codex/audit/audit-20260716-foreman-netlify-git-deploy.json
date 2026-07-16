@@ -1,0 +1,28 @@
+{
+  "id": "audit-20260716-foreman-netlify-git-deploy",
+  "occurredAt": "2026-07-16T05:00:40.040Z",
+  "actor": "agent-codex",
+  "eventType": "registry_change",
+  "summary": "Quote Builder repository binding was activated and verified through a successful Netlify Git production deploy.",
+  "scope": "foreman-quote-studio:gurnoorbassi/Foreman-Quote-Maker:main",
+  "source": "connector_metadata",
+  "relatedArtifacts": [
+    {
+      "type": "approval",
+      "reference": "approval-20260716-foreman-netlify-git-deploy"
+    },
+    {
+      "type": "commit",
+      "reference": "7beb3d07e476234340bfeef79650070c0791af81"
+    },
+    {
+      "type": "other",
+      "reference": "Netlify deploy 6a5863ffc544a86cad46626c"
+    }
+  ],
+  "riskLevel": "high",
+  "dataClassification": "internal",
+  "liveServiceTouched": true,
+  "notes": "The authorized GitHub App connection built and published the exact main commit. Netlify returned ready; no domain, DNS, environment variable, credential, customer-data, messaging, posting, or paid change was performed.",
+  "createdAt": "2026-07-16T05:00:40.040Z"
+}
