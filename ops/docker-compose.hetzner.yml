@@ -17,6 +17,8 @@ services:
       AG_OS_INTERNAL_WATCHDOG_INTERVAL_MS: "60000"
     ports:
       - "127.0.0.1:8787:8787"
+    networks:
+      - private_runner
     volumes:
       - /var/lib/ag-os/state:/app/.codex
     security_opt:
@@ -37,3 +39,12 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+
+networks:
+  private_runner:
+    name: ag-os-private-runner
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.79.0/24
+          gateway: 172.30.79.1

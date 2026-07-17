@@ -8,7 +8,7 @@ AG OS supports separately approval-gated live transports beyond draft creation.
 
 ## Production deployment runner
 
-`production-deployment` sends one exact repository commit to a loopback or HTTPS runner. The request cannot include shell commands, filesystem paths, or arbitrary health checks. The root-owned runner matches the repository, profile, and expected service against `/etc/ag-os/deployment-profiles.json`, then runs only the preconfigured backup, deploy, verify, and rollback commands with `shell: false`.
+`production-deployment` sends one exact repository commit to a loopback, the fixed AG OS private Docker bridge, or an HTTPS runner. The request cannot include shell commands, filesystem paths, arbitrary health checks, or unknown fields. The root-owned runner matches the repository, profile, and expected service against `/etc/ag-os/deployment-profiles.json`, then runs only the preconfigured backup, deploy, verify, and rollback commands with `shell: false`.
 
 The runner requires:
 
@@ -16,6 +16,8 @@ The runner requires:
 - A separate root-only runner environment file containing the same runner token.
 - A root-owned, mode `0600` deployment profile file.
 - An exact single-job owner approval naming the profile, repository, commit, environment, and service.
+
+On the Hetzner Compose runtime, the coordinator uses the dedicated `ag-os-private-runner` bridge at `172.30.79.0/24`. The host runner binds only to the bridge gateway `172.30.79.1:8790`; the port is not published on the VPS public interface. Authenticated HTTP is accepted only for loopback and this exact bridge gateway. Every other non-HTTPS runner address remains rejected.
 
 Installing or changing the runner, profile file, token, systemd service, deployment target, or production application remains a separate production action. Source support alone grants no permission and does not activate the runner.
 

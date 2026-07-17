@@ -15,8 +15,12 @@ test("pins the approved amd64 Node 20 image and runs as non-root", () => {
   assert.doesNotMatch(dockerfile, /curl\s+.*\|\s*(?:sh|bash)/);
 });
 
-test("keeps the first Hetzner activation loopback-only and isolated", () => {
+test("keeps the Hetzner coordinator public-port-free with an isolated runner bridge", () => {
   assert.match(compose, /"127\.0\.0\.1:8787:8787"/);
+  assert.match(compose, /name: ag-os-private-runner/);
+  assert.match(compose, /subnet: 172\.30\.79\.0\/24/);
+  assert.match(compose, /gateway: 172\.30\.79\.1/);
+  assert.doesNotMatch(compose, /8790:8790/);
   assert.doesNotMatch(compose, /infra_default|ai-lead-command-center|N8N_/);
   assert.match(compose, /no-new-privileges:true/);
   assert.match(compose, /cap_drop:\s*\n\s*- ALL/);

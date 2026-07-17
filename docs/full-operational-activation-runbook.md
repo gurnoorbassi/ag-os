@@ -22,7 +22,7 @@ The owner must grant a separate Anthropic work-product approval naming its expir
 
 ### Deployment runner
 
-Install the root-owned runner service, generate one separate runner token, create `/etc/ag-os/deployment-profiles.json` with exact allowlisted commands for each product, and configure the coordinator loopback URL. Installing the service, writing profiles, creating the token, and performing the first deployment require an exact production activation approval.
+Install the root-owned runner service, generate one separate runner token, create `/etc/ag-os/deployment-profiles.json` with exact allowlisted commands for each product, and configure the coordinator URL as `http://172.30.79.1:8790`. The Hetzner coordinator joins the source-controlled `ag-os-private-runner` bridge, while the host runner binds only to that bridge gateway and never to a public interface. Installing the service, writing profiles, creating the token, and performing the first deployment require an exact production activation approval.
 
 ### Secure access anywhere
 

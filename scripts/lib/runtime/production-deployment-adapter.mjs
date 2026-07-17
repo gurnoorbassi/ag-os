@@ -3,6 +3,20 @@ import { isoTimestamp, normalizeRunId, writeJson } from "./common.mjs";
 import { assertApprovalStillActive, assertExactConnectorApproval } from "./connector-approval-guard.mjs";
 import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 
+export const DEPLOYMENT_RUNNER_PRIVATE_BRIDGE_HOST = "172.30.79.1";
+const DEPLOYMENT_REQUEST_FIELDS = new Set([
+  "adapterId",
+  "operation",
+  "profileId",
+  "repository",
+  "commitSha",
+  "targetEnvironment",
+  "expectedService",
+  "jobId",
+  "projectId",
+  "approvalId"
+]);
+
 function safeValue(value, label, pattern, max = 200) {
   const text = String(value || "").trim();
   if (!text || text.length > max || !pattern.test(text)) throw new Error(`invalid production deployment ${label}`);
@@ -13,13 +27,20 @@ export function validateDeploymentRunnerUrl(value) {
   let url;
   try { url = new URL(String(value || "")); } catch { throw new Error("deployment runner URL is invalid"); }
   const loopback = ["127.0.0.1", "localhost", "::1"].includes(url.hostname);
-  if ((!loopback && url.protocol !== "https:") || (loopback && !["http:", "https:"].includes(url.protocol)) || url.username || url.password || url.search || url.hash) {
-    throw new Error("deployment runner must use HTTPS, except for an authenticated loopback runner");
+  const privateBridge = url.hostname === DEPLOYMENT_RUNNER_PRIVATE_BRIDGE_HOST;
+  if ((!loopback && !privateBridge && url.protocol !== "https:") || ((loopback || privateBridge) && !["http:", "https:"].includes(url.protocol)) || url.username || url.password || url.search || url.hash) {
+    throw new Error("deployment runner must use HTTPS, except for an authenticated loopback or dedicated AG OS private-bridge runner");
   }
   return url.toString().replace(/\/$/, "");
 }
 
 export function validateProductionDeploymentRequest({ request }) {
+  const unexpectedFields = request && typeof request === "object"
+    ? Object.keys(request).filter((field) => !DEPLOYMENT_REQUEST_FIELDS.has(field))
+    : [];
+  if (unexpectedFields.length > 0) {
+    throw new Error(`executionRequest contains unsupported fields: ${unexpectedFields.sort().join(", ")}`);
+  }
   if (request?.adapterId !== "production-deployment" || request?.operation !== "deploy_exact_commit") {
     throw new Error("executionRequest must select production-deployment and deploy_exact_commit");
   }

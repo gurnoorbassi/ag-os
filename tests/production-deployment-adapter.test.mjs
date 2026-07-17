@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { selectExecutionAdapter } from "../scripts/lib/runtime/execution-adapter-registry.mjs";
-import { executeProductionDeployment, productionDeploymentApprovalCriteria, validateProductionDeploymentRequest } from "../scripts/lib/runtime/production-deployment-adapter.mjs";
+import { executeProductionDeployment, productionDeploymentApprovalCriteria, validateDeploymentRunnerUrl, validateProductionDeploymentRequest } from "../scripts/lib/runtime/production-deployment-adapter.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const COMMIT = "b".repeat(40);
@@ -56,4 +56,28 @@ test("production deployment uses an exact allowlisted runner request and records
   assert.equal(sent.body.approvalId, approval.approvalId);
   assert.equal(result.record.health.ok, true);
   assert.equal(JSON.stringify(result.record).includes(privateCredential), false);
+});
+
+test("deployment runner permits HTTP only on loopback and the fixed private bridge", () => {
+  assert.equal(validateDeploymentRunnerUrl("http://127.0.0.1:8790"), "http://127.0.0.1:8790");
+  assert.equal(validateDeploymentRunnerUrl("http://172.30.79.1:8790"), "http://172.30.79.1:8790");
+  assert.throws(() => validateDeploymentRunnerUrl("http://172.30.79.2:8790"), /must use HTTPS/);
+  assert.throws(() => validateDeploymentRunnerUrl("http://10.0.0.1:8790"), /must use HTTPS/);
+  assert.throws(() => validateDeploymentRunnerUrl("http://example.com:8790"), /must use HTTPS/);
+  assert.throws(() => validateDeploymentRunnerUrl("http://user:pass@172.30.79.1:8790"), /must use HTTPS/);
+});
+
+test("deployment request rejects arbitrary commands and unknown transport fields", () => {
+  const base = {
+    adapterId: "production-deployment",
+    operation: "deploy_exact_commit",
+    profileId: "ag-os-coordinator",
+    repository: "gurnoorbassi/ag-os",
+    commitSha: COMMIT,
+    targetEnvironment: "production",
+    expectedService: "ag-os-coordinator"
+  };
+  assert.throws(() => validateProductionDeploymentRequest({ request: { ...base, command: "touch /tmp/not-allowed" } }), /unsupported fields: command/);
+  assert.throws(() => validateProductionDeploymentRequest({ request: { ...base, cwd: "/opt/ag-os" } }), /unsupported fields: cwd/);
+  assert.throws(() => validateProductionDeploymentRequest({ request: { ...base, args: ["--force"] } }), /unsupported fields: args/);
 });
