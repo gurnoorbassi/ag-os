@@ -27,6 +27,26 @@ const SECRET_RULES = [
     pattern: /sk-(?:proj-)?[A-Za-z0-9_-]{20,}/
   },
   {
+    ruleId: "meta_access_token",
+    pattern: /\bEAA[A-Za-z0-9]{20,}\b/
+  },
+  {
+    ruleId: "aws_access_key_id",
+    pattern: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/
+  },
+  {
+    ruleId: "slack_token",
+    pattern: /\bxox[baprs]-[A-Za-z0-9-]{10,}\b/
+  },
+  {
+    ruleId: "google_api_key",
+    pattern: /\bAIza[0-9A-Za-z_-]{35}\b/
+  },
+  {
+    ruleId: "json_web_token",
+    pattern: /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/
+  },
+  {
     ruleId: "netlify_credential_marker",
     pattern: new RegExp("netlify" + "[a-z0-9_-]*(?:" + "token|auth" + ")[a-z0-9_-]*\\s*[:=]\\s*[\"']?[A-Za-z0-9._-]{12,}", "i")
   },
@@ -72,17 +92,15 @@ function scanFile({ root, relativePath }) {
 
   lines.forEach((lineText, index) => {
     for (const rule of SECRET_RULES) {
-      const match = lineText.match(rule.pattern);
-      if (!match) {
-        continue;
+      const flags = rule.pattern.flags.includes("g") ? rule.pattern.flags : `${rule.pattern.flags}g`;
+      for (const match of lineText.matchAll(new RegExp(rule.pattern.source, flags))) {
+        findings.push({
+          ruleId: rule.ruleId,
+          filePath: relativePath.replaceAll("\\", "/"),
+          line: index + 1,
+          match: redact(match[0])
+        });
       }
-
-      findings.push({
-        ruleId: rule.ruleId,
-        filePath: relativePath.replaceAll("\\", "/"),
-        line: index + 1,
-        match: redact(match[0])
-      });
     }
   });
 

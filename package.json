@@ -18,7 +18,7 @@
     "security:scan": "node scripts/scan-secrets.mjs",
     "production:check": "node scripts/check-production-readiness.mjs",
     "production:check:coordinator": "node scripts/check-production-readiness.mjs --record .codex/production/production-readiness-ag-os-coordinator-v1.json",
-    "live:start": "node scripts/live-server.mjs",
+    "live:start": "node scripts/build-dashboard.mjs && node scripts/live-server.mjs",
     "validate": "node scripts/validate-foundation.mjs && node scripts/check-dashboard.mjs"
   },
   "engines": {

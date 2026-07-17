@@ -4,6 +4,7 @@
 node_modules/
 dist/
 build/
+dashboard/dashboard-data.js
 .DS_Store
 Thumbs.db
 *.log
