@@ -1,5 +1,6 @@
 import { assertPlanDraftShape } from "./planner-processor.mjs";
 import { finalizeAnthropicBudgetReservation, reserveAnthropicBudget } from "./anthropic-budget-guard.mjs";
+import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 
 const DEFAULT_BASE_URL = "https://api.anthropic.com";
 const ANTHROPIC_VERSION = "2023-06-01";
@@ -101,8 +102,9 @@ export async function createAnthropicPlanDraft({
   approvalMaxUsd,
   root,
   env,
-  now
-}) {
+    now,
+    timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS
+  }) {
   if (!apiKey) throw new Error("Anthropic planner credential is not configured");
   if (!model) throw new Error("Anthropic planner model is not configured");
   if (typeof fetchImpl !== "function") throw new Error("Anthropic planner fetch implementation is unavailable");
@@ -134,7 +136,7 @@ export async function createAnthropicPlanDraft({
   });
   let response;
   try {
-    response = await fetchImpl(`${baseUrl.replace(/\/$/, "")}/v1/messages`, {
+    response = await fetchWithTimeout(fetchImpl, `${baseUrl.replace(/\/$/, "")}/v1/messages`, {
     method: "POST",
     headers: {
       "anthropic-version": ANTHROPIC_VERSION,
@@ -142,7 +144,7 @@ export async function createAnthropicPlanDraft({
       "x-api-key": apiKey
     },
       body: JSON.stringify(requestBody)
-    });
+    }, timeoutMs);
 
     if (!response.ok) throw new Error(`Anthropic planner request failed with HTTP ${response.status}`);
     const payload = await response.json();

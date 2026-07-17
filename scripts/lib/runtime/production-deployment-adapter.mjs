@@ -1,6 +1,7 @@
 import process from "node:process";
 import { isoTimestamp, normalizeRunId, writeJson } from "./common.mjs";
 import { assertApprovalStillActive, assertExactConnectorApproval } from "./connector-approval-guard.mjs";
+import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 
 function safeValue(value, label, pattern, max = 200) {
   const text = String(value || "").trim();
@@ -42,14 +43,14 @@ export function productionDeploymentApprovalCriteria(validated) {
   ];
 }
 
-export async function executeProductionDeployment({ request, job, adapter, approval, runnerUrl, runnerToken, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date() }) {
+export async function executeProductionDeployment({ request, job, adapter, approval, runnerUrl, runnerToken, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date(), timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS }) {
   if (!runnerToken) throw new Error("deployment runner credential is not configured");
   if (typeof fetchImpl !== "function") throw new Error("deployment runner transport is unavailable");
   const endpoint = validateDeploymentRunnerUrl(runnerUrl);
   const validated = validateProductionDeploymentRequest({ request });
   assertExactConnectorApproval({ approval, job, adapter, criteria: productionDeploymentApprovalCriteria(validated) });
   assertApprovalStillActive({ approvalId: approval.approvalId, connectorName: "production deployment runner", root, now });
-  const response = await fetchImpl(`${endpoint}/v1/deployments`, {
+  const response = await fetchWithTimeout(fetchImpl, `${endpoint}/v1/deployments`, {
     method: "POST",
     headers: { accept: "application/json", authorization: `Bearer ${runnerToken}`, "content-type": "application/json" },
     body: JSON.stringify({
@@ -58,7 +59,7 @@ export async function executeProductionDeployment({ request, job, adapter, appro
       projectId: job.projectId,
       approvalId: approval.approvalId
     })
-  });
+  }, timeoutMs);
   if (!response.ok) throw new Error(`deployment runner failed with HTTP ${response.status}`);
   const result = await response.json();
   if (result?.status !== "succeeded" || result.profileId !== validated.profileId || result.repository !== validated.repository ||

@@ -4,12 +4,18 @@ After=ag-os.service
 
 [Service]
 Type=oneshot
-User=ag-os
-Group=ag-os
+User=root
+Group=root
 WorkingDirectory=/opt/ag-os
 Environment=AG_OS_BASE_URL=http://127.0.0.1:8787
+Environment=AG_OS_MONITOR_STATE_FILE=/var/lib/ag-os-monitor/last-check.json
+EnvironmentFile=-/etc/ag-os/monitor.env
 ExecStart=/usr/bin/node ops/monitor-health.mjs
+StateDirectory=ag-os-monitor
+StateDirectoryMode=0700
+UMask=0077
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
+ReadWritePaths=/var/lib/ag-os-monitor

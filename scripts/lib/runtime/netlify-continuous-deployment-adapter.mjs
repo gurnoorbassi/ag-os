@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { isoTimestamp, normalizeRunId, writeJson } from "./common.mjs";
+import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 
 const API_BASE = "https://api.netlify.com/api/v1";
 
@@ -73,7 +74,7 @@ function assertApproval({ approval, job, adapter, validated, root, now }) {
   if (current.status !== "approved" || Date.parse(current.expiresAt) <= now.getTime()) throw new Error("Netlify approval is not active at mutation time");
 }
 
-export async function executeNetlifyContinuousDeployment({ request, job, adapter, approval, token, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date() }) {
+export async function executeNetlifyContinuousDeployment({ request, job, adapter, approval, token, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date(), timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS }) {
   if (!token) throw new Error("Netlify private runtime credential is not configured");
   const validated = validateNetlifyContinuousDeploymentRequest({ request, root });
   assertApproval({ approval, job, adapter, validated, root, now });
@@ -88,11 +89,11 @@ export async function executeNetlifyContinuousDeployment({ request, job, adapter
     stop_builds: true,
     ...(validated.installationId ? { installation_id: validated.installationId } : {})
   };
-  const response = await fetchImpl(`${API_BASE}/sites/${validated.siteId}`, {
+  const response = await fetchWithTimeout(fetchImpl, `${API_BASE}/sites/${validated.siteId}`, {
     method: "PATCH",
     headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
     body: JSON.stringify({ repo })
-  });
+  }, timeoutMs);
   if (!response.ok) throw new Error(`Netlify repository link failed with HTTP ${response.status}`);
   const site = await response.json();
   const settings = site.build_settings || {};

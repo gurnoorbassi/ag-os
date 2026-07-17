@@ -44,6 +44,7 @@
         "running",
         "blocked",
         "failed",
+        "plan_ready",
         "done",
         "cancelled"
       ]
@@ -97,6 +98,16 @@
     "expectedOutput": {
       "type": "string",
       "minLength": 1
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "sourceJobId", "requestedAt"],
+      "properties": {
+        "action": { "type": "string", "enum": ["retry", "replan"] },
+        "sourceJobId": { "type": "string", "pattern": "^job-[a-z0-9-]+$" },
+        "requestedAt": { "type": "string", "minLength": 1 }
+      }
     },
     "completionEvidence": {
       "type": "object",

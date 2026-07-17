@@ -17,6 +17,8 @@ import { executeNetlifyContinuousDeployment } from "./netlify-continuous-deploym
 import { jobDeliverableSummary } from "./deliverable-service.mjs";
 import { executeN8nWorkflowControl } from "./n8n-workflow-control-adapter.mjs";
 import { executeProductionDeployment } from "./production-deployment-adapter.mjs";
+import { executeSocialPublishing } from "./social-publishing-adapter.mjs";
+import { executeDnsChange } from "./dns-change-adapter.mjs";
 
 const LIVE_JOB_PREFIX = "job-runtime-operator-";
 let processing = false;
@@ -118,6 +120,10 @@ export function listAutonomousJobs({ root = process.cwd(), env = process.env, li
       adapter,
       approvalId: job.approvalId,
       approvalValid: approval.valid,
+      recovery: job.recovery ?? null,
+      availableRecoveryActions: ["failed", "blocked", "cancelled", "plan_ready"].includes(job.status)
+        ? ["retry", "replan"]
+        : [],
       availableDecisions: job.status === "waiting_approval"
         ? [...(approval.valid ? [] : ["approve"]), "reject", ...(approval.valid ? ["revoke"] : [])]
         : (approval.valid && ["queued", "running"].includes(job.status) ? ["revoke"] : []),
@@ -136,7 +142,9 @@ export async function processAutonomousJob({
   githubFetch = globalThis.fetch,
   n8nFetch = globalThis.fetch,
   netlifyFetch = globalThis.fetch,
-  deploymentFetch = globalThis.fetch
+  deploymentFetch = globalThis.fetch,
+  socialFetch = globalThis.fetch,
+  dnsFetch = globalThis.fetch
 }) {
   const sourceJob = readJson(jobPath(jobId), root);
   if (!sourceJob.jobId.startsWith(LIVE_JOB_PREFIX)) {
@@ -280,6 +288,28 @@ export async function processAutonomousJob({
         now,
         root
       });
+    } else if (adapter.adapterId === "social-publishing") {
+      execution = await executeSocialPublishing({
+        request: command.executionRequest,
+        job: running,
+        adapter,
+        approval: approval.approval,
+        token: env.AG_OS_SOCIAL_API_TOKEN,
+        fetchImpl: socialFetch,
+        now,
+        root
+      });
+    } else if (adapter.adapterId === "dns-change") {
+      execution = await executeDnsChange({
+        request: command.executionRequest,
+        job: running,
+        adapter,
+        approval: approval.approval,
+        token: env.AG_OS_DNS_API_TOKEN,
+        fetchImpl: dnsFetch,
+        now,
+        root
+      });
     } else {
       execution = executeLocalWorkProduct({
           job: running,
@@ -293,6 +323,17 @@ export async function processAutonomousJob({
     }
     const validation = runValidation ? runLocalValidation({ root }) : { passed: true, status: 0, stdout: "", stderr: "" };
     if (!validation.passed) throw new Error(`local validation failed: ${validation.stderr || validation.stdout}`);
+    const effectiveDeliverable = execution.deliverable ?? (
+      adapter.kind === "connector" && (execution.executionPath || execution.filePath)
+        ? {
+            kind: "connector_result",
+            ownerUsable: true,
+            previewAvailable: false,
+            entryFile: "",
+            files: [execution.executionPath || execution.filePath]
+          }
+        : undefined
+    );
     const completion = writeJobCompletionArtifacts({
       job: running,
       plan,
@@ -300,19 +341,20 @@ export async function processAutonomousJob({
       commandRecordPath,
       executionRecordPath: execution.executionPath || execution.filePath,
       workProductPath: execution.workProductPath,
-      deliverable: execution.deliverable,
+      deliverable: effectiveDeliverable,
       root,
       now
     });
+    const finalStatus = effectiveDeliverable?.ownerUsable === true ? "done" : "plan_ready";
     const completed = writeJobState(running, root, now, {
-      status: "done",
+      status: finalStatus,
       completionEvidence: completion.completionEvidence,
       queueTimestamps: { completedAt: isoTimestamp(now) }
     });
     const audit = writeAuditEventRecord({
       runId: `${sourceJob.jobId}-automatic-completion`,
       eventType: "validation_run",
-      summary: execution.deliverable?.ownerUsable
+      summary: effectiveDeliverable?.ownerUsable
         ? `Autonomous job ${sourceJob.jobId} created an owner-usable deliverable and completed with mandatory quality and lesson evidence.`
         : `Autonomous job ${sourceJob.jobId} completed planning evidence only with mandatory quality and lesson evidence; no finished product was claimed.`,
       scope: sourceJob.jobId,
@@ -332,7 +374,7 @@ export async function processAutonomousJob({
       now,
       root
     });
-    return { status: completed.status, job: completed, ...execution, completion, validationResult: validation, auditPath: audit.filePath };
+    return { status: completed.status, job: completed, ...execution, deliverable: effectiveDeliverable, completion, validationResult: validation, auditPath: audit.filePath };
   } catch (error) {
     const failed = writeJobState(running, root, now, {
       status: "failed",
@@ -347,8 +389,8 @@ export async function processAutonomousJob({
       source: "ag_os_coordinator",
       relatedArtifacts: [{ type: "other", reference: jobPath(sourceJob.jobId) }],
       riskLevel: sourceJob.riskLevel,
-      liveServiceTouched: false,
-      notes: error.message,
+      liveServiceTouched: adapter?.kind === "connector",
+      notes: `${error.message}${adapter?.kind === "connector" ? " Connector mutation may have started; review connector evidence and provider state before retrying." : ""}`,
       now,
       root
     });

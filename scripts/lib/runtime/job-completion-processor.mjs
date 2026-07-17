@@ -75,6 +75,7 @@ export function writeJobCompletionArtifacts({
     planPath: planRecordPath,
     commandIntakePath: usableCommandPath,
     evidencePath: workProductPath,
+    ownerUsable: deliverable?.ownerUsable === true,
     root,
     now
   });

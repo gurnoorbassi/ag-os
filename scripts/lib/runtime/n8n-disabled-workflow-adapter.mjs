@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import process from "node:process";
 import { isoTimestamp, normalizeRunId, writeJson } from "./common.mjs";
 import { assertApprovalStillActive, assertExactConnectorApproval, canonicalJson } from "./connector-approval-guard.mjs";
+import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 
 const MAX_WORKFLOW_BYTES = 500_000;
 const MAX_NODES = 100;
@@ -69,8 +70,8 @@ export function n8nApprovalCriteria(validated) {
   ];
 }
 
-async function n8n(fetchImpl, credential, method, url, body) {
-  const response = await fetchImpl(url, {
+async function n8n(fetchImpl, credential, method, url, body, timeoutMs) {
+  const response = await fetchWithTimeout(fetchImpl, url, {
     method,
     headers: {
       accept: "application/json",
@@ -78,21 +79,21 @@ async function n8n(fetchImpl, credential, method, url, body) {
       [["X", "N8N", "API", "KEY"].join("-")]: credential
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) })
-  });
+  }, timeoutMs);
   if (!response.ok) throw new Error(`n8n ${method} failed with HTTP ${response.status}`);
   return response.json();
 }
 
-export async function executeN8nDisabledWorkflow({ request, job, adapter, approval, credential, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date() }) {
+export async function executeN8nDisabledWorkflow({ request, job, adapter, approval, credential, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date(), timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS }) {
   if (!credential) throw new Error("n8n private runtime credential is not configured");
   if (typeof fetchImpl !== "function") throw new Error("n8n transport is unavailable");
   const validated = validateN8nDisabledWorkflowRequest({ request });
   assertExactConnectorApproval({ approval, job, adapter, criteria: n8nApprovalCriteria(validated) });
   assertApprovalStillActive({ approvalId: approval.approvalId, connectorName: "n8n", root, now });
-  const created = await n8n(fetchImpl, credential, "POST", `${validated.baseUrl}/workflows`, validated.payload);
+  const created = await n8n(fetchImpl, credential, "POST", `${validated.baseUrl}/workflows`, validated.payload, timeoutMs);
   if (!created?.id) throw new Error("n8n did not return a workflow ID");
   if (created.active !== false) throw new Error("n8n returned a workflow that is not explicitly disabled");
-  const verified = await n8n(fetchImpl, credential, "GET", `${validated.baseUrl}/workflows/${encodeURIComponent(created.id)}`);
+  const verified = await n8n(fetchImpl, credential, "GET", `${validated.baseUrl}/workflows/${encodeURIComponent(created.id)}`, undefined, timeoutMs);
   if (verified.id !== created.id || verified.active !== false) throw new Error("n8n disabled-workflow verification failed");
 
   const timestamp = isoTimestamp(now);

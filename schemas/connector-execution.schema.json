@@ -104,8 +104,7 @@
           "const": false
         },
         "changesDomain": {
-          "type": "boolean",
-          "const": false
+          "type": "boolean"
         },
         "usesPaidAction": {
           "type": "boolean",

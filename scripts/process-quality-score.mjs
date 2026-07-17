@@ -216,6 +216,7 @@ export function buildQualityScoreRecord({
   planPath,
   commandIntakePath,
   evidencePath,
+  ownerUsable = Boolean(evidencePath),
   root = process.cwd(),
   now = new Date()
 }) {
@@ -245,7 +246,7 @@ export function buildQualityScoreRecord({
     "$schema": "../../schemas/quality-score.schema.json",
     scoreId: `quality-score-${scoreSlug}`,
     status: "candidate",
-    scoreType: evidencePath ? "product_quality_score" : "plan_quality_score",
+    scoreType: ownerUsable ? "product_quality_score" : "plan_quality_score",
     projectId: plan.projectId || "project-unregistered",
     planId: plan.planId,
     sourcePlanPath: normalizeReference(planPath, root),
@@ -264,9 +265,9 @@ export function buildQualityScoreRecord({
     lessonCandidates: [],
     evidence: [...new Set(evidenceReferences)],
     generatedBy: SCRIPT_ID,
-    limitations: evidencePath
+    limitations: ownerUsable
       ? ["Score is limited to the provided source-controlled evidence references."]
-      : ["No product output was provided; this is a plan quality only score and does not represent owner acceptance or product quality."],
+      : ["No owner-usable product output was provided; this is a plan quality only score and does not represent owner acceptance or product quality."],
     notes: "Candidate score only. It does not authorize execution, deployment, live connector use, or accepted lessons.",
     createdAt: timestamp,
     updatedAt: timestamp
@@ -277,6 +278,7 @@ export function writeQualityScoreRecord({
   planPath,
   commandIntakePath,
   evidencePath,
+  ownerUsable = Boolean(evidencePath),
   outputPath,
   root = process.cwd(),
   now = new Date()
@@ -285,6 +287,7 @@ export function writeQualityScoreRecord({
     planPath,
     commandIntakePath,
     evidencePath,
+    ownerUsable,
     root,
     now
   });

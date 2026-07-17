@@ -225,10 +225,13 @@ function renderOverview() {
   );
 }
 
-function renderActivationCenter(connected = false, productionStatus = "private runtime", aiPlanner = runtimeAiPlanner) {
+function renderActivationCenter(connected = false, productionStatus = "private runtime", aiPlanner = runtimeAiPlanner, aiWorker = runtimeAiWorker) {
   const root = clear("#activation-grid");
   const n8nAdapter = runtimeAutomation?.adapters?.find((adapter) => adapter.adapterId === "n8n-disabled-workflow");
   const netlifyAdapter = runtimeAutomation?.adapters?.find((adapter) => adapter.adapterId === "netlify-staging");
+  const deploymentAdapter = runtimeAutomation?.adapters?.find((adapter) => adapter.adapterId === "production-deployment");
+  const socialAdapter = runtimeAutomation?.adapters?.find((adapter) => adapter.adapterId === "social-publishing");
+  const dnsAdapter = runtimeAutomation?.adapters?.find((adapter) => adapter.adapterId === "dns-change");
   const items = [
     {
       title: "Private coordinator",
@@ -253,6 +256,13 @@ function renderActivationCenter(connected = false, productionStatus = "private r
         : "Needs the Anthropic key, token pricing, enable flag, and a scoped paid-planning approval."
     },
     {
+      title: "Professional AI builder",
+      status: aiWorker?.ready ? "ready" : "approval needed",
+      detail: aiWorker?.ready
+        ? `${aiWorker.model} can create bounded owner-usable files with cost, quality, and lesson evidence.`
+        : aiWorker?.blockers?.join("; ") || "Needs a separate scoped Anthropic builder approval before paid file generation."
+    },
+    {
       title: "n8n workflow drafts",
       status: n8nAdapter?.executionReady ? "ready when approved" : "setup needed",
       detail: n8nAdapter?.executionReady
@@ -265,6 +275,32 @@ function renderActivationCenter(connected = false, productionStatus = "private r
       detail: netlifyAdapter?.executionReady
         ? "Can create secret-scanned draft previews without publishing to production."
         : netlifyAdapter?.blockers?.join("; ") || "Connect first to verify the draft-preview adapter."
+    },
+    {
+      title: "Production deployment runner",
+      status: deploymentAdapter?.executionReady ? "ready when approved" : "private setup needed",
+      detail: deploymentAdapter?.executionReady
+        ? "Can back up, deploy one exact allowlisted commit, verify health, and roll back after one-job approval."
+        : deploymentAdapter?.blockers?.join("; ") || "Connect first to verify the private deployment runner."
+    },
+    {
+      title: "Social publishing",
+      status: socialAdapter?.executionReady ? "ready when approved" : "credential needed",
+      detail: socialAdapter?.executionReady
+        ? "Can publish one exact digest-locked Instagram image after account verification and one-job approval."
+        : socialAdapter?.blockers?.join("; ") || "A least-privilege social API credential is not configured."
+    },
+    {
+      title: "DNS changes",
+      status: dnsAdapter?.executionReady ? "ready when approved" : "credential needed",
+      detail: dnsAdapter?.executionReady
+        ? "Can snapshot, change, verify, and roll back one exact Cloudflare DNS record after one-job approval."
+        : dnsAdapter?.blockers?.join("; ") || "A zone-scoped DNS API credential is not configured."
+    },
+    {
+      title: "Secure access anywhere",
+      status: productionStatus === "live_private" ? "private tunnel" : productionStatus,
+      detail: "The coordinator stays loopback-only. Tailscale or authenticated HTTPS still requires an exact hostname/access-mode activation."
     },
     {
       title: "Safety boundary",
@@ -289,7 +325,7 @@ const dashboardViews = {
   projects: new Set(["projects"]),
   work: new Set(["action-queue", "approvals", "connector-proofs"]),
   intelligence: new Set(["quality-review", "unified-memory", "costs", "metrics", "skills"]),
-  system: new Set(["overview", "registries", "capabilities", "operating-systems", "safe-merge"])
+  system: new Set(["activation-center", "overview", "registries", "capabilities", "operating-systems", "safe-merge"])
 };
 
 const dashboardViewMeta = {
@@ -545,7 +581,7 @@ async function openProjectWorkspace(project) {
     const jobs = result.jobs.length
       ? table(["Job", "State", "Worker", "Result", "Updated"], result.jobs.map((job) => [
           job.jobId,
-          pill(job.status === "done" && job.deliverable?.kind === "plan_evidence" ? "plan only" : job.status),
+          pill(job.status === "plan_ready" || (job.status === "done" && job.deliverable?.kind === "plan_evidence") ? "plan ready" : job.status),
           job.assignedAgent,
           job.deliverable?.ownerUsable || job.deliverable?.kind === "plan_evidence"
             ? deliverableControls(job)
@@ -1610,7 +1646,7 @@ function renderRecentCommands(commands = []) {
     commands.map((command) => [
       command.rawCommand,
       pill(command.riskLevel),
-      command.requiresApproval ? "Waiting approval" : "Planned",
+      command.state === "plan_ready" ? "Plan ready" : command.state,
       new Date(command.createdAt).toLocaleString()
     ])
   ));
@@ -1633,7 +1669,7 @@ function renderRuntimeJobs(jobs = []) {
       labelStack(job.jobId, job.assignedAgent),
       job.projectId === "project-one-off" ? "One-off work" : job.projectId,
       labelStack(job.adapter?.name || "Unassigned", job.adapter?.adapterId || "No adapter"),
-      pill(job.status === "done" && job.deliverable?.kind === "plan_evidence" ? "plan only" : job.status),
+      pill(job.status === "plan_ready" || (job.status === "done" && job.deliverable?.kind === "plan_evidence") ? "plan ready" : job.status),
       job.deliverable?.ownerUsable
         ? deliverableControls(job)
         : job.deliverable?.kind === "plan_evidence"
@@ -1734,8 +1770,18 @@ async function openJobDeliverable(job) {
 function runtimeJobDecisionControls(job) {
   const actions = document.createElement("div");
   actions.className = "job-actions";
+  for (const action of job.availableRecoveryActions || []) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = action === "replan" ? "job-approve" : "secondary-action";
+    button.textContent = action === "replan" ? "Replan + rebuild" : "Retry";
+    button.addEventListener("click", () => recoverRuntimeJob(job, action, button));
+    actions.append(button);
+  }
   if (!job.availableDecisions?.length) {
-    actions.textContent = job.status === "done" ? "Completed" : "No decision needed";
+    if (!(job.availableRecoveryActions || []).length) {
+      actions.textContent = job.status === "done" ? "Completed" : (job.status === "plan_ready" ? "Plan ready" : "No decision needed");
+    }
     return actions;
   }
   for (const decision of job.availableDecisions) {
@@ -1747,6 +1793,26 @@ function runtimeJobDecisionControls(job) {
     actions.append(button);
   }
   return actions;
+}
+
+async function recoverRuntimeJob(job, action, button) {
+  const exact = `${action.toUpperCase()} ${job.jobId}`;
+  if (!window.confirm(`${action === "replan" ? "Create a new plan and rebuild" : "Retry this command"} as a new traceable job?\n\n${exact}`)) return;
+  button.disabled = true;
+  setRuntimeStatus(`${action === "replan" ? "Replanning" : "Retrying"} ${job.jobId}...`, true);
+  try {
+    assertOwnerSession();
+    const { response, result } = await runtimeRequest(`/api/v1/jobs/${encodeURIComponent(job.jobId)}/recover`, {
+      method: "POST",
+      body: JSON.stringify({ action, confirmation: exact })
+    });
+    if (!response.ok) throw new Error(result.detail || result.error || "Recovery failed");
+    setRuntimeStatus(`${job.jobId} recovery created ${result.jobId}. The original evidence remains unchanged.`, true);
+    await connectRuntime();
+  } catch (error) {
+    setRuntimeStatus(`Recovery stopped: ${error.message}`, true);
+    button.disabled = false;
+  }
 }
 
 async function decideRuntimeJob(job, decision, button) {
@@ -1824,7 +1890,7 @@ async function connectRuntime(options = {}) {
     document.querySelector("#worker-routing-help").textContent = runtimeAiWorker?.ready
       ? `Professional builder ${runtimeAiWorker.model} is ready. AG OS automatically uses it when the outcome requires files; every paid use remains costed and approval-limited.`
       : `Planning is available, but real file generation needs builder activation. AG OS will stop with a clear setup message instead of claiming a plan is a finished product.`;
-    renderActivationCenter(true, result.production.status, runtimeAiPlanner);
+    renderActivationCenter(true, result.runtimeDeployment?.status || "live_private", runtimeAiPlanner, runtimeAiWorker);
     renderRecentCommands(result.recentCommands);
     renderRuntimeJobs(result.jobs);
     renderProjects(result.projects);
