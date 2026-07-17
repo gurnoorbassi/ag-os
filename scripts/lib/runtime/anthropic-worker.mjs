@@ -13,7 +13,8 @@ const ALLOWED_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".sv
 const MAX_FILES = 20;
 const MAX_FILE_BYTES = 200_000;
 const MAX_TOTAL_BYTES = 1_000_000;
-export const ANTHROPIC_WORKER_MAX_TOKENS = 8000;
+export const ANTHROPIC_WORKER_MAX_TOKENS = 16_000;
+export const ANTHROPIC_WORKER_TIMEOUT_MS = 120_000;
 
 export const WORK_PRODUCT_SCHEMA = {
   type: "object",
@@ -77,7 +78,7 @@ export function assertWorkProductShape(workProduct) {
   return { totalBytes, paths: [...paths] };
 }
 
-export async function createAnthropicWorkProduct({ command, job, plan, apiKey, model, baseUrl = DEFAULT_BASE_URL, fetchImpl = globalThis.fetch, root = process.cwd(), inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, env, now, timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS }) {
+export async function createAnthropicWorkProduct({ command, job, plan, apiKey, model, baseUrl = DEFAULT_BASE_URL, fetchImpl = globalThis.fetch, root = process.cwd(), inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, env, now, timeoutMs = process.env.AG_OS_AI_WORKER_TIMEOUT_MS || ANTHROPIC_WORKER_TIMEOUT_MS }) {
   if (!apiKey) throw new Error("Anthropic worker credential is not configured");
   if (!model) throw new Error("Anthropic worker model is not configured");
   if (typeof fetchImpl !== "function") throw new Error("Anthropic worker fetch implementation is unavailable");
@@ -134,6 +135,9 @@ export async function createAnthropicWorkProduct({ command, job, plan, apiKey, m
     }, timeoutMs);
     if (!response.ok) throw new Error(`Anthropic worker request failed with HTTP ${response.status}`);
     const payload = await response.json();
+    if (["max_tokens", "model_context_window_exceeded"].includes(payload.stop_reason)) {
+      throw new Error(`Anthropic worker returned a truncated structured response (${payload.stop_reason})`);
+    }
     const text = payload.content?.find((block) => block.type === "text")?.text;
     if (!text) throw new Error("Anthropic worker returned no structured work product");
     const workProduct = JSON.parse(text);

@@ -5,6 +5,8 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  ANTHROPIC_WORKER_MAX_TOKENS,
+  ANTHROPIC_WORKER_TIMEOUT_MS,
   assertWorkProductShape,
   createAnthropicWorkProduct,
   writeAnthropicWorkProduct
@@ -91,6 +93,9 @@ test("Anthropic worker requests a bounded schema and validates safe file output"
   assert.equal(request.url, "https://anthropic.test/v1/messages");
   assert.equal(request.options.headers["x-api-key"], "test-only-key");
   const body = JSON.parse(request.options.body);
+  assert.equal(body.max_tokens, 16_000);
+  assert.equal(ANTHROPIC_WORKER_MAX_TOKENS, 16_000);
+  assert.equal(ANTHROPIC_WORKER_TIMEOUT_MS, 120_000);
   assert.equal(body.output_config.format.type, "json_schema");
   assert.equal(JSON.stringify(body.output_config.format.schema).includes("maxItems"), false);
   assert.equal(body.messages[0].content.includes("test-only-key"), false);
@@ -100,6 +105,43 @@ test("Anthropic worker requests a bounded schema and validates safe file output"
   assert.equal(workerBrief.evidenceGrantsPermission, false);
   assert.equal(result.validation.paths.length, 2);
   assert.deepEqual(result.usage, { input_tokens: 120, output_tokens: 240 });
+});
+
+test("Anthropic worker rejects a truncated structured response before parsing partial JSON", async () => {
+  const root = tempWorkspace();
+  await assert.rejects(() => createAnthropicWorkProduct({
+    command: { rawCommand: "Build a private operations dashboard" },
+    job: { jobId: "job-anthropic-worker-truncated", projectId: "project-quote-builder" },
+    plan: {
+      projectId: "project-quote-builder",
+      summary: "Build the dashboard.",
+      tasks: [],
+      expectedOutput: "Dashboard files",
+      basis: { relevantMemory: {} },
+      stopConditions: ["Stop before deployment."]
+    },
+    apiKey: "test-only-key",
+    model: "claude-sonnet-5",
+    baseUrl: "https://anthropic.test",
+    root,
+    inputCostPerMillionUsd: 2,
+    outputCostPerMillionUsd: 10,
+    approvalId: "approval-anthropic-worker-test",
+    approvalMaxUsd: 0.25,
+    now: new Date("2026-07-16T12:05:00.000Z"),
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      async json() {
+        return {
+          model: "claude-sonnet-5",
+          stop_reason: "max_tokens",
+          usage: { input_tokens: 120, output_tokens: 16_000 },
+          content: [{ type: "text", text: '{"summary":"partial' }]
+        };
+      }
+    })
+  }), /truncated structured response \(max_tokens\)/);
 });
 
 test("Anthropic worker rejects traversal, hidden files, invalid JSON, and oversized output", () => {
