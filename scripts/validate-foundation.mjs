@@ -180,6 +180,11 @@ const templateRecords = [
     schemaPath: "schemas/agent.schema.json"
   },
   {
+    name: "state template",
+    recordPath: ".codex/state/state.template.json",
+    schemaPath: "schemas/state-management.schema.json"
+  },
+  {
     name: "client template",
     recordPath: ".codex/templates/client-management/client.template.json",
     schemaPath: "schemas/client.schema.json"
@@ -258,6 +263,16 @@ const schemaValidatedRecords = [
   }
 ];
 const schemaValidatedRecordDirectories = [
+  {
+    name: "n8n plan",
+    recordDir: ".codex/n8n",
+    schemaPath: "schemas/n8n-plan.schema.json"
+  },
+  {
+    name: "Netlify plan",
+    recordDir: ".codex/netlify",
+    schemaPath: "schemas/netlify-plan.schema.json"
+  },
   {
     name: "approval lock",
     recordDir: ".codex/approvals",

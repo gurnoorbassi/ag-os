@@ -6,7 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { assertOwnerCommand, assertRegisteredProject, ONE_OFF_PROJECT_ID, submitOwnerCommand } from "../scripts/lib/runtime/live-command-service.mjs";
-import { tokenMatches } from "../scripts/live-server.mjs";
+import { loginRateLimitKey, tokenMatches } from "../scripts/live-server.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -23,6 +23,23 @@ test("owner token comparison fails closed", () => {
   assert.equal(tokenMatches("expected", "expected"), true);
   assert.equal(tokenMatches("expected", "wrong"), false);
   assert.equal(tokenMatches("", "expected"), false);
+});
+
+test("login rate limiting uses the direct socket address unless trusted proxy mode is explicit", () => {
+  const request = {
+    socket: { remoteAddress: "203.0.113.8" },
+    headers: { "x-forwarded-for": "198.51.100.4" }
+  };
+  assert.equal(loginRateLimitKey(request, {}), "203.0.113.8");
+  assert.equal(loginRateLimitKey(request, { AG_OS_TRUST_PROXY: "true" }), "203.0.113.8");
+});
+
+test("trusted loopback proxy rate limiting uses the rightmost forwarded client", () => {
+  const request = {
+    socket: { remoteAddress: "127.0.0.1" },
+    headers: { "x-forwarded-for": "192.0.2.9, 198.51.100.7" }
+  };
+  assert.equal(loginRateLimitKey(request, { AG_OS_TRUST_PROXY: "true" }), "198.51.100.7");
 });
 
 test("owner commands require non-empty bounded input", () => {

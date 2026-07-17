@@ -41,10 +41,42 @@
     "costs": { "type": "array", "items": { "type": "string" } },
     "connectors": { "type": "array", "items": { "type": "string" } },
     "capabilities": { "type": "array", "items": { "type": "string" } },
-    "validation": { "$ref": "#/$defs/statusCheck" },
-    "boot": { "$ref": "#/$defs/statusCheck" },
-    "watchdog": { "$ref": "#/$defs/statusCheck" },
-    "engine": { "$ref": "#/$defs/statusCheck" },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "lastCheckedAt"],
+      "properties": {
+        "status": { "type": "string", "enum": ["unknown", "pass", "warn", "fail", "blocked"] },
+        "lastCheckedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "boot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "lastCheckedAt"],
+      "properties": {
+        "status": { "type": "string", "enum": ["unknown", "pass", "warn", "fail", "blocked"] },
+        "lastCheckedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "watchdog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "lastCheckedAt"],
+      "properties": {
+        "status": { "type": "string", "enum": ["unknown", "pass", "warn", "fail", "blocked"] },
+        "lastCheckedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "lastCheckedAt"],
+      "properties": {
+        "status": { "type": "string", "enum": ["unknown", "pass", "warn", "fail", "blocked"] },
+        "lastCheckedAt": { "type": "string", "format": "date-time" }
+      }
+    },
     "rules": {
       "type": "object",
       "additionalProperties": false,
@@ -67,16 +99,5 @@
     },
     "createdAt": { "type": "string", "format": "date-time" },
     "updatedAt": { "type": "string", "format": "date-time" }
-  },
-  "$defs": {
-    "statusCheck": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["status", "lastCheckedAt"],
-      "properties": {
-        "status": { "type": "string", "enum": ["unknown", "pass", "warn", "fail", "blocked"] },
-        "lastCheckedAt": { "type": "string", "format": "date-time" }
-      }
-    }
   }
 }

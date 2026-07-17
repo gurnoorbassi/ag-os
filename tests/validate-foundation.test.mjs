@@ -184,6 +184,30 @@ test("validator fails when a required field is missing", () => withTempRepo((roo
   assert.match(result.output, /missing required field: status/);
 }));
 
+test("validator covers n8n, Netlify, and state record directories", () => withTempRepo((root) => {
+  const n8nPath = ".codex/n8n/n8n-plan-20260704-construction-lead-draft-proof.json";
+  const n8nPlan = readJson(root, n8nPath);
+  n8nPlan.safety.executesN8nAction = true;
+  writeJson(root, n8nPath, n8nPlan);
+
+  const netlifyPath = ".codex/netlify/netlify-plan-20260704-social-media-staging.json";
+  const netlifyPlan = readJson(root, netlifyPath);
+  netlifyPlan.safety.changesDns = true;
+  writeJson(root, netlifyPath, netlifyPlan);
+
+  const statePath = ".codex/state/state.template.json";
+  const state = readJson(root, statePath);
+  state.rules.credentialsAllowed = true;
+  writeJson(root, statePath, state);
+
+  const result = runValidator(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /n8n-plan-.*\.safety\.executesN8nAction must be false/);
+  assert.match(result.output, /netlify-plan-.*\.safety\.changesDns must be false/);
+  assert.match(result.output, /state\.template\.json\.rules\.credentialsAllowed must be false/);
+}));
+
 test("validator blocks new completed jobs without mechanical learning evidence", () => withTempRepo((root) => {
   const recordPath = ".codex/jobs/job-runtime-quality-loop-crm-20260704.json";
   const job = readJson(root, recordPath);
@@ -758,11 +782,11 @@ test("validator warns when format keywords are present but not enforced", () => 
   assert.match(result.output, /WARN schema format keyword is present but not enforced/);
 }));
 
-test("validator reports unsupported keywords in orphan schemas without failing", () => withTempRepo((root) => {
+test("validator has no orphan state schema with unsupported structural keywords", () => withTempRepo((root) => {
   const result = runValidator(root);
 
   assert.equal(result.status, 0, result.output);
-  assert.match(result.output, /WARN unsupported schema keyword \$ref in orphan schema schemas\/state-management\.schema\.json/);
+  assert.doesNotMatch(result.output, /unsupported schema keyword .*state-management\.schema\.json/);
 }));
 
 test("validator still succeeds on the real repo after invalid temp fixtures are cleaned up", () => {

@@ -131,8 +131,18 @@ function requestAuthentication(request) {
   return verifyOwnerSession({ value: session, ownerToken, passwordHash: ownerPasswordHash }) ? "password_session" : null;
 }
 
-function loginRateLimitKey(request) {
-  return request.socket.remoteAddress || "unknown-private-client";
+function isLoopbackAddress(value) {
+  return ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(String(value || "").toLowerCase());
+}
+
+export function loginRateLimitKey(request, env = process.env) {
+  const socketAddress = request.socket.remoteAddress || "unknown-private-client";
+  if (env.AG_OS_TRUST_PROXY !== "true" || !isLoopbackAddress(socketAddress)) return socketAddress;
+  const forwarded = Array.isArray(request.headers["x-forwarded-for"])
+    ? request.headers["x-forwarded-for"].join(",")
+    : String(request.headers["x-forwarded-for"] || "");
+  const rightmost = forwarded.split(",").map((item) => item.trim()).filter(Boolean).at(-1);
+  return rightmost && rightmost.length <= 128 ? rightmost : socketAddress;
 }
 
 async function readJsonBody(request) {

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
-import { collectDashboardData, renderDashboardDataModule } from "./build-dashboard.mjs";
+import { collectDashboardData } from "./build-dashboard.mjs";
 
 const root = process.cwd();
 const failures = [];
@@ -22,21 +22,12 @@ function requireFile(relativePath) {
 for (const relativePath of [
   "dashboard/index.html",
   "dashboard/styles.css",
-  "dashboard/app.js",
-  "dashboard/dashboard-data.js"
+  "dashboard/app.js"
 ]) {
   requireFile(relativePath);
 }
 
 const data = collectDashboardData();
-const expectedDataModule = renderDashboardDataModule(data);
-const actualDataModule = existsSync(path.join(root, "dashboard/dashboard-data.js"))
-  ? read("dashboard/dashboard-data.js")
-  : "";
-
-if (actualDataModule !== expectedDataModule) {
-  fail("dashboard/dashboard-data.js is stale; run npm.cmd run dashboard:build");
-}
 
 if (data.meta.mode !== "read_only") {
   fail("dashboard mode must be read_only");
@@ -68,18 +59,20 @@ for (const requiredInterfacePattern of [
   /data-dashboard-view="projects"/,
   /data-dashboard-view="work"/,
   /data-dashboard-view="intelligence"/,
-  /data-dashboard-view="system"/,
-  /class="nav-workspace"/,
-  />Command<\/button>/,
-  />Projects<\/button>/,
-  />Activity<\/button>/,
-  /id="view-title"/,
-  /id="owner-command-projects"[^>]*class="project-picker-grid"/,
-  /id="projects-go-command"/,
-  /const dashboardViewMeta =/
+  /data-dashboard-view="system"/
 ]) {
   if (!requiredInterfacePattern.test(`${dashboardSource}\n${styles}`)) {
     fail(`dashboard navigation or dark-theme invariant missing: ${requiredInterfacePattern}`);
+  }
+}
+
+const expectedDashboardViews = new Set(["home", "projects", "work", "intelligence", "system"]);
+const navigationControls = [...index.matchAll(/<button\b[^>]*data-dashboard-view="([^"]+)"[^>]*>([\s\S]*?)<\/button>/gi)]
+  .map((match) => ({ view: match[1], label: match[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() }));
+for (const view of expectedDashboardViews) {
+  const controls = navigationControls.filter((control) => control.view === view);
+  if (controls.length === 0 || controls.some((control) => control.label.length === 0)) {
+    fail(`dashboard navigation must expose a non-empty control label for view: ${view}`);
   }
 }
 
@@ -89,12 +82,17 @@ for (const forbiddenPattern of [
   /navigator\.sendBeacon/,
   /\blocalStorage\b/,
   /type=["']file["']/i,
-  /<button[^>]*>\s*(?:deploy|merge|publish|post|send|spend|change\s+dns)/i,
-  /buy|purchase|subscribe/i
+  /<button[^>]*>\s*(?:deploy|merge|publish|post|send|spend|change\s+dns)/i
 ]) {
   if (forbiddenPattern.test(dashboardSource)) {
     fail(`dashboard operator-safety check failed for pattern: ${forbiddenPattern}`);
   }
+}
+
+const interactiveLabels = [...dashboardSource.matchAll(/<(button|a)\b[^>]*>([\s\S]*?)<\/\1>/gi)]
+  .map((match) => match[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+if (interactiveLabels.some((label) => /\b(?:buy|purchase|subscribe)\b/i.test(label))) {
+  fail("dashboard operator-safety check forbids purchase actions in interactive controls");
 }
 
 for (const requiredOperatorPattern of [

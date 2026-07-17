@@ -42,6 +42,37 @@ test("flags GitHub and OpenAI-style tokens", () => withWorkspace((root) => {
   assert.equal(result.findings.some((finding) => finding.ruleId === "openai_api_key"), true);
 }));
 
+test("flags Meta, AWS, Slack, Google, and JWT token families", () => withWorkspace((root) => {
+  const metaToken = `EAA${"A1b2C3d4E5f6G7h8I9j0K1"}`;
+  const awsKey = `AKIA${"ABCDEFGHIJKLMNOP"}`;
+  const slackToken = `xoxb-${"1234567890"}-${"abcdefghijklmnopqrst"}`;
+  const googleKey = `AIza${"1234567890abcdefghijklmnopqrstuvwxy"}`;
+  const jwt = [
+    `eyJ${"hbGciOiJIUzI1NiJ9"}`,
+    "eyJzdWIiOiIxMjM0NTY3ODkwIn0",
+    "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+  ].join(".");
+  write(root, "provider-secrets.txt", [metaToken, awsKey, slackToken, googleKey, jwt].join("\n"));
+
+  const result = scanSecrets({ root });
+  const ruleIds = new Set(result.findings.map((finding) => finding.ruleId));
+
+  assert.equal(result.ok, false);
+  for (const ruleId of ["meta_access_token", "aws_access_key_id", "slack_token", "google_api_key", "json_web_token"]) {
+    assert.equal(ruleIds.has(ruleId), true, `missing ${ruleId}`);
+  }
+}));
+
+test("reports every same-family secret on one line", () => withWorkspace((root) => {
+  const first = `ghp_${"1234567890abcdefghijklmnopqrst"}`;
+  const second = `ghp_${"zyxwvutsrqponmlkjihgfedcba098765"}`;
+  write(root, "two.txt", `${first} ${second}\n`);
+
+  const result = scanSecrets({ root });
+
+  assert.equal(result.findings.filter((finding) => finding.ruleId === "github_token").length, 2);
+}));
+
 test("flags private keys and env secret assignments", () => withWorkspace((root) => {
   const privateKeyHeader = `-----BEGIN ${"OPENSSH"} PRIVATE KEY-----`;
   const privateKeyFooter = `-----END ${"OPENSSH"} PRIVATE KEY-----`;
