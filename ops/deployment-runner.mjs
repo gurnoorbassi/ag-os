@@ -5,9 +5,19 @@ import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { validateProductionDeploymentRequest } from "../scripts/lib/runtime/production-deployment-adapter.mjs";
+import { DEPLOYMENT_RUNNER_PRIVATE_BRIDGE_HOST, validateProductionDeploymentRequest } from "../scripts/lib/runtime/production-deployment-adapter.mjs";
 
-const host = process.env.AG_OS_DEPLOYMENT_RUNNER_HOST || "127.0.0.1";
+export { DEPLOYMENT_RUNNER_PRIVATE_BRIDGE_HOST };
+
+export function validateDeploymentRunnerHost(value) {
+  const candidate = String(value || "127.0.0.1").trim();
+  if (!["127.0.0.1", DEPLOYMENT_RUNNER_PRIVATE_BRIDGE_HOST].includes(candidate)) {
+    throw new Error("deployment runner must bind to loopback or the dedicated AG OS private bridge");
+  }
+  return candidate;
+}
+
+const host = validateDeploymentRunnerHost(process.env.AG_OS_DEPLOYMENT_RUNNER_HOST);
 const port = Number(process.env.AG_OS_DEPLOYMENT_RUNNER_PORT || 8790);
 const credential = process.env.AG_OS_DEPLOYMENT_RUNNER_TOKEN || "";
 const profilesPath = process.env.AG_OS_DEPLOYMENT_PROFILES_FILE || "/etc/ag-os/deployment-profiles.json";
@@ -133,6 +143,5 @@ const server = createServer(async (request, response) => {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   if (!credential) throw new Error("AG OS deployment runner credential is required");
-  if (host !== "127.0.0.1") throw new Error("deployment runner must remain loopback-only");
   server.listen(port, host, () => console.log(JSON.stringify({ service: "ag-os-deployment-runner", status: "listening", host, port })));
 }
