@@ -350,8 +350,8 @@ if (data.socialMediaSystem.safetyBlocks.socialOauthConnected !== false) {
 if (data.socialMediaSystem.safetyBlocks.clientConfigAdded !== true) {
   fail("dashboard control center must show Social Media client config added after AG Digitalz records are registered");
 }
-if (!data.socialPosting || data.socialPosting.status !== "foundation_active") {
-  fail("dashboard control center must expose the Production Social Posting read model");
+if (!data.socialPosting || data.socialPosting.status !== "archived") {
+  fail("dashboard control center must preserve the archived Production Social Posting read model as inactive history");
 }
 if (data.socialPosting.targetHandle !== "@agdigitalz") {
   fail("dashboard control center must show @agdigitalz as the Instagram posting target handle");
@@ -405,9 +405,9 @@ if (!data.socialPosting.blockedPublishReasons.includes("oauth_not_executed")) {
   fail("dashboard control center must show OAuth has not been executed");
 }
 if (data.socialPosting.productionReadiness?.activationAllowed !== false ||
-  data.socialPosting.productionReadiness?.status !== "blocked" ||
+  data.socialPosting.productionReadiness?.status !== "archived" ||
   data.socialPosting.productionReadiness?.permissionGrantedByReadiness !== false) {
-  fail("dashboard must show production readiness as fail-closed and non-authorizing");
+  fail("dashboard must show archived production readiness as inactive and non-authorizing");
 }
 if (data.socialPosting.permissionModel.oauthDoesNotAuthorizePosting !== true ||
   data.socialPosting.permissionModel.connectedDraftOnlyDoesNotAuthorizePosting !== true ||
@@ -417,12 +417,11 @@ if (data.socialPosting.permissionModel.oauthDoesNotAuthorizePosting !== true ||
   data.socialPosting.permissionModel.candidateLessonsCanGrantPermission !== false) {
   fail("dashboard control center must show OAuth, drafts, memory, and skills cannot grant posting permission");
 }
-if (!data.ownerAttention.some((item) => item.id === "instagram-oauth-execution-needed" && item.status === "blocked")) {
-  fail("dashboard control center must show Instagram OAuth execution as blocked owner attention");
+if (data.ownerAttention.some((item) => item.id === "instagram-oauth-execution-needed")) {
+  fail("dashboard control center must not surface archived Instagram OAuth work as active owner attention");
 }
-if (data.dashboardActionQueue.manualPostingAvailable === true &&
-  !data.ownerAttention.some((item) => item.id === "manual-posting-available" && item.status === "ready")) {
-  fail("dashboard control center must show manual posting available as an owner-attention item");
+if (data.ownerAttention.some((item) => item.id === "manual-posting-available")) {
+  fail("dashboard control center must not surface archived manual posting work as active owner attention");
 }
 if (data.connectorProofs.n8nActiveWorkflowCount !== 0) {
   fail("dashboard control center must not infer active n8n workflows from source records");

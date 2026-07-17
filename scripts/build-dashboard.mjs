@@ -769,7 +769,7 @@ function collectSocialPosting({ firstContentSprint }) {
   ]);
 
   return {
-    status: "foundation_active",
+    status: productionReadinessRecord?.status === "archived" ? "archived" : "foundation_active",
     mode: "source_controlled_read_model",
     targetPlatform: "Instagram",
     targetHandle: instagram?.handle ?? sprintInstagram?.handle ?? "not_recorded",
@@ -891,36 +891,38 @@ function collectOwnerAttention({ firstClientReadiness, approvals, qualityReview,
     });
   }
 
-  attention.push({
-    id: "live-social-integrations-blocked",
-    status: "blocked",
-    presentationStatus: "protected",
-    title: "Live social integrations protected",
-    detail: "OAuth, credentials, posting, scheduling, analytics API, and n8n activation require separate scoped approval.",
-    action: "No failure: the Constitution is holding these actions until an exact approval is active.",
-    sourceRecord: "docs/social-media-management-system-v1-future-connectors.md"
-  });
-
-  if (socialPosting?.targetHandle === "@agdigitalz" && socialPosting?.oauthStatus !== "connected") {
+  if (socialPosting?.status !== "archived") {
     attention.push({
-      id: "instagram-oauth-execution-needed",
+      id: "live-social-integrations-blocked",
       status: "blocked",
-      presentationStatus: "approval_gated",
-      title: "Instagram OAuth approval gate",
-      detail: `${socialPosting.targetHandle} remains ${socialPosting.accountState}; automated posting cannot start.`,
-      action: socialPosting.nextRequiredOwnerApproval,
-      sourceRecord: ".codex/social/accounts/ag-digitalz-instagram.json"
+      presentationStatus: "protected",
+      title: "Live social integrations protected",
+      detail: "OAuth, credentials, posting, scheduling, analytics API, and n8n activation require separate scoped approval.",
+      action: "No failure: the Constitution is holding these actions until an exact approval is active.",
+      sourceRecord: "docs/social-media-management-system-v1-future-connectors.md"
+    });
+
+    if (socialPosting?.targetHandle === "@agdigitalz" && socialPosting?.oauthStatus !== "connected") {
+      attention.push({
+        id: "instagram-oauth-execution-needed",
+        status: "blocked",
+        presentationStatus: "approval_gated",
+        title: "Instagram OAuth approval gate",
+        detail: `${socialPosting.targetHandle} remains ${socialPosting.accountState}; automated posting cannot start.`,
+        action: socialPosting.nextRequiredOwnerApproval,
+        sourceRecord: ".codex/social/accounts/ag-digitalz-instagram.json"
+      });
+    }
+
+    attention.push({
+      id: "manual-posting-available",
+      status: "ready",
+      title: "Manual posting available",
+      detail: "AG Digitalz approved drafts can be copied/exported for owner manual use while AG OS automation posting remains blocked.",
+      action: "Use the staged Social Media Manual Posting Pack manually, or approve a future OAuth package separately.",
+      sourceRecord: ".codex/connectors/connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result.json"
     });
   }
-
-  attention.push({
-    id: "manual-posting-available",
-    status: "ready",
-    title: "Manual posting available",
-    detail: "AG Digitalz approved drafts can be copied/exported for owner manual use while AG OS automation posting remains blocked.",
-    action: "Use the staged Social Media Manual Posting Pack manually, or approve a future OAuth package separately.",
-    sourceRecord: ".codex/connectors/connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result.json"
-  });
 
   return attention;
 }

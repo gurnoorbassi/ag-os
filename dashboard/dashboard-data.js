@@ -1407,7 +1407,7 @@ window.AG_OS_DASHBOARD_DATA = {
     ]
   },
   "socialPosting": {
-    "status": "foundation_active",
+    "status": "archived",
     "mode": "source_controlled_read_model",
     "targetPlatform": "Instagram",
     "targetHandle": "@agdigitalz",
@@ -1464,15 +1464,9 @@ window.AG_OS_DASHBOARD_DATA = {
     ],
     "productionReadiness": {
       "readinessId": "production-readiness-social-media-management-system-v1",
-      "status": "blocked",
+      "status": "archived",
       "activationAllowed": false,
-      "blockers": [
-        "rollback_restore_drill",
-        "monitoring_active",
-        "credential_rotation_revocation_ready",
-        "validation_security_ci_passed",
-        "exact_production_approval_active"
-      ],
+      "blockers": [],
       "passedCheckCount": 6,
       "requiredCheckCount": 11,
       "liveActionPerformed": false,
@@ -1529,34 +1523,7 @@ window.AG_OS_DASHBOARD_DATA = {
       ".codex/production/production-readiness-social-media-management-system-v1.json"
     ]
   },
-  "ownerAttention": [
-    {
-      "id": "live-social-integrations-blocked",
-      "status": "blocked",
-      "presentationStatus": "protected",
-      "title": "Live social integrations protected",
-      "detail": "OAuth, credentials, posting, scheduling, analytics API, and n8n activation require separate scoped approval.",
-      "action": "No failure: the Constitution is holding these actions until an exact approval is active.",
-      "sourceRecord": "docs/social-media-management-system-v1-future-connectors.md"
-    },
-    {
-      "id": "instagram-oauth-execution-needed",
-      "status": "blocked",
-      "presentationStatus": "approval_gated",
-      "title": "Instagram OAuth approval gate",
-      "detail": "@agdigitalz remains access_requested; automated posting cannot start.",
-      "action": "Owner must approve approval-instagram-oauth-execution before any Instagram OAuth flow can start. Credential reference credential-ref-instagram-agdigitalz-oauth is source-controlled as a reference only and contains no secret value. OAuth approval still does not authorize posting, scheduling, analytics, DMs/comments, or n8n activation.",
-      "sourceRecord": ".codex/social/accounts/ag-digitalz-instagram.json"
-    },
-    {
-      "id": "manual-posting-available",
-      "status": "ready",
-      "title": "Manual posting available",
-      "detail": "AG Digitalz approved drafts can be copied/exported for owner manual use while AG OS automation posting remains blocked.",
-      "action": "Use the staged Social Media Manual Posting Pack manually, or approve a future OAuth package separately.",
-      "sourceRecord": ".codex/connectors/connector-exec-20260705-ag-digitalz-manual-posting-pack-v1-netlify-staging-live-result.json"
-    }
-  ],
+  "ownerAttention": [],
   "connectorAuth": {
     "records": [
       {

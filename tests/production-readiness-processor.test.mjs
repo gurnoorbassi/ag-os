@@ -61,3 +61,15 @@ test("fails closed when any safety default is relaxed", () => {
   assert.equal(result.activationAllowed, false);
   assert.equal(result.blockers.includes("safety_defaults_not_locked"), true);
 });
+
+test("treats archived legacy readiness as inactive history instead of an active blocker", () => {
+  const record = readyRecord();
+  record.status = "archived";
+  record.activationAllowed = false;
+  record.requiredChecks[0].status = "blocked";
+  const result = evaluateProductionReadiness(record);
+  assert.equal(result.status, "archived");
+  assert.equal(result.activationAllowed, false);
+  assert.deepEqual(result.blockers, []);
+  assert.equal(result.permissionGrantedByReadiness, false);
+});
