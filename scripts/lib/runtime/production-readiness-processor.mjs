@@ -16,6 +16,21 @@ const REQUIRED_CHECK_IDS = [
 ];
 
 export function evaluateProductionReadiness(record) {
+  if (record?.status === "archived") {
+    const passedCheckCount = (record.requiredChecks ?? []).filter((check) =>
+      REQUIRED_CHECK_IDS.includes(check.checkId) && check.status === "pass" && Array.isArray(check.evidence) && check.evidence.length > 0
+    ).length;
+    return {
+      readinessId: record?.readinessId ?? null,
+      status: "archived",
+      activationAllowed: false,
+      blockers: [],
+      passedCheckCount,
+      requiredCheckCount: REQUIRED_CHECK_IDS.length,
+      liveActionPerformed: false,
+      permissionGrantedByReadiness: false
+    };
+  }
   const checkMap = new Map((record?.requiredChecks ?? []).map((check) => [check.checkId, check]));
   const blockers = [];
   for (const checkId of REQUIRED_CHECK_IDS) {

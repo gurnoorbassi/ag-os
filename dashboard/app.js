@@ -1111,9 +1111,13 @@ function renderProductionSocialPosting() {
     }),
     card({
       title: "Production Safeguards",
-      status: posting.productionReadiness.activationAllowed ? "ready" : "blocked",
+      status: posting.productionReadiness.status === "archived"
+        ? "archived"
+        : posting.productionReadiness.activationAllowed ? "ready" : "blocked",
       metric: `${posting.productionReadiness.passedCheckCount}/${posting.productionReadiness.requiredCheckCount}`,
-      detail: posting.productionReadiness.activationAllowed
+      detail: posting.productionReadiness.status === "archived"
+        ? "Archived legacy readiness history; it is not an active AG OS project or blocker."
+        : posting.productionReadiness.activationAllowed
         ? "Every safeguard has evidence; exact action approval is still evaluated separately."
         : "Production activation fails closed until every required safeguard carries evidence.",
       meta: posting.productionReadiness.blockers

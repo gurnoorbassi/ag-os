@@ -7,6 +7,7 @@ const ANTHROPIC_VERSION = "2023-06-01";
 export const ANTHROPIC_PLANNER_MAX_TOKENS = 2500;
 const UNSUPPORTED_STRUCTURED_OUTPUT_CONSTRAINTS = new Set([
   "maximum",
+  "maxItems",
   "minimum",
   "minItems",
   "minLength"

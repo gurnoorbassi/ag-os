@@ -2,7 +2,7 @@
   "$schema": "../../schemas/production-readiness.schema.json",
   "readinessId": "production-readiness-social-media-management-system-v1",
   "projectId": "project-social-media-management-system-v1",
-  "status": "blocked",
+  "status": "archived",
   "targetMode": "production_managed",
   "requiredChecks": [
     {
@@ -78,5 +78,5 @@
     "postingAllowed": false
   },
   "createdAt": "2026-07-11T00:00:00.000Z",
-  "updatedAt": "2026-07-11T00:00:00.000Z"
+  "updatedAt": "2026-07-17T05:00:00.000Z"
 }

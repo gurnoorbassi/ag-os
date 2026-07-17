@@ -159,12 +159,14 @@ function projectReadinessStatuses() {
     .filter((name) => name.startsWith("production-readiness-") && name.endsWith(".json"))
     .map((name) => {
       const record = JSON.parse(readFileSync(path.join(directory, name), "utf8"));
+      if (record.status === "archived") return null;
       return {
         projectId: record.projectId,
         targetMode: record.targetMode,
         ...evaluateProductionReadiness(record)
       };
-    });
+    })
+    .filter(Boolean);
 }
 
 function aiPlannerReadiness() {

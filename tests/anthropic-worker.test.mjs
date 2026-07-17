@@ -92,6 +92,7 @@ test("Anthropic worker requests a bounded schema and validates safe file output"
   assert.equal(request.options.headers["x-api-key"], "test-only-key");
   const body = JSON.parse(request.options.body);
   assert.equal(body.output_config.format.type, "json_schema");
+  assert.equal(JSON.stringify(body.output_config.format.schema).includes("maxItems"), false);
   assert.equal(body.messages[0].content.includes("test-only-key"), false);
   const workerBrief = JSON.parse(body.messages[0].content);
   assert.match(workerBrief.relevantLessons[0].lesson, /archetype/i);
