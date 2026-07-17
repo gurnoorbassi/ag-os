@@ -18,7 +18,7 @@ function tempWorkspace() {
   return target;
 }
 
-test("autonomous runner completes safe owner-console work with quality and lesson evidence", async () => {
+test("autonomous runner records planning evidence without claiming a finished product", async () => {
   const workspace = tempWorkspace();
   const command = await submitOwnerCommand({
     command: "Create a professional dashboard for internal operations",
@@ -33,7 +33,8 @@ test("autonomous runner completes safe owner-console work with quality and lesso
     runValidation: false
   });
 
-  assert.equal(result.status, "done");
+  assert.equal(result.status, "plan_ready");
+  assert.equal(result.job.completionEvidence.deliverable.ownerUsable, false);
   assert.ok(result.job.completionEvidence.qualityScorePath);
   assert.ok(result.job.completionEvidence.lessonCandidatePaths.length > 0);
   for (const recordPath of [

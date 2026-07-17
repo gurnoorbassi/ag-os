@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { writeAuditEventRecord } from "./audit-writer.mjs";
@@ -73,6 +73,11 @@ export function listRecentOwnerCommands({ root = process.cwd(), limit = 10 } = {
     .filter((name) => name.startsWith("command-intake-runtime-operator-") && name.endsWith(".json"))
     .map((name) => {
       const record = JSON.parse(readFileSync(path.join(commandDir, name), "utf8"));
+      const jobId = record.nextRecord?.jobId;
+      const jobPath = jobId ? path.join(root, ".codex/jobs", `${jobId}.json`) : null;
+      const jobStatus = jobPath && existsSync(jobPath)
+        ? JSON.parse(readFileSync(jobPath, "utf8")).status
+        : null;
       return {
         commandIntakeId: record.commandIntakeId,
         rawCommand: record.rawCommand,
@@ -80,7 +85,9 @@ export function listRecentOwnerCommands({ root = process.cwd(), limit = 10 } = {
         projectId: record.projectId,
         createdAt: record.createdAt,
         requiresApproval: record.classification?.requiresApproval === true,
-        planId: record.nextRecord?.planId
+        planId: record.nextRecord?.planId,
+        jobId,
+        state: jobStatus || (record.classification?.requiresApproval === true ? "waiting_approval" : "planned")
       };
     })
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
@@ -98,6 +105,7 @@ export async function submitOwnerCommand({
   aiWorkerReadiness,
   planDraftProvider,
   workProductProvider,
+  recovery = null,
   root = process.cwd(),
   now = new Date()
 }) {
@@ -137,7 +145,7 @@ export async function submitOwnerCommand({
     now,
     root
   });
-  const job = writeJobRecord({ commandIntake: intake.record, runId, now, root });
+  const job = writeJobRecord({ commandIntake: intake.record, runId, now, recovery, root });
   const route = writeTaskRouteRecord({ job: job.record, commandIntake: intake.record, runId, now, root });
   const aiPlanning = useAiPlanner
     ? await planDraftProvider({ commandIntake: intake.record, job: job.record, route: route.record })
@@ -277,11 +285,11 @@ export async function submitOwnerCommand({
     relatedArtifacts,
     riskLevel: intake.record.riskLevel,
     liveServiceTouched: Boolean(aiPlanning || aiWork),
-    notes: aiWork
+    notes: `${recovery ? `Recovery ${recovery.action} of ${recovery.sourceJobId}. ` : ""}${aiWork
       ? `The coordinator used separately approved Anthropic planning/build capabilities to create bounded files in the isolated AG OS workspace. Builder approval ${aiWorkerReadiness.approvalId}; model ${aiWork.model}; input tokens ${aiWork.usage.input_tokens || 0}; output tokens ${aiWork.usage.output_tokens || 0}; total recorded AI cost USD ${totalActualAiCostUsd}. No connector, deployment, message, post, DNS, customer-data, or production action was executed.`
       : aiPlanning
         ? `The coordinator used approved Anthropic planning via ${aiPlannerReadiness.approvalId}; model ${aiPlanning.model}; input tokens ${aiPlanning.usage.input_tokens || 0}; output tokens ${aiPlanning.usage.output_tokens || 0}; actual recorded cost USD ${actualAiCostUsd}. No connector, deployment, message, post, DNS, or production action was executed.`
-        : "The coordinator created planning and gate records only. It did not execute connectors or live side effects.",
+        : "The coordinator created planning and gate records only. It did not execute connectors or live side effects."}`,
     now,
     root
   });

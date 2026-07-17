@@ -102,9 +102,12 @@ export function assertLessonTextIsSafe(lesson) {
   ].filter(Boolean).join(" ");
 
   for (const pattern of FORBIDDEN_LESSON_PATTERNS) {
-    if (pattern.test(text)) {
-      throw new Error("lesson must not relax security, approval, cost, or live-action rules");
-    }
+    const match = text.match(pattern);
+    if (!match) continue;
+    const prefix = text.slice(Math.max(0, match.index - 160), match.index).toLowerCase();
+    const explicitlyProhibited = /(?:do not|don't|never|must not|cannot|can't|may not)\b[^.!?]{0,150}$/.test(prefix);
+    if (explicitlyProhibited) continue;
+    throw new Error("lesson must not relax security, approval, cost, or live-action rules");
   }
 }
 

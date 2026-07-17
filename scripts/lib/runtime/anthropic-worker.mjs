@@ -5,6 +5,7 @@ import { isoTimestamp, normalizeRunId, slugify, writeJson } from "./common.mjs";
 import { toAnthropicStructuredOutputSchema } from "./anthropic-planner.mjs";
 import { loadWorkerEvidence } from "./worker-evidence-loader.mjs";
 import { finalizeAnthropicBudgetReservation, reserveAnthropicBudget } from "./anthropic-budget-guard.mjs";
+import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 
 const DEFAULT_BASE_URL = "https://api.anthropic.com";
 const ANTHROPIC_VERSION = "2023-06-01";
@@ -76,7 +77,7 @@ export function assertWorkProductShape(workProduct) {
   return { totalBytes, paths: [...paths] };
 }
 
-export async function createAnthropicWorkProduct({ command, job, plan, apiKey, model, baseUrl = DEFAULT_BASE_URL, fetchImpl = globalThis.fetch, root = process.cwd(), inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, env, now }) {
+export async function createAnthropicWorkProduct({ command, job, plan, apiKey, model, baseUrl = DEFAULT_BASE_URL, fetchImpl = globalThis.fetch, root = process.cwd(), inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, env, now, timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS }) {
   if (!apiKey) throw new Error("Anthropic worker credential is not configured");
   if (!model) throw new Error("Anthropic worker model is not configured");
   if (typeof fetchImpl !== "function") throw new Error("Anthropic worker fetch implementation is unavailable");
@@ -122,7 +123,7 @@ export async function createAnthropicWorkProduct({ command, job, plan, apiKey, m
     now
   });
   try {
-    const response = await fetchImpl(`${baseUrl.replace(/\/$/, "")}/v1/messages`, {
+    const response = await fetchWithTimeout(fetchImpl, `${baseUrl.replace(/\/$/, "")}/v1/messages`, {
     method: "POST",
     headers: {
       "anthropic-version": ANTHROPIC_VERSION,
@@ -130,7 +131,7 @@ export async function createAnthropicWorkProduct({ command, job, plan, apiKey, m
       "x-api-key": apiKey
     },
       body: JSON.stringify(requestBody)
-    });
+    }, timeoutMs);
     if (!response.ok) throw new Error(`Anthropic worker request failed with HTTP ${response.status}`);
     const payload = await response.json();
     const text = payload.content?.find((block) => block.type === "text")?.text;

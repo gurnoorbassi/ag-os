@@ -48,7 +48,7 @@ function tempWorkspace() {
   return target;
 }
 
-test("registered local worker creates a real work product before product scoring", async () => {
+test("registered local worker records plan evidence without claiming product completion", async () => {
   const workspace = tempWorkspace();
   const command = await submitOwnerCommand({
     command: "Create a professional internal operations dashboard for AG OS",
@@ -63,12 +63,12 @@ test("registered local worker creates a real work product before product scoring
     now: new Date("2026-07-13T23:11:00.000Z")
   });
 
-  assert.equal(result.status, "done");
+  assert.equal(result.status, "plan_ready");
   assert.equal(result.adapter.adapterId, "local-work-product");
   assert.equal(existsSync(path.join(workspace, result.workProductPath)), true);
   assert.match(readFileSync(path.join(workspace, result.workProductPath), "utf8"), /## Owner outcome/);
   const score = JSON.parse(readFileSync(path.join(workspace, result.completion.qualityScorePath), "utf8"));
-  assert.equal(score.scoreType, "product_quality_score");
+  assert.equal(score.scoreType, "plan_quality_score");
   assert.ok(score.evidence.includes(result.workProductPath));
 });
 

@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { isoTimestamp, normalizeRunId, writeJson } from "./common.mjs";
+import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 
 const API_BASE = "https://api.github.com";
 
@@ -66,8 +67,8 @@ function assertApprovalStillActive({ approvalId, root, now }) {
   if (!record.expiresAt || Date.parse(record.expiresAt) <= now.getTime()) throw new Error("GitHub repository approval expired");
 }
 
-async function github(fetchImpl, token, method, pathname, body) {
-  const response = await fetchImpl(`${API_BASE}${pathname}`, {
+async function github(fetchImpl, token, method, pathname, body, timeoutMs) {
+  const response = await fetchWithTimeout(fetchImpl, `${API_BASE}${pathname}`, {
     method,
     headers: {
       accept: "application/vnd.github+json",
@@ -76,18 +77,18 @@ async function github(fetchImpl, token, method, pathname, body) {
       "x-github-api-version": "2022-11-28"
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) })
-  });
+  }, timeoutMs);
   if (response.status === 404 && method === "GET") return null;
   if (!response.ok) throw new Error(`GitHub ${method} ${pathname} failed with HTTP ${response.status}`);
   return response.status === 204 ? null : response.json();
 }
 
-export async function executeGitHubPrivateRepository({ request, job, adapter, approval, token, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date() }) {
+export async function executeGitHubPrivateRepository({ request, job, adapter, approval, token, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date(), timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS }) {
   if (!token) throw new Error("GitHub private runtime credential is not configured");
   const validated = validateGitHubPrivateRepositoryRequest({ request, root });
   assertApproval({ approval, job, adapter, validated });
   const repoPath = `/repos/${encodeURIComponent(validated.owner)}/${encodeURIComponent(validated.name)}`;
-  let repository = await github(fetchImpl, token, "GET", repoPath);
+  let repository = await github(fetchImpl, token, "GET", repoPath, undefined, timeoutMs);
   let created = false;
   if (!repository) {
     assertApprovalStillActive({ approvalId: approval.approvalId, root, now });
@@ -99,7 +100,7 @@ export async function executeGitHubPrivateRepository({ request, job, adapter, ap
       has_issues: true,
       has_projects: false,
       has_wiki: false
-    });
+    }, timeoutMs);
     created = true;
   }
   if (repository.full_name !== validated.repository || repository.private !== true) {

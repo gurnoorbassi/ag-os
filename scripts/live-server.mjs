@@ -22,6 +22,7 @@ import { decideJob } from "./lib/runtime/job-approval-service.mjs";
 import { evaluateOperationalSafeguards, resolveOperationalFinding } from "./lib/runtime/operational-safeguards.mjs";
 import { startInternalWatchdog } from "./lib/runtime/internal-watchdog.mjs";
 import { getJobDeliverable } from "./lib/runtime/deliverable-service.mjs";
+import { prepareJobRecovery } from "./lib/runtime/job-recovery-service.mjs";
 import {
   buildOwnerSessionCookie,
   clearOwnerSessionCookie,
@@ -196,6 +197,51 @@ function publicAiWorkerStatus(readiness = aiWorkerReadiness()) {
     uses: readiness.uses,
     blockers: readiness.blockers
   };
+}
+
+async function submitRuntimeCommand(body, { recovery = null, forceReplan = false, disablePlanner = false } = {}) {
+  const plannerReadiness = aiPlannerReadiness();
+  const workerReadiness = aiWorkerReadiness();
+  const builderRequired = !body.executionRequest && commandRequiresBuilder(body.command);
+  const useAiWorker = body.useAiWorker === true || builderRequired;
+  const useAiPlanner = !disablePlanner && (body.useAiPlanner === true || forceReplan || (builderRequired && plannerReadiness.ready));
+  if (builderRequired && !workerReadiness.ready) {
+    throw new Error(`This command requests a real deliverable, but the professional builder is not active: ${workerReadiness.blockers.join("; ")}. AG OS did not create a plan-only job or claim completion.`);
+  }
+  return submitOwnerCommand({
+    command: body.command,
+    projectId: body.projectId,
+    understanding: body.understanding,
+    executionRequest: body.executionRequest,
+    useAiPlanner,
+    useAiWorker,
+    aiPlannerReadiness: plannerReadiness,
+    aiWorkerReadiness: workerReadiness,
+    planDraftProvider: (input) => createAnthropicPlanDraft({
+      ...input,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: plannerReadiness.model,
+      baseUrl: process.env.ANTHROPIC_BASE_URL,
+      inputCostPerMillionUsd: plannerReadiness.inputCostPerMillionUsd,
+      outputCostPerMillionUsd: plannerReadiness.outputCostPerMillionUsd,
+      approvalId: plannerReadiness.approvalId,
+      approvalMaxUsd: plannerReadiness.approval?.budget?.maxUsd,
+      root
+    }),
+    workProductProvider: (input) => createAnthropicWorkProduct({
+      ...input,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: workerReadiness.model,
+      baseUrl: process.env.ANTHROPIC_BASE_URL,
+      inputCostPerMillionUsd: workerReadiness.inputCostPerMillionUsd,
+      outputCostPerMillionUsd: workerReadiness.outputCostPerMillionUsd,
+      approvalId: workerReadiness.approvalId,
+      approvalMaxUsd: workerReadiness.approval?.budget?.maxUsd,
+      root
+    }),
+    recovery,
+    root
+  });
 }
 
 function serveStatic(request, response) {
@@ -455,49 +501,32 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    if (request.method === "POST" && url.pathname === "/api/v1/commands") {
+    const jobRecoveryMatch = url.pathname.match(/^\/api\/v1\/jobs\/([^/]+)\/recover$/);
+    if (request.method === "POST" && jobRecoveryMatch) {
       const body = await readJsonBody(request);
-      const plannerReadiness = aiPlannerReadiness();
-      const workerReadiness = aiWorkerReadiness();
-      const builderRequired = !body.executionRequest && commandRequiresBuilder(body.command);
-      const useAiWorker = body.useAiWorker === true || builderRequired;
-      const useAiPlanner = body.useAiPlanner === true || (builderRequired && plannerReadiness.ready);
-      if (builderRequired && !workerReadiness.ready) {
-        throw new Error(`This command requests a real deliverable, but the professional builder is not active: ${workerReadiness.blockers.join("; ")}. AG OS did not create a plan-only job or claim completion.`);
-      }
-      const result = await submitOwnerCommand({
-        command: body.command,
-        projectId: body.projectId,
-        understanding: body.understanding,
-        executionRequest: body.executionRequest,
-        useAiPlanner,
-        useAiWorker,
-        aiPlannerReadiness: plannerReadiness,
-        aiWorkerReadiness: workerReadiness,
-        planDraftProvider: (input) => createAnthropicPlanDraft({
-          ...input,
-          apiKey: process.env.ANTHROPIC_API_KEY,
-          model: plannerReadiness.model,
-          baseUrl: process.env.ANTHROPIC_BASE_URL,
-          inputCostPerMillionUsd: plannerReadiness.inputCostPerMillionUsd,
-          outputCostPerMillionUsd: plannerReadiness.outputCostPerMillionUsd,
-          approvalId: plannerReadiness.approvalId,
-          approvalMaxUsd: plannerReadiness.approval?.budget?.maxUsd,
-          root
-        }),
-        workProductProvider: (input) => createAnthropicWorkProduct({
-          ...input,
-          apiKey: process.env.ANTHROPIC_API_KEY,
-          model: workerReadiness.model,
-          baseUrl: process.env.ANTHROPIC_BASE_URL,
-          inputCostPerMillionUsd: workerReadiness.inputCostPerMillionUsd,
-          outputCostPerMillionUsd: workerReadiness.outputCostPerMillionUsd,
-          approvalId: workerReadiness.approvalId,
-          approvalMaxUsd: workerReadiness.approval?.budget?.maxUsd,
-          root
-        }),
+      const prepared = prepareJobRecovery({
+        jobId: decodeURIComponent(jobRecoveryMatch[1]),
+        action: body.action,
+        confirmation: body.confirmation,
         root
       });
+      const result = await submitRuntimeCommand({
+        command: prepared.command,
+        projectId: prepared.projectId,
+        useAiPlanner: body.action === "replan"
+      }, {
+        recovery: prepared.recovery,
+        forceReplan: body.action === "replan",
+        disablePlanner: body.action === "retry"
+      });
+      json(response, 201, { ...result, recovery: prepared.recovery }, headers);
+      setImmediate(runAutomaticQueue);
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/v1/commands") {
+      const body = await readJsonBody(request);
+      const result = await submitRuntimeCommand(body);
       json(response, 201, result, headers);
       setImmediate(runAutomaticQueue);
       return;

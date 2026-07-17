@@ -148,17 +148,17 @@ test("classifies Archetype Pack v1 intake commands without website fallback", ()
   }
 });
 
-test("keeps unknown product types as explicit archetype gaps", () => {
+test("routes unknown product types through the registered general work archetype", () => {
   const record = buildCommandIntakeRecord({
     command: "make me a vendor scheduling hub",
     runId: "unknown-product-type",
     now: fixedNow
   });
 
-  assert.equal(record.productContext.productType, "unclassified product");
-  assert.equal(record.productContext.archetypeId, null);
-  assert.equal(record.productContext.archetypeRegistered, false);
-  assert.equal(record.productContext.archetypeGap, "no_product_type_match");
+  assert.equal(record.productContext.productType, "general digital work product");
+  assert.equal(record.productContext.archetypeId, "archetype-general-digital-work");
+  assert.equal(record.productContext.archetypeRegistered, true);
+  assert.equal(record.productContext.archetypeGap, null);
   assert.equal(record.projectId, "project-unregistered-vendor-scheduling-hub");
 });
 

@@ -1,0 +1,106 @@
+{
+  "$schema": "../../schemas/product-archetype.schema.json",
+  "archetypeId": "archetype-general-digital-work",
+  "name": "General Digital Work Product",
+  "category": "other",
+  "status": "active",
+  "professionalExpectations": [
+    "Translate the owner outcome into a concrete, reviewable deliverable instead of stopping at planning notes.",
+    "Keep assumptions explicit and make the smallest professional product that satisfies the requested outcome.",
+    "Produce files that can be opened, inspected, and validated by the owner.",
+    "Keep credentials, customer data, production data, paid actions, deployments, messaging, posting, and DNS outside the build unless separately approved."
+  ],
+  "minimumQualityBar": [
+    "The requested outcome is represented by owner-usable files.",
+    "No placeholder-only output is presented as complete.",
+    "Relevant local validation passes.",
+    "The result includes a clear entry point or opening instruction.",
+    "Quality and lesson evidence is recorded before the job becomes done."
+  ],
+  "commonModules": [
+    "Owner-facing deliverable files",
+    "Local validation and acceptance evidence",
+    "README or entry-point guidance",
+    "Approval-gated integration notes when external actions are requested"
+  ],
+  "uxExpectations": [
+    "The owner can understand what was produced without reading internal AG OS records.",
+    "The primary result is reachable in one action from the job or workspace.",
+    "Errors and incomplete states are shown as blocked or failed, never as completed."
+  ],
+  "recommendedStack": {
+    "bootstrapMode": true,
+    "components": [
+      "Use the simplest local file format or application stack that fits the requested outcome.",
+      "Prefer existing project tooling when a registered project is targeted.",
+      "Keep source in an isolated workspace until repository or deployment actions are separately approved."
+    ],
+    "notes": "This fallback enables safe planning and building for legitimate product types that do not yet have a specialized archetype. It does not authorize external actions."
+  },
+  "phases": [
+    {
+      "phaseId": "phase-understand",
+      "name": "Understand the owner outcome",
+      "goals": [
+        "Identify the concrete deliverable, intended user, and acceptance conditions.",
+        "Select the smallest appropriate file or application shape."
+      ]
+    },
+    {
+      "phaseId": "phase-build",
+      "name": "Build the local work product",
+      "goals": [
+        "Create complete owner-usable files inside the isolated workspace.",
+        "Avoid placeholders and unsupported claims."
+      ]
+    },
+    {
+      "phaseId": "phase-verify",
+      "name": "Verify and explain",
+      "goals": [
+        "Run relevant local checks.",
+        "Record the entry point, quality score, and lesson candidates."
+      ]
+    }
+  ],
+  "knownPitfalls": [
+    "Treating a planning document as the finished product.",
+    "Inventing a specialized stack before the deliverable shape is clear.",
+    "Marking a job done when ownerUsable is false.",
+    "Crossing into live services because the requested product mentions them."
+  ],
+  "approvalGates": [
+    "Repository creation or mutation requires its exact connector approval.",
+    "Deployment, production data, credentials, messaging, posting, paid actions, and DNS each require separate exact approval."
+  ],
+  "qualityChecklist": [
+    "The result directly answers the owner command.",
+    "At least one owner-usable file exists.",
+    "The entry point is identified and opens correctly.",
+    "Local validation passes.",
+    "No secret or prohibited data is present.",
+    "Incomplete work is not labeled done."
+  ],
+  "whatToBuildFirst": [
+    "The smallest complete local deliverable.",
+    "A clear entry point and acceptance checklist.",
+    "Local validation before external integration planning."
+  ],
+  "whatNotToOverbuildEarly": [
+    "Infrastructure not required by the owner outcome.",
+    "External connectors before the local product is reviewable.",
+    "Production deployment or data paths before exact approval."
+  ],
+  "stopConditions": [
+    "Stop before any credential, customer data, production data, paid action, deployment, message, post, or DNS change without exact approval.",
+    "Stop if the requested outcome cannot be represented as owner-usable files or requires a missing owner decision."
+  ],
+  "sources": [
+    "docs/ag-os-constitution-v1.md",
+    "docs/build-mode-roadmap.md",
+    "docs/product-archetypes.md"
+  ],
+  "notes": "Generic fallback knowledge only. Specialized archetypes remain preferred when a deterministic match exists, and this record grants no permission.",
+  "createdAt": "2026-07-16T00:00:00Z",
+  "updatedAt": "2026-07-16T00:00:00Z"
+}

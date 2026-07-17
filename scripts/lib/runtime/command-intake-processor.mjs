@@ -93,8 +93,12 @@ const ADAPTER_COMMAND_CATEGORIES = {
   "n8n-disabled-workflow": "connect_service",
   "n8n-workflow-control": "connect_service",
   "netlify-staging": "deploy_staging",
-  "production-deployment": "deploy_production"
+  "production-deployment": "deploy_production",
+  "social-publishing": "send_message",
+  "dns-change": "change_domain"
 };
+
+const GENERAL_ARCHETYPE_ID = "archetype-general-digital-work";
 
 export function routeCommandCategory({ command, executionRequest, root = process.cwd() }) {
   const registry = JSON.parse(readFileSync(path.join(root, ".codex/commands/registry.json"), "utf8"));
@@ -174,15 +178,14 @@ function classifyCommand(command, root = process.cwd()) {
 
   const matched = PRODUCT_TYPE_MATCHERS.find((matcher) => matcher.pattern.test(lowerCommand));
   const targetSlug = matched ? matched.slug : deriveCommandSlug(command);
-  const productType = matched ? matched.productType : "unclassified product";
-  const archetypeRegistered = matched ? findRegisteredArchetype(matched.archetypeId, root) : false;
+  const productType = matched ? matched.productType : "general digital work product";
+  const archetypeId = matched?.archetypeId ?? GENERAL_ARCHETYPE_ID;
+  const archetypeRegistered = findRegisteredArchetype(archetypeId, root);
   const productContext = {
     productType,
-    archetypeId: matched?.archetypeId ?? null,
+    archetypeId,
     archetypeRegistered,
-    archetypeGap: matched
-      ? (archetypeRegistered ? null : `missing_registered_archetype:${matched.archetypeId}`)
-      : "no_product_type_match"
+    archetypeGap: archetypeRegistered ? null : `missing_registered_archetype:${archetypeId}`
   };
 
   const requiresApproval = mentionsDeployment || mentionsDomain || mentionsPaid || mentionsCredentials;

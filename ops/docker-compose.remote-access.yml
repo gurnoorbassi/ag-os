@@ -1,0 +1,5 @@
+services:
+  coordinator:
+    environment:
+      AG_OS_ALLOWED_ORIGIN: ${AG_OS_PRIVATE_ORIGIN:?set AG_OS_PRIVATE_ORIGIN to the exact HTTPS origin}
+      AG_OS_OWNER_SESSION_COOKIE_SECURE: "true"

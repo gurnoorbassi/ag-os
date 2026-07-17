@@ -104,11 +104,11 @@ const ADAPTERS = [
     kind: "connector",
     requestedAction: "social_publish",
     commandPatterns: [/\bpost\b[^.]{0,80}\b(?:instagram|facebook|linkedin|social)\b/i, /\bpublish\b/i, /\bschedule\b[^.]{0,60}\bpost\b/i],
-    credentialEnvParts: null,
+    credentialEnvParts: ["AG_OS", "SOCIAL", "API", "TOKEN"],
     capabilities: ["preflight", "publish", "verify_public_result", "rollback_when_supported"],
     liveServiceTouched: true,
     approvalRequired: true,
-    implemented: false
+    implemented: true
   },
   {
     adapterId: "dns-change",
@@ -116,11 +116,11 @@ const ADAPTERS = [
     kind: "connector",
     requestedAction: "dns_change",
     commandPatterns: [/\bdns\b/i, /\bdomain\b[^.]{0,80}\b(?:change|point|configure)\b/i],
-    credentialEnvParts: null,
+    credentialEnvParts: ["AG_OS", "DNS", "API", "TOKEN"],
     capabilities: ["snapshot_records", "apply_change", "verify_resolution", "restore_records"],
     liveServiceTouched: true,
     approvalRequired: true,
-    implemented: false
+    implemented: true
   }
 ];
 
@@ -174,7 +174,7 @@ export function selectExecutionAdapter({ command, env = process.env } = {}) {
       blockers: [...selected.blockers, "exact GitHub executionRequest with repository, base commit, branch, and isolated source directory is missing"]
     };
   }
-  if (["github-private-repository", "n8n-disabled-workflow", "n8n-workflow-control", "netlify-staging", "netlify-continuous-deployment", "production-deployment"].includes(matched.adapterId) && typeof command === "object" && !command.executionRequest) {
+  if (["github-private-repository", "n8n-disabled-workflow", "n8n-workflow-control", "netlify-staging", "netlify-continuous-deployment", "production-deployment", "social-publishing", "dns-change"].includes(matched.adapterId) && typeof command === "object" && !command.executionRequest) {
     return {
       ...selected,
       executionReady: false,

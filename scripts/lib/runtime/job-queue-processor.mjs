@@ -5,7 +5,8 @@ export function buildJobRecord({
   commandIntake,
   runId,
   now = new Date(),
-  requestedBy = DEFAULT_OWNER_ID
+  requestedBy = DEFAULT_OWNER_ID,
+  recovery = null
 }) {
   if (!commandIntake?.commandIntakeId) {
     throw new Error("commandIntake with commandIntakeId is required");
@@ -29,6 +30,7 @@ export function buildJobRecord({
     assignedAgent: "agent-local-runtime",
     approvalRequired,
     expectedOutput: commandIntake.plannedOutput || "Plan-only local output.",
+    ...(recovery ? { recovery } : {}),
     queueTimestamps: {
       queuedAt: timestamp
     },
@@ -50,10 +52,11 @@ export function writeJobRecord({
   commandRecordPath,
   runId,
   now,
+  recovery,
   root = process.cwd()
 }) {
   const sourceCommandIntake = commandIntake ?? readJson(commandRecordPath, root);
-  const record = buildJobRecord({ commandIntake: sourceCommandIntake, runId, now });
+  const record = buildJobRecord({ commandIntake: sourceCommandIntake, runId, now, recovery });
   const filePath = `.codex/jobs/${record.jobId}.json`;
   writeJson(filePath, record, root);
   return { filePath, record };

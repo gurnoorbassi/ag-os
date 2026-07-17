@@ -4,6 +4,7 @@ import path from "node:path";
 import process from "node:process";
 import { scanSecrets } from "../security/secret-scanner.mjs";
 import { isoTimestamp, normalizeRunId, writeJson } from "./common.mjs";
+import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 
 const API_BASE = "https://api.github.com";
 const MAX_FILES = 100;
@@ -128,8 +129,8 @@ function assertApprovalStillActive({ approvalId, root, now = new Date() }) {
   if (!current.expiresAt || Date.parse(current.expiresAt) <= now.getTime()) throw new Error("GitHub approval expired before the next connector mutation");
 }
 
-async function github(fetchImpl, token, method, pathname, body) {
-  const response = await fetchImpl(`${API_BASE}${pathname}`, {
+async function github(fetchImpl, token, method, pathname, body, timeoutMs) {
+  const response = await fetchWithTimeout(fetchImpl, `${API_BASE}${pathname}`, {
     method,
     headers: {
       accept: "application/vnd.github+json",
@@ -138,24 +139,24 @@ async function github(fetchImpl, token, method, pathname, body) {
       "x-github-api-version": "2022-11-28"
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) })
-  });
+  }, timeoutMs);
   if (!response.ok) throw new Error(`GitHub ${method} ${pathname} failed with HTTP ${response.status}`);
   return response.status === 204 ? null : response.json();
 }
 
-export async function executeGitHubDraftPr({ request, job, plan, adapter, approval, token, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date() }) {
+export async function executeGitHubDraftPr({ request, job, plan, adapter, approval, token, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date(), timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS }) {
   if (!token) throw new Error("GitHub private runtime credential is not configured");
   if (typeof fetchImpl !== "function") throw new Error("GitHub transport is unavailable");
   const validated = validateGitHubDraftPrRequest({ request, root });
   assertApproval({ approval, job, adapter, validated });
   const mutate = async (method, pathname, body) => {
     assertApprovalStillActive({ approvalId: approval.approvalId, root, now });
-    return github(fetchImpl, token, method, pathname, body);
+    return github(fetchImpl, token, method, pathname, body, timeoutMs);
   };
   const repoPath = `/repos/${encodeURIComponent(validated.owner)}/${encodeURIComponent(validated.repo)}`;
-  const baseRef = await github(fetchImpl, token, "GET", `${repoPath}/git/ref/heads/${encodeURIComponent(validated.baseBranch)}`);
+  const baseRef = await github(fetchImpl, token, "GET", `${repoPath}/git/ref/heads/${encodeURIComponent(validated.baseBranch)}`, undefined, timeoutMs);
   if (baseRef.object.sha !== validated.expectedBaseCommit) throw new Error("GitHub base branch moved after approval; stop before connector mutation");
-  const baseCommit = await github(fetchImpl, token, "GET", `${repoPath}/git/commits/${baseRef.object.sha}`);
+  const baseCommit = await github(fetchImpl, token, "GET", `${repoPath}/git/commits/${baseRef.object.sha}`, undefined, timeoutMs);
   const treeEntries = [];
   for (const file of validated.source.files) {
     const blob = await mutate("POST", `${repoPath}/git/blobs`, {

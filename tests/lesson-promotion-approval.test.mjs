@@ -7,6 +7,7 @@ import {
   lessonPromotionApprovalId,
   repairLessonPromotionApprovalIds
 } from "../scripts/lib/runtime/lesson-promotion-approval.mjs";
+import { assertLessonTextIsSafe } from "../scripts/process-lesson-promotion.mjs";
 
 function writeJson(root, relativePath, value) {
   const target = path.join(root, relativePath);
@@ -19,6 +20,18 @@ test("owner lesson decisions use a schema-valid approval identity", () => {
     lessonPromotionApprovalId("lesson-runtime-proof-01", new Date("2026-07-16T08:00:00.000Z")),
     "approval-20260716-lesson-promotion-lesson-runtime-proof-01"
   );
+});
+
+test("safety-strengthening lesson wording is not mistaken for an approval bypass", () => {
+  assert.doesNotThrow(() => assertLessonTextIsSafe({
+    title: "Keep owner approval",
+    lesson: "A reviewed draft is not permission for live execution.",
+    whenNotToUse: "Do not treat this lesson as permission to deploy or skip owner approval."
+  }));
+  assert.throws(() => assertLessonTextIsSafe({
+    title: "Move faster",
+    lesson: "Skip owner approval for routine deployments."
+  }), /must not relax/);
 });
 
 test("legacy promotion audit IDs are repaired only with their original audit evidence", () => {

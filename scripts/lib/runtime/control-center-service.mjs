@@ -43,6 +43,10 @@ function safeJob(job, root) {
     updatedAt: job.updatedAt,
     hasQualityScore: Boolean(job.completionEvidence?.qualityScorePath),
     lessonCandidateCount: job.completionEvidence?.lessonCandidatePaths?.length ?? 0,
+    recovery: job.recovery ?? null,
+    availableRecoveryActions: ["failed", "blocked", "cancelled", "plan_ready"].includes(job.status)
+      ? ["retry", "replan"]
+      : [],
     deliverable: jobDeliverableSummary({ job, root })
   };
 }

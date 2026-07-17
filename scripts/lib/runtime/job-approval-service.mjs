@@ -11,6 +11,8 @@ import { validateNetlifyStagingRequest, netlifyApprovalCriteria } from "./netlif
 import { netlifyContinuousDeploymentApprovalCriteria, validateNetlifyContinuousDeploymentRequest } from "./netlify-continuous-deployment-adapter.mjs";
 import { n8nWorkflowControlApprovalCriteria, validateN8nWorkflowControlRequest } from "./n8n-workflow-control-adapter.mjs";
 import { productionDeploymentApprovalCriteria, validateProductionDeploymentRequest } from "./production-deployment-adapter.mjs";
+import { socialPublishingApprovalCriteria, validateSocialPublishingRequest } from "./social-publishing-adapter.mjs";
+import { dnsChangeApprovalCriteria, validateDnsChangeRequest } from "./dns-change-adapter.mjs";
 
 function jobPath(jobId) {
   return `.codex/jobs/${jobId}.json`;
@@ -55,6 +57,10 @@ function buildExactApproval({ job, command, adapter, now, expiresAt, root }) {
           ? netlifyContinuousDeploymentApprovalCriteria(validateNetlifyContinuousDeploymentRequest({ request: command.executionRequest, root }))
         : adapter.adapterId === "production-deployment"
           ? productionDeploymentApprovalCriteria(validateProductionDeploymentRequest({ request: command.executionRequest }))
+        : adapter.adapterId === "social-publishing"
+          ? socialPublishingApprovalCriteria(validateSocialPublishingRequest({ request: command.executionRequest }))
+        : adapter.adapterId === "dns-change"
+          ? dnsChangeApprovalCriteria(validateDnsChangeRequest({ request: command.executionRequest }))
         : [];
   return {
     approvalId,

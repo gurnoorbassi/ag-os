@@ -1,6 +1,6 @@
 # Operational execution transports
 
-AG OS supports two separately approval-gated live transports beyond draft creation.
+AG OS supports separately approval-gated live transports beyond draft creation.
 
 ## n8n workflow control
 
@@ -18,3 +18,15 @@ The runner requires:
 - An exact single-job owner approval naming the profile, repository, commit, environment, and service.
 
 Installing or changing the runner, profile file, token, systemd service, deployment target, or production application remains a separate production action. Source support alone grants no permission and does not activate the runner.
+
+## Instagram publishing
+
+`social-publishing` supports one immediate Instagram image post. The request locks the account ID, expected username, public HTTPS media URL, caption, and a SHA-256 content digest. The adapter verifies account identity, creates and verifies one media container, rechecks the exact approval, publishes once, and verifies the public permalink. Scheduling, messages, comments, ads, deletion, and additional posts are prohibited. Because a publish has no guaranteed transactional rollback, the approval must acknowledge that deletion would require a separate action.
+
+## Cloudflare DNS
+
+`dns-change` supports one exact Cloudflare record upsert. The request locks the zone, optional record ID, type, name, value, TTL, proxy setting, and SHA-256 digest. The adapter snapshots the prior record, rechecks approval, performs one mutation, verifies every approved value, and restores or deletes the changed record if verification fails. Nameserver, zone, registration, TLS, and unrelated record changes are not implemented.
+
+## Network safety
+
+Every external transport uses a bounded request timeout. The default is 30 seconds and may be reduced through `AG_OS_PROVIDER_TIMEOUT_MS`; invalid or excessive values fall back to the safe default. A timeout fails the job closed and records conservative connector-touch evidence so the owner knows to verify provider state before retrying.

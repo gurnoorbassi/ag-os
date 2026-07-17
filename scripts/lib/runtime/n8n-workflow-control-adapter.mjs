@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import process from "node:process";
 import { isoTimestamp, normalizeRunId, writeJson } from "./common.mjs";
 import { assertApprovalStillActive, assertExactConnectorApproval, canonicalJson } from "./connector-approval-guard.mjs";
+import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 
 const OPERATIONS = new Map([
   ["activate_workflow", { active: true, endpoint: "activate" }],
@@ -59,11 +60,11 @@ export function n8nWorkflowControlApprovalCriteria(validated) {
   ];
 }
 
-async function n8n(fetchImpl, credential, method, url) {
-  const response = await fetchImpl(url, {
+async function n8n(fetchImpl, credential, method, url, timeoutMs) {
+  const response = await fetchWithTimeout(fetchImpl, url, {
     method,
     headers: { accept: "application/json", [["X", "N8N", "API", "KEY"].join("-")]: credential }
-  });
+  }, timeoutMs);
   if (!response.ok) throw new Error(`n8n ${method} failed with HTTP ${response.status}`);
   return response.json();
 }
@@ -79,28 +80,28 @@ function assertExactWorkflow(workflow, validated) {
   return digest;
 }
 
-export async function executeN8nWorkflowControl({ request, job, adapter, approval, credential, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date() }) {
+export async function executeN8nWorkflowControl({ request, job, adapter, approval, credential, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date(), timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS }) {
   if (!credential) throw new Error("n8n private runtime credential is not configured");
   if (typeof fetchImpl !== "function") throw new Error("n8n transport is unavailable");
   const validated = validateN8nWorkflowControlRequest({ request });
   assertExactConnectorApproval({ approval, job, adapter, criteria: n8nWorkflowControlApprovalCriteria(validated) });
   assertApprovalStillActive({ approvalId: approval.approvalId, connectorName: "n8n", root, now });
   const workflowUrl = `${validated.baseUrl}/workflows/${encodeURIComponent(validated.workflowId)}`;
-  const before = await n8n(fetchImpl, credential, "GET", workflowUrl);
+  const before = await n8n(fetchImpl, credential, "GET", workflowUrl, timeoutMs);
   const digest = assertExactWorkflow(before, validated);
   const changed = before.active !== validated.desired.active;
   if (changed) {
     assertApprovalStillActive({ approvalId: approval.approvalId, connectorName: "n8n", root, now });
-    await n8n(fetchImpl, credential, "POST", `${workflowUrl}/${validated.desired.endpoint}`);
+    await n8n(fetchImpl, credential, "POST", `${workflowUrl}/${validated.desired.endpoint}`, timeoutMs);
   }
   let verified;
   try {
-    verified = await n8n(fetchImpl, credential, "GET", workflowUrl);
+    verified = await n8n(fetchImpl, credential, "GET", workflowUrl, timeoutMs);
     assertExactWorkflow(verified, validated);
     if (verified.active !== validated.desired.active) throw new Error("n8n workflow state verification failed");
   } catch (error) {
     if (changed && validated.desired.active) {
-      try { await n8n(fetchImpl, credential, "POST", `${workflowUrl}/deactivate`); } catch { /* rollback evidence is reported by the thrown failure */ }
+      try { await n8n(fetchImpl, credential, "POST", `${workflowUrl}/deactivate`, timeoutMs); } catch { /* rollback evidence is reported by the thrown failure */ }
     }
     throw error;
   }

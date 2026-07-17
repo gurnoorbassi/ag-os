@@ -5,6 +5,7 @@ import process from "node:process";
 import { scanSecrets } from "../security/secret-scanner.mjs";
 import { isoTimestamp, normalizeRunId, writeJson } from "./common.mjs";
 import { assertApprovalStillActive, assertExactConnectorApproval } from "./connector-approval-guard.mjs";
+import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 
 const API_BASE = "https://api.netlify.com/api/v1";
 const MAX_FILES = 200;
@@ -85,25 +86,25 @@ export function netlifyApprovalCriteria(validated) {
   ];
 }
 
-async function netlifyJson(fetchImpl, token, method, pathname, body) {
-  const response = await fetchImpl(`${API_BASE}${pathname}`, {
+async function netlifyJson(fetchImpl, token, method, pathname, body, timeoutMs) {
+  const response = await fetchWithTimeout(fetchImpl, `${API_BASE}${pathname}`, {
     method,
     headers: { accept: "application/json", authorization: `Bearer ${token}`, "content-type": "application/json" },
     ...(body === undefined ? {} : { body: JSON.stringify(body) })
-  });
+  }, timeoutMs);
   if (!response.ok) throw new Error(`Netlify ${method} ${pathname} failed with HTTP ${response.status}`);
   return response.json();
 }
 
-export async function executeNetlifyStagingDeploy({ request, job, adapter, approval, token, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date() }) {
+export async function executeNetlifyStagingDeploy({ request, job, adapter, approval, token, fetchImpl = globalThis.fetch, root = process.cwd(), now = new Date(), timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS }) {
   if (!token) throw new Error("Netlify private runtime credential is not configured");
   if (typeof fetchImpl !== "function") throw new Error("Netlify transport is unavailable");
   const validated = validateNetlifyStagingRequest({ request, root });
   assertExactConnectorApproval({ approval, job, adapter, criteria: netlifyApprovalCriteria(validated) });
   const mutate = async (method, pathname, body, headers) => {
     assertApprovalStillActive({ approvalId: approval.approvalId, connectorName: "Netlify", root, now });
-    if (!headers) return netlifyJson(fetchImpl, token, method, pathname, body);
-    const response = await fetchImpl(`${API_BASE}${pathname}`, { method, headers: { authorization: `Bearer ${token}`, ...headers }, body });
+    if (!headers) return netlifyJson(fetchImpl, token, method, pathname, body, timeoutMs);
+    const response = await fetchWithTimeout(fetchImpl, `${API_BASE}${pathname}`, { method, headers: { authorization: `Bearer ${token}`, ...headers }, body }, timeoutMs);
     if (!response.ok) throw new Error(`Netlify ${method} ${pathname} failed with HTTP ${response.status}`);
     return response.json();
   };
