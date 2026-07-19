@@ -5,6 +5,7 @@ import { toAnthropicStructuredOutputSchema } from "./anthropic-planner.mjs";
 import { loadWorkerEvidence } from "./worker-evidence-loader.mjs";
 import { finalizeAnthropicBudgetReservation, reserveAnthropicBudget } from "./anthropic-budget-guard.mjs";
 import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
+import { writeAnthropicApprovalUse } from "./anthropic-usage-audit.mjs";
 
 const DEFAULT_BASE_URL = "https://api.anthropic.com";
 const ANTHROPIC_VERSION = "2023-06-01";
@@ -77,6 +78,15 @@ export function assertWorkProductShape(workProduct) {
   return { totalBytes, paths: [...paths] };
 }
 
+export function assertWorkProductMatchesCommand({ command, workProduct }) {
+  const rawCommand = String(command?.rawCommand ?? command ?? "");
+  const paths = workProduct.files.map((file) => normalizedArtifactPath(file.path));
+  if (/\b(?:web\s*site|website|landing\s+page)\b/i.test(rawCommand) && !paths.includes("index.html")) {
+    throw new Error("website work product must include a root index.html entry file");
+  }
+  return { paths };
+}
+
 export async function createAnthropicWorkProduct({ command, job, plan, apiKey, model, baseUrl = DEFAULT_BASE_URL, fetchImpl = globalThis.fetch, root = process.cwd(), inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, env, now, timeoutMs = process.env.AG_OS_AI_WORKER_TIMEOUT_MS || ANTHROPIC_WORKER_TIMEOUT_MS }) {
   if (!apiKey) throw new Error("Anthropic worker credential is not configured");
   if (!model) throw new Error("Anthropic worker model is not configured");
@@ -85,7 +95,7 @@ export async function createAnthropicWorkProduct({ command, job, plan, apiKey, m
   const requestBody = {
     model,
     max_tokens: ANTHROPIC_WORKER_MAX_TOKENS,
-    system: "You are the AG OS builder worker. Produce professional work-product files that satisfy the approved plan. Work only inside the isolated artifact workspace. Never include secrets, credentials, customer data, production data, deployment commands, messages, posts, paid actions, DNS changes, or claims that an external action occurred. Return complete usable file contents, not placeholders.",
+    system: "You are the AG OS builder worker. Produce professional work-product files that satisfy the approved plan. Work only inside the isolated artifact workspace. Never include secrets, credentials, customer data, production data, deployment commands, messages, posts, paid actions, DNS changes, or claims that an external action occurred. Return complete usable file contents, not placeholders. For a website or landing page, return a complete root index.html entry file; add root-relative CSS or JavaScript files only when needed.",
     messages: [{
       role: "user",
       content: JSON.stringify({
@@ -100,7 +110,10 @@ export async function createAnthropicWorkProduct({ command, job, plan, apiKey, m
         ownerOutcomeFeedback: workerEvidence.outcomes,
         evidenceStrategy: workerEvidence.strategy,
         evidenceGrantsPermission: false,
-        stopConditions: plan.stopConditions
+        stopConditions: plan.stopConditions,
+        deliverableContract: /\b(?:web\s*site|website|landing\s+page)\b/i.test(command.rawCommand)
+          ? { kind: "website", requiredEntryFile: "index.html", ownerUsable: true }
+          : { kind: "files", ownerUsable: true }
       })
     }],
     output_config: {
@@ -124,6 +137,8 @@ export async function createAnthropicWorkProduct({ command, job, plan, apiKey, m
     now
   });
   let providerAcceptedRequest = false;
+  let providerModel = model;
+  let providerUsage = null;
   try {
     const response = await fetchWithTimeout(fetchImpl, `${baseUrl.replace(/\/$/, "")}/v1/messages`, {
     method: "POST",
@@ -137,6 +152,8 @@ export async function createAnthropicWorkProduct({ command, job, plan, apiKey, m
     if (!response.ok) throw new Error(`Anthropic worker request failed with HTTP ${response.status}`);
     providerAcceptedRequest = true;
     const payload = await response.json();
+    providerModel = payload.model || model;
+    providerUsage = payload.usage || {};
     if (["max_tokens", "model_context_window_exceeded"].includes(payload.stop_reason)) {
       throw new Error(`Anthropic worker returned a truncated structured response (${payload.stop_reason})`);
     }
@@ -144,9 +161,14 @@ export async function createAnthropicWorkProduct({ command, job, plan, apiKey, m
     if (!text) throw new Error("Anthropic worker returned no structured work product");
     const workProduct = JSON.parse(text);
     const validation = assertWorkProductShape(workProduct);
-    return { workProduct, validation, model: payload.model || model, usage: payload.usage || {}, budgetReservation };
+    assertWorkProductMatchesCommand({ command, workProduct });
+    const usageAudit = writeAnthropicApprovalUse({ kind: "worker", job, approvalId, model: providerModel, usage: providerUsage, inputCostPerMillionUsd, outputCostPerMillionUsd, reservation: budgetReservation, root, now });
+    return { workProduct, validation, model: providerModel, usage: providerUsage, budgetReservation, usageAuditPath: usageAudit.filePath };
   } catch (error) {
-    finalizeAnthropicBudgetReservation({ reservation: budgetReservation, consumed: providerAcceptedRequest, root, now });
+    const usageAudit = providerAcceptedRequest
+      ? writeAnthropicApprovalUse({ kind: "worker", job, approvalId, model: providerModel, usage: providerUsage, inputCostPerMillionUsd, outputCostPerMillionUsd, reservation: budgetReservation, outcome: "failed_after_provider_acceptance", root, now })
+      : null;
+    finalizeAnthropicBudgetReservation({ reservation: budgetReservation, consumed: providerAcceptedRequest, actualCostUsd: usageAudit?.billingReconciled ? usageAudit.costUsd : undefined, root, now });
     throw error;
   }
 }
@@ -154,6 +176,7 @@ export async function createAnthropicWorkProduct({ command, job, plan, apiKey, m
 export function writeAnthropicWorkProduct({ job, plan, command, result, runId, root = process.cwd(), now = new Date() }) {
   if (!result?.approvalId) throw new Error("Anthropic worker execution requires an exact approvalId");
   const validation = assertWorkProductShape(result?.workProduct);
+  assertWorkProductMatchesCommand({ command, workProduct: result.workProduct });
   const workspace = `.codex/workspaces/${slugify(job.projectId)}/${slugify(job.jobId)}/deliverables`;
   const written = result.workProduct.files.map((file) => {
     const relative = normalizedArtifactPath(file.path);

@@ -19,6 +19,7 @@ import { runLocalValidation } from "./execution-dry-run-processor.mjs";
 import { writeJobCompletionArtifacts } from "./job-completion-processor.mjs";
 import { isoTimestamp, writeJson } from "./common.mjs";
 import { deriveExecutionRequest } from "./execution-request-deriver.mjs";
+import { writeAnthropicApprovalUse } from "./anthropic-usage-audit.mjs";
 
 const MAX_COMMAND_LENGTH = 10_000;
 const inFlightAiApprovals = new Set();
@@ -29,6 +30,34 @@ export function commandRequiresBuilder(command) {
   if (!text || /\b(?:plan|outline|research|audit|review|explain|analy[sz]e)\b/i.test(text)) return false;
   return /\b(?:build|create|make|implement|code|design|redesign|write)\b/i.test(text) &&
     /\b(?:website|site|app|application|dashboard|page|component|code|file|document|tool|system|workflow)\b/i.test(text);
+}
+
+export function buildDeterministicWorkProductDraft(commandIntake) {
+  const rawCommand = String(commandIntake?.rawCommand || "").trim();
+  if (!rawCommand) throw new Error("deterministic work-product planning requires the owner command");
+  const productType = commandIntake?.productContext?.productType || "digital work product";
+  return {
+    summary: `Create an owner-usable ${productType} that directly satisfies the authenticated owner command. External actions remain separately approval-gated.`,
+    tools: ["isolated-workspace"],
+    tasks: [
+      {
+        taskId: "work-build-owner-usable-deliverable",
+        description: `Build complete professional files for the owner outcome: ${rawCommand}`,
+        owner: "agent-local-runtime",
+        status: "planned"
+      },
+      {
+        taskId: "work-verify-deliverable-against-owner-outcome",
+        description: "Verify the generated files are complete, accessible, and directly usable before independent critique.",
+        owner: "quality-os",
+        status: "planned"
+      }
+    ],
+    expectedOutput: `An owner-usable ${productType} with complete files that directly satisfies: ${rawCommand}`,
+    stopConditions: [
+      "Stop before any connector, deployment, publishing, messaging, DNS, credential, customer-data, or production-data action without its separate exact approval."
+    ]
+  };
 }
 
 function artifact(type, reference) {
@@ -188,6 +217,9 @@ export async function submitOwnerCommand({
     return failedJob;
   };
   let aiPlanning = null;
+  let aiUsageAudit = null;
+  let aiWorkerUsageAudit = null;
+  let aiCriticUsageAudit = null;
   if (useAiPlanner) {
     try {
       aiPlanning = await planDraftProvider({ commandIntake: intake.record, job: job.record, route: route.record });
@@ -207,7 +239,7 @@ export async function submitOwnerCommand({
     route: route.record,
     job: job.record,
     commandIntake: intake.record,
-    planDraft: aiPlanning?.planDraft,
+    planDraft: aiPlanning?.planDraft ?? (useAiWorker ? buildDeterministicWorkProductDraft(intake.record) : undefined),
     runId,
     now,
     root
@@ -229,6 +261,9 @@ export async function submitOwnerCommand({
     if (actualAiCostUsd > aiPlannerReadiness.approval.budget.maxUsd) {
       throw new Error("AI planning call exceeded the approved budget");
     }
+    aiUsageAudit = aiPlanning.usageAuditPath
+      ? { filePath: aiPlanning.usageAuditPath }
+      : writeAnthropicApprovalUse({ kind: "planner", job: job.record, approvalId: aiPlannerReadiness.approvalId, model: aiPlanning.model, usage: aiPlanning.usage, inputCostPerMillionUsd: aiPlannerReadiness.inputCostPerMillionUsd, outputCostPerMillionUsd: aiPlannerReadiness.outputCostPerMillionUsd, reservation: aiPlanning.budgetReservation, root, now });
   }
   let aiWork = null;
   if (useAiWorker) {
@@ -266,6 +301,9 @@ export async function submitOwnerCommand({
     if (actualWorkerCostUsd > aiWorkerReadiness.approval.budget.maxUsd) {
       throw new Error("AI builder call exceeded the approved budget");
     }
+    aiWorkerUsageAudit = aiWork.usageAuditPath
+      ? { filePath: aiWork.usageAuditPath }
+      : writeAnthropicApprovalUse({ kind: "worker", job: job.record, approvalId: aiWorkerReadiness.approvalId, model: aiWork.model, usage: aiWork.usage, inputCostPerMillionUsd: aiWorkerReadiness.inputCostPerMillionUsd, outputCostPerMillionUsd: aiWorkerReadiness.outputCostPerMillionUsd, reservation: aiWork.budgetReservation, root, now });
   }
   const connectorGates = writeConnectorDryRunGateRecords({ plan: plan.record, runId, now, root });
   let workerExecution = null;
@@ -300,6 +338,9 @@ export async function submitOwnerCommand({
       });
       finalizeAnthropicBudgetReservation({ reservation: criticResult.budgetReservation, consumed: true, actualCostUsd: actualCriticCostUsd, root, now });
       if (actualCriticCostUsd > aiCriticReadiness.approval.budget.maxUsd) throw new Error("AI critic call exceeded the approved budget");
+      aiCriticUsageAudit = criticResult.usageAuditPath
+        ? { filePath: criticResult.usageAuditPath }
+        : writeAnthropicApprovalUse({ kind: "critic", job: job.record, approvalId: aiCriticReadiness.approvalId, model: criticResult.model, usage: criticResult.usage, inputCostPerMillionUsd: aiCriticReadiness.inputCostPerMillionUsd, outputCostPerMillionUsd: aiCriticReadiness.outputCostPerMillionUsd, reservation: criticResult.budgetReservation, root, now });
       totalActualAiCostUsd = Number((actualAiCostUsd + actualWorkerCostUsd + actualCriticCostUsd).toFixed(6));
       cost = writeCostLedgerRecord({ job: job.record, plan: plan.record, runId, now, estimatedCostUsd: plan.record.estimatedCostUsd, actualCostUsd: totalActualAiCostUsd, usesPaidService: true, usesLiveApi: true, root });
       criticRecord = writeDeliverableCritique({ job: job.record, plan: plan.record, execution: workerExecution, result: criticResult, approvalId: aiCriticReadiness.approvalId, root, now });
@@ -405,61 +446,6 @@ export async function submitOwnerCommand({
     now,
     root
   });
-
-  const aiUsageAudit = aiPlanning
-    ? writeAuditEventRecord({
-        runId: `${runId}-anthropic-planner-use`,
-        eventType: "standing_approval_used",
-        summary: `Scoped approval ${aiPlannerReadiness.approvalId} used for one Anthropic plan generation call.`,
-        scope: "anthropic_plan_generation",
-        source: "connector_metadata",
-        relatedArtifacts: [
-          artifact("approval", aiPlannerReadiness.approvalId),
-          artifact("other", plan.record.planId),
-          artifact("other", cost.record.costLedgerId)
-        ],
-        riskLevel: intake.record.riskLevel,
-        liveServiceTouched: true,
-        notes: `Model ${aiPlanning.model}; input tokens ${aiPlanning.usage.input_tokens || 0}; output tokens ${aiPlanning.usage.output_tokens || 0}; recorded cost USD ${actualAiCostUsd}.`,
-        now,
-        root
-      })
-    : null;
-  const aiWorkerUsageAudit = aiWork
-    ? writeAuditEventRecord({
-        runId: `${runId}-anthropic-worker-use`,
-        eventType: "standing_approval_used",
-        summary: `Scoped approval ${aiWorkerReadiness.approvalId} used for one Anthropic work-product generation call.`,
-        scope: "anthropic_work_product_generation",
-        source: "connector_metadata",
-        relatedArtifacts: [
-          artifact("approval", aiWorkerReadiness.approvalId),
-          artifact("other", workerExecution.executionPath),
-          ...(workerCompletion ? [artifact("other", workerCompletion.qualityScorePath)] : []),
-          ...(criticRecord ? [artifact("other", criticRecord.recordPath)] : [])
-        ],
-        riskLevel: intake.record.riskLevel,
-        liveServiceTouched: true,
-        notes: `Model ${aiWork.model}; input tokens ${aiWork.usage.input_tokens || 0}; output tokens ${aiWork.usage.output_tokens || 0}; recorded builder cost USD ${actualWorkerCostUsd}.`,
-        now,
-        root
-      })
-    : null;
-  const aiCriticUsageAudit = criticResult
-    ? writeAuditEventRecord({
-        runId: `${runId}-anthropic-critic-use`,
-        eventType: "standing_approval_used",
-        summary: `Scoped approval ${aiCriticReadiness.approvalId} used for one independent Anthropic deliverable critique.`,
-        scope: "anthropic_deliverable_critique",
-        source: "connector_metadata",
-        relatedArtifacts: [artifact("approval", aiCriticReadiness.approvalId), artifact("other", criticRecord.recordPath), artifact("other", cost.record.costLedgerId)],
-        riskLevel: intake.record.riskLevel,
-        liveServiceTouched: true,
-        notes: `Model ${criticResult.model}; verdict ${criticRecord.record.verdict}; input tokens ${criticResult.usage.input_tokens || 0}; output tokens ${criticResult.usage.output_tokens || 0}; recorded critic cost USD ${actualCriticCostUsd}.`,
-        now,
-        root
-      })
-    : null;
 
   runDashboardBuild(root);
 

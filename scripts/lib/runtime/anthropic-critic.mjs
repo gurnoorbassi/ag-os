@@ -5,10 +5,11 @@ import { reserveAnthropicBudget, finalizeAnthropicBudgetReservation } from "./an
 import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 import { toAnthropicStructuredOutputSchema } from "./anthropic-planner.mjs";
 import { isoTimestamp, slugify, writeJson } from "./common.mjs";
+import { writeAnthropicApprovalUse } from "./anthropic-usage-audit.mjs";
 
 const BASE_URL = "https://api.anthropic.com";
 const VERSION = "2023-06-01";
-export const CRITIC_MAX_TOKENS = 4_000;
+export const CRITIC_MAX_TOKENS = 16_000;
 export const CRITIC_TIMEOUT_MS = 120_000;
 const MAX_REVIEW_BYTES = 500_000;
 
@@ -79,17 +80,26 @@ export async function createAnthropicDeliverableCritique({ command, job, plan, e
   };
   const reservation = reserveAnthropicBudget({ kind: "critic", job, requestBody, maxTokens: CRITIC_MAX_TOKENS, inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, root, env, now });
   let providerAcceptedRequest = false;
+  let providerModel = model;
+  let providerUsage = null;
   try {
     const response = await fetchWithTimeout(fetchImpl, `${baseUrl.replace(/\/$/, "")}/v1/messages`, { method: "POST", headers: { "anthropic-version": VERSION, "content-type": "application/json", "x-api-key": apiKey }, body: JSON.stringify(requestBody) }, timeoutMs);
     if (!response.ok) throw new Error(`Anthropic critic request failed with HTTP ${response.status}`);
     providerAcceptedRequest = true;
     const payload = await response.json();
+    providerModel = payload.model || model;
+    providerUsage = payload.usage || {};
     if (["max_tokens", "model_context_window_exceeded"].includes(payload.stop_reason)) throw new Error(`Anthropic critic returned a truncated response (${payload.stop_reason})`);
     const text = payload.content?.find((block) => block.type === "text")?.text;
     if (!text) throw new Error("Anthropic critic returned no structured critique");
-    return { critique: assertDeliverableCritique(JSON.parse(text)), model: payload.model || model, usage: payload.usage || {}, budgetReservation: reservation };
+    const critique = assertDeliverableCritique(JSON.parse(text));
+    const usageAudit = writeAnthropicApprovalUse({ kind: "critic", job, approvalId, model: providerModel, usage: providerUsage, inputCostPerMillionUsd, outputCostPerMillionUsd, reservation, root, now });
+    return { critique, model: providerModel, usage: providerUsage, budgetReservation: reservation, usageAuditPath: usageAudit.filePath };
   } catch (error) {
-    finalizeAnthropicBudgetReservation({ reservation, consumed: providerAcceptedRequest, root, now });
+    const usageAudit = providerAcceptedRequest
+      ? writeAnthropicApprovalUse({ kind: "critic", job, approvalId, model: providerModel, usage: providerUsage, inputCostPerMillionUsd, outputCostPerMillionUsd, reservation, outcome: "failed_after_provider_acceptance", root, now })
+      : null;
+    finalizeAnthropicBudgetReservation({ reservation, consumed: providerAcceptedRequest, actualCostUsd: usageAudit?.billingReconciled ? usageAudit.costUsd : undefined, root, now });
     throw error;
   }
 }
