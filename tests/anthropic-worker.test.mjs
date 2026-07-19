@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import {
   ANTHROPIC_WORKER_MAX_TOKENS,
   ANTHROPIC_WORKER_TIMEOUT_MS,
+  assertWorkProductMatchesCommand,
   assertWorkProductShape,
   createAnthropicWorkProduct,
   writeAnthropicWorkProduct
@@ -164,6 +165,13 @@ test("Anthropic worker rejects traversal, hidden files, invalid JSON, and oversi
   }), /exceeds 200000 bytes/);
 });
 
+test("website work products require a previewable root entry file", () => {
+  assert.throws(() => assertWorkProductMatchesCommand({ command: { rawCommand: "Build a polished website" }, workProduct: safeWorkProduct() }), /root index\.html/);
+  const website = safeWorkProduct();
+  website.files[0].path = "index.html";
+  assert.doesNotThrow(() => assertWorkProductMatchesCommand({ command: { rawCommand: "Build a polished website" }, workProduct: website }));
+});
+
 test("Anthropic worker cannot write paid work-product evidence without an exact approval id", () => {
   const root = tempWorkspace();
   const options = {
@@ -246,6 +254,9 @@ test("owner command closes the real file, score, lesson, cost, and audit loop wi
   }
   const score = JSON.parse(readFileSync(path.join(root, result.aiWorker.qualityScorePath), "utf8"));
   assert.equal(score.scoreType, "product_quality_score");
+  const plan = JSON.parse(readFileSync(path.join(root, `.codex/plans/${result.planId}.json`), "utf8"));
+  assert.match(plan.summary, /owner-usable dashboard/);
+  assert.doesNotMatch(plan.summary, /Plan-only scaffold/);
   const usageAudit = result.recordsCreated.find((item) => item.includes("anthropic-worker-use"));
   assert.ok(usageAudit);
   assert.equal(JSON.parse(readFileSync(path.join(root, usageAudit), "utf8")).eventType, "standing_approval_used");
@@ -338,6 +349,24 @@ test("a builder provider failure becomes a recoverable failed job instead of rem
   assert.equal(job.status, "failed");
   assert.match(job.blockedReason, /builder failed closed/);
   assert.equal(job.approvalRequired, false);
+});
+
+test("a successful builder use remains audited when the independent critic later fails", async () => {
+  const root = tempWorkspace();
+  const builderApprovalId = "approval-builder-before-critic-failure";
+  await assert.rejects(() => submitOwnerCommand({
+    command: "Build a private operations dashboard",
+    projectId: "project-quote-builder",
+    useAiWorker: true,
+    aiWorkerReadiness: { ready: true, approvalId: builderApprovalId, approval: { budget: { maxUsd: 0.25 } }, inputCostPerMillionUsd: 2, outputCostPerMillionUsd: 10, blockers: [] },
+    aiCriticReadiness: { ready: true, required: true, approvalId: "approval-critic-failure", approval: { budget: { maxUsd: 0.25 } }, inputCostPerMillionUsd: 1, outputCostPerMillionUsd: 5, blockers: [] },
+    workProductProvider: async () => ({ workProduct: safeWorkProduct(), model: "builder-model", usage: { input_tokens: 100, output_tokens: 100 } }),
+    criticProvider: async () => { throw new Error("critic response truncated"); },
+    root,
+    now: new Date("2026-07-19T19:05:00.000Z")
+  }), /critic response truncated/);
+  const audits = readdirSync(path.join(root, ".codex/audit")).filter((name) => name.endsWith(".json")).map((name) => JSON.parse(readFileSync(path.join(root, ".codex/audit", name), "utf8")));
+  assert.equal(audits.filter((record) => record.eventType === "standing_approval_used" && record.relatedArtifacts.some((item) => item.reference === builderApprovalId)).length, 1);
 });
 
 test("concurrent paid calls cannot consume the same approval before its usage audit is written", async () => {

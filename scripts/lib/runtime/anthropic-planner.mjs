@@ -1,6 +1,7 @@
 import { assertPlanDraftShape } from "./planner-processor.mjs";
 import { finalizeAnthropicBudgetReservation, reserveAnthropicBudget } from "./anthropic-budget-guard.mjs";
 import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
+import { writeAnthropicApprovalUse } from "./anthropic-usage-audit.mjs";
 
 const DEFAULT_BASE_URL = "https://api.anthropic.com";
 const ANTHROPIC_VERSION = "2023-06-01";
@@ -137,6 +138,8 @@ export async function createAnthropicPlanDraft({
   });
   let response;
   let providerAcceptedRequest = false;
+  let providerModel = model;
+  let providerUsage = null;
   try {
     response = await fetchWithTimeout(fetchImpl, `${baseUrl.replace(/\/$/, "")}/v1/messages`, {
     method: "POST",
@@ -151,18 +154,28 @@ export async function createAnthropicPlanDraft({
     if (!response.ok) throw new Error(`Anthropic planner request failed with HTTP ${response.status}`);
     providerAcceptedRequest = true;
     const payload = await response.json();
+    providerModel = payload.model || model;
+    providerUsage = payload.usage || {};
+    if (["max_tokens", "model_context_window_exceeded"].includes(payload.stop_reason)) {
+      throw new Error(`Anthropic planner returned a truncated structured response (${payload.stop_reason})`);
+    }
     const text = payload.content?.find((block) => block.type === "text")?.text;
     if (!text) throw new Error("Anthropic planner returned no structured plan");
     const planDraft = JSON.parse(text);
     assertPlanDraftShape(planDraft);
+    const usageAudit = writeAnthropicApprovalUse({ kind: "planner", job, approvalId, model: providerModel, usage: providerUsage, inputCostPerMillionUsd, outputCostPerMillionUsd, reservation: budgetReservation, root, now });
     return {
       planDraft,
-      model: payload.model || model,
-      usage: payload.usage || {},
-      budgetReservation
+      model: providerModel,
+      usage: providerUsage,
+      budgetReservation,
+      usageAuditPath: usageAudit.filePath
     };
   } catch (error) {
-    finalizeAnthropicBudgetReservation({ reservation: budgetReservation, consumed: providerAcceptedRequest, root, now });
+    const usageAudit = providerAcceptedRequest
+      ? writeAnthropicApprovalUse({ kind: "planner", job, approvalId, model: providerModel, usage: providerUsage, inputCostPerMillionUsd, outputCostPerMillionUsd, reservation: budgetReservation, outcome: "failed_after_provider_acceptance", root, now })
+      : null;
+    finalizeAnthropicBudgetReservation({ reservation: budgetReservation, consumed: providerAcceptedRequest, actualCostUsd: usageAudit?.billingReconciled ? usageAudit.costUsd : undefined, root, now });
     throw error;
   }
 }
