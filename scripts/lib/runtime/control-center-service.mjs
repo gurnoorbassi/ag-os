@@ -44,10 +44,11 @@ function safeJob(job, root) {
     hasQualityScore: Boolean(job.completionEvidence?.qualityScorePath),
     lessonCandidateCount: job.completionEvidence?.lessonCandidatePaths?.length ?? 0,
     recovery: job.recovery ?? null,
-    availableRecoveryActions: ["failed", "blocked", "cancelled", "plan_ready"].includes(job.status)
+    availableRecoveryActions: ["failed", "blocked", "cancelled", "needs_revision", "plan_ready"].includes(job.status)
       ? ["retry", "replan"]
       : [],
-    deliverable: jobDeliverableSummary({ job, root })
+    deliverable: jobDeliverableSummary({ job, root }),
+    outcomeRecorded: existsSync(path.join(root, `.codex/outcomes/outcome-${slugify(job.jobId)}.json`))
   };
 }
 
@@ -69,10 +70,13 @@ export function getProjectWorkspace({ projectId, root = process.cwd() }) {
   const costs = matching(".codex/costs").map(({ record }) => ({
     costLedgerId: record.costLedgerId,
     status: record.status,
-    actualTaskCostUsd: record.totals?.actualTaskCostUsd ?? record.actualTaskCostUsd ?? 0,
-    budgetStatus: record.budgetStatus,
+    actualTaskCostUsd: record.summary?.actualTaskCostUsd ?? record.totals?.actualTaskCostUsd ?? record.actualTaskCostUsd ?? 0,
+    budgetStatus: record.summary?.budgetStatus ?? record.budgetStatus,
     updatedAt: record.updatedAt
-  }));
+  })).filter((record) =>
+    !record.costLedgerId?.startsWith("cost-ledger-anthropic-call-") &&
+    !record.costLedgerId?.startsWith("cost-ledger-anthropic-budget-blocked-")
+  );
   const commands = matching(".codex/commands").map(({ record }) => ({
     commandId: record.commandId ?? record.id,
     status: record.status,

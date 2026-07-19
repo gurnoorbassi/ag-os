@@ -498,17 +498,19 @@ function collectFirstClientReadiness(clientManagement) {
 }
 
 function collectQualityReview() {
-  const critiques = latestBy(listDirectJson(".codex/critiques")
-    .filter((recordPath) => path.basename(recordPath).startsWith("critique-"))
+  const critiques = latestBy([
+    ...listDirectJson(".codex/critiques").filter((recordPath) => path.basename(recordPath).startsWith("critique-")),
+    ...listDirectJson(".codex/deliverable-critiques").filter((recordPath) => path.basename(recordPath).startsWith("deliverable-critique-"))
+  ]
     .map((recordPath) => {
       const record = readJson(recordPath);
       return {
         critiqueId: record.critiqueId,
-        sourcePlanId: record.sourcePlanId,
+        sourcePlanId: record.sourcePlanId ?? record.planId,
         archetypeId: record.archetypeId,
-        reviewStatus: record.reviewStatus,
-        blocksBuildMode: record.blocksBuildMode,
-        findingCount: record.findings?.length ?? 0,
+        reviewStatus: record.reviewStatus ?? record.verdict,
+        blocksBuildMode: record.blocksBuildMode ?? record.verdict === "needs_revision",
+        findingCount: record.findings?.length ?? record.defects?.length ?? 0,
         requiredFixCount: record.requiredFixes?.length ?? 0,
         createdAt: record.createdAt,
         recordPath

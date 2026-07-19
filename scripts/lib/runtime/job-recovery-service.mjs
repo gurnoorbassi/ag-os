@@ -1,7 +1,7 @@
 import process from "node:process";
 import { readJson } from "./common.mjs";
 
-const RECOVERABLE_STATUSES = new Set(["failed", "blocked", "cancelled", "plan_ready"]);
+const RECOVERABLE_STATUSES = new Set(["failed", "blocked", "cancelled", "needs_revision", "plan_ready"]);
 const ONE_OFF_PROJECT_ID = "project-one-off";
 
 function assertJobId(jobId) {

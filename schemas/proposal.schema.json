@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/proposal.schema.json",
+  "title": "AG OS Proposed Work",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["proposalId", "status", "priority", "title", "reason", "proposedCommand", "projectId", "source", "safety", "createdAt", "updatedAt"],
+  "properties": {
+    "proposalId": { "type": "string", "pattern": "^proposal-[a-z0-9-]+$" },
+    "status": { "type": "string", "enum": ["proposed", "accepted", "rejected", "stale"] },
+    "priority": { "type": "string", "enum": ["low", "medium", "high"] },
+    "title": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 },
+    "proposedCommand": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "source": { "type": "object", "additionalProperties": false, "required": ["type", "id", "evidence"], "properties": { "type": { "type": "string", "enum": ["failed_job", "lesson_candidate", "expiring_approval"] }, "id": { "type": "string", "minLength": 1 }, "evidence": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } },
+    "safety": { "type": "object", "additionalProperties": false, "required": ["mayExecuteWithoutOwnerDecision", "grantsPermission", "downstreamApprovalsStillRequired"], "properties": { "mayExecuteWithoutOwnerDecision": { "const": false }, "grantsPermission": { "const": false }, "downstreamApprovalsStillRequired": { "const": true } } },
+    "decision": { "type": "object", "additionalProperties": false, "required": ["decidedBy", "decidedAt", "reason"], "properties": { "decidedBy": { "type": "string" }, "decidedAt": { "type": "string" }, "reason": { "type": "string" } } },
+    "lastStartError": { "type": "string", "maxLength": 1000 },
+    "createdAt": { "type": "string" },
+    "updatedAt": { "type": "string" }
+  }
+}

@@ -20,3 +20,4 @@ credentials/
 local/
 .codex/**/local-*
 .codex/**/runtime-*-scratch-*.json
+.codex/proposals/proposal-*.json

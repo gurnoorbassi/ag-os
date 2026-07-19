@@ -54,7 +54,7 @@ function recordDate(record) {
 function actualSpend(records, predicate) {
   return records
     .filter((record) => !record.costLedgerId?.startsWith("cost-ledger-anthropic-budget-blocked-"))
-    .filter((record) => !record.costLedgerId?.startsWith("cost-ledger-anthropic-call-"))
+    .filter((record) => !record.costLedgerId?.startsWith("cost-ledger-anthropic-call-") || record.summary?.billingReconciled === false)
     .filter(predicate)
     .reduce((total, record) => total + Number(record.summary?.actualTaskCostUsd || 0), 0);
 }
@@ -199,7 +199,7 @@ export function reserveAnthropicBudget({
   return { recordPath, estimatedCostUsd: estimate, dailyCallCount, dailyCallLimit };
 }
 
-export function finalizeAnthropicBudgetReservation({ reservation, consumed, root = process.cwd(), now = new Date() }) {
+export function finalizeAnthropicBudgetReservation({ reservation, consumed, actualCostUsd, root = process.cwd(), now = new Date() }) {
   if (!reservation?.recordPath) return null;
   const absolute = path.join(root, reservation.recordPath);
   if (!existsSync(absolute)) throw new Error(`Anthropic budget reservation is missing: ${reservation.recordPath}`);
@@ -210,9 +210,17 @@ export function finalizeAnthropicBudgetReservation({ reservation, consumed, root
     status: "archived",
     entries: record.entries.map((entry) => ({
       ...entry,
-      costType: consumed ? "reserved" : "reversed",
+      costType: consumed ? "actual" : "reversed",
+      ...(consumed ? { amountUsd: Number.isFinite(Number(actualCostUsd)) ? Number(actualCostUsd) : Number(entry.amountUsd) } : {}),
       status: consumed ? "recorded" : "reversed"
     })),
+    summary: {
+      ...record.summary,
+      ...(consumed ? {
+        actualTaskCostUsd: Number.isFinite(Number(actualCostUsd)) ? Number(actualCostUsd) : Number(record.summary.estimatedTaskCostUsd),
+        billingReconciled: Number.isFinite(Number(actualCostUsd))
+      } : { billingReconciled: true })
+    },
     updatedAt: isoTimestamp(now)
   };
   writeJson(reservation.recordPath, updated, root);

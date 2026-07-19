@@ -10,6 +10,8 @@ import { createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
 import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-planner-readiness.mjs";
 import { createAnthropicWorkProduct } from "./lib/runtime/anthropic-worker.mjs";
 import { evaluateAnthropicWorkerReadiness } from "./lib/runtime/anthropic-worker-readiness.mjs";
+import { createAnthropicDeliverableCritique } from "./lib/runtime/anthropic-critic.mjs";
+import { evaluateAnthropicCriticReadiness } from "./lib/runtime/anthropic-critic-readiness.mjs";
 import { createProject, listProjects } from "./lib/runtime/project-service.mjs";
 import {
   decideLessons,
@@ -17,12 +19,15 @@ import {
   getProjectWorkspace,
   listLessonDecisions
 } from "./lib/runtime/control-center-service.mjs";
+import { decideProposal, listProposals, markProposalStartFailed, refreshProposals } from "./lib/runtime/proposal-engine.mjs";
+import { listOutcomes, recordJobOutcome } from "./lib/runtime/outcome-feedback-service.mjs";
 import { autonomousExecutionStatus, listAutonomousJobs, processQueuedJobs } from "./lib/runtime/autonomous-runner.mjs";
 import { decideJob } from "./lib/runtime/job-approval-service.mjs";
 import { evaluateOperationalSafeguards, resolveOperationalFinding } from "./lib/runtime/operational-safeguards.mjs";
 import { startInternalWatchdog } from "./lib/runtime/internal-watchdog.mjs";
 import { getJobDeliverable } from "./lib/runtime/deliverable-service.mjs";
 import { prepareJobRecovery } from "./lib/runtime/job-recovery-service.mjs";
+import { consumeMobileApproval, createMobileApprovalLink, deliverMobileApprovalLink, mobileApprovalReadiness } from "./lib/runtime/mobile-approval-service.mjs";
 import {
   buildOwnerSessionCookie,
   clearOwnerSessionCookie,
@@ -66,6 +71,7 @@ async function runAutomaticQueue() {
         detail: result.dashboardRefresh.error
       }));
     }
+    refreshProposals({ root });
     return result;
   } catch (error) {
     console.error(JSON.stringify({ service: "ag-os-coordinator", event: "automatic-run-failed", detail: error.message }));
@@ -187,6 +193,10 @@ function aiWorkerReadiness() {
   return evaluateAnthropicWorkerReadiness({ root });
 }
 
+function aiCriticReadiness() {
+  return evaluateAnthropicCriticReadiness({ root });
+}
+
 function publicAiPlannerStatus(readiness = aiPlannerReadiness()) {
   return {
     ready: readiness.ready,
@@ -211,16 +221,21 @@ function publicAiWorkerStatus(readiness = aiWorkerReadiness()) {
   };
 }
 
+function publicAiCriticStatus(readiness = aiCriticReadiness()) {
+  return { ready: readiness.ready, enabled: readiness.enabled, required: readiness.required, credentialConfigured: readiness.credentialConfigured, model: readiness.model, approvalId: readiness.approvalId, uses: readiness.uses, blockers: readiness.blockers };
+}
+
 async function submitRuntimeCommand(body, { recovery = null, forceReplan = false, disablePlanner = false } = {}) {
   const plannerReadiness = aiPlannerReadiness();
   const workerReadiness = aiWorkerReadiness();
+  const criticReadiness = aiCriticReadiness();
   const builderRequired = !body.executionRequest && commandRequiresBuilder(body.command);
   const useAiWorker = body.useAiWorker === true || builderRequired;
   const useAiPlanner = !disablePlanner && (body.useAiPlanner === true || forceReplan || (builderRequired && plannerReadiness.ready));
   if (builderRequired && !workerReadiness.ready) {
     throw new Error(`This command requests a real deliverable, but the professional builder is not active: ${workerReadiness.blockers.join("; ")}. AG OS did not create a plan-only job or claim completion.`);
   }
-  return submitOwnerCommand({
+  const result = await submitOwnerCommand({
     command: body.command,
     projectId: body.projectId,
     understanding: body.understanding,
@@ -229,6 +244,7 @@ async function submitRuntimeCommand(body, { recovery = null, forceReplan = false
     useAiWorker,
     aiPlannerReadiness: plannerReadiness,
     aiWorkerReadiness: workerReadiness,
+    aiCriticReadiness: criticReadiness,
     planDraftProvider: (input) => createAnthropicPlanDraft({
       ...input,
       apiKey: process.env.ANTHROPIC_API_KEY,
@@ -251,14 +267,36 @@ async function submitRuntimeCommand(body, { recovery = null, forceReplan = false
       approvalMaxUsd: workerReadiness.approval?.budget?.maxUsd,
       root
     }),
+    criticProvider: (input) => createAnthropicDeliverableCritique({
+      ...input,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: criticReadiness.model,
+      baseUrl: process.env.ANTHROPIC_BASE_URL,
+      inputCostPerMillionUsd: criticReadiness.inputCostPerMillionUsd,
+      outputCostPerMillionUsd: criticReadiness.outputCostPerMillionUsd,
+      approvalId: criticReadiness.approvalId,
+      approvalMaxUsd: criticReadiness.approval?.budget?.maxUsd,
+      root
+    }),
     recovery,
-    root
+    root,
+    env: process.env
   });
+  const mobile = mobileApprovalReadiness({ root });
+  if (result.status === "waiting_approval" && mobile.ready && mobile.deliveryActive) {
+    try {
+      const link = createMobileApprovalLink({ jobId: result.jobId, root });
+      result.mobileNotification = await deliverMobileApprovalLink({ linkResult: link, root });
+    } catch (error) {
+      result.mobileNotification = { delivery: { mode: mobile.delivery, sent: false }, error: error.message };
+    }
+  }
+  return result;
 }
 
 function serveStatic(request, response) {
   const requestPath = new URL(request.url, "http://localhost").pathname;
-  const relative = requestPath === "/" ? "index.html" : decodeURIComponent(requestPath.slice(1));
+  const relative = requestPath === "/" ? "index.html" : requestPath === "/mobile-approval" ? "mobile-approval.html" : decodeURIComponent(requestPath.slice(1));
   const target = path.resolve(dashboardRoot, relative);
   if (!target.startsWith(`${dashboardRoot}${path.sep}`) || !existsSync(target) || !statSync(target).isFile()) {
     json(response, 404, { error: "not_found" });
@@ -300,6 +338,18 @@ const server = createServer(async (request, response) => {
       sessionDays: ownerSessionDays,
       recoveryTokenAvailable: Boolean(ownerToken)
     }, headers);
+    return;
+  }
+
+  if (request.method === "POST" && url.pathname === "/api/v1/mobile-approvals/decision") {
+    try {
+      const body = await readJsonBody(request);
+      const result = consumeMobileApproval({ token: body.token, decision: body.decision, root });
+      json(response, 200, { requestId: result.requestId, jobId: result.jobId, decision: result.decision, status: result.result.job.status }, headers);
+      setImmediate(runAutomaticQueue);
+    } catch (error) {
+      json(response, 400, { error: "mobile_decision_rejected", detail: error.message }, headers);
+    }
     return;
   }
 
@@ -398,9 +448,13 @@ const server = createServer(async (request, response) => {
         },
         aiPlanner: publicAiPlannerStatus(),
         aiWorker: publicAiWorkerStatus(),
+        aiCritic: publicAiCriticStatus(),
+        mobileApprovals: mobileApprovalReadiness(),
         projects: listProjects({ root }),
         operatingSystems: getOperatingSystems({ root }),
         lessonDecisions: listLessonDecisions({ root }),
+        proposals: listProposals({ root }),
+        outcomes: listOutcomes({ root }).slice(0, 20),
         jobs: listAutonomousJobs({ root }),
         recentCommands: listRecentOwnerCommands({ root })
       }, headers);
@@ -454,6 +508,41 @@ const server = createServer(async (request, response) => {
         root
       });
       json(response, 200, result, headers);
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/v1/proposals") {
+      json(response, 200, { proposals: listProposals({ root }) }, headers);
+      return;
+    }
+
+    const proposalDecisionMatch = url.pathname.match(/^\/api\/v1\/proposals\/([^/]+)\/decision$/);
+    if (request.method === "POST" && proposalDecisionMatch) {
+      const body = await readJsonBody(request);
+      const decision = decideProposal({ proposalId: decodeURIComponent(proposalDecisionMatch[1]), decision: body.decision, confirmation: body.confirmation, reason: body.reason, root });
+      let commandResult = null;
+      if (decision.acceptedCommand) {
+        try { commandResult = await submitRuntimeCommand(decision.acceptedCommand); }
+        catch (error) { markProposalStartFailed({ proposalId: decision.proposal.proposalId, error: error.message, root }); throw error; }
+      }
+      json(response, 200, { ...decision, commandResult }, headers);
+      if (commandResult) setImmediate(runAutomaticQueue);
+      return;
+    }
+
+    const outcomeMatch = url.pathname.match(/^\/api\/v1\/jobs\/([^/]+)\/outcome$/);
+    if (request.method === "POST" && outcomeMatch) {
+      const body = await readJsonBody(request);
+      const result = recordJobOutcome({ jobId: decodeURIComponent(outcomeMatch[1]), rating: body.rating, reason: body.reason, confirmation: body.confirmation, root });
+      json(response, 201, result, headers);
+      return;
+    }
+
+    const mobileLinkMatch = url.pathname.match(/^\/api\/v1\/jobs\/([^/]+)\/mobile-approval$/);
+    if (request.method === "POST" && mobileLinkMatch) {
+      const link = createMobileApprovalLink({ jobId: decodeURIComponent(mobileLinkMatch[1]), root });
+      const result = await deliverMobileApprovalLink({ linkResult: link, root });
+      json(response, 201, result, headers);
       return;
     }
 
@@ -576,6 +665,10 @@ if (isMain) {
 
   server.listen(port, host, () => {
     console.log(JSON.stringify({ service: "ag-os-coordinator", status: "listening", host, port }));
+    setImmediate(() => {
+      try { refreshProposals({ root }); }
+      catch (error) { console.error(JSON.stringify({ service: "ag-os-coordinator", event: "proposal-refresh-failed", detail: error.message })); }
+    });
     if (process.env.AG_OS_AUTOMATION_ENABLED !== "false") {
       setImmediate(runAutomaticQueue);
       setInterval(runAutomaticQueue, 15_000).unref();

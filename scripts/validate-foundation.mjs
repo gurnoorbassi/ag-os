@@ -65,6 +65,10 @@ const requiredPaths = [
   ".codex/quality/policy.json",
   ".codex/quality-scores/README.md",
   ".codex/critiques/README.md",
+  ".codex/deliverable-critiques/README.md",
+  ".codex/outcomes/README.md",
+  ".codex/proposals/README.md",
+  ".codex/mobile-approvals/README.md",
   ".codex/security/README.md",
   ".codex/security/policy.json",
   ".codex/security/credential-store-policy.json",
@@ -146,7 +150,11 @@ const requiredPaths = [
   "schemas/social-account.schema.json",
   "schemas/social-post.schema.json",
   "schemas/social-publish-approval.schema.json",
-  "schemas/social-connector-preflight.schema.json"
+  "schemas/social-connector-preflight.schema.json",
+  "schemas/deliverable-critique.schema.json",
+  "schemas/outcome.schema.json",
+  "schemas/proposal.schema.json",
+  "schemas/mobile-approval.schema.json"
 ];
 
 const forbiddenPatterns = [
@@ -456,6 +464,30 @@ const runtimeRecordDirectories = [
     includePrefixes: ["critique-"]
   },
   {
+    name: "deliverable critique",
+    recordDir: ".codex/deliverable-critiques",
+    schemaPath: "schemas/deliverable-critique.schema.json",
+    includePrefixes: ["deliverable-critique-"]
+  },
+  {
+    name: "owner outcome",
+    recordDir: ".codex/outcomes",
+    schemaPath: "schemas/outcome.schema.json",
+    includePrefixes: ["outcome-"]
+  },
+  {
+    name: "proposed work",
+    recordDir: ".codex/proposals",
+    schemaPath: "schemas/proposal.schema.json",
+    includePrefixes: ["proposal-"]
+  },
+  {
+    name: "mobile approval request",
+    recordDir: ".codex/mobile-approvals",
+    schemaPath: "schemas/mobile-approval.schema.json",
+    includePrefixes: ["mobile-approval-"]
+  },
+  {
     name: "credential reference",
     recordDir: ".codex/credentials",
     schemaPath: "schemas/credential-reference.schema.json",
@@ -537,10 +569,6 @@ function inspectSchemaKeywordSupport(schema, schemaPath, enforced, location = "$
   }
 
   for (const [key, value] of Object.entries(schema)) {
-    if (key === "format") {
-      warn(`schema format keyword is present but not enforced: ${schemaPath} at ${location}.format`);
-    }
-
     if (unsupportedStructuralKeywords.has(key)) {
       const message = `unsupported schema keyword ${key} in ${enforced ? "enforced" : "orphan"} schema ${schemaPath} at ${location}.${key}`;
       if (enforced) {
@@ -677,11 +705,11 @@ function validateSchemaValue(value, schema, location, options = {}) {
   if (Array.isArray(schema.type)) {
     if (!schema.type.some((type) => matchesType(value, type))) {
       fail(`${location} must match one of these types or use a REQUIRED_* placeholder: ${schema.type.join(", ")}`);
+      return;
     }
-    return;
   }
 
-  if (schema.type && !matchesType(value, schema.type)) {
+  else if (schema.type && !matchesType(value, schema.type)) {
     fail(`${location} must be ${schema.type} or use a REQUIRED_* placeholder`);
     return;
   }
@@ -698,6 +726,22 @@ function validateSchemaValue(value, schema, location, options = {}) {
     fail(`${location} must be at least ${schema.minLength} character(s) or use a REQUIRED_* placeholder`);
   }
 
+  if (schema.maxLength !== undefined && typeof value === "string" && value.length > schema.maxLength) {
+    fail(`${location} must be at most ${schema.maxLength} character(s)`);
+  }
+
+  if (!options.allowPlaceholders && schema.format === "date-time" && typeof value === "string" && !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value)) {
+    fail(`${location} must be an RFC 3339 date-time`);
+  }
+
+  if (!options.allowPlaceholders && schema.format === "date-time" && typeof value === "string" && Number.isNaN(Date.parse(value))) {
+    fail(`${location} must be a valid date-time`);
+  }
+
+  if (!options.allowPlaceholders && schema.format === "uri" && typeof value === "string") {
+    try { new URL(value); } catch { fail(`${location} must be an absolute URI`); }
+  }
+
   if (schema.minimum !== undefined && typeof value === "number" && value < schema.minimum) {
     fail(`${location} must be at least ${schema.minimum} or use a REQUIRED_* placeholder`);
   }
@@ -710,11 +754,11 @@ function validateSchemaValue(value, schema, location, options = {}) {
     fail(`${location} must be ${JSON.stringify(schema.const)}`);
   }
 
-  if (schema.type === "array") {
+  if (schema.type === "array" || (Array.isArray(schema.type) && schema.type.includes("array") && Array.isArray(value))) {
     validateSchemaArray(value, schema, location, options);
   }
 
-  if (schema.type === "object") {
+  if (schema.type === "object" || (Array.isArray(schema.type) && schema.type.includes("object") && value && typeof value === "object" && !Array.isArray(value))) {
     validateSchemaObject(value, schema, location, options);
   }
 }
@@ -1764,7 +1808,7 @@ for (const schemaValidatedRecordDirectory of schemaValidatedRecordDirectories) {
     for (const recordPath of recordPaths) {
       const record = readJson(recordPath);
       const failuresBeforeRecord = failures;
-      validateSchemaObject(record, schema, recordPath);
+      validateSchemaObject(record, schema, recordPath, { allowPlaceholders: isTemplateRecordPath(recordPath) });
       if (schemaValidatedRecordDirectory.name === "approval lock") {
         validateStandingApprovalRecord(record, recordPath);
       }

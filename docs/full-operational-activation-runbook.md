@@ -28,6 +28,14 @@ Install the root-owned runner service, generate one separate runner token, creat
 
 Choose one exact HTTPS hostname. The approved activation may add the Caddy site from `ops/ag-os-private-access.Caddyfile.template`, set `AG_OS_PRIVATE_ORIGIN`, use `ops/docker-compose.remote-access.yml`, and preserve the coordinator's loopback binding. DNS and Caddy changes remain separate exact actions. A private-network alternative such as Tailscale may be selected instead, but AG OS must not install or enroll it without approval.
 
+### Mobile approval notifications
+
+Create one Telegram bot and obtain the owner's numeric chat ID outside source control. Store both values only in the root-owned AG OS environment, generate a separate mobile signing key, configure the secure phone-reachable dashboard URL, and create a revocable standing approval for `mobile_approval_notification` targeting `telegram:bot-api` with `message_send` coverage and a finite use limit. AG OS automatically sends only a job identifier and its signed one-time decision link. It does not include command content, customer data, production data, credentials, or the chat ID in audit records.
+
+### Owner-command preview routing
+
+Set `AG_OS_NETLIFY_PREVIEW_SITE_ID` to the one site that may receive generated draft previews. A plain command must explicitly mention Netlify and a deploy/preview action before AG OS derives a request. The derived request is always `draft=true`, uses only generated files inside the job workspace, and still pauses for an exact one-job adapter approval. Production deployment, DNS, social, and messaging requests are never inferred from incomplete details.
+
 ### Social and DNS
 
 Social publishing requires a least-privilege Instagram token in `AG_OS_SOCIAL_API_TOKEN`; each post still needs one digest-locked approval. DNS requires a Cloudflare token limited to the exact zone in `AG_OS_DNS_API_TOKEN`; each record change still needs one digest-locked approval. Tokens stay only in root-owned runtime configuration and never enter evidence.
