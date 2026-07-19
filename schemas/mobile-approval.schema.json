@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/mobile-approval.schema.json",
+  "title": "AG OS Mobile Approval Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["requestId", "jobId", "status", "tokenHash", "issuedAt", "expiresAt", "allowedDecisions", "delivery", "safety", "createdAt", "updatedAt"],
+  "properties": {
+    "requestId": { "type": "string", "pattern": "^mobile-approval-[a-z0-9-]+$" },
+    "jobId": { "type": "string", "pattern": "^job-[a-z0-9-]+$" },
+    "status": { "type": "string", "enum": ["pending", "consumed", "expired", "revoked"] },
+    "tokenHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "issuedAt": { "type": "string" },
+    "expiresAt": { "type": "string" },
+    "allowedDecisions": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string", "enum": ["approve", "reject"] } },
+    "decision": { "type": "string", "enum": ["approve", "reject"] },
+    "consumedAt": { "type": "string" },
+    "delivery": { "type": "object", "additionalProperties": false, "required": ["mode", "sent"], "properties": { "mode": { "type": "string", "enum": ["disabled", "outbox", "telegram"] }, "sent": { "type": "boolean" }, "providerMessageId": { "type": "string", "pattern": "^[0-9]+$" } } },
+    "safety": { "type": "object", "additionalProperties": false, "required": ["getRequestsMutateState", "exactJobDecisionRequired", "grantsPermission"], "properties": { "getRequestsMutateState": { "const": false }, "exactJobDecisionRequired": { "const": true }, "grantsPermission": { "const": false } } },
+    "createdAt": { "type": "string" },
+    "updatedAt": { "type": "string" }
+  }
+}

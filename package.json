@@ -2,7 +2,7 @@
   "name": "ag-os",
   "version": "0.0.0",
   "private": true,
-  "description": "AG Digitalz OS foundation: docs, schemas, safety rules, and validation only.",
+  "description": "AG OS private owner-operated coordinator with approval-gated autonomous work, evidence, quality, memory, and deployment adapters.",
   "type": "module",
   "scripts": {
     "dashboard:build": "node scripts/build-dashboard.mjs",
@@ -16,6 +16,7 @@
     "archetypes:propose": "node scripts/process-archetype-update-proposal.mjs",
     "safe-merge:check": "node scripts/check-safe-merge.mjs",
     "security:scan": "node scripts/scan-secrets.mjs",
+    "audit:v1": "node scripts/audit-v1-completion.mjs",
     "production:check": "node scripts/check-production-readiness.mjs",
     "production:check:coordinator": "node scripts/check-production-readiness.mjs --record .codex/production/production-readiness-ag-os-coordinator-v1.json",
     "live:start": "node scripts/build-dashboard.mjs && node scripts/live-server.mjs",

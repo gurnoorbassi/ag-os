@@ -13,10 +13,12 @@ import { writePlanRecord } from "./planner-processor.mjs";
 import { writeTaskRouteRecord } from "./task-router-processor.mjs";
 import { calculateAnthropicCostUsd } from "./anthropic-planner.mjs";
 import { writeAnthropicWorkProduct } from "./anthropic-worker.mjs";
+import { writeDeliverableCritique } from "./anthropic-critic.mjs";
 import { finalizeAnthropicBudgetReservation } from "./anthropic-budget-guard.mjs";
 import { runLocalValidation } from "./execution-dry-run-processor.mjs";
 import { writeJobCompletionArtifacts } from "./job-completion-processor.mjs";
 import { isoTimestamp, writeJson } from "./common.mjs";
+import { deriveExecutionRequest } from "./execution-request-deriver.mjs";
 
 const MAX_COMMAND_LENGTH = 10_000;
 const inFlightAiApprovals = new Set();
@@ -103,10 +105,13 @@ export async function submitOwnerCommand({
   useAiWorker = false,
   aiPlannerReadiness,
   aiWorkerReadiness,
+  aiCriticReadiness,
   planDraftProvider,
   workProductProvider,
+  criticProvider,
   recovery = null,
   root = process.cwd(),
+  env = process.env,
   now = new Date()
 }) {
   assertOwnerCommand(command);
@@ -118,9 +123,14 @@ export async function submitOwnerCommand({
   if (useAiWorker && (!aiWorkerReadiness?.ready || typeof workProductProvider !== "function")) {
     throw new Error(`AI builder worker is not ready: ${(aiWorkerReadiness?.blockers || ["worker provider unavailable"]).join("; ")}`);
   }
+  const useAiCritic = useAiWorker && aiCriticReadiness?.ready === true && typeof criticProvider === "function";
+  if (useAiWorker && aiCriticReadiness?.required === true && !useAiCritic) {
+    throw new Error(`Independent critic is required but not ready: ${(aiCriticReadiness?.blockers || ["critic provider unavailable"]).join("; ")}`);
+  }
   const reservationIds = [...new Set([
     ...(useAiPlanner ? [aiPlannerReadiness.approvalId] : []),
-    ...(useAiWorker ? [aiWorkerReadiness.approvalId] : [])
+    ...(useAiWorker ? [aiWorkerReadiness.approvalId] : []),
+    ...(useAiCritic ? [aiCriticReadiness.approvalId] : [])
   ])];
   for (const approvalId of reservationIds) {
     if (!approvalId || inFlightAiApprovals.has(approvalId)) throw new Error(`AI approval ${approvalId || "missing"} already has a call in progress`);
@@ -147,9 +157,45 @@ export async function submitOwnerCommand({
   });
   const job = writeJobRecord({ commandIntake: intake.record, runId, now, recovery, root });
   const route = writeTaskRouteRecord({ job: job.record, commandIntake: intake.record, runId, now, root });
-  const aiPlanning = useAiPlanner
-    ? await planDraftProvider({ commandIntake: intake.record, job: job.record, route: route.record })
-    : null;
+  const recordRunFailure = ({ error, stage, status = "failed", relatedArtifacts = [] }) => {
+    const timestamp = isoTimestamp(now);
+    const failedJob = {
+      ...job.record,
+      status,
+      approvalRequired: false,
+      blockedReason: `${stage} failed closed: ${error.message}`,
+      queueTimestamps: {
+        ...job.record.queueTimestamps,
+        ...(stage === "planning" ? { planningStartedAt: timestamp } : { runningStartedAt: timestamp })
+      },
+      updatedAt: timestamp
+    };
+    writeJson(job.filePath, failedJob, root);
+    writeAuditEventRecord({
+      runId: `${runId}-${stage}-failed`,
+      eventType: "validation_run",
+      summary: `${stage} failed closed for ${job.record.jobId}; the job was not left runnable and completion was not claimed.`,
+      scope: job.record.jobId,
+      source: "ag_os_coordinator",
+      relatedArtifacts: [artifact("other", job.filePath), ...relatedArtifacts],
+      riskLevel: intake.record.riskLevel,
+      liveServiceTouched: ["planning", "builder", "critic"].includes(stage),
+      notes: String(error.message || error).slice(0, 4000),
+      now,
+      root
+    });
+    try { runDashboardBuild(root); } catch { /* Preserve the original stage failure. */ }
+    return failedJob;
+  };
+  let aiPlanning = null;
+  if (useAiPlanner) {
+    try {
+      aiPlanning = await planDraftProvider({ commandIntake: intake.record, job: job.record, route: route.record });
+    } catch (error) {
+      recordRunFailure({ error, stage: "planning" });
+      throw error;
+    }
+  }
   const actualAiCostUsd = aiPlanning
     ? calculateAnthropicCostUsd({
         usage: aiPlanning.usage,
@@ -179,14 +225,20 @@ export async function submitOwnerCommand({
       usesLiveApi: true,
       root
     });
-    finalizeAnthropicBudgetReservation({ reservation: aiPlanning.budgetReservation, consumed: true, root, now });
+    finalizeAnthropicBudgetReservation({ reservation: aiPlanning.budgetReservation, consumed: true, actualCostUsd: actualAiCostUsd, root, now });
     if (actualAiCostUsd > aiPlannerReadiness.approval.budget.maxUsd) {
       throw new Error("AI planning call exceeded the approved budget");
     }
   }
-  const aiWork = useAiWorker
-    ? await workProductProvider({ command: intake.record, job: job.record, plan: plan.record, root })
-    : null;
+  let aiWork = null;
+  if (useAiWorker) {
+    try {
+      aiWork = await workProductProvider({ command: intake.record, job: job.record, plan: plan.record, root });
+    } catch (error) {
+      recordRunFailure({ error, stage: "builder", relatedArtifacts: [artifact("other", plan.filePath)] });
+      throw error;
+    }
+  }
   const actualWorkerCostUsd = aiWork
     ? calculateAnthropicCostUsd({
         usage: aiWork.usage,
@@ -194,7 +246,10 @@ export async function submitOwnerCommand({
         outputCostPerMillionUsd: aiWorkerReadiness.outputCostPerMillionUsd
       })
     : 0;
-  const totalActualAiCostUsd = Number((actualAiCostUsd + actualWorkerCostUsd).toFixed(6));
+  let actualCriticCostUsd = 0;
+  let criticResult = null;
+  let criticRecord = null;
+  let totalActualAiCostUsd = Number((actualAiCostUsd + actualWorkerCostUsd).toFixed(6));
   cost = writeCostLedgerRecord({
     job: job.record,
     plan: plan.record,
@@ -207,7 +262,7 @@ export async function submitOwnerCommand({
     root
   });
   if (aiWork) {
-    finalizeAnthropicBudgetReservation({ reservation: aiWork.budgetReservation, consumed: true, root, now });
+    finalizeAnthropicBudgetReservation({ reservation: aiWork.budgetReservation, consumed: true, actualCostUsd: actualWorkerCostUsd, root, now });
     if (actualWorkerCostUsd > aiWorkerReadiness.approval.budget.maxUsd) {
       throw new Error("AI builder call exceeded the approved budget");
     }
@@ -217,21 +272,70 @@ export async function submitOwnerCommand({
   let workerCompletion = null;
   let completedJob = job.record;
   if (aiWork) {
-    workerExecution = writeAnthropicWorkProduct({
-      job: job.record,
-      plan: plan.record,
-      command: intake.record,
-      result: { ...aiWork, approvalId: aiWorkerReadiness.approvalId },
-      runId,
-      root,
-      now
-    });
+    try {
+      workerExecution = writeAnthropicWorkProduct({
+        job: job.record,
+        plan: plan.record,
+        command: intake.record,
+        result: { ...aiWork, approvalId: aiWorkerReadiness.approvalId },
+        runId,
+        root,
+        now
+      });
+    } catch (error) {
+      recordRunFailure({ error, stage: "builder-write", relatedArtifacts: [artifact("other", plan.filePath)] });
+      throw error;
+    }
+    if (useAiCritic) {
+      try {
+        criticResult = await criticProvider({ command: intake.record, job: job.record, plan: plan.record, execution: workerExecution, root });
+      } catch (error) {
+        recordRunFailure({ error, stage: "critic", status: "needs_revision", relatedArtifacts: [artifact("other", workerExecution.executionPath)] });
+        throw error;
+      }
+      actualCriticCostUsd = calculateAnthropicCostUsd({
+        usage: criticResult.usage,
+        inputCostPerMillionUsd: aiCriticReadiness.inputCostPerMillionUsd,
+        outputCostPerMillionUsd: aiCriticReadiness.outputCostPerMillionUsd
+      });
+      finalizeAnthropicBudgetReservation({ reservation: criticResult.budgetReservation, consumed: true, actualCostUsd: actualCriticCostUsd, root, now });
+      if (actualCriticCostUsd > aiCriticReadiness.approval.budget.maxUsd) throw new Error("AI critic call exceeded the approved budget");
+      totalActualAiCostUsd = Number((actualAiCostUsd + actualWorkerCostUsd + actualCriticCostUsd).toFixed(6));
+      cost = writeCostLedgerRecord({ job: job.record, plan: plan.record, runId, now, estimatedCostUsd: plan.record.estimatedCostUsd, actualCostUsd: totalActualAiCostUsd, usesPaidService: true, usesLiveApi: true, root });
+      criticRecord = writeDeliverableCritique({ job: job.record, plan: plan.record, execution: workerExecution, result: criticResult, approvalId: aiCriticReadiness.approvalId, root, now });
+    }
+    const derivedExecution = deriveExecutionRequest({ command: intake.record, job: job.record, workerExecution, env });
+    let effectiveCommand = intake.record;
+    if (derivedExecution.derived) {
+      effectiveCommand = {
+        ...intake.record,
+        executionRequest: derivedExecution.request,
+        riskLevel: "R3",
+        classification: { ...intake.record.classification, requiresApproval: true, requiresLiveService: true }
+      };
+      writeJson(intake.filePath, effectiveCommand, root);
+    }
     // The dashboard read model is part of local validation. Refresh it after
     // writing cost and execution records so validation evaluates the exact
     // candidate state rather than a stale projection.
     runDashboardBuild(root);
     const validation = runLocalValidation({ root });
-    if (!validation.passed) throw new Error(`AI builder output failed local validation: ${validation.stderr || validation.stdout}`);
+    if (!validation.passed) {
+      const error = new Error(`AI builder output failed local validation: ${validation.stderr || validation.stdout}`);
+      recordRunFailure({ error, stage: "builder-validation", status: "needs_revision", relatedArtifacts: [artifact("other", workerExecution.executionPath)] });
+      throw error;
+    }
+    if (criticRecord?.record.verdict === "needs_revision") {
+      completedJob = {
+        ...job.record,
+        status: "needs_revision",
+        approvalRequired: false,
+        blockedReason: `Independent critic requires revision: ${criticRecord.record.requiredFixes.join("; ")}`,
+        queueTimestamps: { ...job.record.queueTimestamps, runningStartedAt: isoTimestamp(now) },
+        updatedAt: isoTimestamp(now)
+      };
+      writeJson(job.filePath, completedJob, root);
+    } else {
     workerCompletion = writeJobCompletionArtifacts({
       job: job.record,
       plan: plan.record,
@@ -243,22 +347,27 @@ export async function submitOwnerCommand({
       root,
       now
     });
-    const externalGatePending = intake.record.classification?.requiresApproval === true;
+    const qualityPassed = workerCompletion.qualityScore.meetsBar === true && workerCompletion.qualityScore.reviewStatus === "pass";
+    const missingExactExternalRequest = qualityPassed && derivedExecution.adapter.adapterId !== "local-work-product" && !effectiveCommand.executionRequest;
+    const externalGatePending = qualityPassed && !missingExactExternalRequest && effectiveCommand.classification?.requiresApproval === true;
     completedJob = {
       ...job.record,
-      status: externalGatePending ? "waiting_approval" : "done",
+      status: qualityPassed ? (missingExactExternalRequest ? "blocked" : (externalGatePending ? "waiting_approval" : "done")) : "needs_revision",
       approvalRequired: externalGatePending,
       approvalId: aiWorkerReadiness.approvalId,
       ...(externalGatePending ? { blockedReason: "The professional work product is complete; the requested external action still requires a separate exact adapter approval." } : {}),
+      ...(missingExactExternalRequest ? { blockedReason: `External action blocked: ${derivedExecution.blockers.join("; ")}. Use Retry after configuration is available.` } : {}),
+      ...(!qualityPassed ? { blockedReason: `Deterministic quality gate requires revision: score ${workerCompletion.qualityScore.overallScore}/10.` } : {}),
       completionEvidence: workerCompletion.completionEvidence,
       queueTimestamps: {
         ...job.record.queueTimestamps,
         runningStartedAt: isoTimestamp(now),
-        completedAt: isoTimestamp(now)
+        ...(qualityPassed ? { completedAt: isoTimestamp(now) } : {})
       },
       updatedAt: isoTimestamp(now)
     };
     writeJson(job.filePath, completedJob, root);
+    }
   }
   const relatedArtifacts = [
     artifact("other", intake.record.commandIntakeId),
@@ -271,9 +380,12 @@ export async function submitOwnerCommand({
     ...(workerExecution ? [
       artifact("other", workerExecution.executionPath),
       ...workerExecution.workProductPaths.map((reference) => artifact("other", reference)),
-      artifact("other", workerCompletion.qualityScorePath),
-      ...workerCompletion.lessonCandidatePaths.map((reference) => artifact("other", reference)),
-      ...workerCompletion.archetypeProposalPaths.map((reference) => artifact("other", reference))
+      ...(criticRecord ? [artifact("other", criticRecord.recordPath)] : []),
+      ...(workerCompletion ? [
+        artifact("other", workerCompletion.qualityScorePath),
+        ...workerCompletion.lessonCandidatePaths.map((reference) => artifact("other", reference)),
+        ...workerCompletion.archetypeProposalPaths.map((reference) => artifact("other", reference))
+      ] : [])
     ] : [])
   ];
   const audit = writeAuditEventRecord({
@@ -323,11 +435,27 @@ export async function submitOwnerCommand({
         relatedArtifacts: [
           artifact("approval", aiWorkerReadiness.approvalId),
           artifact("other", workerExecution.executionPath),
-          artifact("other", workerCompletion.qualityScorePath)
+          ...(workerCompletion ? [artifact("other", workerCompletion.qualityScorePath)] : []),
+          ...(criticRecord ? [artifact("other", criticRecord.recordPath)] : [])
         ],
         riskLevel: intake.record.riskLevel,
         liveServiceTouched: true,
         notes: `Model ${aiWork.model}; input tokens ${aiWork.usage.input_tokens || 0}; output tokens ${aiWork.usage.output_tokens || 0}; recorded builder cost USD ${actualWorkerCostUsd}.`,
+        now,
+        root
+      })
+    : null;
+  const aiCriticUsageAudit = criticResult
+    ? writeAuditEventRecord({
+        runId: `${runId}-anthropic-critic-use`,
+        eventType: "standing_approval_used",
+        summary: `Scoped approval ${aiCriticReadiness.approvalId} used for one independent Anthropic deliverable critique.`,
+        scope: "anthropic_deliverable_critique",
+        source: "connector_metadata",
+        relatedArtifacts: [artifact("approval", aiCriticReadiness.approvalId), artifact("other", criticRecord.recordPath), artifact("other", cost.record.costLedgerId)],
+        riskLevel: intake.record.riskLevel,
+        liveServiceTouched: true,
+        notes: `Model ${criticResult.model}; verdict ${criticRecord.record.verdict}; input tokens ${criticResult.usage.input_tokens || 0}; output tokens ${criticResult.usage.output_tokens || 0}; recorded critic cost USD ${actualCriticCostUsd}.`,
         now,
         root
       })
@@ -342,7 +470,7 @@ export async function submitOwnerCommand({
     jobId: job.record.jobId,
     planId: plan.record.planId,
     auditId: audit.record.id,
-    approvalRequired: job.record.approvalRequired,
+    approvalRequired: aiWork ? completedJob.approvalRequired : job.record.approvalRequired,
     recordsCreated: [
       boot.filePath,
       intake.filePath,
@@ -353,8 +481,11 @@ export async function submitOwnerCommand({
       ...connectorGates.written.map((item) => item.filePath),
       audit.filePath,
       ...(aiUsageAudit ? [aiUsageAudit.filePath] : []),
-      ...(workerExecution ? [workerExecution.executionPath, ...workerExecution.workProductPaths, workerCompletion.qualityScorePath, ...workerCompletion.lessonCandidatePaths, ...workerCompletion.archetypeProposalPaths] : []),
-      ...(aiWorkerUsageAudit ? [aiWorkerUsageAudit.filePath] : [])
+      ...(workerExecution ? [workerExecution.executionPath, ...workerExecution.workProductPaths] : []),
+      ...(criticRecord ? [criticRecord.recordPath] : []),
+      ...(workerCompletion ? [workerCompletion.qualityScorePath, ...workerCompletion.lessonCandidatePaths, ...workerCompletion.archetypeProposalPaths] : []),
+      ...(aiWorkerUsageAudit ? [aiWorkerUsageAudit.filePath] : []),
+      ...(aiCriticUsageAudit ? [aiCriticUsageAudit.filePath] : [])
     ],
     safety: {
       liveActionExecuted: Boolean(aiPlanning || aiWork),
@@ -380,9 +511,18 @@ export async function submitOwnerCommand({
       actualCostUsd: actualWorkerCostUsd,
       approvalId: aiWorkerReadiness.approvalId,
       workProductPaths: workerExecution.workProductPaths,
-      qualityScorePath: workerCompletion.qualityScorePath,
-      lessonCandidatePaths: workerCompletion.lessonCandidatePaths,
-      archetypeProposalPaths: workerCompletion.archetypeProposalPaths
+      qualityScorePath: workerCompletion?.qualityScorePath || null,
+      lessonCandidatePaths: workerCompletion?.lessonCandidatePaths || [],
+      archetypeProposalPaths: workerCompletion?.archetypeProposalPaths || []
+    } : { used: false },
+    aiCritic: criticResult ? {
+      used: true,
+      model: criticResult.model,
+      verdict: criticRecord.record.verdict,
+      score: criticRecord.record.score,
+      actualCostUsd: actualCriticCostUsd,
+      approvalId: aiCriticReadiness.approvalId,
+      critiquePath: criticRecord.recordPath
     } : { used: false }
   };
   } finally {

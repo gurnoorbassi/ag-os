@@ -146,6 +146,9 @@
             "over_limit",
             "blocked"
           ]
+        },
+        "billingReconciled": {
+          "type": "boolean"
         }
       }
     },

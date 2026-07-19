@@ -1,8 +1,8 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { isoTimestamp, slugify } from "./lib/runtime/common.mjs";
+import { isoTimestamp, slugify, writeJson } from "./lib/runtime/common.mjs";
 
 const ACCEPTED_DIRS = [
   ".codex/memory/accepted",
@@ -20,13 +20,6 @@ const FORBIDDEN_LESSON_PATTERNS = [
 function readJsonFromPath(filePath, root) {
   const absolutePath = path.isAbsolute(filePath) ? filePath : path.join(root, filePath);
   return JSON.parse(readFileSync(absolutePath, "utf8"));
-}
-
-function writeJson(relativePath, record, root) {
-  const absolutePath = path.join(root, relativePath);
-  mkdirSync(path.dirname(absolutePath), { recursive: true });
-  writeFileSync(absolutePath, `${JSON.stringify(record, null, 2)}\n`, "utf8");
-  return absolutePath;
 }
 
 function normalizeReference(filePath, root) {

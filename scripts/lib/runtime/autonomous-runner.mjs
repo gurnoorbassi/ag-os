@@ -3,7 +3,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { writeAuditEventRecord } from "./audit-writer.mjs";
-import { isoTimestamp, readJson, writeJson } from "./common.mjs";
+import { isoTimestamp, readJson, slugify, writeJson } from "./common.mjs";
 import { runLocalValidation } from "./execution-dry-run-processor.mjs";
 import { listExecutionAdapters, selectExecutionAdapter } from "./execution-adapter-registry.mjs";
 import { activeJobApproval } from "./job-approval-service.mjs";
@@ -117,11 +117,12 @@ export function listAutonomousJobs({ root = process.cwd(), env = process.env, li
       qualityScorePath: job.completionEvidence?.qualityScorePath,
       lessonCandidatePaths: job.completionEvidence?.lessonCandidatePaths || [],
       deliverable: jobDeliverableSummary({ job, root }),
+      outcomeRecorded: existsSync(path.join(root, `.codex/outcomes/outcome-${slugify(job.jobId)}.json`)),
       adapter,
       approvalId: job.approvalId,
       approvalValid: approval.valid,
       recovery: job.recovery ?? null,
-      availableRecoveryActions: ["failed", "blocked", "cancelled", "plan_ready"].includes(job.status)
+      availableRecoveryActions: ["failed", "blocked", "cancelled", "needs_revision", "plan_ready"].includes(job.status)
         ? ["retry", "replan"]
         : [],
       availableDecisions: job.status === "waiting_approval"

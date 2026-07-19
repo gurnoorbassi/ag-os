@@ -136,6 +136,7 @@ export async function createAnthropicPlanDraft({
     now
   });
   let response;
+  let providerAcceptedRequest = false;
   try {
     response = await fetchWithTimeout(fetchImpl, `${baseUrl.replace(/\/$/, "")}/v1/messages`, {
     method: "POST",
@@ -148,6 +149,7 @@ export async function createAnthropicPlanDraft({
     }, timeoutMs);
 
     if (!response.ok) throw new Error(`Anthropic planner request failed with HTTP ${response.status}`);
+    providerAcceptedRequest = true;
     const payload = await response.json();
     const text = payload.content?.find((block) => block.type === "text")?.text;
     if (!text) throw new Error("Anthropic planner returned no structured plan");
@@ -160,7 +162,7 @@ export async function createAnthropicPlanDraft({
       budgetReservation
     };
   } catch (error) {
-    finalizeAnthropicBudgetReservation({ reservation: budgetReservation, consumed: false, root, now });
+    finalizeAnthropicBudgetReservation({ reservation: budgetReservation, consumed: providerAcceptedRequest, root, now });
     throw error;
   }
 }

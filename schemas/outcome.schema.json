@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/outcome.schema.json",
+  "title": "AG OS Owner Outcome",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["outcomeId", "jobId", "projectId", "rating", "reason", "acceptedBy", "evidence", "learningUse", "createdAt", "updatedAt"],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../schemas/outcome.schema.json" },
+    "outcomeId": { "type": "string", "pattern": "^outcome-[a-z0-9-]+$" },
+    "jobId": { "type": "string", "pattern": "^job-[a-z0-9-]+$" },
+    "projectId": { "type": "string", "minLength": 1 },
+    "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+    "reason": { "type": "string", "minLength": 3, "maxLength": 1000 },
+    "acceptedBy": { "type": "string", "minLength": 1 },
+    "evidence": { "type": "array", "minItems": 2, "items": { "type": "string", "minLength": 1 } },
+    "learningUse": { "type": "object", "additionalProperties": false, "required": ["eligible", "grantsPermission"], "properties": { "eligible": { "type": "boolean" }, "grantsPermission": { "const": false } } },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

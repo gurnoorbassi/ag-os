@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/deliverable-critique.schema.json",
+  "title": "AG OS Deliverable Critique",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["critiqueId", "jobId", "projectId", "planId", "executionPath", "reviewer", "verdict", "score", "summary", "requirementChecks", "defects", "requiredFixes", "safetyFindings", "authority", "grantsPermission", "createdAt", "updatedAt"],
+  "properties": {
+    "$schema": { "type": "string", "const": "../../schemas/deliverable-critique.schema.json" },
+    "critiqueId": { "type": "string", "pattern": "^deliverable-critique-[a-z0-9-]+$" },
+    "jobId": { "type": "string", "pattern": "^job-[a-z0-9-]+$" },
+    "projectId": { "type": "string", "minLength": 1 },
+    "planId": { "type": "string", "minLength": 1 },
+    "executionPath": { "type": "string", "minLength": 1 },
+    "reviewer": { "type": "object", "additionalProperties": false, "required": ["type", "model", "approvalId"], "properties": { "type": { "const": "independent_anthropic_critic" }, "model": { "type": "string", "minLength": 1 }, "approvalId": { "type": "string", "minLength": 1 } } },
+    "verdict": { "type": "string", "enum": ["pass", "needs_revision"] },
+    "score": { "type": "integer", "minimum": 0, "maximum": 10 },
+    "summary": { "type": "string", "minLength": 1 },
+    "requirementChecks": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["requirement", "met", "evidence"], "properties": { "requirement": { "type": "string" }, "met": { "type": "boolean" }, "evidence": { "type": "string" } } } },
+    "defects": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["severity", "message", "evidence"], "properties": { "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] }, "message": { "type": "string" }, "evidence": { "type": "string" } } } },
+    "requiredFixes": { "type": "array", "items": { "type": "string" } },
+    "safetyFindings": { "type": "array", "items": { "type": "string" } },
+    "authority": { "const": "quality_gate_only" },
+    "grantsPermission": { "const": false },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

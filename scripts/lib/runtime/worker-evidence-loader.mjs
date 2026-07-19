@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { listDirectJson, readJson } from "./common.mjs";
 
 function readAllowedJson({ recordPath, allowedPrefix, root }) {
   const normalized = String(recordPath || "").replaceAll("\\", "/");
@@ -38,10 +39,17 @@ export function loadWorkerEvidence({ plan, root = process.cwd() }) {
       recordPath,
       grantsPermission: false
     }));
+  const outcomes = listDirectJson(".codex/outcomes", { root })
+    .map((recordPath) => ({ recordPath, record: readJson(recordPath, root) }))
+    .filter(({ record }) => record.projectId === plan?.projectId && record.learningUse?.eligible === true && record.learningUse?.grantsPermission === false)
+    .sort((left, right) => Number(right.record.rating) - Number(left.record.rating) || String(right.record.updatedAt).localeCompare(String(left.record.updatedAt)))
+    .slice(0, 3)
+    .map(({ recordPath, record }) => ({ outcomeId: record.outcomeId, rating: record.rating, reason: record.reason, recordPath, grantsPermission: false }));
   return {
     strategy: relevantMemory.strategy || "none",
     lessons,
     examples,
+    outcomes,
     candidatesLoadedAsTruth: false,
     grantsPermission: false
   };

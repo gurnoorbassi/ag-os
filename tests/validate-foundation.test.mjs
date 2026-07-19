@@ -775,11 +775,16 @@ test("validator fails when an enforced schema uses an unsupported structural key
   assert.match(result.output, /unsupported schema keyword \$ref in enforced schema schemas\/cost-ledger\.schema\.json/);
 }));
 
-test("validator warns when format keywords are present but not enforced", () => withTempRepo((root) => {
+test("validator enforces date-time formats on active records", () => withTempRepo((root) => {
+  const recordPath = ".codex/audit/audit-20260703-github-repo-create-executed.json";
+  const record = readJson(root, recordPath);
+  record.occurredAt = "not-a-date";
+  writeJson(root, recordPath, record);
+
   const result = runValidator(root);
 
-  assert.equal(result.status, 0, result.output);
-  assert.match(result.output, /WARN schema format keyword is present but not enforced/);
+  assert.notEqual(result.status, 0);
+  assert.match(result.output, /occurredAt must be an RFC 3339 date-time/);
 }));
 
 test("validator has no orphan state schema with unsupported structural keywords", () => withTempRepo((root) => {

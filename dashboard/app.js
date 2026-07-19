@@ -6,6 +6,9 @@ let runtimeConnected = false;
 let runtimeOperatingSystems = null;
 let runtimeLessonDecisions = null;
 let runtimeSafeguards = null;
+let runtimeProposals = [];
+let runtimeMobileApprovals = null;
+let runtimeAiCritic = null;
 
 function statusClass(value) {
   const normalized = String(value).toLowerCase();
@@ -321,7 +324,7 @@ function renderActivationCenter(connected = false, productionStatus = "private r
 }
 
 const dashboardViews = {
-  home: new Set(["command-center"]),
+  home: new Set(["command-center", "proposals"]),
   projects: new Set(["projects"]),
   work: new Set(["action-queue", "approvals", "connector-proofs"]),
   intelligence: new Set(["quality-review", "unified-memory", "costs", "metrics", "skills"]),
@@ -1499,6 +1502,7 @@ function renderSkills() {
 function renderMetrics() {
   const root = clear("#metrics-panel");
   const metrics = data.metrics;
+  const outcomes = metrics.outcomes ?? { outcomeCount: 0, averageOwnerRating: 0, highRatingCount: 0, lowRatingCount: 0 };
   root.append(
     card({
       title: "Cost Variance",
@@ -1531,6 +1535,13 @@ function renderMetrics() {
         `Plan skill reuse: ${metrics.lessonReuse.skillReuseRatePercent}%`,
         `Skill applications recorded: ${metrics.lessonReuse.skillApplicationsRecorded}`
       ]
+    }),
+    card({
+      title: "Owner Outcomes",
+      status: outcomes.outcomeCount > 0 ? "active" : "zero",
+      metric: outcomes.outcomeCount > 0 ? `${outcomes.averageOwnerRating.toFixed(1)}/5` : "No ratings",
+      detail: `${outcomes.outcomeCount} owner-rated result(s) feed project-specific future work.`,
+      meta: [`High ratings: ${outcomes.highRatingCount}`, `Low ratings: ${outcomes.lowRatingCount}`, "Ratings are evidence, never permission."]
     }),
     card({
       title: "Scaled operations",
@@ -1685,6 +1696,50 @@ function renderRuntimeJobs(jobs = []) {
   ));
 }
 
+function renderProposals(proposals = []) {
+  const root = clear("#proposal-panel");
+  const pending = proposals.filter((proposal) => proposal.status === "proposed");
+  if (!runtimeConnected) {
+    const message = document.createElement("p");
+    message.textContent = "Sign in to load recommendations from the live runtime.";
+    root.append(message);
+    return;
+  }
+  if (pending.length === 0) {
+    const message = document.createElement("p");
+    message.textContent = "No recommended work is waiting. AG OS will add suggestions when its records show a concrete next action.";
+    root.append(message);
+    return;
+  }
+  root.append(table(["Priority", "Recommendation", "Why", "Decision"], pending.map((proposal) => {
+    const actions = document.createElement("div");
+    actions.className = "job-actions";
+    for (const decision of ["accept", "reject"]) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = decision === "accept" ? "job-approve" : "job-reject";
+      button.textContent = decision === "accept" ? "Start this" : "Dismiss";
+      button.addEventListener("click", () => decideProposalRecommendation(proposal, decision, button));
+      actions.append(button);
+    }
+    return [pill(proposal.priority), labelStack(proposal.title, proposal.source?.type), proposal.reason, actions];
+  })));
+}
+
+async function decideProposalRecommendation(proposal, decision, button) {
+  if (!window.confirm(`${decision === "accept" ? "Create a normal AG OS command from" : "Dismiss"} ${proposal.proposalId}? No downstream approval is implied.`)) return;
+  button.disabled = true;
+  try {
+    const { response, result } = await runtimeRequest(`/api/v1/proposals/${encodeURIComponent(proposal.proposalId)}/decision`, { method: "POST", body: JSON.stringify({ decision, confirmation: `${decision.toUpperCase()} ${proposal.proposalId}` }) });
+    if (!response.ok) throw new Error(result.detail || result.error || "Proposal decision failed");
+    setRuntimeStatus(decision === "accept" ? `Started ${result.commandResult.jobId} through the normal gated command path.` : `Dismissed ${proposal.proposalId}.`, true);
+    await connectRuntime();
+  } catch (error) {
+    setRuntimeStatus(`Proposal decision stopped: ${error.message}`, true);
+    button.disabled = false;
+  }
+}
+
 function deliverableControls(job) {
   const wrapper = document.createElement("div");
   wrapper.className = "job-actions";
@@ -1698,7 +1753,35 @@ function deliverableControls(job) {
   open.textContent = job.deliverable.ownerUsable ? "Open result" : "View plan";
   open.addEventListener("click", () => openJobDeliverable(job));
   wrapper.append(summary, open);
+  if (job.deliverable.ownerUsable) {
+    const rate = document.createElement("button");
+    rate.type = "button";
+    rate.className = "secondary-action";
+    rate.textContent = job.outcomeRecorded ? "Outcome recorded" : "Rate result";
+    rate.disabled = job.outcomeRecorded === true;
+    rate.addEventListener("click", () => recordOutcome(job, rate));
+    wrapper.append(rate);
+  }
   return wrapper;
+}
+
+async function recordOutcome(job, button) {
+  const raw = window.prompt("Rate this result from 1 to 5:", "5");
+  if (raw === null) return;
+  const rating = Number(raw);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) return setRuntimeStatus("Rating must be a whole number from 1 to 5.", true);
+  const reason = window.prompt("In one line, what worked or what should improve?");
+  if (!reason) return;
+  button.disabled = true;
+  try {
+    const { response, result } = await runtimeRequest(`/api/v1/jobs/${encodeURIComponent(job.jobId)}/outcome`, { method: "POST", body: JSON.stringify({ rating, reason, confirmation: `RATE ${job.jobId} ${rating}` }) });
+    if (!response.ok) throw new Error(result.detail || result.error || "Outcome was not recorded");
+    setRuntimeStatus(`Recorded ${rating}/5 for ${job.jobId}. Future work in this project can use it as evidence, never permission.`, true);
+    await connectRuntime();
+  } catch (error) {
+    setRuntimeStatus(`Outcome stopped: ${error.message}`, true);
+    button.disabled = false;
+  }
 }
 
 function inlineWebsitePreview(deliverable) {
@@ -1796,7 +1879,34 @@ function runtimeJobDecisionControls(job) {
     button.addEventListener("click", () => decideRuntimeJob(job, decision, button));
     actions.append(button);
   }
+  if (job.status === "waiting_approval") {
+    const mobile = document.createElement("button");
+    mobile.type = "button";
+    mobile.className = "secondary-action";
+    mobile.textContent = "Phone link";
+    mobile.disabled = runtimeMobileApprovals?.ready !== true;
+    mobile.title = runtimeMobileApprovals?.ready ? "Create a signed 15-minute one-tap decision link" : (runtimeMobileApprovals?.blockers || []).join("; ");
+    mobile.addEventListener("click", () => createPhoneDecisionLink(job, mobile));
+    actions.append(mobile);
+  }
   return actions;
+}
+
+async function createPhoneDecisionLink(job, button) {
+  button.disabled = true;
+  try {
+    const { response, result } = await runtimeRequest(`/api/v1/jobs/${encodeURIComponent(job.jobId)}/mobile-approval`, { method: "POST", body: "{}" });
+    if (!response.ok) throw new Error(result.detail || result.error || "Phone link could not be created");
+    if (result.delivery?.sent) {
+      setRuntimeStatus(`Secure decision notification sent for ${job.jobId}. It expires at ${new Date(result.expiresAt).toLocaleTimeString()} and works once.`, true);
+    } else {
+      await navigator.clipboard.writeText(result.link);
+      setRuntimeStatus(`Signed link for ${job.jobId} copied. It expires at ${new Date(result.expiresAt).toLocaleTimeString()} and works once.`, true);
+    }
+  } catch (error) {
+    setRuntimeStatus(`Phone link stopped: ${error.message}`, true);
+    button.disabled = false;
+  }
 }
 
 async function recoverRuntimeJob(job, action, button) {
@@ -1891,12 +2001,16 @@ async function connectRuntime(options = {}) {
     runtimeSafeguards = result.safeguards;
     runtimeOperatingSystems = result.operatingSystems;
     runtimeLessonDecisions = result.lessonDecisions;
+    runtimeProposals = result.proposals || [];
+    runtimeMobileApprovals = result.mobileApprovals;
+    runtimeAiCritic = result.aiCritic;
     document.querySelector("#worker-routing-help").textContent = runtimeAiWorker?.ready
       ? `Professional builder ${runtimeAiWorker.model} is ready. AG OS automatically uses it when the outcome requires files; every paid use remains costed and approval-limited.`
       : `Planning is available, but real file generation needs builder activation. AG OS will stop with a clear setup message instead of claiming a plan is a finished product.`;
     renderActivationCenter(true, result.runtimeDeployment?.status || "live_private", runtimeAiPlanner, runtimeAiWorker);
     renderRecentCommands(result.recentCommands);
     renderRuntimeJobs(result.jobs);
+    renderProposals(runtimeProposals);
     renderProjects(result.projects);
     renderOperatingSystems(runtimeOperatingSystems);
     renderUnifiedMemory(runtimeLessonDecisions);
@@ -1971,6 +2085,7 @@ function initializeCommandCenter() {
   });
   renderRecentCommands();
   renderRuntimeJobs();
+  renderProposals();
   connectRuntime({ restoring: true });
 }
 

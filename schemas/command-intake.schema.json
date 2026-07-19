@@ -206,17 +206,22 @@
       "additionalProperties": false,
       "required": ["adapterId", "operation"],
       "properties": {
-        "adapterId": { "type": "string", "enum": ["github-draft-pr", "n8n-disabled-workflow", "netlify-staging"] },
-        "operation": { "type": "string", "enum": ["create_draft_pr", "create_disabled_workflow", "create_draft_deploy"] },
+        "adapterId": { "type": "string", "enum": ["github-private-repository", "github-draft-pr", "n8n-disabled-workflow", "n8n-workflow-control", "netlify-staging", "netlify-continuous-deployment", "production-deployment", "social-publishing", "dns-change"] },
+        "operation": { "type": "string", "enum": ["create_private_repository", "create_draft_pr", "create_disabled_workflow", "activate_workflow", "deactivate_workflow", "create_draft_deploy", "link_github_repository", "deploy_exact_commit", "publish_instagram_image", "upsert_cloudflare_record"] },
         "repository": {
-          "type": "object",
+          "type": ["object", "string"],
           "additionalProperties": false,
-          "required": ["owner", "name"],
           "properties": {
             "owner": { "type": "string", "minLength": 1 },
-            "name": { "type": "string", "minLength": 1 }
+            "name": { "type": "string", "minLength": 1 },
+            "id": { "type": "integer", "minimum": 1 },
+            "private": { "type": "boolean" },
+            "installationId": { "type": "integer", "minimum": 1 }
           }
         },
+        "projectId": { "type": "string", "minLength": 1 },
+        "projectRecordPath": { "type": "string", "pattern": "^\\.codex/projects/[a-z0-9-]+\\.json$" },
+        "description": { "type": "string", "maxLength": 350 },
         "baseBranch": { "type": "string", "minLength": 1 },
         "expectedBaseCommit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
         "branch": { "type": "string", "pattern": "^codex/[A-Za-z0-9][A-Za-z0-9._/-]*$" },
@@ -237,7 +242,42 @@
           }
         },
         "siteId": { "type": "string", "pattern": "^[A-Za-z0-9-]{3,80}$" },
-        "draft": { "type": "boolean", "const": true }
+        "siteName": { "type": "string", "minLength": 1 },
+        "draft": { "type": "boolean", "const": true },
+        "buildCommand": { "type": "string", "minLength": 1 },
+        "publishDirectory": { "type": "string", "minLength": 1 },
+        "stopBuilds": { "type": "boolean", "const": true },
+        "workflowId": { "type": "string", "minLength": 1 },
+        "expectedWorkflowName": { "type": "string", "minLength": 1 },
+        "expectedWorkflowDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "profileId": { "type": "string", "minLength": 1 },
+        "commitSha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "targetEnvironment": { "type": "string", "const": "production" },
+        "expectedService": { "type": "string", "minLength": 1 },
+        "jobId": { "type": "string", "minLength": 1 },
+        "approvalId": { "type": "string", "minLength": 1 },
+        "graphBaseUrl": { "type": "string", "pattern": "^https://graph\\.facebook\\.com/v[0-9]+\\.[0-9]+$" },
+        "accountId": { "type": "string", "pattern": "^[0-9]{5,40}$" },
+        "expectedUsername": { "type": "string", "minLength": 1 },
+        "mediaUrl": { "type": "string", "pattern": "^https://" },
+        "caption": { "type": "string", "minLength": 1, "maxLength": 2200 },
+        "contentDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "zoneId": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+        "recordId": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+        "recordDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "record": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "name", "content"],
+          "properties": {
+            "type": { "type": "string", "enum": ["A", "AAAA", "CNAME", "TXT", "MX", "CAA"] },
+            "name": { "type": "string", "minLength": 1 },
+            "content": { "type": "string", "minLength": 1 },
+            "ttl": { "type": "integer", "minimum": 1, "maximum": 86400 },
+            "proxied": { "type": "boolean" },
+            "priority": { "type": "integer", "minimum": 0, "maximum": 65535 }
+          }
+        }
       }
     },
     "plannedOutput": {

@@ -12,6 +12,8 @@ import { submitOwnerCommand } from "../scripts/lib/runtime/live-command-service.
 import { executeGitHubDraftPr, validateGitHubDraftPrRequest } from "../scripts/lib/runtime/github-draft-pr-adapter.mjs";
 import { validateN8nDisabledWorkflowRequest } from "../scripts/lib/runtime/n8n-disabled-workflow-adapter.mjs";
 import { validateNetlifyStagingRequest } from "../scripts/lib/runtime/netlify-staging-adapter.mjs";
+import { recordJobOutcome } from "../scripts/lib/runtime/outcome-feedback-service.mjs";
+import { loadWorkerEvidence } from "../scripts/lib/runtime/worker-evidence-loader.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BASE_SHA = "a".repeat(40);
@@ -115,6 +117,83 @@ test("exact owner approval requeues one job but an unavailable live adapter rema
     now: new Date("2026-07-13T23:23:00.000Z")
   });
   assert.equal(rejected.job.status, "cancelled");
+});
+
+test("full autonomy proof builds, independently reviews, deploys an exact commit, verifies, scores, learns, and returns an owner result", async () => {
+  const workspace = tempWorkspace();
+  const command = await submitOwnerCommand({
+    command: "Build and deploy the exact approved AG OS candidate to production",
+    projectId: "project-quote-builder",
+    executionRequest: DEPLOYMENT_REQUEST,
+    useAiWorker: true,
+    aiWorkerReadiness: { ready: true, approvalId: "approval-20260719-builder-proof", approval: { budget: { maxUsd: 0.25 } }, inputCostPerMillionUsd: 2, outputCostPerMillionUsd: 10, blockers: [] },
+    aiCriticReadiness: { ready: true, required: true, approvalId: "approval-20260719-critic-proof", approval: { budget: { maxUsd: 0.25 } }, inputCostPerMillionUsd: 1, outputCostPerMillionUsd: 5, blockers: [] },
+    workProductProvider: async () => ({ workProduct: { summary: "Verified deployment candidate", files: [{ path: "index.html", content: "<!doctype html><html><title>AG OS proof</title><main>Owner-ready</main></html>", purpose: "Accessible proof result" }], validationNotes: ["HTML entry exists"], qualityEvidence: ["Owner-ready index.html generated"] }, model: "builder-proof", usage: { input_tokens: 100, output_tokens: 100 } }),
+    criticProvider: async () => ({ critique: { verdict: "pass", score: 9, summary: "The result is complete and owner-usable.", requirementChecks: [{ requirement: "Owner-ready output", met: true, evidence: "index.html" }], defects: [], requiredFixes: [], safetyFindings: [] }, model: "critic-proof", usage: { input_tokens: 100, output_tokens: 50 } }),
+    root: workspace,
+    now: new Date("2026-07-19T20:00:00.000Z")
+  });
+  assert.equal(command.status, "waiting_approval");
+  assert.equal(command.aiCritic.verdict, "pass");
+  decideJob({ jobId: command.jobId, decision: "approve", confirmation: `APPROVE ${command.jobId}`, root: workspace, now: new Date("2026-07-19T20:01:00.000Z") });
+  const response = {
+    status: "succeeded", profileId: "ag-os-coordinator", repository: "gurnoorbassi/ag-os", verifiedCommit: BASE_SHA,
+    expectedService: "ag-os-coordinator", backupId: "backup-proof", rollbackAvailable: true,
+    deploymentId: "deployment-runtime-full-autonomy-proof", health: { ok: true, checkedAt: "2026-07-19T20:02:00.000Z" }
+  };
+  const deployed = await processAutonomousJob({
+    jobId: command.jobId,
+    root: workspace,
+    env: { AG_OS_LIVE_ADAPTERS_ENABLED: "true", AG_OS_DEPLOYMENT_RUNNER_TOKEN: "configured", AG_OS_DEPLOYMENT_RUNNER_URL: "http://127.0.0.1:8790" },
+    deploymentFetch: async () => ({ ok: true, status: 200, json: async () => response }),
+    runValidation: false,
+    now: new Date("2026-07-19T20:02:00.000Z")
+  });
+  assert.equal(deployed.status, "done", deployed.error);
+  assert.equal(deployed.record.health.ok, true);
+  assert.ok(deployed.job.completionEvidence.qualityScorePath);
+  assert.ok(deployed.job.completionEvidence.lessonCandidatePaths.length > 0);
+  const outcome = recordJobOutcome({ jobId: command.jobId, rating: 5, reason: "Deployment and accessible result verified.", confirmation: `RATE ${command.jobId} 5`, root: workspace, now: new Date("2026-07-19T20:03:00.000Z") });
+  assert.equal(outcome.record.rating, 5);
+  const futureEvidence = loadWorkerEvidence({ plan: { projectId: "project-quote-builder", basis: { relevantMemory: {} } }, root: workspace });
+  assert.equal(futureEvidence.outcomes.some((item) => item.outcomeId === outcome.record.outcomeId), true);
+});
+
+test("one plain owner command derives and completes an approved Netlify draft preview without owner tool configuration", async () => {
+  const workspace = tempWorkspace();
+  const command = await submitOwnerCommand({
+    command: "Build a professional landing page and deploy a Netlify preview",
+    projectId: "project-quote-builder",
+    useAiWorker: true,
+    aiWorkerReadiness: { ready: true, approvalId: "approval-20260719-builder-proof", approval: { budget: { maxUsd: 0.25 } }, inputCostPerMillionUsd: 2, outputCostPerMillionUsd: 10, blockers: [] },
+    aiCriticReadiness: { ready: true, required: true, approvalId: "approval-20260719-critic-proof", approval: { budget: { maxUsd: 0.25 } }, inputCostPerMillionUsd: 1, outputCostPerMillionUsd: 5, blockers: [] },
+    workProductProvider: async () => ({ workProduct: { summary: "Owner-ready landing page", files: [{ path: "index.html", content: "<!doctype html><html><title>Owner preview</title><main>Ready</main></html>", purpose: "Accessible preview" }], validationNotes: ["HTML entry exists"], qualityEvidence: ["Owner-ready index.html generated"] }, model: "builder-proof", usage: { input_tokens: 100, output_tokens: 100 } }),
+    criticProvider: async () => ({ critique: { verdict: "pass", score: 9, summary: "The preview is owner-usable.", requirementChecks: [{ requirement: "Landing page", met: true, evidence: "index.html" }], defects: [], requiredFixes: [], safetyFindings: [] }, model: "critic-proof", usage: { input_tokens: 100, output_tokens: 50 } }),
+    env: { AG_OS_NETLIFY_PREVIEW_SITE_ID: "site-owner-preview" },
+    root: workspace,
+    now: new Date("2026-07-19T21:00:00.000Z")
+  });
+  assert.equal(command.status, "waiting_approval");
+  const intakePath = command.recordsCreated.find((item) => item.includes(".codex/commands/"));
+  const intake = JSON.parse(readFileSync(path.join(workspace, intakePath), "utf8"));
+  assert.equal(intake.executionRequest.adapterId, "netlify-staging");
+  assert.equal(intake.executionRequest.siteId, "site-owner-preview");
+  assert.equal(intake.executionRequest.draft, true);
+  decideJob({ jobId: command.jobId, decision: "approve", confirmation: `APPROVE ${command.jobId}`, root: workspace, now: new Date("2026-07-19T21:01:00.000Z") });
+  const completed = await processAutonomousJob({
+    jobId: command.jobId, root: workspace,
+    env: { AG_OS_LIVE_ADAPTERS_ENABLED: "true", [["AG_OS", "NETLIFY", "TOKEN"].join("_")]: "configured" },
+    netlifyFetch: async (_url, options) => options.method === "POST"
+      ? { ok: true, status: 200, json: async () => ({ id: "deploy-owner-proof", site_id: "site-owner-preview", draft: true, required: [] }) }
+      : { ok: true, status: 200, json: async () => ({ id: "deploy-owner-proof", site_id: "site-owner-preview", draft: true, state: "ready", deploy_ssl_url: "https://deploy-owner-proof--preview.netlify.app", published_at: null }) },
+    runValidation: false,
+    now: new Date("2026-07-19T21:02:00.000Z")
+  });
+  assert.equal(completed.status, "done", completed.error);
+  assert.equal(completed.record.result.deployUrl, "https://deploy-owner-proof--preview.netlify.app");
+  assert.equal(completed.record.result.draft, true);
+  assert.ok(completed.job.completionEvidence.qualityScorePath);
+  assert.ok(completed.job.completionEvidence.lessonCandidatePaths.length > 0);
 });
 
 test("connector adapter registry reports credential and implementation blockers without exposing values", () => {

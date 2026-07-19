@@ -63,7 +63,11 @@ export function computeOperationalMetrics({ root = process.cwd() } = {}) {
   const scores = records(".codex/quality-scores", root, "quality-score-")
     .filter((score) => typeof score.overallScore === "number")
     .sort((left, right) => String(left.updatedAt ?? left.createdAt ?? "").localeCompare(String(right.updatedAt ?? right.createdAt ?? "")));
-  const critiques = records(".codex/critiques", root, "critique-");
+  const critiques = [
+    ...records(".codex/critiques", root, "critique-"),
+    ...records(".codex/deliverable-critiques", root, "deliverable-critique-")
+  ];
+  const outcomes = records(".codex/outcomes", root, "outcome-");
   const jobs = records(".codex/jobs", root, "job-");
   const plans = records(".codex/plans", root, "plan-");
   const acceptedLessons = [
@@ -74,9 +78,13 @@ export function computeOperationalMetrics({ root = process.cwd() } = {}) {
   const projectRegistry = readJson(".codex/projects/registry.json", root);
   const registeredProjectIds = new Set((projectRegistry.projects ?? []).map((project) => project.projectId));
   const acceptedLessonIds = new Set(acceptedLessons.map((lesson) => lesson.lessonId));
+  const operationalCosts = costs.filter((ledger) =>
+    !ledger.costLedgerId?.startsWith("cost-ledger-anthropic-call-") &&
+    !ledger.costLedgerId?.startsWith("cost-ledger-anthropic-budget-blocked-")
+  );
 
-  const estimatedUsd = costs.reduce((sum, ledger) => sum + Number(ledger.summary?.estimatedTaskCostUsd ?? 0), 0);
-  const actualUsd = costs.reduce((sum, ledger) => sum + Number(ledger.summary?.actualTaskCostUsd ?? 0), 0);
+  const estimatedUsd = operationalCosts.reduce((sum, ledger) => sum + Number(ledger.summary?.estimatedTaskCostUsd ?? 0), 0);
+  const actualUsd = operationalCosts.reduce((sum, ledger) => sum + Number(ledger.summary?.actualTaskCostUsd ?? 0), 0);
   const qualityValues = scores.map((score) => score.overallScore);
   const recentValues = qualityValues.slice(-5);
   const priorValues = qualityValues.slice(-10, -5);
@@ -113,6 +121,12 @@ export function computeOperationalMetrics({ root = process.cwd() } = {}) {
       requiredFixCount: critiques.reduce((sum, critique) => sum + (critique.requiredFixes ?? []).length, 0),
       failedJobCount: jobs.filter((job) => job.status === "failed").length,
       reworkSignalRatePercent: critiques.length === 0 ? 0 : round((critiquesWithRequiredFixes.length / critiques.length) * 100)
+    },
+    outcomes: {
+      outcomeCount: outcomes.length,
+      averageOwnerRating: average(outcomes.map((outcome) => outcome.rating)),
+      highRatingCount: outcomes.filter((outcome) => Number(outcome.rating) >= 4).length,
+      lowRatingCount: outcomes.filter((outcome) => Number(outcome.rating) <= 2).length
     },
     lessonReuse: {
       acceptedLessonCount: acceptedLessons.length,

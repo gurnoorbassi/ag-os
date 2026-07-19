@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
 import path from "node:path";
 import process from "node:process";
 
@@ -53,8 +54,19 @@ export function listDirectJson(relativeDir, options = {}) {
 }
 
 export function writeJson(relativePath, record, root = process.cwd()) {
+  return writeText(relativePath, `${JSON.stringify(record, null, 2)}\n`, root);
+}
+
+export function writeText(relativePath, content, root = process.cwd()) {
   const targetPath = resolveWorkspacePath(relativePath, root);
   mkdirSync(path.dirname(targetPath), { recursive: true });
-  writeFileSync(targetPath, `${JSON.stringify(record, null, 2)}\n`, "utf8");
+  const temporaryPath = `${targetPath}.${process.pid}.${randomUUID()}.tmp`;
+  try {
+    writeFileSync(temporaryPath, content, { encoding: "utf8", flush: true });
+    renameSync(temporaryPath, targetPath);
+  } catch (error) {
+    rmSync(temporaryPath, { force: true });
+    throw error;
+  }
   return targetPath;
 }

@@ -1541,3 +1541,26 @@ summary:focus-visible {
     width: 100%;
   }
 }
+
+.mobile-decision-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 20px;
+  background: var(--background);
+}
+
+.mobile-decision-card {
+  width: min(100%, 520px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.mobile-decision-card h1 { font-size: 30px; }
+.mobile-decision-card > p { color: var(--muted); line-height: 1.55; }
+.mobile-decision-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 24px 0; }
+.mobile-decision-actions button { border: 1px solid var(--blue); border-radius: var(--radius); padding: 14px; color: #21170f; background: #dfa078; font: inherit; font-weight: 750; }
+.mobile-decision-actions .job-reject { border-color: rgba(201, 150, 144, 0.45); color: #e4aaa2; background: rgba(201, 150, 144, 0.09); }

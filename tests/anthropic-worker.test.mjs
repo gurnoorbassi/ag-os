@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { cpSync, existsSync, mkdtempSync, readFileSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -251,7 +251,7 @@ test("owner command closes the real file, score, lesson, cost, and audit loop wi
   assert.equal(JSON.parse(readFileSync(path.join(root, usageAudit), "utf8")).eventType, "standing_approval_used");
 });
 
-test("builder completion never bypasses a separate external-action approval gate", async () => {
+test("builder completion blocks ambiguous external action details instead of creating an unusable approval", async () => {
   const root = tempWorkspace();
   const result = await submitOwnerCommand({
     command: "Build and deploy a private operations dashboard to production",
@@ -273,12 +273,71 @@ test("builder completion never bypasses a separate external-action approval gate
     root,
     now: new Date("2026-07-13T18:40:00.000Z")
   });
-  assert.equal(result.status, "waiting_approval");
+  assert.equal(result.status, "blocked");
   const job = JSON.parse(readFileSync(path.join(root, `.codex/jobs/${result.jobId}.json`), "utf8"));
-  assert.equal(job.status, "waiting_approval");
-  assert.equal(job.approvalRequired, true);
-  assert.match(job.blockedReason, /separate exact adapter approval/);
+  assert.equal(job.status, "blocked");
+  assert.equal(job.approvalRequired, false);
+  assert.match(job.blockedReason, /could not be safely derived/);
   assert.ok(job.completionEvidence.qualityScorePath);
+});
+
+test("independent critic blocks a builder result from marking itself complete", async () => {
+  const root = tempWorkspace();
+  const result = await submitOwnerCommand({
+    command: "Build a private operations dashboard",
+    projectId: "project-quote-builder",
+    useAiWorker: true,
+    aiWorkerReadiness: {
+      ready: true, approvalId: "approval-20260713-anthropic-builder-test", approval: { budget: { maxUsd: 0.25 } }, inputCostPerMillionUsd: 2, outputCostPerMillionUsd: 10, blockers: []
+    },
+    aiCriticReadiness: {
+      ready: true, required: true, approvalId: "approval-20260719-anthropic-critic-test", approval: { budget: { maxUsd: 0.25 } }, inputCostPerMillionUsd: 1, outputCostPerMillionUsd: 5, blockers: []
+    },
+    workProductProvider: async () => ({ workProduct: safeWorkProduct(), model: "builder-model", usage: { input_tokens: 100, output_tokens: 100 } }),
+    criticProvider: async () => ({ critique: { verdict: "needs_revision", score: 6, summary: "Navigation is incomplete.", requirementChecks: [], defects: [{ severity: "high", message: "Missing navigation", evidence: "index.html" }], requiredFixes: ["Add working navigation."], safetyFindings: [] }, model: "critic-model", usage: { input_tokens: 100, output_tokens: 50 } }),
+    root,
+    now: new Date("2026-07-19T18:30:00.000Z")
+  });
+  assert.equal(result.status, "needs_revision");
+  assert.equal(result.aiCritic.verdict, "needs_revision");
+  assert.equal(result.aiWorker.qualityScorePath, null);
+  const job = JSON.parse(readFileSync(path.join(root, `.codex/jobs/${result.jobId}.json`), "utf8"));
+  assert.equal(job.status, "needs_revision");
+  assert.match(job.blockedReason, /Add working navigation/);
+});
+
+test("required independent critic fails closed before builder spending when not ready", async () => {
+  const root = tempWorkspace();
+  let builderCalled = false;
+  await assert.rejects(() => submitOwnerCommand({
+    command: "Build a private operations dashboard",
+    projectId: "project-quote-builder",
+    useAiWorker: true,
+    aiWorkerReadiness: { ready: true, approvalId: "approval-builder", approval: { budget: { maxUsd: 0.25 } }, inputCostPerMillionUsd: 2, outputCostPerMillionUsd: 10, blockers: [] },
+    aiCriticReadiness: { ready: false, required: true, blockers: ["critic approval missing"] },
+    workProductProvider: async () => { builderCalled = true; return { workProduct: safeWorkProduct(), model: "builder", usage: {} }; },
+    root
+  }), /Independent critic is required but not ready/);
+  assert.equal(builderCalled, false);
+});
+
+test("a builder provider failure becomes a recoverable failed job instead of remaining queued", async () => {
+  const root = tempWorkspace();
+  await assert.rejects(() => submitOwnerCommand({
+    command: "Build a private operations dashboard",
+    projectId: "project-quote-builder",
+    useAiWorker: true,
+    aiWorkerReadiness: { ready: true, approvalId: "approval-builder-failure", approval: { budget: { maxUsd: 0.25 } }, inputCostPerMillionUsd: 2, outputCostPerMillionUsd: 10, blockers: [] },
+    workProductProvider: async () => { throw new Error("provider unavailable"); },
+    root,
+    now: new Date("2026-07-19T19:00:00.000Z")
+  }), /provider unavailable/);
+  const jobs = readdirSync(path.join(root, ".codex/jobs")).filter((name) => name.startsWith("job-runtime-operator-") && name.endsWith(".json"));
+  assert.equal(jobs.length, 1);
+  const job = JSON.parse(readFileSync(path.join(root, ".codex/jobs", jobs[0]), "utf8"));
+  assert.equal(job.status, "failed");
+  assert.match(job.blockedReason, /builder failed closed/);
+  assert.equal(job.approvalRequired, false);
 });
 
 test("concurrent paid calls cannot consume the same approval before its usage audit is written", async () => {
