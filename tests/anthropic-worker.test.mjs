@@ -182,6 +182,31 @@ test("website work products require a previewable root entry file", () => {
   assert.doesNotThrow(() => assertWorkProductMatchesCommand({ command: { rawCommand: "Build a polished website" }, workProduct: website }));
 });
 
+test("website work products allow only a safe root static netlify.toml", () => {
+  const website = safeWorkProduct();
+  website.files[0].path = "index.html";
+  website.files.push({
+    path: "netlify.toml",
+    content: `[build]\npublish = "."\n\n[[headers]]\nfor = "/*"\n[headers.values]\nX-Content-Type-Options = "nosniff"\n`,
+    purpose: "Static draft-preview configuration"
+  });
+  assert.doesNotThrow(() => assertWorkProductShape(website));
+
+  for (const [filePath, content, expected] of [
+    ["config/netlify.toml", `[build]\npublish = "."`, /limited to a root netlify\.toml/],
+    ["other.toml", `[build]\npublish = "."`, /limited to a root netlify\.toml/],
+    ["netlify.toml", `[build]\ncommand = "npm run build"\npublish = "."`, /build setting is not allowed/],
+    ["netlify.toml", `[build]\npublish = "..\/public"`, /publish path must be the artifact root/],
+    ["netlify.toml", `[build]\npublish = "."\n\n[[headers]]\n[headers.values]\nCache-Control = "public"`, /requires a preceding headers for path/],
+    ["netlify.toml", `[build]\npublish = "."\n\n[[plugins]]\npackage = "unsafe"`, /section is not allowed/]
+  ]) {
+    assert.throws(() => assertWorkProductShape({
+      ...safeWorkProduct(),
+      files: [{ path: filePath, content, purpose: "invalid Netlify configuration" }]
+    }), expected);
+  }
+});
+
 test("Anthropic worker cannot write paid work-product evidence without an exact approval id", () => {
   const root = tempWorkspace();
   const options = {

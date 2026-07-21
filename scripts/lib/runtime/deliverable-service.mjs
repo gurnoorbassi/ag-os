@@ -5,7 +5,7 @@ import { readJson, slugify } from "./common.mjs";
 
 const MAX_FILES = 50;
 const MAX_TOTAL_BYTES = 2_000_000;
-const TEXT_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".svg", ".txt", ".xml", ".yaml", ".yml"]);
+const TEXT_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".svg", ".toml", ".txt", ".xml", ".yaml", ".yml"]);
 
 function safeJobId(jobId) {
   const value = String(jobId || "");
@@ -26,7 +26,9 @@ function collectTextFiles(absoluteRoot) {
         walk(absolute, relative);
         continue;
       }
-      if (!entry.isFile() || !TEXT_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) continue;
+      const extension = path.extname(entry.name).toLowerCase();
+      if (!entry.isFile() || !TEXT_EXTENSIONS.has(extension)) continue;
+      if (extension === ".toml" && relative !== "netlify.toml") continue;
       totalBytes += stat.size;
       if (totalBytes > MAX_TOTAL_BYTES) throw new Error(`deliverable exceeds ${MAX_TOTAL_BYTES} bytes`);
       if (files.length >= MAX_FILES) throw new Error(`deliverable exceeds ${MAX_FILES} files`);

@@ -6,10 +6,11 @@ import { loadWorkerEvidence } from "./worker-evidence-loader.mjs";
 import { finalizeAnthropicBudgetReservation, reserveAnthropicBudget } from "./anthropic-budget-guard.mjs";
 import { fetchWithTimeout } from "./fetch-with-timeout.mjs";
 import { writeAnthropicApprovalUse } from "./anthropic-usage-audit.mjs";
+import { assertSafeStaticNetlifyToml } from "./static-netlify-config.mjs";
 
 const DEFAULT_BASE_URL = "https://api.anthropic.com";
 const ANTHROPIC_VERSION = "2023-06-01";
-const ALLOWED_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".svg", ".txt", ".xml", ".yaml", ".yml"]);
+const ALLOWED_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".svg", ".toml", ".txt", ".xml", ".yaml", ".yml"]);
 const MAX_FILES = 20;
 const MAX_FILE_BYTES = 200_000;
 const MAX_TOTAL_BYTES = 1_000_000;
@@ -75,6 +76,7 @@ export function assertWorkProductShape(workProduct) {
     if (bytes > MAX_FILE_BYTES) throw new Error(`worker artifact exceeds ${MAX_FILE_BYTES} bytes: ${safePath}`);
     totalBytes += bytes;
     if (path.posix.extname(safePath).toLowerCase() === ".json") JSON.parse(file.content);
+    if (path.posix.extname(safePath).toLowerCase() === ".toml") assertSafeStaticNetlifyToml({ filePath: safePath, content: file.content });
   }
   if (totalBytes > MAX_TOTAL_BYTES) throw new Error(`worker artifacts exceed ${MAX_TOTAL_BYTES} total bytes`);
   if (!Array.isArray(workProduct.qualityEvidence) || workProduct.qualityEvidence.length === 0) throw new Error("worker quality evidence is required");
