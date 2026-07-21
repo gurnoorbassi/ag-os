@@ -83,7 +83,13 @@
         </header>
         <div id="keep-world" class="keep-world" aria-label="AG OS operational world"></div>
         <div id="keep-overlay" class="keep-overlay" hidden aria-live="polite"></div>
-        <div class="keep-quest-placeholder" aria-label="Quest command arrives with live wiring"><span>❯</span><span>issue a build quest…</span></div>
+        <form id="keep-quest-form" class="keep-quest" aria-label="Issue an AG OS quest">
+          <span aria-hidden="true">❯</span>
+          <label class="visually-hidden" for="keep-quest-command">Issue a build quest</label>
+          <input id="keep-quest-command" maxlength="10000" autocomplete="off" placeholder="issue a build quest…" required>
+          <select id="keep-quest-project" aria-label="Quest workspace"><option value="project-one-off">one-off work</option></select>
+          <button type="submit">issue quest</button>
+        </form>
       </section>
     </main>
 
@@ -485,6 +491,6 @@
     <script src="./shell.js?v=20260720"></script>
     <script src="./console.js?v=20260720"></script>
     <script type="module" src="./ops.js?v=20260720"></script>
-    <script src="./keep.js?v=20260720"></script>
+    <script type="module" src="./keep.js?v=20260720"></script>
   </body>
 </html>

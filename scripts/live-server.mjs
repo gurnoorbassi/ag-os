@@ -18,7 +18,8 @@ import {
   decideLessons,
   getOperatingSystems,
   getProjectWorkspace,
-  listLessonDecisions
+  listLessonDecisions,
+  listRecentAuditEvents
 } from "./lib/runtime/control-center-service.mjs";
 import { decideProposal, listProposals, markProposalStartFailed, refreshProposals } from "./lib/runtime/proposal-engine.mjs";
 import { listOutcomes, recordJobOutcome } from "./lib/runtime/outcome-feedback-service.mjs";
@@ -486,6 +487,7 @@ const server = createServer(async (request, response) => {
         proposals: listProposals({ root }),
         outcomes: listOutcomes({ root }).slice(0, 20),
         jobs: listAutonomousJobs({ root }),
+        recentAudit: listRecentAuditEvents({ root, limit: 10 }),
         recentCommands: listRecentOwnerCommands({ root })
       }, headers);
       return;

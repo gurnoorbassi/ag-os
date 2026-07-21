@@ -7,7 +7,8 @@ import {
   decideLessons,
   getOperatingSystems,
   getProjectWorkspace,
-  listLessonDecisions
+  listLessonDecisions,
+  listRecentAuditEvents
 } from "../scripts/lib/runtime/control-center-service.mjs";
 
 function writeJson(root, relativePath, record) {
@@ -131,6 +132,20 @@ test("operating system status is evidence-derived and watchdog stays honest", ()
     assert.equal(systems.find((item) => item.id === "watchdog-os").status, "setup_needed");
     assert.equal(systems.find((item) => item.id === "security-os").status, "protected");
     assert.notEqual(systems.find((item) => item.id === "security-os").status, "foundation");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("Keep archive receives only bounded recent audit summaries", () => {
+  const root = fixtureRoot();
+  try {
+    writeJson(root, ".codex/audit/audit-old.json", { id: "audit-old", eventType: "validation_run", summary: "Older", occurredAt: "2026-07-14T00:00:00.000Z", riskLevel: "R1", liveServiceTouched: false });
+    writeJson(root, ".codex/audit/audit-new.json", { id: "audit-new", eventType: "job_completed", summary: "Newer", occurredAt: "2026-07-15T00:00:00.000Z", riskLevel: "R1", liveServiceTouched: false });
+    const records = listRecentAuditEvents({ root, limit: 1 });
+    assert.equal(records.length, 1);
+    assert.equal(records[0].id, "audit-new");
+    assert.deepEqual(Object.keys(records[0]).sort(), ["eventType", "id", "liveServiceTouched", "occurredAt", "riskLevel", "summary"].sort());
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
