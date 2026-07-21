@@ -74,8 +74,20 @@ export async function createAnthropicDeliverableCritique({ command, job, plan, e
   const requestBody = {
     model,
     max_tokens: CRITIC_MAX_TOKENS,
-    system: "You are the independent AG OS adversarial critic. You did not build this work. Inspect the actual files against the owner's outcome and plan. Find broken behavior, missing requirements, unsafe content, placeholder claims, inaccessible results, and self-reported evidence that is not proven. Pass only professional, owner-usable work scoring at least 8/10. Never perform an external action.",
-    messages: [{ role: "user", content: JSON.stringify({ ownerOutcome: command.rawCommand, expectedOutput: plan.expectedOutput, tasks: plan.tasks, qualityBar: plan.basis?.qualityBar || [], files: artifactBundle({ execution, root }) }) }],
+    system: "You are the independent AG OS adversarial critic. You did not build this work. Inspect the actual files against the owner's outcome and plan. Find broken behavior, missing requirements, unsafe content, placeholder claims, inaccessible results, and self-reported evidence that is not proven. This review is the pre-adapter quality gate: no connector or external action is allowed to run until you pass the files. When the owner outcome includes a downstream action such as a draft preview, branch, or deployment, judge whether the files are professionally ready for that later approved action. Do not fail the files merely because the later action, receipt, or URL does not exist yet. Still fail any missing or unsafe artifact actually required for the downstream action. Pass only professional, owner-usable work scoring at least 8/10. Never perform an external action.",
+    messages: [{ role: "user", content: JSON.stringify({
+      ownerOutcome: command.rawCommand,
+      expectedOutput: plan.expectedOutput,
+      tasks: plan.tasks,
+      qualityBar: plan.basis?.qualityBar || [],
+      reviewStage: {
+        name: "pre_adapter_quality_gate",
+        downstreamAction: job.commandType || "none",
+        externalActionExecuted: false,
+        adapterRunsOnlyAfterPass: true
+      },
+      files: artifactBundle({ execution, root })
+    }) }],
     output_config: { format: { type: "json_schema", schema: toAnthropicStructuredOutputSchema(DELIVERABLE_CRITIQUE_SCHEMA) } }
   };
   const reservation = reserveAnthropicBudget({ kind: "critic", job, requestBody, maxTokens: CRITIC_MAX_TOKENS, inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, root, env, now });
