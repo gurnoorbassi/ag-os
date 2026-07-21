@@ -21,8 +21,9 @@ function requireFile(relativePath) {
 
 for (const relativePath of [
   "dashboard/index.html",
-  "dashboard/styles.css",
-  "dashboard/app.js"
+  "dashboard/os.html",
+  "dashboard/os.css",
+  "dashboard/os.js"
 ]) {
   requireFile(relativePath);
 }
@@ -49,25 +50,25 @@ for (const project of data.projectRegistry.projects) {
 }
 
 const index = existsSync(path.join(root, "dashboard/index.html")) ? read("dashboard/index.html") : "";
-const app = existsSync(path.join(root, "dashboard/app.js")) ? read("dashboard/app.js") : "";
-const styles = existsSync(path.join(root, "dashboard/styles.css")) ? read("dashboard/styles.css") : "";
-const dashboardSource = `${index}\n${app}`;
+const consoleHtml = existsSync(path.join(root, "dashboard/os.html")) ? read("dashboard/os.html") : "";
+const consoleApp = existsSync(path.join(root, "dashboard/os.js")) ? read("dashboard/os.js") : "";
+const consoleStyles = existsSync(path.join(root, "dashboard/os.css")) ? read("dashboard/os.css") : "";
+const dashboardSource = `${consoleHtml}\n${consoleApp}`;
 
 for (const requiredInterfacePattern of [
   /color-scheme:\s*dark/,
-  /data-dashboard-view="home"/,
-  /data-dashboard-view="projects"/,
-  /data-dashboard-view="work"/,
-  /data-dashboard-view="intelligence"/,
-  /data-dashboard-view="system"/
+  /data-view="console"/,
+  /data-view="ops"/,
+  /data-view="keep"/,
+  /data-view="dash"/
 ]) {
-  if (!requiredInterfacePattern.test(`${dashboardSource}\n${styles}`)) {
+  if (!requiredInterfacePattern.test(`${dashboardSource}\n${consoleStyles}`)) {
     fail(`dashboard navigation or dark-theme invariant missing: ${requiredInterfacePattern}`);
   }
 }
 
-const expectedDashboardViews = new Set(["home", "projects", "work", "intelligence", "system"]);
-const navigationControls = [...index.matchAll(/<button\b[^>]*data-dashboard-view="([^"]+)"[^>]*>([\s\S]*?)<\/button>/gi)]
+const expectedDashboardViews = new Set(["console", "ops", "keep", "dash"]);
+const navigationControls = [...consoleHtml.matchAll(/<button\b[^>]*data-view="([^"]+)"[^>]*>([\s\S]*?)<\/button>/gi)]
   .map((match) => ({ view: match[1], label: match[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() }));
 for (const view of expectedDashboardViews) {
   const controls = navigationControls.filter((control) => control.view === view);
@@ -96,17 +97,19 @@ if (interactiveLabels.some((label) => /\b(?:buy|purchase|subscribe)\b/i.test(lab
 }
 
 for (const requiredOperatorPattern of [
-  /id="owner-command-form"/,
+  /id="command-form"/,
   /id="owner-password"[^>]*type="password"/,
   /id="owner-token"[^>]*type="password"/,
-  /id="worker-routing-help"/,
-  /dataset\.projectId = "project-one-off"/,
-  /\/api\/v1\/jobs\/\$\{encodeURIComponent\(job\.jobId\)\}\/deliverable/,
-  /credentials:\s*"include"/,
+  /id="os-project"/,
+  /\/api\/v1\/jobs\/\$\{encodeURIComponent\(jobId\)\}\/deliverable/,
+  /credentials:\s*"same-origin"/,
   /\/api\/v1\/auth\/login/,
-  /authorization:\s*`Bearer \$\{token\}`/,
+  /headers\.set\("authorization", `Bearer \$\{state\.ownerToken\}`\)/,
   /\/api\/v1\/commands/,
-  /No live side effect was executed/
+  /\/api\/v1\/memory\/lessons\/decision/,
+  /\/api\/v1\/proposals\/\$\{encodeURIComponent\(proposalId\)\}\/decision/,
+  /\/api\/v1\/jobs\/\$\{encodeURIComponent\(jobId\)\}\/recover/,
+  /\/api\/v1\/jobs\/\$\{encodeURIComponent\(jobId\)\}\/outcome/
 ]) {
   if (!requiredOperatorPattern.test(dashboardSource)) {
     fail(`dashboard authenticated operator console missing invariant: ${requiredOperatorPattern}`);
@@ -114,30 +117,18 @@ for (const requiredOperatorPattern of [
 }
 
 for (const requiredText of [
-  "Constitution",
-  "Ask AG OS to build or operate something",
-  "Activation Center",
-  "Owner Attention",
-  "Dashboard Action Queue",
-  "Project Registry",
-  "Your projects",
-  "Connector Registry",
-  "Command Registry",
-  "Capability Registry",
-  "Capabilities",
-  "Client Management",
-  "Social Media System v1",
-  "Production Social Posting",
-  "Approvals",
-  "GitHub / Netlify / n8n",
-  "Quality and Review",
-  "Unified Memory Learning",
-  "Costs",
-  "Skills",
+  "Owner command deck",
+  "Mission control",
+  "The Keep",
+  "Everything important. Nothing extra.",
+  "Projects",
+  "Active work",
+  "Needs you",
+  "Operational posture",
+  "Owner focus",
   "Cost OS",
   "Watchdog OS",
-  "Memory OS",
-  "Safe Merge"
+  "Constitution v1.0"
 ]) {
   if (!dashboardSource.includes(requiredText)) {
     fail(`dashboard missing required visible section: ${requiredText}`);
@@ -147,11 +138,17 @@ for (const requiredText of [
 for (const forbiddenOwnerUx of [
   "Auto-detect from command",
   "Create a new workspace",
-  "Level 2 - reviewed staging"
+  "Level 2 - reviewed staging",
+  "Open owner console",
+  "data-dashboard-view"
 ]) {
   if (dashboardSource.includes(forbiddenOwnerUx)) {
     fail(`dashboard must not expose legacy or staging owner UX: ${forbiddenOwnerUx}`);
   }
+}
+
+if (!/url=os\.html#console/.test(index)) {
+  fail("legacy dashboard entry must redirect to the unified owner console");
 }
 
 for (const liveUrl of ["https://foreman-quote-studio.netlify.app/", "https://app.agdigitalz.net/"]) {
