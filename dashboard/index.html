@@ -50,8 +50,28 @@
     </main>
 
     <main class="os-surface" data-os-view="ops" hidden>
-      <section class="view-placeholder" aria-labelledby="ops-placeholder-title">
-        <p>OPS VIEW</p><h1 id="ops-placeholder-title">Mission control is next in this stack.</h1>
+      <section class="ops-view" aria-labelledby="ops-title">
+        <header class="ops-header">
+          <div class="ops-banner" aria-label="AG OS">┌─ AG OS ─┐</div>
+          <div><span id="ops-uptime">uptime --</span><span class="ops-armed">● fail-closed</span></div>
+        </header>
+        <div class="ops-grid">
+          <section class="ops-pane ops-activity-pane">
+            <header><h1 id="ops-title">activity.stream</h1><span id="ops-stream-state">polling</span></header>
+            <div id="ops-activity" class="ops-activity" role="log" aria-live="polite"></div>
+          </section>
+          <aside class="ops-rail">
+            <section class="ops-pane" id="ops-budget-panel"></section>
+            <section class="ops-pane" id="ops-jobs-panel"></section>
+            <section class="ops-pane" id="ops-memory-panel"></section>
+            <section class="ops-pane" id="ops-connectors-panel"></section>
+          </aside>
+        </div>
+        <footer class="ops-statusbar">
+          <span id="ops-automation">automation --</span>
+          <span id="ops-tick">tick --</span>
+          <time id="ops-clock">--:--:--</time>
+        </footer>
       </section>
     </main>
 
@@ -458,5 +478,6 @@
     <script src="./app.js?v=20260720"></script>
     <script src="./shell.js?v=20260720"></script>
     <script src="./console.js?v=20260720"></script>
+    <script type="module" src="./ops.js?v=20260720"></script>
   </body>
 </html>

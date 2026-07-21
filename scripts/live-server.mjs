@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { commandRequiresBuilder, listRecentOwnerCommands, submitOwnerCommand } from "./lib/runtime/live-command-service.mjs";
 import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
 import { createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
+import { anthropicBudgetStatus } from "./lib/runtime/anthropic-budget-guard.mjs";
 import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-planner-readiness.mjs";
 import { createAnthropicWorkProduct } from "./lib/runtime/anthropic-worker.mjs";
 import { evaluateAnthropicWorkerReadiness } from "./lib/runtime/anthropic-worker-readiness.mjs";
@@ -467,6 +468,8 @@ const server = createServer(async (request, response) => {
           recoveryTokenAvailable: Boolean(ownerToken)
         },
         automation: autonomousExecutionStatus(),
+        uptimeSeconds: Math.round(process.uptime()),
+        anthropicBudget: anthropicBudgetStatus({ root }),
         safeguards: evaluateOperationalSafeguards({ root }),
         production: readinessStatus(),
         readiness: {

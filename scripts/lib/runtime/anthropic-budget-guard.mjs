@@ -66,6 +66,29 @@ function activeReservedSpend(records, predicate) {
     .reduce((total, record) => total + Number(record.entries?.[0]?.amountUsd || 0), 0);
 }
 
+export function anthropicBudgetStatus({ root = process.cwd(), env = process.env, now = new Date() } = {}) {
+  const records = readCostRecords(root);
+  const limits = loadBudget(root);
+  const day = isoTimestamp(now).slice(0, 10);
+  const month = day.slice(0, 7);
+  const sameDay = (record) => recordDate(record)?.toISOString().slice(0, 10) === day;
+  const sameMonth = (record) => recordDate(record)?.toISOString().slice(0, 7) === month;
+  const dailyCallLimit = Number(env.AG_OS_ANTHROPIC_DAILY_CALL_LIMIT ?? DEFAULT_ANTHROPIC_DAILY_CALL_LIMIT);
+  if (!Number.isInteger(dailyCallLimit) || dailyCallLimit <= 0) throw new Error("AG_OS_ANTHROPIC_DAILY_CALL_LIMIT must be a positive integer");
+  return {
+    dailyCallCount: records.filter((record) => record.costLedgerId?.startsWith("cost-ledger-anthropic-call-") && sameDay(record)).length,
+    dailyCallLimit,
+    dailyActualUsd: actualSpend(records, sameDay),
+    monthlyActualUsd: actualSpend(records, sameMonth),
+    limits: {
+      perTaskMaxUsd: limits.perTaskMax,
+      dailyMaxUsd: limits.dailyMax,
+      monthlyMaxUsd: limits.monthlyMax
+    },
+    breakerArmed: true
+  };
+}
+
 function uniqueLedgerId(kind, jobId, status, now) {
   const instant = isoTimestamp(now).replace(/[^0-9]/g, "");
   return `cost-ledger-anthropic-${status}-${slugify(kind)}-${slugify(jobId)}-${instant}-${randomUUID().slice(0, 8)}`;
