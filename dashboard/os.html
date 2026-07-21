@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AG OS — Owner Console</title>
-  <link rel="stylesheet" href="os.css" />
+  <link rel="stylesheet" href="os.css?v=20260721" />
 </head>
 <body>
   <header class="os-top">
@@ -16,21 +16,21 @@
       <a href="index.html" class="os-dash-link">dash</a>
     </nav>
     <span class="os-right">
-      <span id="os-conn" class="os-conn">connecting…</span>
+      <span id="os-conn" class="os-conn" role="status">connecting…</span>
       <span class="os-failclosed">fail-closed <span class="ok">●</span></span>
     </span>
   </header>
 
   <main>
     <section id="view-console" class="os-view">
-      <div id="con-screen" class="con-screen"></div>
+      <div id="con-screen" class="con-screen" aria-live="polite"></div>
     </section>
 
     <section id="view-ops" class="os-view os-hidden">
       <div class="ops-grid">
         <div class="ops-main">
           <div class="ops-pane-title">┌─ activity ─────────────</div>
-          <div id="ops-feed" class="ops-feed"></div>
+          <div id="ops-feed" class="ops-feed" aria-live="polite"></div>
         </div>
         <div class="ops-side">
           <div class="ops-panel">
@@ -70,11 +70,11 @@
 
   <footer class="os-prompt">
     <span class="os-caret-mark">❯</span>
-    <input id="os-input" autocomplete="off" spellcheck="false"
+    <input id="os-input" aria-label="Owner command" autocomplete="off" spellcheck="false"
       placeholder="tell ag-os what to do… (or: status · jobs · budget · lessons · help)" />
     <span id="os-caret" class="os-caret">█</span>
   </footer>
 
-  <script src="os.js"></script>
+  <script src="os.js?v=20260721"></script>
 </body>
 </html>

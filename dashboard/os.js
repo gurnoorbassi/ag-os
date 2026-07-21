@@ -91,7 +91,7 @@ function findBudget(payload) {
 async function refreshStatus() {
   if (demoActive) {
     status = status?.demo ? status : demoStatus();
-    connBadge.textContent = "demo mode";
+    connBadge.textContent = "demo only — no live data";
     connBadge.className = "os-conn warn";
     onStatus();
     return;
@@ -102,12 +102,10 @@ async function refreshStatus() {
     connBadge.className = "os-conn ok";
     onStatus();
   } catch (error) {
-    if (!status && !String(error.message).startsWith("unauthorized")) {
-      demoActive = true;
-      status = demoStatus();
-      connBadge.textContent = "offline — demo data";
-      connBadge.className = "os-conn warn";
-      onStatus();
+    if (!String(error.message).startsWith("unauthorized")) {
+      connBadge.textContent = "offline — live data unavailable";
+      connBadge.className = "os-conn bad";
+      if (!status) conLine(`<span class="bad">■ live status unavailable: ${esc(error.message)}</span>`);
     }
   }
 }
@@ -227,13 +225,14 @@ async function submitCommand(text) {
   try {
     const result = await api("/api/v1/commands", { method: "POST", body: JSON.stringify({ command: text }) });
     pending.remove();
-    const intake = result.commandIntake || result.record || {};
-    conStep("command intake", intake.commandIntakeId || "classified", "ok");
-    if (intake.riskLevel) conStep("risk", intake.riskLevel, intake.riskLevel === "R1" ? "ok" : "warn");
-    if (result.plan?.planId || intake.nextRecord?.planId) conStep("plan", result.plan?.planId || intake.nextRecord.planId, "ok");
-    const jobId = result.job?.jobId || intake.nextRecord?.jobId;
-    if (jobId) conStep("job", `${jobId} · ${result.job?.status || "queued"}`, "ok");
-    if (result.job?.status === "waiting_approval") conLine('<span class="warn">▲ waiting at the gate — open the keep and click the gate to decide</span>');
+    const intakeId = result.commandIntakeId || result.commandIntake?.commandIntakeId || result.record?.commandIntakeId;
+    const planId = result.planId || result.plan?.planId || result.commandIntake?.nextRecord?.planId;
+    const jobId = result.jobId || result.job?.jobId || result.commandIntake?.nextRecord?.jobId;
+    const jobStatus = result.status || result.job?.status || "queued";
+    conStep("command intake", intakeId || "classified", "ok");
+    if (planId) conStep("plan", planId, "ok");
+    if (jobId) conStep("job", `${jobId} · ${jobStatus}`, jobStatus === "failed" ? "bad" : jobStatus === "waiting_approval" ? "warn" : "ok");
+    if (jobStatus === "waiting_approval") conLine('<span class="warn">▲ waiting at the gate — open the keep and click the gate to decide</span>');
     refreshStatus();
   } catch (error) {
     pending.remove();
@@ -713,6 +712,6 @@ setInterval(() => {
 
 buildKeep();
 setView(activeView);
-conLine('<span class="dim">ag-os owner console · type help for local commands · the keep view shows your company live</span>');
+conLine(`<span class="dim">ag-os owner console · type help for local commands · ${DEMO ? "explicit demo mode; no live actions or data" : "the keep view shows your live coordinator state"}</span>`);
 refreshStatus();
 setInterval(refreshStatus, 5000);
