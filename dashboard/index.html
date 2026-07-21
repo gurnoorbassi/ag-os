@@ -4,10 +4,64 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AG OS Dashboard</title>
-    <link rel="stylesheet" href="./styles.css?v=20260720">
+    <link rel="stylesheet" href="./styles.css?v=20260720-keep-v1">
   </head>
-  <body>
+  <body class="owner-os">
     <a class="skip-link" href="#workspace-content">Skip to workspace</a>
+    <header class="os-topbar" aria-label="AG OS view switcher">
+      <a class="os-wordmark" href="#console" aria-label="AG OS console">AG OS</a>
+      <span class="os-divider" aria-hidden="true">·</span>
+      <nav class="os-view-switcher" aria-label="Owner console views">
+        <button type="button" data-os-view-button="console" aria-pressed="true">console</button>
+        <button type="button" data-os-view-button="ops" aria-pressed="false">ops</button>
+        <button type="button" data-os-view-button="keep" aria-pressed="false">keep</button>
+        <button type="button" data-os-view-button="dash" aria-pressed="false">dash</button>
+      </nav>
+      <div class="os-session-strip">
+        <span class="os-fail-closed"><span aria-hidden="true">●</span> fail-closed</span>
+        <span id="os-owner-session">owner session · checking</span>
+      </div>
+    </header>
+
+    <main class="os-surface" data-os-view="console">
+      <section class="console-view" aria-labelledby="console-title">
+        <header class="console-header">
+          <div>
+            <p class="console-kicker">OWNER CONSOLE</p>
+            <h1 id="console-title">Command AG OS</h1>
+            <p>State the outcome. AG OS plans, builds, reviews, and pauses only at a real gate.</p>
+          </div>
+          <button id="console-sign-in" class="terminal-button" type="button">owner sign-in</button>
+        </header>
+        <div id="console-scrollback" class="console-scrollback" role="log" aria-live="polite" aria-relevant="additions">
+          <p class="console-line console-line-system"><span>system</span><strong>AG OS ready. Type a command or try status, jobs, budget, or lessons.</strong></p>
+        </div>
+        <form id="console-command-form" class="console-prompt">
+          <label class="visually-hidden" for="console-command">Issue an AG OS command</label>
+          <span aria-hidden="true">❯</span>
+          <input id="console-command" name="command" maxlength="10000" autocomplete="off" placeholder="issue a command…" required>
+          <select id="console-project" name="projectId" aria-label="Target workspace">
+            <option value="project-one-off">one-off work</option>
+          </select>
+          <button type="submit">run</button>
+        </form>
+        <p id="console-runtime-note" class="console-runtime-note" role="status">Connecting to the private coordinator…</p>
+      </section>
+    </main>
+
+    <main class="os-surface" data-os-view="ops" hidden>
+      <section class="view-placeholder" aria-labelledby="ops-placeholder-title">
+        <p>OPS VIEW</p><h1 id="ops-placeholder-title">Mission control is next in this stack.</h1>
+      </section>
+    </main>
+
+    <main class="os-surface" data-os-view="keep" hidden>
+      <section class="view-placeholder" aria-labelledby="keep-placeholder-title">
+        <p>THE KEEP</p><h1 id="keep-placeholder-title">Your live AG OS world is being assembled.</h1>
+      </section>
+    </main>
+
+    <section class="os-surface os-dash-view" data-os-view="dash" hidden aria-label="Deep inspection dashboard">
     <div class="app-shell">
       <aside class="sidebar" aria-label="Dashboard sections">
         <div class="brand-row">
@@ -398,8 +452,11 @@
         <div id="workspace-dialog-content" class="workspace-dialog-content"></div>
       </div>
     </dialog>
+    </section>
 
     <script src="./dashboard-data.js"></script>
     <script src="./app.js?v=20260720"></script>
+    <script src="./shell.js?v=20260720"></script>
+    <script src="./console.js?v=20260720"></script>
   </body>
 </html>
