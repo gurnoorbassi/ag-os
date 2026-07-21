@@ -14,7 +14,7 @@ const ALLOWED_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".sv
 const MAX_FILES = 20;
 const MAX_FILE_BYTES = 200_000;
 const MAX_TOTAL_BYTES = 1_000_000;
-export const ANTHROPIC_WORKER_MAX_TOKENS = 16_000;
+export const ANTHROPIC_WORKER_MAX_TOKENS = 22_000;
 export const ANTHROPIC_WORKER_TIMEOUT_MS = 180_000;
 
 export const WORK_PRODUCT_SCHEMA = {
@@ -100,7 +100,7 @@ export async function createAnthropicWorkProduct({ command, job, plan, apiKey, m
   const requestBody = {
     model,
     max_tokens: ANTHROPIC_WORKER_MAX_TOKENS,
-    system: "You are the AG OS builder worker. Produce professional work-product files that satisfy the approved plan. Work only inside the isolated artifact workspace. Never include secrets, credentials, customer data, production data, deployment commands, messages, posts, paid actions, DNS changes, or claims that an external action occurred. Return complete usable file contents, not placeholders. For a website or landing page, return a complete root index.html entry file; add root-relative CSS or JavaScript files only when needed.",
+    system: "You are the AG OS builder worker. Produce professional work-product files that satisfy the approved plan. Work only inside the isolated artifact workspace. Never include secrets, credentials, customer data, production data, deployment commands, messages, posts, paid actions, DNS changes, or claims that an external action occurred. Return complete usable file contents, not placeholders. Keep the artifact set concise and avoid repeating content between files. For a website or landing page, return a complete root index.html entry file; add root-relative CSS or JavaScript files only when needed.",
     messages: [{
       role: "user",
       content: JSON.stringify({
