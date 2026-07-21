@@ -22,7 +22,9 @@ function requireFile(relativePath) {
 for (const relativePath of [
   "dashboard/index.html",
   "dashboard/styles.css",
-  "dashboard/app.js"
+  "dashboard/app.js",
+  "dashboard/shell.js",
+  "dashboard/console.js"
 ]) {
   requireFile(relativePath);
 }
@@ -50,8 +52,20 @@ for (const project of data.projectRegistry.projects) {
 
 const index = existsSync(path.join(root, "dashboard/index.html")) ? read("dashboard/index.html") : "";
 const app = existsSync(path.join(root, "dashboard/app.js")) ? read("dashboard/app.js") : "";
+const shell = existsSync(path.join(root, "dashboard/shell.js")) ? read("dashboard/shell.js") : "";
+const consoleView = existsSync(path.join(root, "dashboard/console.js")) ? read("dashboard/console.js") : "";
 const styles = existsSync(path.join(root, "dashboard/styles.css")) ? read("dashboard/styles.css") : "";
-const dashboardSource = `${index}\n${app}`;
+const dashboardSource = `${index}\n${app}\n${shell}\n${consoleView}`;
+
+for (const view of ["console", "ops", "keep", "dash"]) {
+  if (!new RegExp(`data-os-view=["']${view}["']`).test(index) ||
+      !new RegExp(`data-os-view-button=["']${view}["']`).test(index)) {
+    fail(`owner shell must expose a structural surface and switch control for: ${view}`);
+  }
+}
+if (!/views\.has\(value\)/.test(shell) || !/history\.replaceState\([^\n]+#\$\{next\}/.test(shell)) {
+  fail("owner shell view selection must be allowlisted and persisted in the URL hash");
+}
 
 for (const requiredInterfacePattern of [
   /color-scheme:\s*dark/,

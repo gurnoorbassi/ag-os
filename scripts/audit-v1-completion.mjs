@@ -64,7 +64,10 @@ for (const [file, content] of source) {
   }
 }
 const dashboardHtml = source.get("dashboard/index.html") || "";
-const dashboardJs = source.get("dashboard/app.js") || "";
+const dashboardJs = [...source.entries()]
+  .filter(([file]) => file.startsWith("dashboard/") && file.endsWith(".js"))
+  .map(([, content]) => content)
+  .join("\n");
 const buttonIds = [...dashboardHtml.matchAll(/<button\b[^>]*\bid="([^"]+)"/g)].map((match) => match[1]);
 for (const id of buttonIds) {
   if (!dashboardJs.includes(`#${id}`)) fail(`dashboard button has no JavaScript wiring: #${id}`);
