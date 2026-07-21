@@ -466,6 +466,8 @@ test("Netlify adapter deploys an exact secret-scanned draft preview without prod
   writeFileSync(path.join(workspace, sourceDirectory, "WORK_PRODUCT.md"), "# Private completion evidence\n", "utf8");
   writeFileSync(path.join(workspace, sourceDirectory, "index.html"), "<!doctype html><title>Preview</title>\n", "utf8");
   writeFileSync(path.join(workspace, sourceDirectory, "sitemap.xml"), "<?xml version=\"1.0\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"></urlset>\n", "utf8");
+  const safeNetlifyConfig = `[build]\npublish = "."\n\n[[headers]]\nfor = "/*"\n[headers.values]\nX-Content-Type-Options = "nosniff"\n`;
+  writeFileSync(path.join(workspace, sourceDirectory, "netlify.toml"), safeNetlifyConfig, "utf8");
   const executionRequest = {
     adapterId: "netlify-staging",
     operation: "create_draft_deploy",
@@ -478,6 +480,10 @@ test("Netlify adapter deploys an exact secret-scanned draft preview without prod
   const validated = validateNetlifyStagingRequest({ request: executionRequest, root: workspace });
   assert.equal(validated.source.files.some((file) => file.path === "WORK_PRODUCT.md"), false);
   assert.equal(validated.source.files.some((file) => file.path === "sitemap.xml"), true);
+  assert.equal(validated.source.files.some((file) => file.path === "netlify.toml"), true);
+  writeFileSync(path.join(workspace, sourceDirectory, "netlify.toml"), `[build]\ncommand = "npm run build"\npublish = "."\n`, "utf8");
+  assert.throws(() => validateNetlifyStagingRequest({ request: executionRequest, root: workspace }), /build setting is not allowed/);
+  writeFileSync(path.join(workspace, sourceDirectory, "netlify.toml"), safeNetlifyConfig, "utf8");
   const command = await submitOwnerCommand({
     command: "Create a Netlify staging preview deploy for the dashboard",
     projectId: "project-quote-builder",
