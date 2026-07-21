@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { assertDeliverableCritique, createAnthropicDeliverableCritique, CRITIC_MAX_TOKENS, writeDeliverableCritique } from "../scripts/lib/runtime/anthropic-critic.mjs";
+import { assertDeliverableCritique, createAnthropicDeliverableCritique, CRITIC_MAX_TOKENS, CRITIC_TIMEOUT_MS, writeDeliverableCritique } from "../scripts/lib/runtime/anthropic-critic.mjs";
 
 function setup() {
   const root = mkdtempSync(path.join(os.tmpdir(), "ag-os-critic-"));
@@ -34,6 +34,7 @@ test("critic uses a separate budget reservation and writes independent evidence"
     env: { AG_OS_ANTHROPIC_DAILY_CALL_LIMIT: "20" }, now: new Date("2026-07-19T00:00:00.000Z")
   });
   assert.equal(CRITIC_MAX_TOKENS, 16_000);
+  assert.equal(CRITIC_TIMEOUT_MS, 180_000);
   assert.equal(requestBody.max_tokens, 16_000);
   assert.equal(result.critique.verdict, "pass");
   assert.ok(result.usageAuditPath);

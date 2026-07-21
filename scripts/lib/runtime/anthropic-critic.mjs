@@ -10,7 +10,7 @@ import { writeAnthropicApprovalUse } from "./anthropic-usage-audit.mjs";
 const BASE_URL = "https://api.anthropic.com";
 const VERSION = "2023-06-01";
 export const CRITIC_MAX_TOKENS = 16_000;
-export const CRITIC_TIMEOUT_MS = 120_000;
+export const CRITIC_TIMEOUT_MS = 180_000;
 const MAX_REVIEW_BYTES = 500_000;
 
 export const DELIVERABLE_CRITIQUE_SCHEMA = {
@@ -69,7 +69,7 @@ export function assertDeliverableCritique(value) {
   return value;
 }
 
-export async function createAnthropicDeliverableCritique({ command, job, plan, execution, apiKey, model, baseUrl = BASE_URL, fetchImpl = globalThis.fetch, root = process.cwd(), inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, env, now, timeoutMs = CRITIC_TIMEOUT_MS }) {
+export async function createAnthropicDeliverableCritique({ command, job, plan, execution, apiKey, model, baseUrl = BASE_URL, fetchImpl = globalThis.fetch, root = process.cwd(), inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, env, now, timeoutMs = process.env.AG_OS_AI_CRITIC_TIMEOUT_MS || CRITIC_TIMEOUT_MS }) {
   if (!apiKey || !model || !approvalId) throw new Error("critic credential, model, and approval are required");
   const requestBody = {
     model,

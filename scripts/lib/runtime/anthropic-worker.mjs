@@ -14,7 +14,7 @@ const MAX_FILES = 20;
 const MAX_FILE_BYTES = 200_000;
 const MAX_TOTAL_BYTES = 1_000_000;
 export const ANTHROPIC_WORKER_MAX_TOKENS = 16_000;
-export const ANTHROPIC_WORKER_TIMEOUT_MS = 120_000;
+export const ANTHROPIC_WORKER_TIMEOUT_MS = 180_000;
 
 export const WORK_PRODUCT_SCHEMA = {
   type: "object",
