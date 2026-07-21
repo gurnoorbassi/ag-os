@@ -152,3 +152,4 @@ window.setInterval(() => {
   document.querySelectorAll("[data-spinner='true']").forEach((node) => { node.textContent = braille[spinnerFrame]; });
 }, 120);
 document.querySelector("#ops-clock").textContent = clock();
+if (window.AGOS.latestStatus) render(window.AGOS.latestStatus);

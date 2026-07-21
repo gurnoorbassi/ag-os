@@ -55,6 +55,7 @@
       return null;
     }
     setSessionLabel("connected", result.authentication?.method || "authenticated");
+    window.AGOS.latestStatus = result;
     window.dispatchEvent(new CustomEvent("agos:status", { detail: result }));
     return result;
   }
