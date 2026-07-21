@@ -5,7 +5,7 @@ import { readJson, slugify } from "./common.mjs";
 
 const MAX_FILES = 50;
 const MAX_TOTAL_BYTES = 2_000_000;
-const TEXT_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".svg", ".txt", ".yaml", ".yml"]);
+const TEXT_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".svg", ".txt", ".xml", ".yaml", ".yml"]);
 
 function safeJobId(jobId) {
   const value = String(jobId || "");

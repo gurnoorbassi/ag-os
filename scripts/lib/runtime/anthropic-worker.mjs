@@ -9,7 +9,7 @@ import { writeAnthropicApprovalUse } from "./anthropic-usage-audit.mjs";
 
 const DEFAULT_BASE_URL = "https://api.anthropic.com";
 const ANTHROPIC_VERSION = "2023-06-01";
-const ALLOWED_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".svg", ".txt", ".yaml", ".yml"]);
+const ALLOWED_EXTENSIONS = new Set([".css", ".html", ".js", ".json", ".md", ".svg", ".txt", ".xml", ".yaml", ".yml"]);
 const MAX_FILES = 20;
 const MAX_FILE_BYTES = 200_000;
 const MAX_TOTAL_BYTES = 1_000_000;
@@ -52,6 +52,9 @@ function normalizedArtifactPath(value) {
   }
   const extension = path.posix.extname(normalized).toLowerCase();
   if (!ALLOWED_EXTENSIONS.has(extension)) throw new Error(`worker artifact extension is not allowed: ${extension || "none"}`);
+  if (extension === ".xml" && normalized !== "sitemap.xml") {
+    throw new Error(`worker XML artifacts are limited to a root sitemap.xml: ${normalized}`);
+  }
   return normalized;
 }
 

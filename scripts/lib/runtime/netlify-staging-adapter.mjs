@@ -11,7 +11,7 @@ const API_BASE = "https://api.netlify.com/api/v1";
 const MAX_FILES = 200;
 const MAX_FILE_BYTES = 2_000_000;
 const MAX_TOTAL_BYTES = 10_000_000;
-const PUBLIC_EXTENSIONS = new Set([".css", ".gif", ".html", ".ico", ".jpeg", ".jpg", ".js", ".json", ".map", ".png", ".svg", ".txt", ".webp", ".woff", ".woff2"]);
+const PUBLIC_EXTENSIONS = new Set([".css", ".gif", ".html", ".ico", ".jpeg", ".jpg", ".js", ".json", ".map", ".png", ".svg", ".txt", ".webp", ".woff", ".woff2", ".xml"]);
 
 function safeValue(value, label, pattern) {
   const text = String(value || "").trim();
@@ -44,7 +44,9 @@ function collectFiles(directory) {
       if (entry.isDirectory()) { walk(absolute, relative); continue; }
       if (!entry.isFile()) continue;
       if (relative === "WORK_PRODUCT.md") { workProductPresent = true; continue; }
-      if (!PUBLIC_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) throw new Error(`Netlify source file extension is not allowed: ${relative}`);
+      const extension = path.extname(entry.name).toLowerCase();
+      if (!PUBLIC_EXTENSIONS.has(extension)) throw new Error(`Netlify source file extension is not allowed: ${relative}`);
+      if (extension === ".xml" && relative !== "sitemap.xml") throw new Error(`Netlify XML source files are limited to a root sitemap.xml: ${relative}`);
       if (stat.size > MAX_FILE_BYTES) throw new Error(`Netlify source file exceeds ${MAX_FILE_BYTES} bytes: ${relative}`);
       totalBytes += stat.size;
       if (totalBytes > MAX_TOTAL_BYTES) throw new Error(`Netlify source files exceed ${MAX_TOTAL_BYTES} total bytes`);
