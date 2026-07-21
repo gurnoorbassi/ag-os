@@ -19,6 +19,7 @@ import { executeN8nWorkflowControl } from "./n8n-workflow-control-adapter.mjs";
 import { executeProductionDeployment } from "./production-deployment-adapter.mjs";
 import { executeSocialPublishing } from "./social-publishing-adapter.mjs";
 import { executeDnsChange } from "./dns-change-adapter.mjs";
+import { publishRuntimeEvent } from "./runtime-event-stream.mjs";
 
 const LIVE_JOB_PREFIX = "job-runtime-operator-";
 let processing = false;
@@ -90,6 +91,17 @@ function writeJobState(job, root, now, updates) {
     updatedAt: isoTimestamp(now)
   };
   writeJson(jobPath(job.jobId), next, root);
+  if (job.status !== next.status) {
+    publishRuntimeEvent({
+      type: "job_state_transition",
+      jobId: next.jobId,
+      projectId: next.projectId,
+      previousStatus: job.status,
+      status: next.status,
+      summary: `Job moved from ${job.status} to ${next.status}.`,
+      now
+    });
+  }
   return next;
 }
 

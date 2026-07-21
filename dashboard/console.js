@@ -122,4 +122,10 @@
     status = null;
     note.textContent = "Owner sign-in required. Open Dash once, sign in, then operate from Console.";
   });
+  window.addEventListener("agos:event", (event) => {
+    const record = event.detail;
+    if (record.type === "job_state_transition") pipelineLine("live job", `${record.jobId} · ${record.status}`, record.status === "failed" || record.status === "budget_blocked" ? "blocked" : record.status === "waiting_approval" ? "waiting" : record.status === "running" ? "running" : "done");
+    if (record.type === "lesson_decision") pipelineLine("memory", record.summary || "lesson decision recorded");
+    if (record.type === "automation_tick") writeLine("automation", record.summary || "state refreshed");
+  });
 })();

@@ -1,5 +1,8 @@
 (() => {
   const views = new Set(["console", "ops", "keep", "dash"]);
+  let eventSource = null;
+  let pollTimer = null;
+  let reconnectTimer = null;
 
   function coordinatorBaseUrl() {
     return (sessionStorage.getItem("ag-os-coordinator-url") || "").replace(/\/$/, "");
@@ -56,13 +59,44 @@
     return result;
   }
 
+  function startPolling() {
+    if (!pollTimer) pollTimer = window.setInterval(refreshStatus, 5_000);
+  }
+
+  function stopPolling() {
+    if (pollTimer) window.clearInterval(pollTimer);
+    pollTimer = null;
+  }
+
+  function connectEvents() {
+    if (!("EventSource" in window) || eventSource) {
+      if (!("EventSource" in window)) startPolling();
+      return;
+    }
+    eventSource = new EventSource(`${coordinatorBaseUrl()}/api/v1/events`, { withCredentials: true });
+    eventSource.addEventListener("open", stopPolling);
+    for (const type of ["job_state_transition", "lesson_decision", "automation_tick"]) {
+      eventSource.addEventListener(type, (message) => {
+        const event = JSON.parse(message.data);
+        window.dispatchEvent(new CustomEvent("agos:event", { detail: event }));
+        refreshStatus();
+      });
+    }
+    eventSource.addEventListener("error", () => {
+      eventSource?.close();
+      eventSource = null;
+      startPolling();
+      window.clearTimeout(reconnectTimer);
+      reconnectTimer = window.setTimeout(connectEvents, 10_000);
+    });
+  }
+
   document.querySelectorAll("[data-os-view-button]").forEach((button) => {
     button.addEventListener("click", () => setView(button.dataset.osViewButton));
   });
   window.addEventListener("hashchange", () => setView(selectedView(), { updateHash: false }));
 
-  window.AGOS = { request, refreshStatus, setSessionLabel, setView, views };
+  window.AGOS = { connectEvents, request, refreshStatus, setSessionLabel, setView, views };
   setView(selectedView());
-  refreshStatus();
-  window.setInterval(refreshStatus, 5_000);
+  refreshStatus().then((result) => result ? connectEvents() : startPolling());
 })();
