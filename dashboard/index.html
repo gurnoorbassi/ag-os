@@ -76,8 +76,14 @@
     </main>
 
     <main class="os-surface" data-os-view="keep" hidden>
-      <section class="view-placeholder" aria-labelledby="keep-placeholder-title">
-        <p>THE KEEP</p><h1 id="keep-placeholder-title">Your live AG OS world is being assembled.</h1>
+      <section class="keep-view" aria-labelledby="keep-title">
+        <header class="keep-heading">
+          <div><p>THE KEEP</p><h1 id="keep-title">AG OS at work</h1></div>
+          <p id="keep-mode-line">Private world · awaiting live runtime</p>
+        </header>
+        <div id="keep-world" class="keep-world" aria-label="AG OS operational world"></div>
+        <div id="keep-overlay" class="keep-overlay" hidden aria-live="polite"></div>
+        <div class="keep-quest-placeholder" aria-label="Quest command arrives with live wiring"><span>❯</span><span>issue a build quest…</span></div>
       </section>
     </main>
 
@@ -479,5 +485,6 @@
     <script src="./shell.js?v=20260720"></script>
     <script src="./console.js?v=20260720"></script>
     <script type="module" src="./ops.js?v=20260720"></script>
+    <script src="./keep.js?v=20260720"></script>
   </body>
 </html>
