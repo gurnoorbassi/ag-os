@@ -29,13 +29,21 @@ test("critic uses a separate budget reservation and writes independent evidence"
     return { ok: true, json: async () => ({ model: "critic-model", stop_reason: "end_turn", usage: { input_tokens: 100, output_tokens: 50 }, content: [{ type: "text", text: JSON.stringify(critique) }] }) };
   };
   const result = await createAnthropicDeliverableCritique({
-    command: { rawCommand: "Build a website" }, job: { jobId: "job-test", projectId: "project-one-off" }, plan: { planId: "plan-test", expectedOutput: "Website", tasks: [], basis: {} }, execution: { workProductPaths: [file] },
+    command: { rawCommand: "Build a website and create a draft preview" }, job: { jobId: "job-test", projectId: "project-one-off", commandType: "deploy_staging" }, plan: { planId: "plan-test", expectedOutput: "Website", tasks: [], basis: {} }, execution: { workProductPaths: [file] },
     apiKey: "test-key", model: "critic-model", fetchImpl, root, inputCostPerMillionUsd: 1, outputCostPerMillionUsd: 1, approvalId: "approval-test", approvalMaxUsd: 0.25,
     env: { AG_OS_ANTHROPIC_DAILY_CALL_LIMIT: "20" }, now: new Date("2026-07-19T00:00:00.000Z")
   });
   assert.equal(CRITIC_MAX_TOKENS, 16_000);
   assert.equal(CRITIC_TIMEOUT_MS, 180_000);
   assert.equal(requestBody.max_tokens, 16_000);
+  assert.match(requestBody.system, /pre-adapter quality gate/);
+  const reviewInput = JSON.parse(requestBody.messages[0].content);
+  assert.deepEqual(reviewInput.reviewStage, {
+    name: "pre_adapter_quality_gate",
+    downstreamAction: "deploy_staging",
+    externalActionExecuted: false,
+    adapterRunsOnlyAfterPass: true
+  });
   assert.equal(result.critique.verdict, "pass");
   assert.ok(result.usageAuditPath);
   const written = writeDeliverableCritique({ job: { jobId: "job-test", projectId: "project-one-off" }, plan: { planId: "plan-test" }, execution: { executionPath: ".codex/execution/exec-test.json" }, result, approvalId: "approval-test", root, now: new Date("2026-07-19T00:00:00.000Z") });
