@@ -50,6 +50,11 @@ function copyTrackedRepo() {
 
   for (const relativePath of tracked) {
     const source = path.join(repoRoot, relativePath);
+    // A working tree can intentionally remove tracked files before the
+    // deletion is committed. Temp-repo fixtures should mirror that state.
+    if (!existsSync(source)) {
+      continue;
+    }
     const target = path.join(root, relativePath);
     mkdirSync(path.dirname(target), { recursive: true });
     cpSync(source, target);

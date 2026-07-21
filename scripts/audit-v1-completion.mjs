@@ -8,7 +8,7 @@ const textExtensions = new Set([".css", ".html", ".js", ".json", ".md", ".mjs", 
 
 function repoFiles() {
   const output = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], { cwd: root });
-  return output.toString("utf8").split("\0").filter(Boolean).sort();
+  return output.toString("utf8").split("\0").filter(Boolean).filter((file) => existsSync(path.join(root, file))).sort();
 }
 
 function fail(message) {
@@ -63,8 +63,8 @@ for (const [file, content] of source) {
     }
   }
 }
-const dashboardHtml = source.get("dashboard/index.html") || "";
-const dashboardJs = source.get("dashboard/app.js") || "";
+const dashboardHtml = source.get("dashboard/os.html") || "";
+const dashboardJs = source.get("dashboard/os.js") || "";
 const buttonIds = [...dashboardHtml.matchAll(/<button\b[^>]*\bid="([^"]+)"/g)].map((match) => match[1]);
 for (const id of buttonIds) {
   if (!dashboardJs.includes(`#${id}`)) fail(`dashboard button has no JavaScript wiring: #${id}`);

@@ -1,80 +1,157 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0a08">
   <title>AG OS — Owner Console</title>
-  <link rel="stylesheet" href="os.css?v=20260721" />
+  <link rel="stylesheet" href="os.css?v=20260721b">
 </head>
 <body>
-  <header class="os-top">
-    <span class="os-brand">AG OS</span>
-    <nav class="os-views" id="os-views">
-      <button type="button" data-view="console">console</button>
-      <button type="button" data-view="ops">ops</button>
-      <button type="button" data-view="keep">keep</button>
-      <a href="index.html" class="os-dash-link">dash</a>
+  <header class="os-topbar">
+    <button class="os-brand" type="button" data-view="console" aria-label="Open AG OS console">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>AG OS</span>
+    </button>
+    <nav class="os-tabs" id="os-tabs" aria-label="AG OS views">
+      <button type="button" data-view="console"><span class="tab-glyph">›_</span><span>Console</span></button>
+      <button type="button" data-view="ops"><span class="tab-glyph">⌁</span><span>Ops</span><span id="ops-tab-count" class="tab-count" hidden>0</span></button>
+      <button type="button" data-view="keep"><span class="tab-glyph">♜</span><span>Keep</span></button>
+      <button type="button" data-view="dash"><span class="tab-glyph">◫</span><span>Dash</span></button>
     </nav>
-    <span class="os-right">
-      <span id="os-conn" class="os-conn" role="status">connecting…</span>
-      <span class="os-failclosed">fail-closed <span class="ok">●</span></span>
-    </span>
+    <div class="os-presence">
+      <span id="os-conn" class="presence-pill" role="status"><span></span>Connecting</span>
+      <button id="owner-menu" class="owner-chip" type="button" aria-label="Owner session">GB</button>
+    </div>
   </header>
 
-  <main>
-    <section id="view-console" class="os-view">
-      <div id="con-screen" class="con-screen" aria-live="polite"></div>
-    </section>
+  <main class="os-main">
+    <section id="view-console" class="os-view console-view" aria-labelledby="console-title">
+      <div class="console-shell">
+        <header class="view-intro compact">
+          <div>
+            <p class="eyebrow">Owner command deck</p>
+            <h1 id="console-title">What are we building?</h1>
+          </div>
+          <div id="console-state" class="state-line">Private · fail-closed</div>
+        </header>
 
-    <section id="view-ops" class="os-view os-hidden">
-      <div class="ops-grid">
-        <div class="ops-main">
-          <div class="ops-pane-title">┌─ activity ─────────────</div>
-          <div id="ops-feed" class="ops-feed" aria-live="polite"></div>
+        <div id="console-empty" class="console-empty">
+          <div class="console-orb" aria-hidden="true"><span></span></div>
+          <h2>Give the outcome. AG OS handles the work.</h2>
+          <p>Build, review, recover, deploy a draft, or inspect a project. Sensitive actions still stop at your gate.</p>
         </div>
-        <div class="ops-side">
-          <div class="ops-panel">
-            <div class="ops-label">budget · month</div>
-            <div id="ops-budget" class="ops-value">—</div>
-            <div id="ops-budget-bar" class="ops-bar"></div>
-            <div id="ops-budget-note" class="ops-note">breaker armed</div>
+
+        <div id="con-screen" class="con-screen" aria-live="polite"></div>
+
+        <form id="command-form" class="command-composer">
+          <label class="visually-hidden" for="os-input">Owner command</label>
+          <textarea id="os-input" rows="2" maxlength="10000" spellcheck="true" placeholder="Tell AG OS what outcome you want…"></textarea>
+          <div class="composer-bar">
+            <label class="project-target">
+              <span class="visually-hidden">Project</span>
+              <select id="os-project" aria-label="Target workspace">
+                <option value="">One-off work</option>
+              </select>
+            </label>
+            <span class="composer-hint">Enter to send · Shift Enter for a new line</span>
+            <button id="send-command" class="send-command" type="submit" aria-label="Send command">↑</button>
           </div>
-          <div class="ops-panel">
-            <div class="ops-label">jobs</div>
-            <div id="ops-jobs" class="ops-list"></div>
-          </div>
-          <div class="ops-panel">
-            <div class="ops-label">memory</div>
-            <div id="ops-memory" class="ops-value small">—</div>
-            <div class="ops-note">owner review required — nothing auto-accepts</div>
-          </div>
-          <div class="ops-panel">
-            <div class="ops-label">automation</div>
-            <div id="ops-automation" class="ops-value small">—</div>
-          </div>
+        </form>
+
+        <div class="console-shortcuts" aria-label="Quick commands">
+          <button type="button" data-quick-command="status">System status</button>
+          <button type="button" data-quick-command="jobs">Recent work</button>
+          <button type="button" data-quick-command="projects">Projects</button>
+          <button type="button" data-quick-command="lessons">Lessons</button>
         </div>
       </div>
     </section>
 
-    <section id="view-keep" class="os-view os-hidden">
-      <div id="keep-stage" class="keep-stage"></div>
-      <div id="keep-panel" class="keep-panel os-hidden">
-        <div class="keep-panel-head">
-          <span id="keep-panel-title">—</span>
-          <button type="button" id="keep-panel-close" aria-label="Close panel">×</button>
+    <section id="view-ops" class="os-view ops-view os-hidden" aria-labelledby="ops-title">
+      <header class="view-intro">
+        <div>
+          <p class="eyebrow">Mission control</p>
+          <h1 id="ops-title">Work moving through AG OS</h1>
+          <p>Only the work that needs watching or deciding.</p>
         </div>
-        <div id="keep-panel-body" class="keep-panel-body"></div>
+        <button id="refresh-ops" class="quiet-button" type="button">Refresh</button>
+      </header>
+      <div class="ops-board">
+        <section class="ops-column ops-projects">
+          <div class="column-title"><span>Projects</span><small id="project-count">0</small></div>
+          <div id="ops-project-list" class="card-list"></div>
+        </section>
+        <section class="ops-column ops-work">
+          <div class="column-title"><span>Active work</span><small id="job-count">0</small></div>
+          <div id="ops-job-list" class="card-list"></div>
+        </section>
+        <section class="ops-column ops-decisions">
+          <div class="column-title"><span>Needs you</span><small id="decision-count">0</small></div>
+          <div id="ops-decision-list" class="card-list"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="view-keep" class="os-view keep-view os-hidden" aria-label="AG OS Keep">
+      <div class="keep-toolbar">
+        <div><strong>The Keep</strong><span>Live map of your operating company</span></div>
+        <div id="keep-mode" class="keep-mode">Quiet</div>
+      </div>
+      <div id="keep-stage" class="keep-stage" aria-label="Interactive AG OS operating map"></div>
+    </section>
+
+    <section id="view-dash" class="os-view dash-view os-hidden" aria-labelledby="dash-title">
+      <header class="view-intro">
+        <div>
+          <p class="eyebrow">Owner snapshot</p>
+          <h1 id="dash-title">Everything important. Nothing extra.</h1>
+          <p>The health, money, decisions, and learning behind the Keep.</p>
+        </div>
+        <span id="dash-updated" class="state-line">Waiting for live state</span>
+      </header>
+      <div id="dash-metrics" class="metric-grid"></div>
+      <div class="dash-grid">
+        <section class="dash-panel systems-panel">
+          <div class="panel-heading"><div><span class="eyebrow">Core systems</span><h2>Operational posture</h2></div></div>
+          <div id="dash-systems" class="system-list"></div>
+        </section>
+        <section class="dash-panel focus-panel">
+          <div class="panel-heading"><div><span class="eyebrow">Today</span><h2>Owner focus</h2></div></div>
+          <div id="dash-focus" class="focus-list"></div>
+        </section>
       </div>
     </section>
   </main>
 
-  <footer class="os-prompt">
-    <span class="os-caret-mark">❯</span>
-    <input id="os-input" aria-label="Owner command" autocomplete="off" spellcheck="false"
-      placeholder="tell ag-os what to do… (or: status · jobs · budget · lessons · help)" />
-    <span id="os-caret" class="os-caret">█</span>
-  </footer>
+  <aside id="detail-drawer" class="detail-drawer" aria-hidden="true">
+    <div class="drawer-backdrop" data-close-drawer></div>
+    <section class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+      <header class="drawer-head">
+        <div><p id="drawer-kicker" class="eyebrow">AG OS</p><h2 id="drawer-title">Details</h2></div>
+        <button type="button" class="drawer-close" data-close-drawer aria-label="Close details">×</button>
+      </header>
+      <div id="drawer-body" class="drawer-body"></div>
+    </section>
+  </aside>
 
-  <script src="os.js?v=20260721"></script>
+  <dialog id="auth-dialog" class="auth-dialog" aria-labelledby="auth-title">
+    <form id="auth-form" method="dialog" class="auth-card">
+      <div class="auth-sigil" aria-hidden="true"><span></span></div>
+      <p class="eyebrow">Private owner access</p>
+      <h2 id="auth-title">Enter the Keep</h2>
+      <p>Your session stays on this browser for up to 30 days.</p>
+      <label>Owner password<input id="owner-password" type="password" minlength="12" maxlength="128" autocomplete="current-password" required></label>
+      <button type="submit">Unlock AG OS</button>
+      <details>
+        <summary>Use recovery token</summary>
+        <label>Recovery token<input id="owner-token" type="password" autocomplete="off"></label>
+        <button id="use-token" type="button" class="quiet-button">Use token for this tab</button>
+      </details>
+      <p id="auth-message" class="auth-message" role="status"></p>
+    </form>
+  </dialog>
+
+  <script src="os.js?v=20260721b"></script>
 </body>
 </html>

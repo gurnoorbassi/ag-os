@@ -58,7 +58,11 @@ const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
-  ".svg": "image/svg+xml"
+  ".md": "text/markdown; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".toml": "text/plain; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8"
 };
 
 async function runAutomaticQueue() {
@@ -296,7 +300,7 @@ async function submitRuntimeCommand(body, { recovery = null, forceReplan = false
 
 function serveStatic(request, response) {
   const requestPath = new URL(request.url, "http://localhost").pathname;
-  const relative = requestPath === "/" ? "index.html" : requestPath === "/mobile-approval" ? "mobile-approval.html" : decodeURIComponent(requestPath.slice(1));
+  const relative = requestPath === "/" ? "os.html" : requestPath === "/mobile-approval" ? "mobile-approval.html" : decodeURIComponent(requestPath.slice(1));
   const target = path.resolve(dashboardRoot, relative);
   if (!target.startsWith(`${dashboardRoot}${path.sep}`) || !existsSync(target) || !statSync(target).isFile()) {
     json(response, 404, { error: "not_found" });
@@ -599,6 +603,32 @@ const server = createServer(async (request, response) => {
         root,
         includeContent: true
       }), headers);
+      return;
+    }
+
+    const jobPreviewMatch = url.pathname.match(/^\/api\/v1\/jobs\/([^/]+)\/preview(?:\/(.*))?$/);
+    if (request.method === "GET" && jobPreviewMatch) {
+      const jobId = decodeURIComponent(jobPreviewMatch[1]);
+      const deliverable = getJobDeliverable({ jobId, root, includeContent: true });
+      if (!deliverable.ownerUsable || !deliverable.previewAvailable || !deliverable.entryFile) {
+        json(response, 404, { error: "preview_not_available" }, headers);
+        return;
+      }
+      const requestedFile = decodeURIComponent(jobPreviewMatch[2] || deliverable.entryFile);
+      const file = deliverable.files.find((candidate) => candidate.path === requestedFile);
+      if (!file) {
+        json(response, 404, { error: "preview_file_not_found" }, headers);
+        return;
+      }
+      response.writeHead(200, {
+        ...headers,
+        "content-type": MIME_TYPES[path.extname(file.path).toLowerCase()] || "text/plain; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'self'",
+        "referrer-policy": "no-referrer",
+        "x-content-type-options": "nosniff"
+      });
+      response.end(file.content);
       return;
     }
 
