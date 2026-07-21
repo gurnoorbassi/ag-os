@@ -1,4 +1,4 @@
-import { budgetPercent, gateControlsForJob, packetStage, waitingApprovalJobs } from "./keep-model.mjs";
+import { budgetPercent, gateControlsForJob, packetStage, standupDue, standupLessonTitles, waitingApprovalJobs } from "./keep-model.mjs";
 
 (() => {
   const world = document.querySelector("#keep-world");
@@ -15,6 +15,9 @@ import { budgetPercent, gateControlsForJob, packetStage, waitingApprovalJobs } f
   };
   let latestStatus = null;
   let selectedEntity = null;
+  let standupTimer = null;
+  let standupSpeechTimer = null;
+  let lastScheduledStandupDate = null;
 
   function node(tag, className, text) {
     const element = document.createElement(tag);
@@ -305,6 +308,7 @@ import { budgetPercent, gateControlsForJob, packetStage, waitingApprovalJobs } f
     });
     if (!queue.childElementCount) queue.append(node("p", "keep-empty", "No lessons need a decision."));
     content.append(queue);
+    startStandup(60_000);
   }
 
   function renderOwner() {
@@ -360,10 +364,7 @@ import { budgetPercent, gateControlsForJob, packetStage, waitingApprovalJobs } f
     else if (entity === "constitution") renderConstitution();
     else if (entity === "archive") renderArchive();
     else if (entity === "watchdog") renderWatchdog();
-    else if (entity === "standup") {
-      const content = overlayShell("daily standup");
-      content.append(node("p", "keep-copy", "The read-only lesson standup is added in the next stacked branch."));
-    }
+    else if (entity === "standup") renderStandupPanel();
   }
 
   function activateEntities() {
@@ -440,6 +441,57 @@ import { budgetPercent, gateControlsForJob, packetStage, waitingApprovalJobs } f
     if (selectedEntity && !overlay.hidden) openEntity(selectedEntity);
   }
 
+  function ensureStandupGathering() {
+    let gathering = world.querySelector(".standup-gathering");
+    if (gathering) return gathering;
+    gathering = node("div", "standup-gathering");
+    gathering.append(node("span", "standup-member", "Planner"), node("span", "standup-member", "Codex"), node("span", "standup-member", "Gate"), node("span", "standup-member", "Fable"), node("span", "standup-memory", "Memory"), node("blockquote", "standup-speech"));
+    world.append(gathering);
+    return gathering;
+  }
+
+  function stopStandup() {
+    window.clearTimeout(standupTimer);
+    window.clearInterval(standupSpeechTimer);
+    standupTimer = null;
+    standupSpeechTimer = null;
+    world.classList.remove("standup-active");
+  }
+
+  function startStandup(durationMs = 60_000) {
+    const titles = standupLessonTitles(latestStatus?.lessonDecisions?.decisions || []);
+    if (!titles.length) return false;
+    stopStandup();
+    const gathering = ensureStandupGathering();
+    const speech = gathering.querySelector(".standup-speech");
+    let index = 0;
+    speech.textContent = titles[index];
+    world.classList.add("standup-active");
+    standupSpeechTimer = window.setInterval(() => {
+      index = (index + 1) % titles.length;
+      speech.textContent = titles[index];
+    }, 3_500);
+    standupTimer = window.setTimeout(stopStandup, durationMs);
+    return true;
+  }
+
+  function renderStandupPanel() {
+    const content = overlayShell("daily standup · read only");
+    const titles = standupLessonTitles(latestStatus?.lessonDecisions?.decisions || [], 10);
+    if (titles.length) {
+      const list = node("ul", "standup-lesson-list");
+      titles.forEach((title) => list.append(node("li", "", title)));
+      content.append(node("p", "keep-copy", "The team is discussing real candidate lessons. This scene cannot accept or reject anything."), list);
+      startStandup(60_000);
+    } else content.append(node("p", "keep-empty", "No candidate lessons are waiting for standup."));
+  }
+
+  function checkScheduledStandup(now = new Date()) {
+    if (!standupDue(now, lastScheduledStandupDate, 9)) return;
+    const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    if (startStandup(5 * 60_000)) lastScheduledStandupDate = localDate;
+  }
+
   async function submitQuest(event) {
     event.preventDefault();
     const input = document.querySelector("#keep-quest-command");
@@ -481,4 +533,7 @@ import { budgetPercent, gateControlsForJob, packetStage, waitingApprovalJobs } f
       window.setTimeout(() => actor?.classList.remove("is-walking"), 1_200);
     }
   });
+  if (window.AGOS.latestStatus) renderLiveState(window.AGOS.latestStatus);
+  checkScheduledStandup();
+  window.setInterval(checkScheduledStandup, 60_000);
 })();

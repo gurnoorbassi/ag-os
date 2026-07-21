@@ -21,3 +21,18 @@ export function waitingApprovalJobs(jobs = []) {
 export function gateControlsForJob(job) {
   return job?.status === "waiting_approval" ? ["approve", "reject"] : [];
 }
+
+export function standupLessonTitles(decisions = [], max = 5) {
+  return decisions
+    .map((lesson) => String(lesson?.title || "").trim())
+    .filter(Boolean)
+    .slice(0, Math.max(0, max))
+    .map((title) => title.length > 72 ? `${title.slice(0, 69)}…` : title);
+}
+
+export function standupDue(now = new Date(), lastRunDate = null, hour = 9) {
+  const date = new Date(now);
+  if (!Number.isFinite(date.getTime())) return false;
+  const localDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  return date.getHours() === hour && date.getMinutes() < 10 && lastRunDate !== localDate;
+}

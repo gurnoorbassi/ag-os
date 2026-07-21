@@ -128,4 +128,9 @@
     if (record.type === "lesson_decision") pipelineLine("memory", record.summary || "lesson decision recorded");
     if (record.type === "automation_tick") writeLine("automation", record.summary || "state refreshed");
   });
+  if (window.AGOS.latestStatus) {
+    status = window.AGOS.latestStatus;
+    renderProjects(status);
+    note.textContent = `Connected · ${status.jobs?.length || 0} jobs · fail-closed protections active`;
+  }
 })();

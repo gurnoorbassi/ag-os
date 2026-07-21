@@ -2199,6 +2199,13 @@ kbd {
 .job-packet[data-stage="archive"] { left: calc(50% - 50px); top: calc(58% + var(--packet-index) * 8px); opacity: .28; animation: archive-drop 500ms ease-out; }
 .job-packet[data-stage="blocked"] { right: calc(6% + var(--packet-index) * 8px); bottom: calc(20% + var(--packet-index) * 13px); color: var(--bad); }.job-packet[data-stage="blocked"] .packet-chip { border-color: var(--bad); box-shadow: none; }
 .lesson-accepted-event .standup-table { animation: table-thump 280ms ease-out; }
+.standup-gathering { position: absolute; left: 50%; top: 59%; z-index: 12; width: 260px; height: 140px; transform: translate(-50%,-50%); display: none; pointer-events: none; }
+.standup-active .standup-gathering { display: block; }
+.standup-member,
+.standup-memory { position: absolute; min-width: 44px; padding: 4px 5px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font-size: 8px; text-align: center; }
+.standup-member:nth-child(1) { left: 8px; top: 50px; }.standup-member:nth-child(2) { left: 60px; top: 94px; }.standup-member:nth-child(3) { right: 8px; top: 50px; }.standup-member:nth-child(4) { right: 58px; top: 94px; }.standup-memory { left: 105px; top: 8px; color: var(--accent); }
+.standup-speech { position: absolute; left: 34px; right: 34px; top: -56px; min-height: 34px; margin: 0; padding: 7px; border: 1px solid var(--accent); background: var(--surface); color: var(--text); font-size: 8px; line-height: 1.35; text-align: center; }
+.standup-lesson-list { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--text); font-size: 9px; line-height: 1.4; }
 @keyframes reactor-pulse { 0%,100% { transform: rotate(45deg) scale(.92); } 50% { transform: rotate(45deg) scale(1.04); } }
 @keyframes brain-hover { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 @keyframes brain-blink { 0%,94%,100% { transform: scaleY(1); } 95%,98% { transform: scaleY(.15); } }
