@@ -115,8 +115,11 @@ export function listAutonomousJobs({ root = process.cwd(), env = process.env, li
     .slice(0, Math.max(1, Math.min(limit, 100)))
     .map((job) => {
       const command = readJson(commandPath(job), root);
+      let plan = null;
+      try { plan = readJson(planPathForJob(job, root), root); } catch { plan = null; }
       const adapter = selectExecutionAdapter({ command, env });
       const approval = activeJobApproval({ job, adapter, root });
+      const deliverable = jobDeliverableSummary({ job, root });
       return {
       jobId: job.jobId,
       projectId: job.projectId,
@@ -128,7 +131,12 @@ export function listAutonomousJobs({ root = process.cwd(), env = process.env, li
       expectedOutput: job.expectedOutput,
       qualityScorePath: job.completionEvidence?.qualityScorePath,
       lessonCandidatePaths: job.completionEvidence?.lessonCandidatePaths || [],
-      deliverable: jobDeliverableSummary({ job, root }),
+      deliverable,
+      commandPreview: String(command.rawCommand || "").slice(0, 240),
+      requestedAction: adapter.requestedAction,
+      approvalScope: `${adapter.requestedAction} for ${job.projectId}`,
+      estimatedCostUsd: Number(plan?.estimatedCostUsd || 0),
+      evidence: [job.completionEvidence?.qualityScorePath, ...(job.completionEvidence?.lessonCandidatePaths || []), deliverable?.entryFile].filter(Boolean),
       outcomeRecorded: existsSync(path.join(root, `.codex/outcomes/outcome-${slugify(job.jobId)}.json`)),
       adapter,
       approvalId: job.approvalId,

@@ -27,7 +27,8 @@ for (const relativePath of [
   "dashboard/console.js",
   "dashboard/ops.js",
   "dashboard/ops-model.mjs",
-  "dashboard/keep.js"
+  "dashboard/keep.js",
+  "dashboard/keep-model.mjs"
 ]) {
   requireFile(relativePath);
 }

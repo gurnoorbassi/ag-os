@@ -24,6 +24,20 @@ function newest(items, timestamp = "updatedAt", limit = 12) {
     .slice(0, limit);
 }
 
+export function listRecentAuditEvents({ root = process.cwd(), limit = 10 } = {}) {
+  return newest(records(".codex/audit", root)
+    .map(({ record }) => record)
+    .filter((record) => record.eventType && !record.template)
+    .map((record) => ({
+      id: record.id,
+      eventType: record.eventType,
+      summary: record.summary,
+      occurredAt: record.occurredAt ?? record.createdAt,
+      riskLevel: record.riskLevel,
+      liveServiceTouched: record.liveServiceTouched === true
+    })), "occurredAt", Math.max(1, Math.min(Number(limit) || 10, 25)));
+}
+
 function approvalSensitivity(riskLevel) {
   if (riskLevel === "high") return { level: "protected", label: "Protected", explanation: "Low starting trust keeps external and production actions behind exact owner approval." };
   if (riskLevel === "medium") return { level: "controlled", label: "Controlled", explanation: "Local work can run, while external or production effects remain approval-gated." };
