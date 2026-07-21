@@ -24,7 +24,9 @@ for (const relativePath of [
   "dashboard/styles.css",
   "dashboard/app.js",
   "dashboard/shell.js",
-  "dashboard/console.js"
+  "dashboard/console.js",
+  "dashboard/ops.js",
+  "dashboard/ops-model.mjs"
 ]) {
   requireFile(relativePath);
 }
