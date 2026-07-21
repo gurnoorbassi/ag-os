@@ -94,8 +94,8 @@ test("Anthropic worker requests a bounded schema and validates safe file output"
   assert.equal(request.url, "https://anthropic.test/v1/messages");
   assert.equal(request.options.headers["x-api-key"], "test-only-key");
   const body = JSON.parse(request.options.body);
-  assert.equal(body.max_tokens, 16_000);
-  assert.equal(ANTHROPIC_WORKER_MAX_TOKENS, 16_000);
+  assert.equal(body.max_tokens, 22_000);
+  assert.equal(ANTHROPIC_WORKER_MAX_TOKENS, 22_000);
   assert.equal(ANTHROPIC_WORKER_TIMEOUT_MS, 180_000);
   assert.equal(body.output_config.format.type, "json_schema");
   assert.equal(JSON.stringify(body.output_config.format.schema).includes("maxItems"), false);
@@ -137,7 +137,7 @@ test("Anthropic worker rejects a truncated structured response before parsing pa
         return {
           model: "claude-sonnet-5",
           stop_reason: "max_tokens",
-          usage: { input_tokens: 120, output_tokens: 16_000 },
+          usage: { input_tokens: 120, output_tokens: 22_000 },
           content: [{ type: "text", text: '{"summary":"partial' }]
         };
       }
