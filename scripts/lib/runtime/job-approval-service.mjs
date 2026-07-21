@@ -13,6 +13,7 @@ import { n8nWorkflowControlApprovalCriteria, validateN8nWorkflowControlRequest }
 import { productionDeploymentApprovalCriteria, validateProductionDeploymentRequest } from "./production-deployment-adapter.mjs";
 import { socialPublishingApprovalCriteria, validateSocialPublishingRequest } from "./social-publishing-adapter.mjs";
 import { dnsChangeApprovalCriteria, validateDnsChangeRequest } from "./dns-change-adapter.mjs";
+import { publishRuntimeEvent } from "./runtime-event-stream.mjs";
 
 function jobPath(jobId) {
   return `.codex/jobs/${jobId}.json`;
@@ -141,6 +142,7 @@ export function decideJob({ jobId, decision, confirmation, expiresAt, root = pro
       updatedAt: timestamp
     };
     writeJson(sourcePath, revokedJob, root);
+    publishRuntimeEvent({ type: "job_state_transition", jobId, projectId: job.projectId, previousStatus: job.status, status: revokedJob.status, summary: "Owner revoked the exact job approval.", now });
     const audit = writeAuditEventRecord({
       runId: `${jobId}-owner-revoked`,
       eventType: "approval_rejected",
@@ -173,6 +175,7 @@ export function decideJob({ jobId, decision, confirmation, expiresAt, root = pro
       updatedAt: timestamp
     };
     writeJson(sourcePath, rejected, root);
+    publishRuntimeEvent({ type: "job_state_transition", jobId, projectId: job.projectId, previousStatus: job.status, status: rejected.status, summary: "Owner rejected the exact job.", now });
     const audit = writeAuditEventRecord({
       runId: `${jobId}-owner-rejected`,
       eventType: "approval_rejected",
@@ -201,6 +204,7 @@ export function decideJob({ jobId, decision, confirmation, expiresAt, root = pro
     updatedAt: timestamp
   };
   writeJson(sourcePath, resumed, root);
+  publishRuntimeEvent({ type: "job_state_transition", jobId, projectId: job.projectId, previousStatus: job.status, status: resumed.status, summary: "Owner approved and re-queued the exact job.", now });
   const audit = writeAuditEventRecord({
     runId: `${jobId}-owner-approved`,
     eventType: "approval_granted",

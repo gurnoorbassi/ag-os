@@ -25,6 +25,7 @@ import { autonomousExecutionStatus, listAutonomousJobs, processQueuedJobs } from
 import { decideJob } from "./lib/runtime/job-approval-service.mjs";
 import { evaluateOperationalSafeguards, resolveOperationalFinding } from "./lib/runtime/operational-safeguards.mjs";
 import { startInternalWatchdog } from "./lib/runtime/internal-watchdog.mjs";
+import { publishRuntimeEvent, serializeRuntimeEvent, subscribeRuntimeEvents } from "./lib/runtime/runtime-event-stream.mjs";
 import { getJobDeliverable } from "./lib/runtime/deliverable-service.mjs";
 import { prepareJobRecovery } from "./lib/runtime/job-recovery-service.mjs";
 import { consumeMobileApproval, createMobileApprovalLink, deliverMobileApprovalLink, mobileApprovalReadiness } from "./lib/runtime/mobile-approval-service.mjs";
@@ -72,6 +73,13 @@ async function runAutomaticQueue() {
       }));
     }
     refreshProposals({ root });
+    if (result.processed?.length) {
+      publishRuntimeEvent({
+        type: "automation_tick",
+        status: result.status,
+        summary: `Automation processed ${result.processed.length} job(s).`
+      });
+    }
     return result;
   } catch (error) {
     console.error(JSON.stringify({ service: "ag-os-coordinator", event: "automatic-run-failed", detail: error.message }));
@@ -423,6 +431,25 @@ const server = createServer(async (request, response) => {
   }
 
   try {
+    if (request.method === "GET" && url.pathname === "/api/v1/events") {
+      response.writeHead(200, {
+        ...headers,
+        "content-type": "text/event-stream; charset=utf-8",
+        "cache-control": "no-store",
+        connection: "keep-alive",
+        "x-accel-buffering": "no",
+        "x-content-type-options": "nosniff"
+      });
+      response.write(`event: ready\ndata: ${JSON.stringify({ status: "connected", occurredAt: new Date().toISOString() })}\n\n`);
+      const unsubscribe = subscribeRuntimeEvents((event) => response.write(serializeRuntimeEvent(event)));
+      const keepAlive = setInterval(() => response.write(": keep-alive\n\n"), 15_000);
+      request.on("close", () => {
+        clearInterval(keepAlive);
+        unsubscribe();
+      });
+      return;
+    }
+
     if (request.method === "GET" && url.pathname === "/api/v1/status") {
       json(response, 200, {
         service: "ag-os-coordinator",
@@ -507,6 +534,7 @@ const server = createServer(async (request, response) => {
         reason: body.reason,
         root
       });
+      publishRuntimeEvent({ type: "lesson_decision", status: body.decision, summary: `${body.lessonIds?.length || 0} lesson decision(s) recorded.` });
       json(response, 200, result, headers);
       return;
     }
@@ -573,6 +601,7 @@ const server = createServer(async (request, response) => {
 
     if (request.method === "POST" && url.pathname === "/api/v1/automation/run") {
       const result = await processQueuedJobs({ root });
+      if (result.processed?.length) publishRuntimeEvent({ type: "automation_tick", status: result.status, summary: `Owner-triggered automation processed ${result.processed.length} job(s).` });
       json(response, 200, result, headers);
       return;
     }
@@ -628,6 +657,7 @@ const server = createServer(async (request, response) => {
     if (request.method === "POST" && url.pathname === "/api/v1/commands") {
       const body = await readJsonBody(request);
       const result = await submitRuntimeCommand(body);
+      publishRuntimeEvent({ type: "job_state_transition", jobId: result.jobId, projectId: body.projectId, status: result.status, summary: "Owner command created a runtime job." });
       json(response, 201, result, headers);
       setImmediate(runAutomaticQueue);
       return;
