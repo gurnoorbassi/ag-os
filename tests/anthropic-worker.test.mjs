@@ -161,6 +161,10 @@ test("Anthropic worker rejects traversal, hidden files, invalid JSON, and oversi
   }), SyntaxError);
   assert.throws(() => assertWorkProductShape({
     ...source,
+    files: [{ path: "config.xml", content: "<config />", purpose: "unapproved XML" }]
+  }), /limited to a root sitemap\.xml/);
+  assert.throws(() => assertWorkProductShape({
+    ...source,
     files: [{ path: "large.md", content: "x".repeat(200_001), purpose: "large" }]
   }), /exceeds 200000 bytes/);
 });
@@ -169,6 +173,12 @@ test("website work products require a previewable root entry file", () => {
   assert.throws(() => assertWorkProductMatchesCommand({ command: { rawCommand: "Build a polished website" }, workProduct: safeWorkProduct() }), /root index\.html/);
   const website = safeWorkProduct();
   website.files[0].path = "index.html";
+  website.files.push({
+    path: "sitemap.xml",
+    content: "<?xml version=\"1.0\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"></urlset>",
+    purpose: "Search-engine discovery metadata"
+  });
+  assert.doesNotThrow(() => assertWorkProductShape(website));
   assert.doesNotThrow(() => assertWorkProductMatchesCommand({ command: { rawCommand: "Build a polished website" }, workProduct: website }));
 });
 

@@ -465,6 +465,7 @@ test("Netlify adapter deploys an exact secret-scanned draft preview without prod
   mkdirSync(path.join(workspace, sourceDirectory), { recursive: true });
   writeFileSync(path.join(workspace, sourceDirectory, "WORK_PRODUCT.md"), "# Private completion evidence\n", "utf8");
   writeFileSync(path.join(workspace, sourceDirectory, "index.html"), "<!doctype html><title>Preview</title>\n", "utf8");
+  writeFileSync(path.join(workspace, sourceDirectory, "sitemap.xml"), "<?xml version=\"1.0\"?><urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"></urlset>\n", "utf8");
   const executionRequest = {
     adapterId: "netlify-staging",
     operation: "create_draft_deploy",
@@ -476,6 +477,7 @@ test("Netlify adapter deploys an exact secret-scanned draft preview without prod
   };
   const validated = validateNetlifyStagingRequest({ request: executionRequest, root: workspace });
   assert.equal(validated.source.files.some((file) => file.path === "WORK_PRODUCT.md"), false);
+  assert.equal(validated.source.files.some((file) => file.path === "sitemap.xml"), true);
   const command = await submitOwnerCommand({
     command: "Create a Netlify staging preview deploy for the dashboard",
     projectId: "project-quote-builder",

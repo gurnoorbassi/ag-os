@@ -10,7 +10,7 @@ const API_BASE = "https://api.github.com";
 const MAX_FILES = 100;
 const MAX_FILE_BYTES = 500_000;
 const MAX_TOTAL_BYTES = 2_000_000;
-const TEXT_EXTENSIONS = new Set([".css", ".csv", ".html", ".js", ".json", ".md", ".mjs", ".svg", ".txt", ".yaml", ".yml"]);
+const TEXT_EXTENSIONS = new Set([".css", ".csv", ".html", ".js", ".json", ".md", ".mjs", ".svg", ".txt", ".xml", ".yaml", ".yml"]);
 
 function safeSegment(value, label) {
   const text = String(value || "").trim();
@@ -53,6 +53,7 @@ function collectFiles(directory) {
       if (!entry.isFile()) continue;
       const extension = path.extname(entry.name).toLowerCase();
       if (!TEXT_EXTENSIONS.has(extension)) throw new Error(`GitHub source file extension is not allowed: ${relative}`);
+      if (extension === ".xml" && relative !== "sitemap.xml") throw new Error(`GitHub XML source files are limited to a root sitemap.xml: ${relative}`);
       if (stat.size > MAX_FILE_BYTES) throw new Error(`GitHub source file exceeds ${MAX_FILE_BYTES} bytes: ${relative}`);
       totalBytes += stat.size;
       if (totalBytes > MAX_TOTAL_BYTES) throw new Error(`GitHub source files exceed ${MAX_TOTAL_BYTES} total bytes`);
