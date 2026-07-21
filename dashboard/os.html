@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AG OS — Owner Console</title>
+  <link rel="stylesheet" href="os.css?v=20260721" />
+</head>
+<body>
+  <header class="os-top">
+    <span class="os-brand">AG OS</span>
+    <nav class="os-views" id="os-views">
+      <button type="button" data-view="console">console</button>
+      <button type="button" data-view="ops">ops</button>
+      <button type="button" data-view="keep">keep</button>
+      <a href="index.html" class="os-dash-link">dash</a>
+    </nav>
+    <span class="os-right">
+      <span id="os-conn" class="os-conn" role="status">connecting…</span>
+      <span class="os-failclosed">fail-closed <span class="ok">●</span></span>
+    </span>
+  </header>
+
+  <main>
+    <section id="view-console" class="os-view">
+      <div id="con-screen" class="con-screen" aria-live="polite"></div>
+    </section>
+
+    <section id="view-ops" class="os-view os-hidden">
+      <div class="ops-grid">
+        <div class="ops-main">
+          <div class="ops-pane-title">┌─ activity ─────────────</div>
+          <div id="ops-feed" class="ops-feed" aria-live="polite"></div>
+        </div>
+        <div class="ops-side">
+          <div class="ops-panel">
+            <div class="ops-label">budget · month</div>
+            <div id="ops-budget" class="ops-value">—</div>
+            <div id="ops-budget-bar" class="ops-bar"></div>
+            <div id="ops-budget-note" class="ops-note">breaker armed</div>
+          </div>
+          <div class="ops-panel">
+            <div class="ops-label">jobs</div>
+            <div id="ops-jobs" class="ops-list"></div>
+          </div>
+          <div class="ops-panel">
+            <div class="ops-label">memory</div>
+            <div id="ops-memory" class="ops-value small">—</div>
+            <div class="ops-note">owner review required — nothing auto-accepts</div>
+          </div>
+          <div class="ops-panel">
+            <div class="ops-label">automation</div>
+            <div id="ops-automation" class="ops-value small">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-keep" class="os-view os-hidden">
+      <div id="keep-stage" class="keep-stage"></div>
+      <div id="keep-panel" class="keep-panel os-hidden">
+        <div class="keep-panel-head">
+          <span id="keep-panel-title">—</span>
+          <button type="button" id="keep-panel-close" aria-label="Close panel">×</button>
+        </div>
+        <div id="keep-panel-body" class="keep-panel-body"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="os-prompt">
+    <span class="os-caret-mark">❯</span>
+    <input id="os-input" aria-label="Owner command" autocomplete="off" spellcheck="false"
+      placeholder="tell ag-os what to do… (or: status · jobs · budget · lessons · help)" />
+    <span id="os-caret" class="os-caret">█</span>
+  </footer>
+
+  <script src="os.js?v=20260721"></script>
+</body>
+</html>
