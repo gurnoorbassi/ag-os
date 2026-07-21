@@ -334,6 +334,10 @@ test("required independent critic fails closed before builder spending when not 
 
 test("a builder provider failure becomes a recoverable failed job instead of remaining queued", async () => {
   const root = tempWorkspace();
+  const existingJobs = new Set(
+    readdirSync(path.join(root, ".codex/jobs"))
+      .filter((name) => name.startsWith("job-runtime-operator-") && name.endsWith(".json"))
+  );
   await assert.rejects(() => submitOwnerCommand({
     command: "Build a private operations dashboard",
     projectId: "project-quote-builder",
@@ -343,7 +347,9 @@ test("a builder provider failure becomes a recoverable failed job instead of rem
     root,
     now: new Date("2026-07-19T19:00:00.000Z")
   }), /provider unavailable/);
-  const jobs = readdirSync(path.join(root, ".codex/jobs")).filter((name) => name.startsWith("job-runtime-operator-") && name.endsWith(".json"));
+  const jobs = readdirSync(path.join(root, ".codex/jobs"))
+    .filter((name) => name.startsWith("job-runtime-operator-") && name.endsWith(".json"))
+    .filter((name) => !existingJobs.has(name));
   assert.equal(jobs.length, 1);
   const job = JSON.parse(readFileSync(path.join(root, ".codex/jobs", jobs[0]), "utf8"));
   assert.equal(job.status, "failed");

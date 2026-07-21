@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AG OS Dashboard</title>
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./styles.css?v=20260720">
   </head>
   <body>
+    <a class="skip-link" href="#workspace-content">Skip to workspace</a>
     <div class="app-shell">
       <aside class="sidebar" aria-label="Dashboard sections">
         <div class="brand-row">
@@ -22,7 +23,7 @@
           </button>
         </div>
 
-        <div class="system-presence"><span aria-hidden="true"></span> Private runtime</div>
+        <div id="shell-runtime-presence" class="system-presence"><span aria-hidden="true"></span><span id="shell-runtime-label">Private runtime</span></div>
 
         <nav id="section-nav" class="section-nav">
           <div class="nav-group" aria-label="Workspaces">
@@ -80,22 +81,29 @@
         </div>
       </aside>
 
-      <main class="dashboard">
+      <main id="workspace-content" class="dashboard">
         <header class="topbar">
+          <div class="workspace-location">
+            <button id="mobile-nav-toggle" class="topbar-menu" type="button" aria-label="Open apps">Menu</button>
+            <span class="workspace-location-root">AG OS</span>
+            <span aria-hidden="true">/</span>
+            <strong id="view-kicker">Command</strong>
+          </div>
+          <button id="command-palette-trigger" class="command-palette-trigger" type="button">
+            <span>Search or run a command</span><kbd>Ctrl K</kbd>
+          </button>
+          <div class="topbar-presence">
+            <div id="runtime-mode" class="mode-lock" aria-label="Dashboard mode"><span aria-hidden="true"></span> Offline evidence</div>
+            <div class="owner-avatar" aria-label="Owner workspace">GB</div>
+          </div>
+        </header>
+
+        <div class="workspace-heading">
           <div>
-            <p class="eyebrow">Owner control center <span aria-hidden="true">/</span> <span id="view-kicker">Command</span></p>
+            <p class="eyebrow">Owner workspace</p>
             <h1 id="view-title">Tell AG OS what to do</h1>
             <p id="view-description">Give one clear outcome. AG OS will organize the work and stop only when your approval is required.</p>
           </div>
-          <div id="runtime-mode" class="mode-lock" aria-label="Dashboard mode"><span aria-hidden="true"></span> Offline evidence</div>
-        </header>
-
-        <div class="view-switcher" role="group" aria-label="Dashboard view">
-          <button type="button" data-dashboard-view="home" aria-pressed="true">Command</button>
-          <button type="button" data-dashboard-view="projects" aria-pressed="false">Projects</button>
-          <button type="button" data-dashboard-view="work" aria-pressed="false">Activity</button>
-          <button type="button" data-dashboard-view="intelligence" aria-pressed="false">Memory</button>
-          <button type="button" data-dashboard-view="system" aria-pressed="false">System</button>
         </div>
 
         <section id="command-center" class="section-band">
@@ -148,8 +156,26 @@
               <button type="submit">Start work <span aria-hidden="true">→</span></button>
             </div>
           </form>
-          <div id="recent-command-panel" class="stack-panel"></div>
-          <div id="runtime-job-panel" class="stack-panel"></div>
+          <aside class="command-sidecar" aria-label="AG OS status center">
+            <section class="shell-panel">
+              <div class="shell-panel-heading"><span>System pulse</span><span class="pulse-dot" aria-hidden="true"></span></div>
+              <div class="pulse-list">
+                <div><span>Runtime</span><strong id="shell-runtime-state">Private</strong></div>
+                <div><span>Active approvals</span><strong id="shell-approval-count">0</strong></div>
+                <div><span>Lesson decisions</span><strong id="shell-lesson-count">0</strong></div>
+                <div><span>Current runs</span><strong id="shell-run-count">0</strong></div>
+              </div>
+            </section>
+            <section class="shell-panel shell-quick-actions">
+              <div class="shell-panel-heading"><span>Open</span></div>
+              <button type="button" data-shell-action="projects"><span>Projects</span><small>View products and deliverables</small></button>
+              <button type="button" data-shell-action="activity"><span>Activity</span><small>Runs, reviews, and approvals</small></button>
+              <button type="button" data-shell-action="memory"><span>Memory</span><small>Decide lessons and inspect quality</small></button>
+            </section>
+            <p class="shell-safety-note">External actions remain locked until an exact approval matches the requested action.</p>
+          </aside>
+          <div id="recent-command-panel" class="stack-panel command-history"></div>
+          <div id="runtime-job-panel" class="stack-panel command-runs"></div>
         </section>
 
         <section id="proposals" class="section-band">
@@ -331,7 +357,34 @@
           <div id="safe-merge-panel" class="policy-panel"></div>
         </section>
       </main>
+
+      <nav class="mobile-dock" aria-label="AG OS apps">
+        <button type="button" data-dashboard-view="home" data-icon="C" aria-pressed="true">Command</button>
+        <button type="button" data-dashboard-view="projects" data-icon="P" aria-pressed="false">Projects</button>
+        <button type="button" data-dashboard-view="work" data-icon="A" aria-pressed="false">Activity</button>
+        <button type="button" data-dashboard-view="intelligence" data-icon="M" aria-pressed="false">Memory</button>
+        <button type="button" data-dashboard-view="system" data-icon="S" aria-pressed="false">System</button>
+      </nav>
     </div>
+
+    <dialog id="command-palette" class="command-palette" aria-labelledby="command-palette-title">
+      <div class="command-palette-shell">
+        <div class="command-palette-search">
+          <span aria-hidden="true">/</span>
+          <label class="visually-hidden" for="command-palette-input">Search AG OS</label>
+          <input id="command-palette-input" type="search" placeholder="Search AG OS or choose an action" autocomplete="off">
+          <kbd>Esc</kbd>
+        </div>
+        <div class="command-palette-body">
+          <p id="command-palette-title">Go to</p>
+          <button type="button" data-shell-action="new-command"><span><strong>New command</strong><small>Tell AG OS what outcome you want</small></span><kbd>N</kbd></button>
+          <button type="button" data-shell-action="projects"><span><strong>Projects</strong><small>Open your operating workspaces</small></span><kbd>P</kbd></button>
+          <button type="button" data-shell-action="activity"><span><strong>Activity</strong><small>Review runs and approvals</small></span><kbd>A</kbd></button>
+          <button type="button" data-shell-action="memory"><span><strong>Memory</strong><small>Quality, lessons, and costs</small></span><kbd>M</kbd></button>
+          <button type="button" data-shell-action="system"><span><strong>System</strong><small>Health, capabilities, and safeguards</small></span><kbd>S</kbd></button>
+        </div>
+      </div>
+    </dialog>
 
     <dialog id="workspace-dialog" class="workspace-dialog" aria-labelledby="workspace-dialog-title">
       <div class="workspace-dialog-shell">
@@ -347,6 +400,6 @@
     </dialog>
 
     <script src="./dashboard-data.js"></script>
-    <script src="./app.js"></script>
+    <script src="./app.js?v=20260720"></script>
   </body>
 </html>

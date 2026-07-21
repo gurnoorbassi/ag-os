@@ -331,6 +331,14 @@ const dashboardViews = {
   system: new Set(["activation-center", "overview", "registries", "capabilities", "operating-systems", "safe-merge"])
 };
 
+const dashboardPrimaryHash = {
+  home: "command-center",
+  projects: "projects",
+  work: "action-queue",
+  intelligence: "unified-memory",
+  system: "overview"
+};
+
 const dashboardViewMeta = {
   home: {
     kicker: "Command",
@@ -359,7 +367,24 @@ const dashboardViewMeta = {
   }
 };
 
-function setDashboardView(view) {
+function viewFromHash(hash = window.location.hash) {
+  const sectionId = hash.replace(/^#/, "");
+  return Object.entries(dashboardViews).find(([, sections]) => sections.has(sectionId))?.[0] || "home";
+}
+
+function renderShellPulse() {
+  const runtime = document.querySelector("#shell-runtime-state");
+  const presence = document.querySelector("#shell-runtime-presence");
+  const presenceLabel = document.querySelector("#shell-runtime-label");
+  if (!runtime || !presence || !presenceLabel) return;
+  runtime.textContent = runtimeConnected ? "Connected" : "Private";
+  presenceLabel.textContent = runtimeConnected ? "Owner connected" : "Private runtime";
+  presence.classList.toggle("status-active", runtimeConnected);
+  document.querySelector("#shell-approval-count").textContent = data.approvals.activeCount;
+  document.querySelector("#shell-lesson-count").textContent = runtimeLessonDecisions?.activeCandidateCount ?? data.qualityReview.candidateLessonCount;
+}
+
+function setDashboardView(view, { syncHash = false } = {}) {
   const activeView = dashboardViews[view] ? view : "home";
   document.querySelectorAll("[data-dashboard-view]").forEach((button) => {
     const active = button.dataset.dashboardView === activeView;
@@ -374,21 +399,28 @@ function setDashboardView(view) {
   document.querySelector("#view-title").textContent = meta.title;
   document.querySelector("#view-description").textContent = meta.description;
   document.body.dataset.activeView = activeView;
+  if (syncHash) history.replaceState(null, "", `#${dashboardPrimaryHash[activeView]}`);
+  document.querySelector(".dashboard")?.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function initializeNavigation() {
   const nav = document.querySelector("#section-nav");
   const toggle = document.querySelector("#nav-toggle");
+  const sidebar = document.querySelector(".sidebar");
+  const mobileToggle = document.querySelector("#mobile-nav-toggle");
+  const closeMobileSidebar = () => sidebar.classList.remove("is-open");
   toggle.addEventListener("click", () => {
     const open = nav.classList.toggle("is-open");
     toggle.setAttribute("aria-expanded", String(open));
   });
+  mobileToggle.addEventListener("click", () => sidebar.classList.toggle("is-open"));
   document.querySelectorAll("[data-dashboard-view]").forEach((button) => {
     button.addEventListener("click", () => {
-      setDashboardView(button.dataset.dashboardView);
+      setDashboardView(button.dataset.dashboardView, { syncHash: true });
       nav.querySelectorAll("a").forEach((item) => item.removeAttribute("aria-current"));
       nav.classList.remove("is-open");
       toggle.setAttribute("aria-expanded", "false");
+      closeMobileSidebar();
     });
   });
   nav.querySelectorAll("a[href^='#']").forEach((link) => {
@@ -398,12 +430,60 @@ function initializeNavigation() {
       link.setAttribute("aria-current", "location");
       nav.classList.remove("is-open");
       toggle.setAttribute("aria-expanded", "false");
+      closeMobileSidebar();
     });
   });
-  const initialLink = [...nav.querySelectorAll("a[href^='#']")]
-    .find((link) => link.getAttribute("href") === window.location.hash);
-  if (initialLink) initialLink.setAttribute("aria-current", "location");
-  setDashboardView(initialLink?.dataset.view || "home");
+  window.addEventListener("hashchange", () => setDashboardView(viewFromHash()));
+  setDashboardView(viewFromHash());
+}
+
+function runShellAction(action) {
+  const palette = document.querySelector("#command-palette");
+  if (palette?.open) palette.close();
+  const destinations = {
+    projects: "projects",
+    activity: "work",
+    memory: "intelligence",
+    system: "system"
+  };
+  if (action === "new-command") {
+    setDashboardView("home", { syncHash: true });
+    requestAnimationFrame(() => document.querySelector("#owner-command")?.focus());
+    return;
+  }
+  if (destinations[action]) setDashboardView(destinations[action], { syncHash: true });
+}
+
+function initializeCommandPalette() {
+  const palette = document.querySelector("#command-palette");
+  const input = document.querySelector("#command-palette-input");
+  const trigger = document.querySelector("#command-palette-trigger");
+  const openPalette = () => {
+    if (!palette.open) palette.showModal();
+    input.value = "";
+    palette.querySelectorAll(".command-palette-body > button").forEach((button) => { button.hidden = false; });
+    requestAnimationFrame(() => input.focus());
+  };
+  trigger.addEventListener("click", openPalette);
+  document.querySelectorAll("[data-shell-action]").forEach((button) => {
+    button.addEventListener("click", () => runShellAction(button.dataset.shellAction));
+  });
+  input.addEventListener("input", () => {
+    const query = input.value.trim().toLowerCase();
+    palette.querySelectorAll(".command-palette-body > button").forEach((button) => {
+      button.hidden = Boolean(query) && !button.textContent.toLowerCase().includes(query);
+    });
+  });
+  palette.addEventListener("click", (event) => {
+    if (event.target === palette) palette.close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      openPalette();
+    }
+    if (event.key === "Escape" && palette.open) palette.close();
+  });
 }
 
 function renderOwnerAttention() {
@@ -1646,6 +1726,7 @@ function setRuntimeStatus(message, connected = false) {
   mode.replaceChildren(dot, document.createTextNode(connected ? "Owner connected" : "Offline evidence"));
   mode.className = `mode-lock ${connected ? "status-active" : ""}`;
   if (!connected) renderActivationCenter(false);
+  renderShellPulse();
 }
 
 function renderRecentCommands(commands = []) {
@@ -1669,6 +1750,8 @@ function renderRecentCommands(commands = []) {
 
 function renderRuntimeJobs(jobs = []) {
   const root = clear("#runtime-job-panel");
+  const activeJobs = jobs.filter((job) => !["done", "complete", "failed", "rejected", "cancelled"].includes(job.status)).length;
+  document.querySelector("#shell-run-count").textContent = activeJobs;
   const heading = document.createElement("h3");
   heading.textContent = "Automatic runs";
   root.append(heading);
@@ -2015,6 +2098,7 @@ async function connectRuntime(options = {}) {
     renderOperatingSystems(runtimeOperatingSystems);
     renderUnifiedMemory(runtimeLessonDecisions);
     populateProjectSelect(result.projects);
+    renderShellPulse();
   } catch (error) {
     ownerPasswordField.value = "";
     setRuntimeStatus(restoring ? "Sign in once with your owner password to activate this browser." : `Connection failed: ${error.message}`);
@@ -2075,7 +2159,7 @@ function initializeCommandCenter() {
   document.querySelector("#logout-runtime").addEventListener("click", logoutRuntime);
   document.querySelector("#owner-command-form").addEventListener("submit", submitOwnerCommand);
   document.querySelector("#projects-go-command").addEventListener("click", () => {
-    setDashboardView("home");
+    setDashboardView("home", { syncHash: true });
     document.querySelector("#owner-command").focus();
   });
   document.querySelector("#projects-new").addEventListener("click", openNewProjectDialog);
@@ -2110,3 +2194,5 @@ renderSkills();
 renderSafeMerge();
 initializeCommandCenter();
 initializeNavigation();
+initializeCommandPalette();
+renderShellPulse();

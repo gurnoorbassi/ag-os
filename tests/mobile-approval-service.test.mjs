@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { consumeMobileApproval, createMobileApprovalLink, deliverMobileApprovalLink, mobileApprovalReadiness } from "../scripts/lib/runtime/mobile-approval-service.mjs";
+import { normalizeRunId } from "../scripts/lib/runtime/common.mjs";
 
 function writeJson(root, relative, value) { const target = path.join(root, relative); mkdirSync(path.dirname(target), { recursive: true }); writeFileSync(target, JSON.stringify(value)); }
 function fixture() {
@@ -95,5 +96,6 @@ test("Telegram transport errors are redacted and still consume one conservative 
   const created = createMobileApprovalLink({ jobId, root, env, now });
   await assert.rejects(() => deliverMobileApprovalLink({ linkResult: created, root, env, now, fetchImpl: async (url) => { throw new Error(`failed ${url}`); } }), (error) => error.message === "Telegram approval notification transport failed");
   assert.equal(mobileApprovalReadiness({ root, env, now }).ready, false);
-  assert.equal(readFileSync(path.join(root, ".codex/audit", `audit-runtime-${created.requestId}-telegram-delivery.json`), "utf8").includes("never-log-this-token"), false);
+  const auditName = `audit-${normalizeRunId(`${created.requestId}-telegram-delivery`)}.json`;
+  assert.equal(readFileSync(path.join(root, ".codex/audit", auditName), "utf8").includes("never-log-this-token"), false);
 });
