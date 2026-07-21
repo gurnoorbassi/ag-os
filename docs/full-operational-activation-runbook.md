@@ -8,7 +8,7 @@ AG OS source support is designed to be complete before live privileges are grant
 - Truthful job states: planning evidence becomes `plan_ready`; only owner-usable deliverables become `done`.
 - General-archetype fallback for new product types plus authenticated Retry and Replan controls with lineage to the original job.
 - GitHub repository, GitHub draft PR, Netlify preview and continuous deployment, n8n draft/control, allowlisted production deployment, Instagram image publishing, and Cloudflare DNS transports.
-- Thirty-second bounded external requests by default through `AG_OS_PROVIDER_TIMEOUT_MS`; the file-generating Anthropic worker alone uses `AG_OS_AI_WORKER_TIMEOUT_MS=120000` because structured work products can exceed the general connector timeout.
+- Thirty-second bounded external requests by default through `AG_OS_PROVIDER_TIMEOUT_MS`; the file-generating Anthropic worker and independent critic use separate `AG_OS_AI_WORKER_TIMEOUT_MS=180000` and `AG_OS_AI_CRITIC_TIMEOUT_MS=180000` response windows because structured work products and critiques can exceed the general connector timeout.
 - In-container Watchdog plus an out-of-container systemd health timer with root-only local evidence.
 - Authenticated HTTPS reverse-proxy templates while the coordinator remains bound to `127.0.0.1:8787`.
 

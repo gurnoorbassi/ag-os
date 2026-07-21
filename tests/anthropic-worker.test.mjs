@@ -96,7 +96,7 @@ test("Anthropic worker requests a bounded schema and validates safe file output"
   const body = JSON.parse(request.options.body);
   assert.equal(body.max_tokens, 16_000);
   assert.equal(ANTHROPIC_WORKER_MAX_TOKENS, 16_000);
-  assert.equal(ANTHROPIC_WORKER_TIMEOUT_MS, 120_000);
+  assert.equal(ANTHROPIC_WORKER_TIMEOUT_MS, 180_000);
   assert.equal(body.output_config.format.type, "json_schema");
   assert.equal(JSON.stringify(body.output_config.format.schema).includes("maxItems"), false);
   assert.equal(body.messages[0].content.includes("test-only-key"), false);
