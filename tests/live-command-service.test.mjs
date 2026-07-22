@@ -6,7 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { assertOwnerCommand, assertRegisteredProject, ONE_OFF_PROJECT_ID, submitOwnerCommand } from "../scripts/lib/runtime/live-command-service.mjs";
-import { loginRateLimitKey, tokenMatches } from "../scripts/live-server.mjs";
+import { loginRateLimitKey, secureSessionCookieFor, tokenMatches } from "../scripts/live-server.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -40,6 +40,14 @@ test("trusted loopback proxy rate limiting uses the rightmost forwarded client",
     headers: { "x-forwarded-for": "192.0.2.9, 198.51.100.7" }
   };
   assert.equal(loginRateLimitKey(request, { AG_OS_TRUST_PROXY: "true" }), "198.51.100.7");
+});
+
+test("session cookies become secure automatically only for a trusted loopback HTTPS proxy", () => {
+  const request = { socket: { remoteAddress: "127.0.0.1" }, headers: { "x-forwarded-proto": "https" } };
+  assert.equal(secureSessionCookieFor(request, { AG_OS_TRUST_PROXY: "true" }), true);
+  assert.equal(secureSessionCookieFor(request, {}), false);
+  assert.equal(secureSessionCookieFor(request, { AG_OS_TRUST_PROXY: "true", AG_OS_OWNER_SESSION_COOKIE_SECURE: "false" }), false);
+  assert.equal(secureSessionCookieFor(request, { AG_OS_OWNER_SESSION_COOKIE_SECURE: "true" }), true);
 });
 
 test("owner commands require non-empty bounded input", () => {

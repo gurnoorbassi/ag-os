@@ -97,6 +97,19 @@ test("ignores dependency and git directories", () => withWorkspace((root) => {
   assert.equal(result.ok, true);
 }));
 
+test("scans an explicit reviewed file list and ignores generated hosting output", () => withWorkspace((root) => {
+  const githubToken = `ghp_${"1234567890abcdefghijklmnopqrst"}`;
+  write(root, "reviewed/source.mjs", "export const safe = true;\n");
+  write(root, "ignored/source.mjs", `const token = '${githubToken}';\n`);
+  write(root, ".netlify/generated.js", `const token = '${githubToken}';\n`);
+
+  const targeted = scanSecrets({ root, relativePaths: ["reviewed/source.mjs"] });
+
+  assert.equal(targeted.ok, true);
+  assert.equal(scanSecrets({ root }).ok, false);
+  assert.throws(() => scanSecrets({ root, relativePaths: ["../outside.env"] }), /escapes root/);
+}));
+
 test("reports file path, line, and redacted match only", () => withWorkspace((root) => {
   write(root, "unsafe.md", `${"password"} = hunter2\n`);
 

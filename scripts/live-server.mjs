@@ -28,6 +28,7 @@ import { startInternalWatchdog } from "./lib/runtime/internal-watchdog.mjs";
 import { getJobDeliverable } from "./lib/runtime/deliverable-service.mjs";
 import { prepareJobRecovery } from "./lib/runtime/job-recovery-service.mjs";
 import { consumeMobileApproval, createMobileApprovalLink, deliverMobileApprovalLink, mobileApprovalReadiness } from "./lib/runtime/mobile-approval-service.mjs";
+import { recordExternalEvidence } from "./lib/runtime/external-evidence-service.mjs";
 import {
   buildOwnerSessionCookie,
   clearOwnerSessionCookie,
@@ -45,11 +46,11 @@ const host = process.env.AG_OS_HOST || "127.0.0.1";
 const port = Number(process.env.PORT || process.env.AG_OS_PORT || 8787);
 const ownerToken = process.env.AG_OS_OWNER_TOKEN || "";
 const ownerPasswordHash = process.env.AG_OS_OWNER_PASSWORD_HASH || "";
+const externalEvidenceToken = process.env.AG_OS_EXTERNAL_EVIDENCE_TOKEN || "";
 const configuredSessionDays = Number(process.env.AG_OS_OWNER_SESSION_DAYS || 30);
 const ownerSessionDays = Number.isInteger(configuredSessionDays) && configuredSessionDays >= 1 && configuredSessionDays <= 30
   ? configuredSessionDays
   : 30;
-const secureSessionCookie = process.env.AG_OS_OWNER_SESSION_COOKIE_SECURE === "true";
 const allowedOrigin = process.env.AG_OS_ALLOWED_ORIGIN || "";
 const loginRateLimiter = createLoginRateLimiter();
 
@@ -153,6 +154,17 @@ export function loginRateLimitKey(request, env = process.env) {
     : String(request.headers["x-forwarded-for"] || "");
   const rightmost = forwarded.split(",").map((item) => item.trim()).filter(Boolean).at(-1);
   return rightmost && rightmost.length <= 128 ? rightmost : socketAddress;
+}
+
+export function secureSessionCookieFor(request, env = process.env) {
+  if (env.AG_OS_OWNER_SESSION_COOKIE_SECURE === "true") return true;
+  if (env.AG_OS_OWNER_SESSION_COOKIE_SECURE === "false") return false;
+  const socketAddress = request.socket.remoteAddress || "";
+  if (env.AG_OS_TRUST_PROXY !== "true" || !isLoopbackAddress(socketAddress)) return false;
+  const forwardedProto = Array.isArray(request.headers["x-forwarded-proto"])
+    ? request.headers["x-forwarded-proto"][0]
+    : String(request.headers["x-forwarded-proto"] || "").split(",")[0].trim();
+  return forwardedProto.toLowerCase() === "https";
 }
 
 async function readJsonBody(request) {
@@ -357,6 +369,20 @@ const server = createServer(async (request, response) => {
     return;
   }
 
+  if (request.method === "POST" && url.pathname === "/api/v1/evidence/external") {
+    if (!tokenMatches(externalEvidenceToken, suppliedToken(request))) {
+      json(response, 401, { error: "unauthorized" }, headers);
+      return;
+    }
+    try {
+      const body = await readJsonBody(request);
+      json(response, 201, recordExternalEvidence(body, { root }), headers);
+    } catch (error) {
+      json(response, 400, { error: error.message }, headers);
+    }
+    return;
+  }
+
   if (request.method === "POST" && url.pathname === "/api/v1/auth/login") {
     if (!trustedBrowserOrigin(request, { allowMissing: true })) {
       json(response, 403, { error: "untrusted_origin" }, headers);
@@ -375,6 +401,7 @@ const server = createServer(async (request, response) => {
     try {
       body = await readJsonBody(request);
     } catch {
+      loginRateLimiter.recordFailure(rateLimitKey);
       json(response, 400, { error: "invalid_login_request" }, headers);
       return;
     }
@@ -396,7 +423,7 @@ const server = createServer(async (request, response) => {
       ...headers,
       "set-cookie": buildOwnerSessionCookie(session.value, {
         maxAgeSeconds: session.maxAgeSeconds,
-        secure: secureSessionCookie
+        secure: secureSessionCookieFor(request)
       })
     });
     return;
@@ -409,7 +436,7 @@ const server = createServer(async (request, response) => {
     }
     json(response, 200, { authenticated: false }, {
       ...headers,
-      "set-cookie": clearOwnerSessionCookie({ secure: secureSessionCookie })
+      "set-cookie": clearOwnerSessionCookie({ secure: secureSessionCookieFor(request) })
     });
     return;
   }

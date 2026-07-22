@@ -4,6 +4,7 @@ import path from "node:path";
 import process from "node:process";
 import { writeAuditEventRecord } from "./audit-writer.mjs";
 import { isoTimestamp, readJson, slugify, writeJson } from "./common.mjs";
+import { withStateMutationLock } from "./state-mutation-lock.mjs";
 import { runLocalValidation } from "./execution-dry-run-processor.mjs";
 import { listExecutionAdapters, selectExecutionAdapter } from "./execution-adapter-registry.mjs";
 import { activeJobApproval } from "./job-approval-service.mjs";
@@ -409,42 +410,41 @@ export async function processQueuedJobs({
   if (processing) return { status: "busy", processed: [] };
   processing = true;
   try {
-    const queued = listAutonomousJobs({ root, env, limit: 100 }).filter((job) =>
-      job.status === "queued" || (job.status === "waiting_approval" && job.approvalValid && job.adapter?.executionReady)
-    );
-    const processed = [];
-    for (const job of queued) {
-      try {
-        processed.push(await processAutonomousJob({ jobId: job.jobId, root, env, now, runValidation }));
-      } catch (error) {
-        const sourceJob = readJson(jobPath(job.jobId), root);
-        const failed = writeJobState(sourceJob, root, now, {
-          status: "failed",
-          blockedReason: `Automatic queue recovery failed closed: ${error.message}`,
-          queueTimestamps: { completedAt: isoTimestamp(now) }
-        });
-        writeAuditEventRecord({
-          runId: `${job.jobId}-queue-recovery-failure`,
-          eventType: "validation_run",
-          summary: `Autonomous queue recovery for ${job.jobId} failed closed.`,
-          scope: job.jobId,
-          source: "ag_os_coordinator",
-          relatedArtifacts: [{ type: "other", reference: jobPath(job.jobId) }],
-          riskLevel: sourceJob.riskLevel,
-          liveServiceTouched: false,
-          notes: error.message,
-          now,
-          root
-        });
-        processed.push({ status: "failed", job: failed, error: error.message });
+    const locked = await withStateMutationLock({ root, operation: "autonomous-queue" }, async () => {
+      const queued = listAutonomousJobs({ root, env, limit: 100 }).filter((job) =>
+        job.status === "queued" || (job.status === "waiting_approval" && job.approvalValid && job.adapter?.executionReady)
+      );
+      const processed = [];
+      for (const job of queued) {
+        try {
+          processed.push(await processAutonomousJob({ jobId: job.jobId, root, env, now, runValidation }));
+        } catch (error) {
+          const sourceJob = readJson(jobPath(job.jobId), root);
+          const failed = writeJobState(sourceJob, root, now, {
+            status: "failed",
+            blockedReason: `Automatic queue recovery failed closed: ${error.message}`,
+            queueTimestamps: { completedAt: isoTimestamp(now) }
+          });
+          writeAuditEventRecord({
+            runId: `${job.jobId}-queue-recovery-failure`,
+            eventType: "validation_run",
+            summary: `Autonomous queue recovery for ${job.jobId} failed closed.`,
+            scope: job.jobId,
+            source: "ag_os_coordinator",
+            relatedArtifacts: [{ type: "other", reference: jobPath(job.jobId) }],
+            riskLevel: sourceJob.riskLevel,
+            liveServiceTouched: false,
+            notes: error.message,
+            now,
+            root
+          });
+          processed.push({ status: "failed", job: failed, error: error.message });
+        }
       }
-    }
-    const dashboardRefresh = refreshDashboardReadModel({
-      root,
-      dashboardBuilder,
-      required: processed.length > 0
+      const dashboardRefresh = refreshDashboardReadModel({ root, dashboardBuilder, required: processed.length > 0 });
+      return { status: "complete", processed, dashboardRefresh };
     });
-    return { status: "complete", processed, dashboardRefresh };
+    return locked.acquired ? locked.result : { status: "busy", processed: [], lock: "state-mutations" };
   } finally {
     processing = false;
   }
