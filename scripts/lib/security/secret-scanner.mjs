@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-const IGNORE_DIRS = new Set([".git", "node_modules", "dist", "build"]);
+const IGNORE_DIRS = new Set([".git", ".netlify", ".next", "node_modules", "dist", "build", "coverage", "out"]);
 const SCANNED_EXTENSIONS = new Set([
   ".env",
   ".json",
@@ -107,8 +107,20 @@ function scanFile({ root, relativePath }) {
   return findings;
 }
 
-export function scanSecrets({ root = process.cwd() } = {}) {
+export function scanSecrets({ root = process.cwd(), relativePaths } = {}) {
   const findings = [];
+
+  if (Array.isArray(relativePaths) && relativePaths.length > 0) {
+    for (const relativePath of relativePaths) {
+      const normalized = path.normalize(relativePath);
+      const absolutePath = path.resolve(root, normalized);
+      const relative = path.relative(root, absolutePath);
+      if (relative.startsWith("..") || path.isAbsolute(relative)) throw new Error(`scan path escapes root: ${relativePath}`);
+      if (!existsSync(absolutePath) || !statSync(absolutePath).isFile() || !shouldScanFile(normalized)) continue;
+      findings.push(...scanFile({ root, relativePath: normalized }));
+    }
+    return { ok: findings.length === 0, findings };
+  }
 
   function walk(relativeDir = ".") {
     const absoluteDir = path.join(root, relativeDir);

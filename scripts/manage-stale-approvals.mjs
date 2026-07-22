@@ -5,6 +5,7 @@ import {
   findStaleApprovalLocks,
   listActiveApprovalLocks
 } from "./lib/runtime/stale-approval-manager.mjs";
+import { withStateMutationLock } from "./lib/runtime/state-mutation-lock.mjs";
 
 function usage() {
   console.log(`Usage:
@@ -52,13 +53,17 @@ if (args.includes("--list")) {
 }
 
 if (args.includes("--archive-stale")) {
-  const stale = findStaleApprovalLocks({ root, now });
-  const archived = stale.map((approval) => archiveApprovalLock({
-    root,
-    recordPath: approval.recordPath,
-    now,
-    reason: "Expired approval lock blocked or would block the mandatory boot sequence."
-  }));
+  const locked = await withStateMutationLock({ root, operation: "archive-stale-approvals" }, () => {
+    const stale = findStaleApprovalLocks({ root, now });
+    return stale.map((approval) => archiveApprovalLock({
+      root,
+      recordPath: approval.recordPath,
+      now,
+      reason: "Expired approval lock blocked or would block the mandatory boot sequence."
+    }));
+  });
+  if (!locked.acquired) throw new Error("AG OS state is busy; stale approvals were not changed");
+  const archived = locked.result;
 
   console.log(JSON.stringify({
     generatedAt: now.toISOString(),
@@ -81,12 +86,14 @@ if (consumedIndex !== -1) {
     throw new Error("--archive-consumed requires at least one approval file path");
   }
 
-  const archived = targets.map((recordPath) => archiveApprovalLock({
+  const locked = await withStateMutationLock({ root, operation: "archive-consumed-approvals" }, () => targets.map((recordPath) => archiveApprovalLock({
     root,
     recordPath,
     now,
     reason: "Completed one-time approval lock was consumed by its recorded milestone and is archived before it can authorize future work."
-  }));
+  })));
+  if (!locked.acquired) throw new Error("AG OS state is busy; consumed approvals were not changed");
+  const archived = locked.result;
 
   console.log(JSON.stringify({
     generatedAt: now.toISOString(),

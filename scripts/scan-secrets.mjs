@@ -2,7 +2,7 @@
 import process from "node:process";
 import { scanSecrets } from "./lib/security/secret-scanner.mjs";
 
-const result = scanSecrets();
+const result = scanSecrets({ relativePaths: process.argv.slice(2) });
 
 if (!result.ok) {
   console.error("Secret scan failed. Findings:");
