@@ -8,7 +8,7 @@ import { allowedToolsForRole, executeAgentTool, resolveAgentPath, runAgentToolLo
 import { buildDefaultMissionPlan, cancelMission, createMission, runMission } from "../scripts/lib/runtime/mission-runtime.mjs";
 import { createAnthropicAgentProvider } from "../scripts/lib/runtime/anthropic-agent-provider.mjs";
 import { finalizeAnthropicBudgetReservation } from "../scripts/lib/runtime/anthropic-budget-guard.mjs";
-import { createAnthropicMissionPlan } from "../scripts/lib/runtime/anthropic-mission-planner.mjs";
+import { createAnthropicMissionPlan, DEFAULT_MISSION_PLANNER_TIMEOUT_MS } from "../scripts/lib/runtime/anthropic-mission-planner.mjs";
 import { detectWorkspacePackageManager } from "../scripts/lib/runtime/mission-bootstrap.mjs";
 import { validateMissionPlanDraft } from "../scripts/lib/runtime/mission-plan.mjs";
 import { readMissionEvents } from "../scripts/lib/runtime/mission-store.mjs";
@@ -373,6 +373,7 @@ test("agent loop stops before executing a tool action that exceeds the mission b
 });
 
 test("Anthropic mission planner returns and audits the mission-native graph without keyword reduction", async () => {
+  assert.equal(DEFAULT_MISSION_PLANNER_TIMEOUT_MS, 180_000);
   const root = mkdtempSync(path.join(tmpdir(), "ag-os-mission-planner-"));
   write(root, ".codex/costs/budget.json", `${JSON.stringify({ limits: { monthlyMaxUsd: 50, dailyMaxUsd: 10, perTaskMaxUsd: 5 } })}\n`);
   const expected = missionNativePlan();

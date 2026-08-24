@@ -9,6 +9,7 @@ import { assertAllowedAgentCommand } from "./agent-runner.mjs";
 const DEFAULT_BASE_URL = "https://api.anthropic.com";
 const VERSION = "2023-06-01";
 const MAX_TOKENS = 3500;
+export const DEFAULT_MISSION_PLANNER_TIMEOUT_MS = 180_000;
 
 export async function createAnthropicMissionPlan({
   ownerOutcome,
@@ -24,7 +25,7 @@ export async function createAnthropicMissionPlan({
   env = process.env,
   baseUrl = DEFAULT_BASE_URL,
   fetchImpl = globalThis.fetch,
-  timeoutMs = process.env.AG_OS_PROVIDER_TIMEOUT_MS,
+  timeoutMs = process.env.AG_OS_AI_PLANNER_TIMEOUT_MS || DEFAULT_MISSION_PLANNER_TIMEOUT_MS,
   now = new Date(),
   signal = null
 }) {
