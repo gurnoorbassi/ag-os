@@ -159,7 +159,8 @@ const requiredPaths = [
   "schemas/agent-run.schema.json",
   "schemas/mission-task.schema.json",
   "schemas/mission-event.schema.json",
-  "schemas/handoff.schema.json"
+  "schemas/handoff.schema.json",
+  "schemas/mission-plan.schema.json"
 ];
 
 const forbiddenPatterns = [

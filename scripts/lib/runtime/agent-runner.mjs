@@ -1,5 +1,5 @@
 import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
-import { spawnSync } from "node:child_process";
+import { spawn } from "node:child_process";
 import path from "node:path";
 import process from "node:process";
 import { gitDiff, gitStatus, platformNpmExecutable } from "./mission-workspace.mjs";
@@ -15,6 +15,41 @@ const SECRET_CONTENT_PATTERNS = [
   /\bsk-[A-Za-z0-9_-]{20,}\b/,
   /\bAKIA[0-9A-Z]{16}\b/
 ];
+const READ_TOOLS = ["list_files", "read_file", "search_files", "git_diff"];
+const COMMAND_TOOLS = ["run_command", "run_tests", "run_build", "run_typecheck"];
+const EDIT_TOOLS = ["write_file", "edit_file", "apply_patch"];
+
+export const ROLE_TOOL_POLICIES = Object.freeze({
+  Commander: [],
+  "Product Manager": READ_TOOLS,
+  Architect: [...READ_TOOLS, ...EDIT_TOOLS],
+  "UI Designer": [...READ_TOOLS, ...EDIT_TOOLS],
+  "Frontend Engineer": [...READ_TOOLS, ...EDIT_TOOLS, ...COMMAND_TOOLS],
+  "Backend Engineer": [...READ_TOOLS, ...EDIT_TOOLS, ...COMMAND_TOOLS],
+  "Database Engineer": [...READ_TOOLS, ...EDIT_TOOLS, ...COMMAND_TOOLS],
+  "QA Engineer": [...READ_TOOLS, ...COMMAND_TOOLS],
+  "Security Reviewer": [...READ_TOOLS, ...COMMAND_TOOLS],
+  "Code Reviewer": [...READ_TOOLS, ...COMMAND_TOOLS],
+  Fixer: [...READ_TOOLS, ...EDIT_TOOLS, ...COMMAND_TOOLS],
+  "Integration Agent": [...READ_TOOLS, ...COMMAND_TOOLS]
+});
+
+export function allowedToolsForRole(role) {
+  const tools = ROLE_TOOL_POLICIES[role];
+  if (!tools) throw new Error(`unsupported mission role: ${role}`);
+  return [...tools];
+}
+
+function abortError(signal) {
+  const error = signal?.reason instanceof Error ? signal.reason : new Error(String(signal?.reason || "mission execution aborted"));
+  error.name = "AbortError";
+  error.code = "ABORT_ERR";
+  return error;
+}
+
+function throwIfAborted(signal) {
+  if (signal?.aborted) throw abortError(signal);
+}
 
 function normalizedRelative(value) {
   const normalized = String(value || "").replaceAll("\\", "/").replace(/^\.\//, "");
@@ -79,7 +114,70 @@ function commandTokens(command) {
   throw new Error(`agent command is not allowlisted: ${executable || "missing"}`);
 }
 
-export function executeAgentTool({ workspacePath, tool, input = {}, timeoutMs = 120_000, reviewBaseRevision = null }) {
+export function assertAllowedAgentCommand(command) {
+  commandTokens(command);
+  return command;
+}
+
+function appendBounded(current, chunk) {
+  const next = `${current}${String(chunk || "")}`;
+  return next.length > MAX_OUTPUT_BYTES ? next.slice(-MAX_OUTPUT_BYTES) : next;
+}
+
+async function runBoundedCommand({ parsed, command, workspacePath, timeoutMs, signal }) {
+  throwIfAborted(signal);
+  const childEnv = { ...process.env };
+  delete childEnv.NODE_TEST_CONTEXT;
+  return new Promise((resolve, reject) => {
+    const child = spawn(parsed.executable, parsed.args, { cwd: workspacePath, env: childEnv, stdio: ["ignore", "pipe", "pipe"], windowsHide: true });
+    let stdout = "";
+    let stderr = "";
+    let timedOut = false;
+    let settled = false;
+    const stop = () => {
+      if (child.exitCode === null && process.platform === "win32" && child.pid) {
+        const killer = spawn("taskkill", ["/pid", String(child.pid), "/t", "/f"], { stdio: "ignore", windowsHide: true });
+        killer.on("error", () => { if (child.exitCode === null) child.kill("SIGTERM"); });
+      } else if (child.exitCode === null) child.kill("SIGTERM");
+      const forceTimer = setTimeout(() => { if (child.exitCode === null) child.kill("SIGKILL"); }, 1500);
+      forceTimer.unref?.();
+    };
+    const onAbort = () => stop();
+    const timer = setTimeout(() => { timedOut = true; stop(); }, timeoutMs);
+    timer.unref?.();
+    signal?.addEventListener("abort", onAbort, { once: true });
+    child.stdout.on("data", (chunk) => { stdout = appendBounded(stdout, chunk); });
+    child.stderr.on("data", (chunk) => { stderr = appendBounded(stderr, chunk); });
+    child.on("error", (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", onAbort);
+      if (signal?.aborted) reject(abortError(signal));
+      else resolve({ command, passed: false, status: null, stdout, stderr: appendBounded(stderr, error.message) });
+    });
+    child.on("close", (status, childSignal) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", onAbort);
+      if (signal?.aborted) {
+        reject(abortError(signal));
+        return;
+      }
+      if (timedOut) stderr = appendBounded(stderr, `command timed out after ${timeoutMs}ms`);
+      resolve({ command, passed: !timedOut && status === 0, status, signal: childSignal, stdout, stderr });
+    });
+  });
+}
+
+export async function executeAgentTool({ workspacePath, tool, input = {}, timeoutMs = 120_000, reviewBaseRevision = null, allowedTools = null, signal = null }) {
+  throwIfAborted(signal);
+  if (Array.isArray(allowedTools) && !allowedTools.includes(tool)) {
+    const error = new Error(`agent role is not allowed to use tool: ${tool}`);
+    error.code = "tool_not_allowed";
+    throw error;
+  }
   if (tool === "list_files") return { files: walkFiles(workspacePath) };
   if (tool === "read_file") {
     const target = resolveAgentPath(workspacePath, input.path);
@@ -120,17 +218,12 @@ export function executeAgentTool({ workspacePath, tool, input = {}, timeoutMs = 
   if (tool === "git_diff") return { diff: gitDiff(workspacePath, reviewBaseRevision), status: gitStatus(workspacePath) };
   if (tool === "run_command" || tool === "run_tests" || tool === "run_build" || tool === "run_typecheck") {
     const parsed = commandTokens(input.command);
-    const childEnv = { ...process.env };
-    delete childEnv.NODE_TEST_CONTEXT;
-    const result = spawnSync(parsed.executable, parsed.args, { cwd: workspacePath, encoding: "utf8", timeout: timeoutMs, env: childEnv, stdio: ["ignore", "pipe", "pipe"] });
-    const stdout = String(result.stdout || "").slice(-MAX_OUTPUT_BYTES);
-    const stderr = String(result.stderr || result.error?.message || "").slice(-MAX_OUTPUT_BYTES);
-    return { command: input.command, passed: result.status === 0, status: result.status, stdout, stderr };
+    return runBoundedCommand({ parsed, command: input.command, workspacePath, timeoutMs, signal });
   }
   throw new Error(`agent tool is not supported: ${tool}`);
 }
 
-export async function runAgentToolLoop({ agent, task, workspace, provider, emit, budgetRemainingUsd = Infinity, maxSteps = MAX_TOOL_STEPS, now = () => new Date() }) {
+export async function runAgentToolLoop({ agent, task, workspace, provider, emit, budgetRemainingUsd = Infinity, maxSteps = MAX_TOOL_STEPS, now = () => new Date(), signal = null }) {
   if (!provider || typeof provider.nextAction !== "function") throw new Error("agent provider must implement nextAction");
   const transcript = [];
   const filesChanged = new Set();
@@ -140,7 +233,9 @@ export async function runAgentToolLoop({ agent, task, workspace, provider, emit,
   let tokenUsage = { input: 0, output: 0 };
   let costUsd = 0;
   for (let step = 1; step <= maxSteps; step += 1) {
-    const response = await provider.nextAction({ agent, task, workspace, transcript: [...transcript], budgetRemainingUsd: budgetRemainingUsd - costUsd, step });
+    throwIfAborted(signal);
+    const response = await provider.nextAction({ agent, task, workspace, transcript: [...transcript], budgetRemainingUsd: budgetRemainingUsd - costUsd, step, signal });
+    throwIfAborted(signal);
     const action = response?.action;
     tokenUsage = { input: tokenUsage.input + Number(response?.usage?.input || 0), output: tokenUsage.output + Number(response?.usage?.output || 0) };
     costUsd = Number((costUsd + Number(response?.costUsd || 0)).toFixed(6));
@@ -166,6 +261,11 @@ export async function runAgentToolLoop({ agent, task, workspace, provider, emit,
         steps: step
       };
     }
+    if (!agent.allowedTools.includes(action.tool)) {
+      const error = new Error(`${agent.role} is not allowed to use tool: ${action.tool}`);
+      error.code = "tool_not_allowed";
+      throw error;
+    }
     emit("tool.started", { tool: action.tool, input: { ...action.input, ...(action.input?.content ? { content: `[${Buffer.byteLength(action.input.content, "utf8")} bytes]` } : {}) } }, now());
     toolsUsed.push(action.tool);
     if (["run_command", "run_tests", "run_build", "run_typecheck"].includes(action.tool)) {
@@ -174,9 +274,11 @@ export async function runAgentToolLoop({ agent, task, workspace, provider, emit,
     }
     let result;
     try {
-      result = executeAgentTool({ workspacePath: workspace.path, tool: action.tool, input: action.input, reviewBaseRevision: workspace.reviewBaseRevision });
+      result = await executeAgentTool({ workspacePath: workspace.path, tool: action.tool, input: action.input, reviewBaseRevision: workspace.reviewBaseRevision, allowedTools: agent.allowedTools, signal });
+      throwIfAborted(signal);
       emit("tool.completed", { tool: action.tool, passed: result.passed !== false }, now());
     } catch (error) {
+      if (error?.name === "AbortError" || error?.code === "ABORT_ERR" || error?.code === "tool_not_allowed") throw error;
       result = { error: error.message, passed: false };
       emit("tool.completed", { tool: action.tool, passed: false, error: error.message }, now());
     }

@@ -39,19 +39,20 @@ export function createAnthropicAgentProvider({ apiKey, model, approvalId, approv
   return {
     name: "anthropic-tool-loop",
     paidService: true,
-    async nextAction({ agent, task, workspace, transcript, budgetRemainingUsd, step }) {
+    async nextAction({ agent, task, workspace, transcript, budgetRemainingUsd, step, signal = null }) {
       if (approvalUses >= approvalUsesRemaining) {
         const error = new Error("Scoped Anthropic worker approval has no uses remaining");
         error.code = "approval_exhausted";
         throw error;
       }
       approvalUses += 1;
+      const advertisedTools = TOOLS.filter((tool) => tool.name === "complete" || agent.allowedTools.includes(tool.name));
       const requestBody = {
         model,
         max_tokens: 4000,
         system: "You are a bounded AG OS coding agent. Work only through the supplied tools in your assigned isolated workspace. Inspect before editing. Make the smallest complete change for your task. Run relevant validation. Never request secrets, credentials, network calls, deployments, publishing, DNS, destructive commands, or customer/production data. Use complete only when the assigned acceptance criteria are actually satisfied; report concrete defects on failure.",
         messages: [{ role: "user", content: JSON.stringify({ missionId: task.missionId, agent: { id: agent.agentRunId, role: agent.role }, task: { id: task.taskId, title: task.title, description: task.description, acceptanceCriteria: task.acceptanceCriteria, attempt: task.attempt }, workspace: { id: workspace.workspaceId, branch: workspace.branch }, priorToolResults: safeTranscript(transcript), budgetRemainingUsd, step }) }],
-        tools: TOOLS,
+        tools: advertisedTools,
         tool_choice: { type: "any" }
       };
       const job = { jobId: task.missionId, projectId: task.projectId || "project-unregistered-request" };
@@ -70,7 +71,7 @@ export function createAnthropicAgentProvider({ apiKey, model, approvalId, approv
       let providerModel = model;
       let providerUsage = null;
       try {
-        const response = await fetchWithTimeout(fetchImpl, `${baseUrl.replace(/\/$/, "")}/v1/messages`, { method: "POST", headers: { "anthropic-version": VERSION, "content-type": "application/json", "x-api-key": apiKey }, body: JSON.stringify(requestBody) }, timeoutMs);
+        const response = await fetchWithTimeout(fetchImpl, `${baseUrl.replace(/\/$/, "")}/v1/messages`, { method: "POST", headers: { "anthropic-version": VERSION, "content-type": "application/json", "x-api-key": apiKey }, body: JSON.stringify(requestBody), signal }, timeoutMs);
         if (!response.ok) throw new Error(`Anthropic agent request failed with HTTP ${response.status}`);
         accepted = true;
         const payload = await response.json();
@@ -78,7 +79,7 @@ export function createAnthropicAgentProvider({ apiKey, model, approvalId, approv
         providerUsage = payload.usage || {};
         if (["max_tokens", "model_context_window_exceeded"].includes(payload.stop_reason)) throw new Error(`Anthropic agent response was truncated (${payload.stop_reason})`);
         const toolUse = payload.content?.find((block) => block.type === "tool_use");
-        if (!toolUse || !TOOLS.some((tool) => tool.name === toolUse.name)) throw new Error("Anthropic agent returned no supported tool action");
+        if (!toolUse || !advertisedTools.some((tool) => tool.name === toolUse.name)) throw new Error("Anthropic agent returned no permitted tool action");
         const usage = providerUsage;
         const costUsd = calculateAnthropicCostUsd({ usage, inputCostPerMillionUsd, outputCostPerMillionUsd });
         writeAnthropicApprovalUse({ kind: "worker", job, approvalId, model: providerModel, usage, inputCostPerMillionUsd, outputCostPerMillionUsd, reservation, root });

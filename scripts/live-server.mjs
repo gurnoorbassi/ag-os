@@ -6,7 +6,8 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { commandRequiresBuilder, listRecentOwnerCommands, submitOwnerCommand } from "./lib/runtime/live-command-service.mjs";
 import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
-import { calculateAnthropicCostUsd, createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
+import { createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
+import { createAnthropicMissionPlan } from "./lib/runtime/anthropic-mission-planner.mjs";
 import { finalizeAnthropicBudgetReservation } from "./lib/runtime/anthropic-budget-guard.mjs";
 import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-planner-readiness.mjs";
 import { createAnthropicWorkProduct } from "./lib/runtime/anthropic-worker.mjs";
@@ -283,13 +284,24 @@ function missionProvider(readiness = aiWorkerReadiness()) {
 }
 
 async function continueMission(missionId) {
-  if (activeMissionRuns.has(missionId)) return activeMissionRuns.get(missionId);
+  if (activeMissionRuns.has(missionId)) return activeMissionRuns.get(missionId).promise;
   const readiness = aiWorkerReadiness();
   const provider = missionProvider(readiness);
   if (!provider) return { status: "blocked", missionId, blockers: readiness.blockers };
-  const active = runMission({ missionId, provider, root }).finally(() => activeMissionRuns.delete(missionId));
+  const controller = new AbortController();
+  const active = { controller, promise: null };
+  active.promise = runMission({ missionId, provider, root, signal: controller.signal }).finally(() => {
+    if (activeMissionRuns.get(missionId) === active) activeMissionRuns.delete(missionId);
+  });
   activeMissionRuns.set(missionId, active);
-  return active;
+  return active.promise;
+}
+
+async function cancelActiveMission(missionId, reason) {
+  const active = activeMissionRuns.get(missionId);
+  if (!active) return cancelMission({ missionId, reason, root });
+  active.controller.abort(new Error(String(reason || "Cancelled by owner")));
+  return active.promise;
 }
 
 async function submitRuntimeCommand(body, { recovery = null, forceReplan = false, disablePlanner = false } = {}) {
@@ -302,12 +314,13 @@ async function submitRuntimeCommand(body, { recovery = null, forceReplan = false
     const repositoryPath = projectWorkspacePath(projectId, body);
     if (!repositoryPath) throw new Error(`No local mission workspace is configured for ${projectId}. Configure AG_OS_PROJECT_WORKSPACES_JSON or provide repositoryPath.`);
     const missionBudgetUsd = body.missionBudgetUsd ?? 5;
+    const validationCommands = targetValidationCommands(repositoryPath, body.validationCommands);
     let planningEvidence = null;
     if (plannerReadiness.ready) {
-      const planned = await createAnthropicPlanDraft({
-        commandIntake: { rawCommand: body.command, normalizedCommand: body.command.trim().toLowerCase(), classification: { kind: "software_delivery" }, productContext: { projectId } },
-        job: { jobId: `mission-planning-${Date.now()}`, projectId },
-        route: { riskLevel: "R1", assignedAgent: "mission-commander" },
+      const planned = await createAnthropicMissionPlan({
+        ownerOutcome: body.command,
+        projectId,
+        validationCommands,
         apiKey: process.env.ANTHROPIC_API_KEY,
         model: plannerReadiness.model,
         baseUrl: process.env.ANTHROPIC_BASE_URL,
@@ -318,9 +331,8 @@ async function submitRuntimeCommand(body, { recovery = null, forceReplan = false
         root,
         env: process.env
       });
-      const costUsd = calculateAnthropicCostUsd({ usage: planned.usage, inputCostPerMillionUsd: plannerReadiness.inputCostPerMillionUsd, outputCostPerMillionUsd: plannerReadiness.outputCostPerMillionUsd });
-      finalizeAnthropicBudgetReservation({ reservation: planned.budgetReservation, consumed: true, actualCostUsd: costUsd, root });
-      planningEvidence = { planDraft: planned.planDraft, model: planned.model, usage: planned.usage, usageAuditPath: planned.usageAuditPath, costUsd };
+      finalizeAnthropicBudgetReservation({ reservation: planned.budgetReservation, consumed: true, actualCostUsd: planned.costUsd, root });
+      planningEvidence = { planDraft: planned.planDraft, model: planned.model, usage: planned.usage, usageAuditPath: planned.usageAuditPath, costUsd: planned.costUsd };
     }
     const mission = createMission({
       ownerOutcome: body.command,
@@ -330,7 +342,7 @@ async function submitRuntimeCommand(body, { recovery = null, forceReplan = false
       autonomyLevel: body.autonomyLevel || "balanced",
       concurrencyLimit: body.concurrencyLimit ?? 3,
       budgetUsd: missionBudgetUsd,
-      validationCommands: targetValidationCommands(repositoryPath, body.validationCommands),
+      validationCommands,
       planningEvidence,
       root
     });
@@ -664,7 +676,7 @@ const server = createServer(async (request, response) => {
     if (request.method === "POST" && missionControlMatch) {
       const missionId = decodeURIComponent(missionControlMatch[1]);
       const body = await readJsonBody(request);
-      if (body.action === "cancel") json(response, 200, cancelMission({ missionId, reason: body.reason, root }), headers);
+      if (body.action === "cancel") json(response, 200, await cancelActiveMission(missionId, body.reason), headers);
       else if (body.action === "run" || body.action === "resume") {
         const readiness = aiWorkerReadiness();
         if (!readiness.ready) json(response, 409, { status: "blocked", missionId, blockers: readiness.blockers }, headers);

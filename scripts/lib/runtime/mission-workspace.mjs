@@ -1,4 +1,4 @@
-import { existsSync, lstatSync, mkdirSync, realpathSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, realpathSync, rmSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import path from "node:path";
@@ -58,6 +58,10 @@ export function commitTaskWorkspace({ workspace, taskId }) {
   const status = git(["status", "--porcelain"], { cwd: workspace.path }).stdout;
   if (!status) return { changed: false, commit: null, files: [] };
   git(["add", "-A"], { cwd: workspace.path });
+  for (const generatedPath of [":(glob)**/node_modules/**", ":(glob)**/.pnpm-store/**", ":(glob)**/.yarn/cache/**", ":(glob)**/.yarn/unplugged/**"]) {
+    git(["reset", "--quiet", "HEAD", "--", generatedPath], { cwd: workspace.path, allowFailure: true });
+  }
+  if (git(["diff", "--cached", "--quiet"], { cwd: workspace.path, allowFailure: true }).status === 0) return { changed: false, commit: null, files: [] };
   git(["commit", "-m", `AG OS mission task: ${taskId}`], { cwd: workspace.path });
   const commit = git(["rev-parse", "HEAD"], { cwd: workspace.path }).stdout;
   const files = git(["diff-tree", "--no-commit-id", "--name-only", "-r", commit], { cwd: workspace.path }).stdout.split(/\r?\n/).filter(Boolean);
@@ -95,7 +99,12 @@ export function cancelMissionWorkspaces({ repositoryPath, missionId }) {
   const base = path.join(runtimeBase(repository), safeBranchFragment(missionId));
   const listed = git(["worktree", "list", "--porcelain"], { cwd: repository }).stdout;
   const targets = listed.split(/\r?\n/).filter((line) => line.startsWith("worktree ")).map((line) => line.slice(9)).filter((item) => path.resolve(item).startsWith(`${path.resolve(base)}${path.sep}`));
-  for (const target of targets) git(["worktree", "remove", "--force", target], { cwd: repository, allowFailure: true });
+  for (const target of targets) {
+    const resolvedTarget = path.resolve(target);
+    if (!resolvedTarget.startsWith(`${path.resolve(base)}${path.sep}`)) throw new Error("mission worktree cleanup target escaped its verified runtime directory");
+    git(["worktree", "remove", "--force", resolvedTarget], { cwd: repository, allowFailure: true });
+    if (existsSync(resolvedTarget)) rmSync(resolvedTarget, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
+  }
   git(["worktree", "prune"], { cwd: repository, allowFailure: true });
   return { removed: targets };
 }

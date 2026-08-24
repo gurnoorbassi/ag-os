@@ -2,7 +2,9 @@ import { createHash, randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import process from "node:process";
 import { isoTimestamp, slugify, writeJson } from "./common.mjs";
-import { executeAgentTool, runAgentToolLoop } from "./agent-runner.mjs";
+import { allowedToolsForRole, assertAllowedAgentCommand, executeAgentTool, runAgentToolLoop } from "./agent-runner.mjs";
+import { bootstrapMissionWorkspace } from "./mission-bootstrap.mjs";
+import { SUPPORTED_MISSION_ROLES, validateMissionPlanDraft } from "./mission-plan.mjs";
 import {
   appendMissionEvent,
   listMissionAgents,
@@ -27,7 +29,7 @@ import {
 import { scanSecrets } from "../security/secret-scanner.mjs";
 
 const DEFAULT_CONCURRENCY = 3;
-const SOFTWARE_ROLES = new Set(["Commander", "Product Manager", "Architect", "UI Designer", "Frontend Engineer", "Backend Engineer", "Database Engineer", "QA Engineer", "Security Reviewer", "Code Reviewer", "Fixer", "Integration Agent"]);
+const SOFTWARE_ROLES = new Set(SUPPORTED_MISSION_ROLES);
 
 function id(prefix, value) {
   const candidate = `${prefix}-${slugify(value)}`;
@@ -39,6 +41,7 @@ function id(prefix, value) {
 function agentDefinition(missionId, role, index, { provider = "anthropic", model = "configured-at-runtime", now = new Date() } = {}) {
   const roleSlug = slugify(role);
   const timestamp = isoTimestamp(now);
+  const allowedTools = allowedToolsForRole(role);
   return {
     agentRunId: id("agent-run", `${missionId}-${roleSlug}-${index + 1}`),
     missionId,
@@ -48,8 +51,8 @@ function agentDefinition(missionId, role, index, { provider = "anthropic", model
     model,
     status: role === "Commander" ? "idle" : "waiting",
     currentTaskId: null,
-    allowedTools: role === "Commander" ? ["mission_control"] : ["list_files", "read_file", "search_files", "write_file", "edit_file", "apply_patch", "git_diff", "run_command", "run_tests", "run_build", "run_typecheck"],
-    permissions: { workspaceRead: true, workspaceWrite: role !== "Commander", localCommands: role !== "Commander", localGit: true, externalActions: false, credentials: false },
+    allowedTools,
+    permissions: { workspaceRead: allowedTools.some((tool) => ["list_files", "read_file", "search_files", "git_diff"].includes(tool)), workspaceWrite: allowedTools.some((tool) => ["write_file", "edit_file", "apply_patch"].includes(tool)), localCommands: allowedTools.some((tool) => tool.startsWith("run_")), localGit: allowedTools.includes("git_diff"), externalActions: false, credentials: false },
     workspacePath: null,
     branch: null,
     tokenUsage: { input: 0, output: 0 },
@@ -63,10 +66,8 @@ function agentDefinition(missionId, role, index, { provider = "anthropic", model
   };
 }
 
-export function buildDefaultMissionPlan({ missionId, ownerOutcome, projectId, validationCommands = ["npm test", "npm run build"], planningDraft = null }) {
-  const planningText = planningDraft
-    ? planningDraft.tasks.map((task) => `${task.owner} ${task.description}`).join(" ").toLowerCase()
-    : ownerOutcome.toLowerCase();
+export function buildDefaultMissionPlan({ missionId, ownerOutcome, projectId, validationCommands = ["npm test", "npm run build"] }) {
+  const planningText = ownerOutcome.toLowerCase();
   const mentionsAny = (terms) => terms.some((term) => planningText.includes(term));
   const wantsUi = mentionsAny(["ui", "dashboard", "frontend", "page", "responsive", "website", "interface"]);
   const wantsBackend = mentionsAny(["api", "backend", "server", "lead", "crm", "data", "auth"]);
@@ -89,21 +90,27 @@ export function buildDefaultMissionPlan({ missionId, ownerOutcome, projectId, va
   add("architecture", "Define implementation architecture", `Define the smallest implementation architecture and file boundaries for: ${ownerOutcome}`, "Architect", [], ["Architecture and component boundaries are explicit", "Parallel work can proceed without shared-file ambiguity"], "planning");
   const architectureId = tasks[0].taskId;
   const buildIds = [];
+  let designId = null;
   if (byRole["UI Designer"]) {
     add("design", "Define responsive interface contract", "Create the UI structure, interaction states, and responsive acceptance contract.", "UI Designer", [architectureId], ["States and responsive behavior are explicit"]);
-    buildIds.push(tasks.at(-1).taskId);
+    designId = tasks.at(-1).taskId;
   }
-  if (byRole["Frontend Engineer"]) {
-    add("frontend", "Build frontend experience", "Implement the user-facing software experience in the isolated task workspace.", "Frontend Engineer", [architectureId], ["Required views and flows work", "UI is responsive and accessible"]);
-    buildIds.push(tasks.at(-1).taskId);
-  }
-  if (byRole["Backend Engineer"]) {
-    add("backend", "Build application backend", "Implement the local API and domain behavior in the isolated task workspace.", "Backend Engineer", [architectureId], ["API behavior matches the mission", "Invalid input fails safely"]);
-    buildIds.push(tasks.at(-1).taskId);
-  }
+  let databaseId = null;
   if (byRole["Database Engineer"]) {
     add("database", "Build data layer", "Implement local schemas and data access required by the mission.", "Database Engineer", [architectureId], ["Schema supports required workflows", "Data validation is covered"]);
+    databaseId = tasks.at(-1).taskId;
+  }
+  if (byRole["Frontend Engineer"]) {
+    add("frontend", "Build frontend experience", "Implement the user-facing software experience in the isolated task workspace.", "Frontend Engineer", [designId || architectureId], ["Required views and flows work", "UI is responsive and accessible"]);
     buildIds.push(tasks.at(-1).taskId);
+  } else if (designId) {
+    buildIds.push(designId);
+  }
+  if (byRole["Backend Engineer"]) {
+    add("backend", "Build application backend", "Implement the local API and domain behavior in the isolated task workspace.", "Backend Engineer", [databaseId || architectureId], ["API behavior matches the mission", "Invalid input fails safely"]);
+    buildIds.push(tasks.at(-1).taskId);
+  } else if (databaseId) {
+    buildIds.push(databaseId);
   }
   const implementationDeps = buildIds.length > 0 ? buildIds : [architectureId];
   const reviewDeps = [...implementationDeps];
@@ -117,13 +124,38 @@ export function buildDefaultMissionPlan({ missionId, ownerOutcome, projectId, va
   const qaId = tasks.at(-1).taskId;
   add("integration", "Seal mission integration", "Confirm all task commits are integrated in dependency order and the final target validation passes.", "Integration Agent", [qaId], ["Integration branch contains all accepted work", "Final validation passes"], "integration");
   return {
-    summary: planningDraft?.summary || `Build and validate the owner outcome with ${uniqueRoles.length} runtime agents and an isolated dependency graph.`,
+    summary: `Build and validate the owner outcome with ${uniqueRoles.length} runtime agents and an isolated dependency graph.`,
     agents,
     tasks,
     integrationOrder: tasks.map((task) => task.taskId),
     validationStrategy: validationCommands,
     expectedArtifacts: ["integrated source tree", "target validation evidence", "mission event stream"],
     risks: ["External actions remain approval gated", "Mission stops at bounded repair and budget limits"]
+  };
+}
+
+export function buildMissionPlanFromDraft({ missionId, projectId, planDraft }) {
+  validateMissionPlanDraft(planDraft, { assertValidationCommand: assertAllowedAgentCommand });
+  const agents = planDraft.requiredRoles.map((role, index) => agentDefinition(missionId, role, index));
+  const byRole = Object.fromEntries(agents.map((agent) => [agent.role, agent.agentRunId]));
+  const taskIds = new Map(planDraft.tasks.map((task) => [task.taskId, id("mission-task", `${missionId}-${task.taskId}`)]));
+  const tasks = planDraft.tasks.map((task) => ({
+    taskId: taskIds.get(task.taskId), missionId, projectId, title: task.title, description: task.description,
+    assignedAgentRunId: byRole[task.assignedRole], assignedRole: task.assignedRole,
+    status: task.dependencies.length === 0 ? "ready" : "waiting", dependencies: task.dependencies.map((dependency) => taskIds.get(dependency)),
+    acceptanceCriteria: [...task.acceptanceCriteria], attempt: 1, maximumAttempts: task.kind === "qa" ? 3 : 2,
+    workspace: null, artifacts: [], filesTouched: [], commandsExecuted: [], blockers: [], reviewState: "pending", kind: task.kind,
+    validationCommands: task.kind === "qa" ? [...planDraft.validationStrategy] : [], createdAt: null, startedAt: null, completedAt: null, updatedAt: null
+  }));
+  return {
+    summary: planDraft.summary,
+    agents,
+    tasks,
+    integrationOrder: planDraft.integrationOrder.map((taskId) => taskIds.get(taskId)),
+    validationStrategy: [...planDraft.validationStrategy],
+    expectedArtifacts: ["integrated source tree", "target validation evidence", "mission event stream"],
+    risks: [...planDraft.risks],
+    approvalRequirements: [...planDraft.approvalRequirements]
   };
 }
 
@@ -144,7 +176,10 @@ export function createMission({ ownerOutcome, projectId, repositoryPath, baseRev
   const missionId = id("mission", `${now.toISOString().replace(/[^0-9]/g, "").slice(0, 14)}-${randomUUID().slice(0, 8)}`);
   const planningCostUsd = Number(planningEvidence?.costUsd || 0);
   if (planningCostUsd > budgetUsd) throw new Error("mission planning cost exceeds the mission budget");
-  const missionPlan = plan ?? buildDefaultMissionPlan({ missionId, ownerOutcome: ownerOutcome.trim(), projectId, validationCommands, planningDraft: planningEvidence?.planDraft });
+  validationCommands.forEach(assertAllowedAgentCommand);
+  const missionPlan = plan ?? (planningEvidence?.planDraft
+    ? buildMissionPlanFromDraft({ missionId, projectId, planDraft: planningEvidence.planDraft })
+    : buildDefaultMissionPlan({ missionId, ownerOutcome: ownerOutcome.trim(), projectId, validationCommands }));
   for (const agent of missionPlan.agents) if (!SOFTWARE_ROLES.has(agent.role)) throw new Error(`unsupported mission role: ${agent.role}`);
   const integration = createMissionIntegrationWorkspace({ missionId, repositoryPath, baseRevision });
   const mission = {
@@ -153,7 +188,9 @@ export function createMission({ ownerOutcome, projectId, repositoryPath, baseRev
     tasks: missionPlan.tasks.map((task) => task.taskId), dependencies: Object.fromEntries(missionPlan.tasks.map((task) => [task.taskId, task.dependencies])),
     budget: { limitUsd: budgetUsd, spentUsd: planningCostUsd, remainingUsd: Number((budgetUsd - planningCostUsd).toFixed(6)) }, concurrencyLimit,
     progress: progress(missionPlan.tasks), eventsPath: missionPaths(missionId).events, artifacts: [], preview: { ready: false, url: null, entryFile: null },
-    validationStrategy: missionPlan.validationStrategy, planning: planningEvidence ? { mode: "model", model: planningEvidence.model, usage: planningEvidence.usage, costUsd: planningCostUsd, usageAuditPath: planningEvidence.usageAuditPath } : { mode: "deterministic_fallback", reason: "approved model planner unavailable" },
+    validationStrategy: missionPlan.validationStrategy, integrationOrder: missionPlan.integrationOrder, risks: missionPlan.risks || [], approvalRequirements: missionPlan.approvalRequirements || ["Exact owner approval is required for every protected external action"],
+    finalValidation: { attempt: 1, maximumAttempts: 2 },
+    planning: planningEvidence ? { mode: "model", model: planningEvidence.model, usage: planningEvidence.usage, costUsd: planningCostUsd, usageAuditPath: planningEvidence.usageAuditPath } : { mode: "deterministic_fallback", reason: "approved model planner unavailable" },
     policy: autonomyLevel === "supervised"
       ? { localExecution: "manual_start", protectedExternalActions: "exact_owner_approval" }
       : autonomyLevel === "autonomous"
@@ -205,7 +242,20 @@ function createEmit({ missionId, agentRunId, taskId, workspaceId, root }) {
   return (type, payload, now) => appendMissionEvent({ missionId, type, agentRunId, taskId, workspaceId, payload, now, root });
 }
 
-async function executeMissionTask({ mission, task, agent, provider, root, now }) {
+function isAbortError(error, signal) {
+  return Boolean(signal?.aborted || error?.name === "AbortError" || error?.code === "ABORT_ERR");
+}
+
+function throwIfAborted(signal) {
+  if (!signal?.aborted) return;
+  const error = signal.reason instanceof Error ? signal.reason : new Error(String(signal.reason || "mission execution cancelled"));
+  error.name = "AbortError";
+  error.code = "ABORT_ERR";
+  throw error;
+}
+
+async function executeMissionTask({ mission, task, agent, provider, root, now, signal = null }) {
+  throwIfAborted(signal);
   const workspace = createTaskWorkspace({ missionId: mission.missionId, taskId: `${task.taskId}-attempt-${task.attempt}`, repositoryPath: mission.baseRepository, integrationWorkspace: mission.integrationWorkspace });
   const emit = createEmit({ missionId: mission.missionId, agentRunId: agent.agentRunId, taskId: task.taskId, workspaceId: workspace.workspaceId, root });
   const startedAt = isoTimestamp(now());
@@ -215,7 +265,14 @@ async function executeMissionTask({ mission, task, agent, provider, root, now })
   emit(task.kind === "review" ? "review.started" : "task.started", { title: task.title, attempt: task.attempt }, now());
   let result;
   try {
-    result = await runAgentToolLoop({ agent, task, workspace, provider, emit, budgetRemainingUsd: mission.budget.remainingUsd, now });
+    emit("dependency.bootstrap.started", { workspacePath: workspace.path }, now());
+    const bootstrap = await bootstrapMissionWorkspace({ workspacePath: workspace.path, signal });
+    throwIfAborted(signal);
+    workspace.bootstrap = bootstrap;
+    task = updateTask(task, { workspace }, root, now());
+    emit("dependency.bootstrap.completed", { manager: bootstrap.manager, status: bootstrap.status, lifecycleScriptsAllowed: bootstrap.lifecycleScriptsAllowed }, now());
+    result = await runAgentToolLoop({ agent, task, workspace, provider, emit, budgetRemainingUsd: mission.budget.remainingUsd, now, signal });
+    throwIfAborted(signal);
     if (task.kind === "coding" && result.outcome === "complete" && result.filesChanged.length === 0) {
       result.outcome = "failed";
       result.defects.push({ title: `No implementation produced for ${task.title}`, description: "The coding agent completed without changing any target-project file.", ownerRole: "Fixer" });
@@ -224,22 +281,33 @@ async function executeMissionTask({ mission, task, agent, provider, root, now })
       result.outcome = "failed";
       result.defects.push({ title: `Review evidence missing for ${task.title}`, description: "The reviewer did not inspect the integrated Git diff.", ownerRole: "Fixer" });
     }
-    if (task.kind === "qa" && result.testResults.length === 0) {
+    if (task.kind === "qa") {
+      const evidenceByCommand = new Map();
+      for (const evidence of result.testResults) if (evidence?.command) evidenceByCommand.set(evidence.command, evidence);
+      for (const evidence of result.commandsExecuted) if (evidence?.command && !evidenceByCommand.has(evidence.command)) evidenceByCommand.set(evidence.command, { command: evidence.command, passed: evidence.passed, output: "Validation command executed by the QA agent." });
       for (const command of task.validationCommands) {
-        emit("test.started", { command }, now());
-        const validation = executeAgentTool({ workspacePath: workspace.path, tool: "run_tests", input: { command } });
-        result.commandsExecuted.push({ command, passed: validation.passed, status: validation.status });
-        result.testResults.push({ command, passed: validation.passed, output: (validation.stderr || validation.stdout || "").slice(-4000) });
-        emit(validation.passed ? "test.passed" : "test.failed", { command, output: (validation.stderr || validation.stdout || "").slice(-4000) }, now());
-        if (!validation.passed) {
+        let evidence = evidenceByCommand.get(command);
+        if (!evidence) {
+          emit("test.started", { command }, now());
+          const validation = await executeAgentTool({ workspacePath: workspace.path, tool: "run_tests", input: { command }, allowedTools: agent.allowedTools, signal });
+          evidence = { command, passed: validation.passed, output: (validation.stderr || validation.stdout || "").slice(-4000) };
+          evidenceByCommand.set(command, evidence);
+          result.commandsExecuted.push({ command, passed: validation.passed, status: validation.status });
+          emit(validation.passed ? "test.passed" : "test.failed", { command, output: evidence.output }, now());
+        }
+        if (!evidence.passed) {
           result.outcome = "failed";
-          result.defects.push({ title: `Target validation failed: ${command}`, description: validation.stderr || validation.stdout || "Target validation failed", ownerRole: "Fixer" });
+          if (!result.defects.some((defect) => defect.title === `Target validation failed: ${command}`)) result.defects.push({ title: `Target validation failed: ${command}`, description: evidence.output || "Target validation failed", ownerRole: "Fixer" });
         }
       }
+      result.testResults = task.validationCommands.map((command) => evidenceByCommand.get(command));
     }
+    throwIfAborted(signal);
     const commit = commitTaskWorkspace({ workspace, taskId: task.taskId });
     return { task, agent, workspace, result, commit };
   } catch (error) {
+    if (isAbortError(error, signal)) throw error;
+    if (!workspace.bootstrap) emit("dependency.bootstrap.failed", { error: error.message }, now());
     return { task, agent, workspace, result: { outcome: "failed", summary: error.message, defects: [{ title: "Agent execution failed", description: error.message, ownerRole: "Fixer" }], filesChanged: [], commandsExecuted: [], testResults: [], toolsUsed: [], tokenUsage: error.tokenUsage || { input: 0, output: 0 }, costUsd: Number(error.costUsd || 0) }, commit: { changed: false, commit: null, files: [] }, error };
   }
 }
@@ -285,7 +353,45 @@ function createHandoffs({ mission, completedTask, tasks, root, now }) {
   return created;
 }
 
-export async function runMission({ missionId, provider, root = process.cwd(), now = () => new Date() }) {
+function scheduleFinalValidationRetry({ mission, blockers, root, now }) {
+  const agents = listMissionAgents(mission.missionId, root);
+  const tasks = listMissionTasks(mission.missionId, root);
+  const fixer = ensureFixer({ mission, agents, root, now });
+  const integrationTask = tasks.find((task) => task.kind === "integration") || tasks.at(-1);
+  const repair = createRepairTask({
+    mission,
+    failedTask: integrationTask,
+    defect: { title: `Repair final integration validation attempt ${mission.finalValidation.attempt}`, description: blockers.join("\n"), ownerRole: "Fixer" },
+    fixer,
+    root,
+    now
+  });
+  const qa = agents.find((agent) => agent.role === "QA Engineer");
+  if (!qa) throw new Error("final integration repair requires a QA Engineer AgentRun");
+  const timestamp = isoTimestamp(now);
+  const qaTaskId = id("mission-task", `${mission.missionId}-final-revalidation-${mission.finalValidation.attempt + 1}`);
+  const qaTask = {
+    taskId: qaTaskId, missionId: mission.missionId, projectId: mission.projectId, title: `Revalidate repaired integration attempt ${mission.finalValidation.attempt + 1}`,
+    description: "Run the complete declared validation strategy after the bounded final-integration repair.", assignedAgentRunId: qa.agentRunId, assignedRole: qa.role,
+    status: "waiting", dependencies: [repair.taskId], acceptanceCriteria: ["Every declared validation command has passing evidence"], attempt: 1, maximumAttempts: 2,
+    workspace: null, artifacts: [], filesTouched: [], commandsExecuted: [], blockers: [], reviewState: "pending", kind: "qa", validationCommands: [...mission.validationStrategy],
+    createdAt: timestamp, startedAt: null, completedAt: null, updatedAt: timestamp
+  };
+  writeMissionTask(qaTask, root);
+  appendMissionEvent({ missionId: mission.missionId, type: "task.created", agentRunId: qa.agentRunId, taskId: qaTask.taskId, payload: { title: qaTask.title, dependencies: qaTask.dependencies, finalRevalidation: true }, now, root });
+  mission.tasks.push(repair.taskId, qaTask.taskId);
+  mission.dependencies = { ...mission.dependencies, [repair.taskId]: repair.dependencies, [qaTask.taskId]: qaTask.dependencies };
+  mission.team = [...new Set(mission.team)];
+  mission.finalValidation = { ...mission.finalValidation, attempt: mission.finalValidation.attempt + 1 };
+  mission.status = "running";
+  mission.blockers = blockers;
+  writeMission(mission, root);
+  appendMissionEvent({ missionId: mission.missionId, type: "final_validation.repair_created", agentRunId: fixer.agentRunId, taskId: repair.taskId, payload: { blockers, revalidationTaskId: qaTask.taskId, attempt: mission.finalValidation.attempt }, now, root });
+  return mission;
+}
+
+async function runMissionExecution({ missionId, provider, root = process.cwd(), now = () => new Date(), signal = null }) {
+  throwIfAborted(signal);
   let mission = readMission(missionId, root);
   if (["completed", "cancelled"].includes(mission.status)) return missionDetail(missionId, root);
   mission = updateMissionRecord(mission, { status: "running", blockers: [] }, root, now());
@@ -294,6 +400,7 @@ export async function runMission({ missionId, provider, root = process.cwd(), no
   appendMissionEvent({ missionId, type: "mission.running", payload: { concurrencyLimit: mission.concurrencyLimit }, now: now(), root });
   let safetyCounter = 0;
   while (safetyCounter++ < 100) {
+    throwIfAborted(signal);
     mission = readMission(missionId, root);
     if (mission.status === "cancelled") return missionDetail(missionId, root);
     let tasks = listMissionTasks(missionId, root);
@@ -304,7 +411,14 @@ export async function runMission({ missionId, provider, root = process.cwd(), no
       appendMissionEvent({ missionId, type: "task.ready", agentRunId: task.assignedAgentRunId, taskId: task.taskId, payload: {}, now: now(), root });
     }
     tasks = listMissionTasks(missionId, root);
-    const ready = tasks.filter((task) => task.status === "ready").slice(0, mission.concurrencyLimit);
+    const claimedAgents = new Set();
+    const ready = [];
+    for (const candidate of tasks.filter((task) => task.status === "ready")) {
+      if (claimedAgents.has(candidate.assignedAgentRunId)) continue;
+      claimedAgents.add(candidate.assignedAgentRunId);
+      ready.push(candidate);
+      if (ready.length >= mission.concurrencyLimit) break;
+    }
     if (ready.length === 0) {
       if (tasks.every((task) => task.status === "complete")) break;
       const terminalFailure = tasks.find((task) => task.status === "failed" || task.status === "blocked");
@@ -313,7 +427,11 @@ export async function runMission({ missionId, provider, root = process.cwd(), no
       return missionDetail(missionId, root);
     }
     const taskBudgetAllowance = mission.budget.remainingUsd / ready.length;
-    const executions = await Promise.all(ready.map((task) => executeMissionTask({ mission: { ...mission, budget: { ...mission.budget, remainingUsd: taskBudgetAllowance } }, task, agent: agents.find((agent) => agent.agentRunId === task.assignedAgentRunId), provider, root, now })));
+    const settledExecutions = await Promise.allSettled(ready.map((task) => executeMissionTask({ mission: { ...mission, budget: { ...mission.budget, remainingUsd: taskBudgetAllowance } }, task, agent: agents.find((agent) => agent.agentRunId === task.assignedAgentRunId), provider, root, now, signal })));
+    throwIfAborted(signal);
+    const rejected = settledExecutions.find((entry) => entry.status === "rejected");
+    if (rejected) throw rejected.reason;
+    const executions = settledExecutions.map((entry) => entry.value);
     for (const execution of executions) {
       mission = readMission(missionId, root);
       tasks = listMissionTasks(missionId, root);
@@ -371,15 +489,32 @@ export async function runMission({ missionId, provider, root = process.cwd(), no
   }
   mission = readMission(missionId, root);
   const finalValidation = [];
+  appendMissionEvent({ missionId, type: "dependency.bootstrap.started", workspaceId: mission.integrationWorkspace.workspaceId, payload: { finalIntegration: true }, now: now(), root });
+  try {
+    const bootstrap = await bootstrapMissionWorkspace({ workspacePath: mission.integrationWorkspace.path, signal });
+    throwIfAborted(signal);
+    mission.integrationWorkspace = { ...mission.integrationWorkspace, bootstrap };
+    writeMission(mission, root);
+    appendMissionEvent({ missionId, type: "dependency.bootstrap.completed", workspaceId: mission.integrationWorkspace.workspaceId, payload: { finalIntegration: true, manager: bootstrap.manager, status: bootstrap.status, lifecycleScriptsAllowed: bootstrap.lifecycleScriptsAllowed }, now: now(), root });
+  } catch (error) {
+    if (isAbortError(error, signal)) throw error;
+    finalValidation.push({ command: "dependency bootstrap", passed: false, status: null, output: error.message });
+    appendMissionEvent({ missionId, type: "dependency.bootstrap.failed", workspaceId: mission.integrationWorkspace.workspaceId, payload: { finalIntegration: true, error: error.message }, now: now(), root });
+  }
   for (const command of mission.validationStrategy) {
     appendMissionEvent({ missionId, type: "test.started", workspaceId: mission.integrationWorkspace.workspaceId, payload: { command, final: true }, now: now(), root });
-    const result = executeAgentTool({ workspacePath: mission.integrationWorkspace.path, tool: "run_tests", input: { command } });
+    const result = await executeAgentTool({ workspacePath: mission.integrationWorkspace.path, tool: "run_tests", input: { command }, signal });
+    throwIfAborted(signal);
     finalValidation.push({ command, passed: result.passed, status: result.status, output: (result.stderr || result.stdout || "").slice(-4000) });
     appendMissionEvent({ missionId, type: result.passed ? "test.passed" : "test.failed", workspaceId: mission.integrationWorkspace.workspaceId, payload: { command, final: true, output: finalValidation.at(-1).output }, now: now(), root });
   }
   const secretScan = scanSecrets({ root: mission.integrationWorkspace.path });
   if (finalValidation.some((result) => !result.passed) || !secretScan.ok) {
-    const blockers = [...finalValidation.filter((result) => !result.passed).map((result) => `Final validation failed: ${result.command}`), ...(!secretScan.ok ? [`Secret scan found ${secretScan.findings.length} finding(s)`] : [])];
+    const blockers = [...finalValidation.filter((result) => !result.passed).map((result) => `Final validation failed: ${result.command}\n${result.output}`), ...(!secretScan.ok ? [`Secret scan found ${secretScan.findings.length} finding(s)`] : [])];
+    if (mission.finalValidation.attempt < mission.finalValidation.maximumAttempts) {
+      scheduleFinalValidationRetry({ mission, blockers, root, now: now() });
+      return runMissionExecution({ missionId, provider, root, now, signal });
+    }
     mission = updateMissionRecord(mission, { status: "failed", blockers, progress: progress(listMissionTasks(missionId, root)) }, root, now());
     appendMissionEvent({ missionId, type: "mission.failed", payload: { blockers }, now: now(), root });
     return missionDetail(missionId, root);
@@ -406,7 +541,7 @@ function executionRevision(workspacePath) {
   return gitRevision(workspacePath);
 }
 
-export function cancelMission({ missionId, reason, root = process.cwd(), now = new Date() }) {
+function finalizeMissionCancellation({ missionId, reason, root = process.cwd(), now = new Date() }) {
   let mission = readMission(missionId, root);
   if (["completed", "cancelled"].includes(mission.status)) return missionDetail(missionId, root);
   mission = updateMissionRecord(mission, { status: "cancelled", blockers: [String(reason || "Cancelled by owner")] }, root, now);
@@ -415,6 +550,19 @@ export function cancelMission({ missionId, reason, root = process.cwd(), now = n
   cancelMissionWorkspaces({ repositoryPath: mission.baseRepository, missionId });
   appendMissionEvent({ missionId, type: "mission.cancelled", payload: { reason: mission.blockers[0] }, now, root });
   return missionDetail(missionId, root);
+}
+
+export async function runMission(options) {
+  try {
+    return await runMissionExecution(options);
+  } catch (error) {
+    if (!isAbortError(error, options.signal)) throw error;
+    return finalizeMissionCancellation({ missionId: options.missionId, reason: options.signal?.reason?.message || options.signal?.reason || "Cancelled by owner", root: options.root, now: options.now?.() || new Date() });
+  }
+}
+
+export function cancelMission(options) {
+  return finalizeMissionCancellation(options);
 }
 
 export { listMissions, missionDetail };
