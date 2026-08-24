@@ -30,13 +30,17 @@ export async function createAnthropicMissionPlan({
   signal = null
 }) {
   if (!apiKey || !model || !approvalId) throw new Error("Anthropic mission planner requires configured credentials, model, and approval");
+  if (!Array.isArray(validationCommands) || validationCommands.length === 0) throw new Error("Anthropic mission planner requires at least one coordinator validation command");
+  validationCommands.forEach(assertAllowedAgentCommand);
+  const providerSchema = structuredClone(MISSION_NATIVE_PLAN_SCHEMA);
+  providerSchema.properties.validationStrategy.items = { type: "string", enum: [...new Set(validationCommands)] };
   const job = { jobId: `mission-planning-${now.getTime()}`, projectId, riskLevel: "R1" };
   const requestBody = {
     model,
     max_tokens: MAX_TOKENS,
     system: "You are the AG OS Mission Control planner. Return a complete mission-native software execution graph. Commander, QA Engineer, Code Reviewer, and Integration Agent are mandatory roles. Put the first non-quality work item in tasks.primary, any other non-quality work in tasks.additional, and the mandatory quality tasks in tasks.codeReview, tasks.qa, and tasks.integration. Set the corresponding optional-role boolean true for every non-quality assignedRole. Make code review depend on all work it reviews, QA depend on code review, and integration depend on QA. Assign only supported roles. Make dependencies express real collaboration: UI design feeds dependent frontend work, database design feeds dependent backend work, and genuinely independent work remains parallel. Include deterministic target validation. Never authorize deployment, publishing, credentials, production data, paid actions beyond this call, or any other protected external action; list those as approval requirements.",
     messages: [{ role: "user", content: JSON.stringify({ ownerOutcome, projectId, availableValidationCommands: validationCommands, externalActionsAuthorized: false }) }],
-    output_config: { format: { type: "json_schema", schema: toAnthropicStructuredOutputSchema(MISSION_NATIVE_PLAN_SCHEMA) } }
+    output_config: { format: { type: "json_schema", schema: toAnthropicStructuredOutputSchema(providerSchema) } }
   };
   const reservation = reserveAnthropicBudget({ kind: "planner", job, requestBody, maxTokens: MAX_TOKENS, inputCostPerMillionUsd, outputCostPerMillionUsd, approvalId, approvalMaxUsd, root, env, now });
   let accepted = false;
