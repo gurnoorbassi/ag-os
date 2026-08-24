@@ -44,7 +44,10 @@ export async function createAnthropicMissionPlan({
   let providerModel = model;
   try {
     const response = await fetchWithTimeout(fetchImpl, `${baseUrl.replace(/\/$/, "")}/v1/messages`, { method: "POST", headers: { "anthropic-version": VERSION, "content-type": "application/json", "x-api-key": apiKey }, body: JSON.stringify(requestBody), signal }, timeoutMs);
-    if (!response.ok) throw new Error(`Anthropic mission planner request failed with HTTP ${response.status}`);
+    if (!response.ok) {
+      const detail = typeof response.text === "function" ? String(await response.text()).replace(/[\r\n]+/g, " ").slice(0, 1200) : "";
+      throw new Error(`Anthropic mission planner request failed with HTTP ${response.status}${detail ? `: ${detail}` : ""}`);
+    }
     accepted = true;
     const payload = await response.json();
     providerUsage = payload.usage || {};

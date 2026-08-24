@@ -431,6 +431,16 @@ test("Anthropic mission planner returns and audits the mission-native graph with
   assert.ok(planned.usageAuditPath.endsWith(".json"));
 });
 
+test("Anthropic mission planner preserves bounded provider schema errors", async () => {
+  const root = mkdtempSync(path.join(tmpdir(), "ag-os-mission-planner-error-"));
+  write(root, ".codex/costs/budget.json", `${JSON.stringify({ limits: { monthlyMaxUsd: 50, dailyMaxUsd: 10, perTaskMaxUsd: 5 } })}\n`);
+  await assert.rejects(createAnthropicMissionPlan({
+    ownerOutcome: "Build a fixture", projectId: "planner-error", validationCommands: ["npm test"], apiKey: "fixture-key", model: "fixture-model",
+    approvalId: "approval-fixture-planner-error", approvalMaxUsd: 5, inputCostPerMillionUsd: 3, outputCostPerMillionUsd: 15, root,
+    fetchImpl: async () => ({ ok: false, status: 400, text: async () => "schema validation failed\nwithout credential material" })
+  }), /HTTP 400: schema validation failed without credential material/);
+});
+
 test("Anthropic mission provider reserves Cost OS budget and audits an approved tool turn", async () => {
   const root = mkdtempSync(path.join(tmpdir(), "ag-os-provider-"));
   write(root, ".codex/costs/budget.json", `${JSON.stringify({ limits: { monthlyMaxUsd: 50, dailyMaxUsd: 10, perTaskMaxUsd: 5 } })}\n`);
