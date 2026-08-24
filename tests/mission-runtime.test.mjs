@@ -10,7 +10,7 @@ import { createAnthropicAgentProvider } from "../scripts/lib/runtime/anthropic-a
 import { finalizeAnthropicBudgetReservation } from "../scripts/lib/runtime/anthropic-budget-guard.mjs";
 import { createAnthropicMissionPlan, DEFAULT_MISSION_PLANNER_TIMEOUT_MS } from "../scripts/lib/runtime/anthropic-mission-planner.mjs";
 import { detectWorkspacePackageManager } from "../scripts/lib/runtime/mission-bootstrap.mjs";
-import { validateMissionPlanDraft } from "../scripts/lib/runtime/mission-plan.mjs";
+import { missionPlanTasks, validateMissionPlanDraft } from "../scripts/lib/runtime/mission-plan.mjs";
 import { readMissionEvents } from "../scripts/lib/runtime/mission-store.mjs";
 
 function write(root, relativePath, content) {
@@ -206,16 +206,24 @@ function missionRoles(...additional) {
   return { commander: "Commander", qa: "QA Engineer", codeReviewer: "Code Reviewer", integration: "Integration Agent", additional: selected };
 }
 
+function groupedTasks(tasks) {
+  const codeReview = tasks.find((task) => task.assignedRole === "Code Reviewer");
+  const qa = tasks.find((task) => task.assignedRole === "QA Engineer");
+  const integration = tasks.find((task) => task.assignedRole === "Integration Agent");
+  const work = tasks.filter((task) => ![codeReview, qa, integration].includes(task));
+  return { primary: work[0], additional: work.slice(1), codeReview, qa, integration };
+}
+
 function missionNativePlan(overrides = {}) {
   return {
     summary: "Build a dependency-backed CRM through a mission-native graph.",
     requiredRoles: missionRoles("Backend Engineer"),
-    tasks: [
+    tasks: groupedTasks([
       { taskId: "backend", title: "Build backend", description: "Build the backend.", assignedRole: "Backend Engineer", dependencies: [], acceptanceCriteria: ["Backend works"], kind: "coding" },
       { taskId: "review", title: "Review", description: "Review the integrated diff.", assignedRole: "Code Reviewer", dependencies: ["backend"], acceptanceCriteria: ["No blocking defect"], kind: "review" },
       { taskId: "qa", title: "Validate", description: "Run all validation.", assignedRole: "QA Engineer", dependencies: ["review"], acceptanceCriteria: ["All commands pass"], kind: "qa" },
       { taskId: "integration", title: "Integrate", description: "Seal integration.", assignedRole: "Integration Agent", dependencies: ["qa"], acceptanceCriteria: ["Integrated"], kind: "integration" }
-    ],
+    ]),
     validationStrategy: ["npm test", "npm run build"],
     integrationOrder: ["backend", "review", "qa", "integration"],
     risks: ["Local validation may reveal defects"],
@@ -229,8 +237,8 @@ test("mission-native plans reject unknown dependencies, cycles, unsupported role
   const missingQa = { ...valid.requiredRoles };
   delete missingQa.qa;
   assert.equal(validateMissionPlanDraft(valid), valid);
-  assert.throws(() => validateMissionPlanDraft(missionNativePlan({ tasks: missionNativePlan().tasks.map((task) => task.taskId === "review" ? { ...task, dependencies: ["missing"] } : task) })), /unknown dependency/);
-  assert.throws(() => validateMissionPlanDraft(missionNativePlan({ tasks: missionNativePlan().tasks.map((task) => task.taskId === "backend" ? { ...task, dependencies: ["integration"] } : task) })), /cycle/);
+  assert.throws(() => validateMissionPlanDraft(missionNativePlan({ tasks: groupedTasks(missionPlanTasks(missionNativePlan()).map((task) => task.taskId === "review" ? { ...task, dependencies: ["missing"] } : task)) })), /unknown dependency/);
+  assert.throws(() => validateMissionPlanDraft(missionNativePlan({ tasks: groupedTasks(missionPlanTasks(missionNativePlan()).map((task) => task.taskId === "backend" ? { ...task, dependencies: ["integration"] } : task)) })), /cycle/);
   assert.throws(() => validateMissionPlanDraft(missionNativePlan({ requiredRoles: missionRoles("Backend Engineer", "wizard") })), /unsupported field/);
   assert.throws(() => validateMissionPlanDraft(missionNativePlan({ requiredRoles: missingQa })), /missing qa/);
   assert.throws(() => validateMissionPlanDraft(missionNativePlan({ integrationOrder: ["review", "backend", "qa", "integration"] })), /before dependency/);
@@ -241,13 +249,13 @@ test("scheduler never runs two ready tasks on the same AgentRun concurrently", a
   const planDraft = {
     summary: "Build two independent files with one bounded backend AgentRun.",
     requiredRoles: missionRoles("Backend Engineer"),
-    tasks: [
+    tasks: groupedTasks([
       { taskId: "server", title: "Build server", description: "Create the server module.", assignedRole: "Backend Engineer", dependencies: [], acceptanceCriteria: ["Server exists"], kind: "coding" },
       { taskId: "page", title: "Build page", description: "Create the public page.", assignedRole: "Backend Engineer", dependencies: [], acceptanceCriteria: ["Page exists"], kind: "coding" },
       { taskId: "review", title: "Review", description: "Inspect the integrated diff.", assignedRole: "Code Reviewer", dependencies: ["server", "page"], acceptanceCriteria: ["Diff reviewed"], kind: "review" },
       { taskId: "qa", title: "QA", description: "Run all validation.", assignedRole: "QA Engineer", dependencies: ["review"], acceptanceCriteria: ["Validation passes"], kind: "qa" },
       { taskId: "integration", title: "Integrate", description: "Run integration validation.", assignedRole: "Integration Agent", dependencies: ["qa"], acceptanceCriteria: ["Tests pass"], kind: "integration" }
-    ],
+    ]),
     validationStrategy: ["npm test", "npm run build"], integrationOrder: ["server", "page", "review", "qa", "integration"], risks: [], approvalRequirements: []
   };
   const activeByAgent = new Map();
@@ -275,13 +283,13 @@ test("scheduler preserves concurrency for independent tasks on different AgentRu
   const planDraft = {
     summary: "Build independent frontend and backend work concurrently.",
     requiredRoles: missionRoles("Frontend Engineer", "Backend Engineer"),
-    tasks: [
+    tasks: groupedTasks([
       { taskId: "frontend", title: "Build frontend", description: "Create the public page.", assignedRole: "Frontend Engineer", dependencies: [], acceptanceCriteria: ["Page exists"], kind: "coding" },
       { taskId: "backend", title: "Build backend", description: "Create the server module.", assignedRole: "Backend Engineer", dependencies: [], acceptanceCriteria: ["Server exists"], kind: "coding" },
       { taskId: "review", title: "Review", description: "Inspect the integrated diff.", assignedRole: "Code Reviewer", dependencies: ["frontend", "backend"], acceptanceCriteria: ["Diff reviewed"], kind: "review" },
       { taskId: "qa", title: "QA", description: "Run all validation.", assignedRole: "QA Engineer", dependencies: ["review"], acceptanceCriteria: ["Validation passes"], kind: "qa" },
       { taskId: "integration", title: "Integrate", description: "Run integration validation.", assignedRole: "Integration Agent", dependencies: ["qa"], acceptanceCriteria: ["Tests pass"], kind: "integration" }
-    ],
+    ]),
     validationStrategy: ["npm test", "npm run build"], integrationOrder: ["frontend", "backend", "review", "qa", "integration"], risks: [], approvalRequirements: []
   };
   let concurrentFirstTurns = 0;
@@ -309,17 +317,20 @@ test("scheduler preserves concurrency for independent tasks on different AgentRu
 test("QA executes every declared validation command and deduplicates agent evidence", async () => {
   const { repository, records } = readyFixture();
   const planDraft = {
-    summary: "Run deterministic QA.", requiredRoles: missionRoles(),
-    tasks: [
-      { taskId: "review", title: "Review", description: "Inspect the current diff.", assignedRole: "Code Reviewer", dependencies: [], acceptanceCriteria: ["Diff reviewed"], kind: "review" },
+    summary: "Run deterministic QA.", requiredRoles: missionRoles("Product Manager"),
+    tasks: groupedTasks([
+      { taskId: "scope", title: "Confirm scope", description: "Confirm the validation scope.", assignedRole: "Product Manager", dependencies: [], acceptanceCriteria: ["Scope confirmed"], kind: "planning" },
+      { taskId: "review", title: "Review", description: "Inspect the current diff.", assignedRole: "Code Reviewer", dependencies: ["scope"], acceptanceCriteria: ["Diff reviewed"], kind: "review" },
       { taskId: "qa", title: "QA all commands", description: "Validate everything.", assignedRole: "QA Engineer", dependencies: ["review"], acceptanceCriteria: ["All declared commands pass"], kind: "qa" },
       { taskId: "integration", title: "Integrate", description: "Confirm integration.", assignedRole: "Integration Agent", dependencies: ["qa"], acceptanceCriteria: ["Integration passes"], kind: "integration" }
-    ],
-    validationStrategy: ["npm test", "npm run build"], integrationOrder: ["review", "qa", "integration"], risks: [], approvalRequirements: []
+    ]),
+    validationStrategy: ["npm test", "npm run build"], integrationOrder: ["scope", "review", "qa", "integration"], risks: [], approvalRequirements: []
   };
   const provider = { nextAction: async ({ agent, transcript }) => transcript.length > 0
     ? { action: { tool: "complete", input: { outcome: "complete", summary: "QA evidence recorded", defects: [] } }, costUsd: 0, usage: {} }
-    : agent.role === "Code Reviewer"
+    : agent.role === "Product Manager"
+      ? { action: { tool: "complete", input: { outcome: "complete", summary: "Scope confirmed", defects: [] } }, costUsd: 0, usage: {} }
+      : agent.role === "Code Reviewer"
       ? { action: { tool: "git_diff", input: {} }, costUsd: 0, usage: {} }
       : { action: { tool: "run_tests", input: { command: "npm test" } }, costUsd: 0, usage: {} } };
   const created = createMission({ ownerOutcome: "Validate the ready CRM", projectId: "qa-fixture", repositoryPath: repository, planningEvidence: { planDraft, model: "fixture", usage: {}, costUsd: 0 }, root: records });
@@ -341,17 +352,20 @@ test("mission cancellation persists terminal state and removes its worktrees", (
 test("long mission commands stay asynchronous and cancellation stops work without late mutations", async () => {
   const { repository, records } = fixture({ requireFinalRepair: false });
   const planDraft = {
-    summary: "Run one long cancellable QA command.", requiredRoles: missionRoles(),
-    tasks: [
-      { taskId: "review", title: "Review", description: "Inspect the current diff.", assignedRole: "Code Reviewer", dependencies: [], acceptanceCriteria: ["Diff reviewed"], kind: "review" },
+    summary: "Run one long cancellable QA command.", requiredRoles: missionRoles("Product Manager"),
+    tasks: groupedTasks([
+      { taskId: "scope", title: "Confirm scope", description: "Confirm the cancellation scope.", assignedRole: "Product Manager", dependencies: [], acceptanceCriteria: ["Scope confirmed"], kind: "planning" },
+      { taskId: "review", title: "Review", description: "Inspect the current diff.", assignedRole: "Code Reviewer", dependencies: ["scope"], acceptanceCriteria: ["Diff reviewed"], kind: "review" },
       { taskId: "qa", title: "Long QA", description: "Run the cancellable test.", assignedRole: "QA Engineer", dependencies: [], acceptanceCriteria: ["Command completes or cancellation stops it"], kind: "qa" },
       { taskId: "integration", title: "Integrate", description: "Confirm integration.", assignedRole: "Integration Agent", dependencies: ["review", "qa"], acceptanceCriteria: ["Integration passes"], kind: "integration" }
-    ],
-    validationStrategy: ["npm run slowtest"], integrationOrder: ["review", "qa", "integration"], risks: [], approvalRequirements: []
+    ]),
+    validationStrategy: ["npm run slowtest"], integrationOrder: ["scope", "review", "qa", "integration"], risks: [], approvalRequirements: []
   };
   const provider = { nextAction: async ({ agent, transcript }) => transcript.length > 0
     ? { action: { tool: "complete", input: { outcome: "complete", summary: "done", defects: [] } }, costUsd: 0, usage: {} }
-    : agent.role === "Code Reviewer"
+    : agent.role === "Product Manager"
+      ? { action: { tool: "complete", input: { outcome: "complete", summary: "Scope confirmed", defects: [] } }, costUsd: 0, usage: {} }
+      : agent.role === "Code Reviewer"
       ? { action: { tool: "git_diff", input: {} }, costUsd: 0, usage: {} }
       : { action: { tool: "run_tests", input: { command: "npm run slowtest" } }, costUsd: 0, usage: {} } };
   const created = createMission({ ownerOutcome: "Prove cancellable QA", projectId: "cancel-fixture", repositoryPath: repository, planningEvidence: { planDraft, model: "fixture", usage: {}, costUsd: 0 }, root: records });
@@ -406,8 +420,8 @@ test("Anthropic mission planner returns and audits the mission-native graph with
     root,
     fetchImpl: async (_url, request) => {
       const body = JSON.parse(request.body);
-      assert.ok(body.output_config.format.schema.properties.tasks.items.properties.assignedRole);
-      assert.ok(body.output_config.format.schema.properties.tasks.items.properties.dependencies);
+      assert.ok(body.output_config.format.schema.properties.tasks.properties.primary.properties.assignedRole);
+      assert.ok(body.output_config.format.schema.properties.tasks.properties.primary.properties.dependencies);
       return { ok: true, json: async () => ({ model: "fixture-model", stop_reason: "end_turn", usage: { input_tokens: 100, output_tokens: 200 }, content: [{ type: "text", text: JSON.stringify(expected) }] }) };
     }
   });

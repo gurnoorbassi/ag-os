@@ -12,6 +12,31 @@ const ADDITIONAL_ROLE_FIELDS = Object.freeze({
   securityReviewer: "Security Reviewer",
   fixer: "Fixer"
 });
+const WORK_ROLES = Object.freeze(Object.values(ADDITIONAL_ROLE_FIELDS));
+const TASK_KINDS = Object.freeze(["planning", "coding", "review", "qa", "integration"]);
+const TASK_FIELDS = Object.freeze(["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"]);
+
+function taskSchema(roles, kinds) {
+  return {
+    type: "object",
+    additionalProperties: false,
+    required: TASK_FIELDS,
+    properties: {
+      taskId: { type: "string", minLength: 2 },
+      title: { type: "string", minLength: 1 },
+      description: { type: "string", minLength: 1 },
+      assignedRole: { type: "string", enum: roles },
+      dependencies: { type: "array", items: { type: "string" } },
+      acceptanceCriteria: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } },
+      kind: { type: "string", enum: kinds }
+    }
+  };
+}
+
+const WORK_TASK_SCHEMA = taskSchema(WORK_ROLES, ["planning", "coding", "review"]);
+const CODE_REVIEW_TASK_SCHEMA = taskSchema(["Code Reviewer"], ["review"]);
+const QA_TASK_SCHEMA = taskSchema(["QA Engineer"], ["qa"]);
+const INTEGRATION_TASK_SCHEMA = taskSchema(["Integration Agent"], ["integration"]);
 
 export const MISSION_NATIVE_PLAN_SCHEMA = {
   type: "object",
@@ -37,21 +62,15 @@ export const MISSION_NATIVE_PLAN_SCHEMA = {
       }
     },
     tasks: {
-      type: "array",
-      minItems: 1,
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
-        properties: {
-          taskId: { type: "string", minLength: 2 },
-          title: { type: "string", minLength: 1 },
-          description: { type: "string", minLength: 1 },
-          assignedRole: { type: "string", enum: SUPPORTED_MISSION_ROLES },
-          dependencies: { type: "array", items: { type: "string" } },
-          acceptanceCriteria: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } },
-          kind: { type: "string", enum: ["planning", "coding", "review", "qa", "integration"] }
-        }
+      type: "object",
+      additionalProperties: false,
+      required: ["primary", "additional", "codeReview", "qa", "integration"],
+      properties: {
+        primary: WORK_TASK_SCHEMA,
+        additional: { type: "array", items: WORK_TASK_SCHEMA },
+        codeReview: CODE_REVIEW_TASK_SCHEMA,
+        qa: QA_TASK_SCHEMA,
+        integration: INTEGRATION_TASK_SCHEMA
       }
     },
     validationStrategy: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } },
@@ -84,6 +103,10 @@ function assertAcyclic(tasksById) {
   for (const taskId of tasksById.keys()) visit(taskId);
 }
 
+export function missionPlanTasks(plan) {
+  return [plan.tasks.primary, ...plan.tasks.additional, plan.tasks.codeReview, plan.tasks.qa, plan.tasks.integration];
+}
+
 export function validateMissionPlanDraft(plan, { assertValidationCommand = null } = {}) {
   if (!plan || typeof plan !== "object" || Array.isArray(plan)) throw new Error("mission plan must be an object");
   const expectedKeys = new Set(MISSION_NATIVE_PLAN_SCHEMA.required);
@@ -102,10 +125,15 @@ export function validateMissionPlanDraft(plan, { assertValidationCommand = null 
   const additionalRoles = additionalRoleKeys.filter((key) => plan.requiredRoles.additional[key]).map((key) => ADDITIONAL_ROLE_FIELDS[key]);
   const requiredRoles = [plan.requiredRoles.commander, ...additionalRoles, plan.requiredRoles.codeReviewer, plan.requiredRoles.qa, plan.requiredRoles.integration];
   for (const role of requiredRoles) if (!SUPPORTED_MISSION_ROLES.includes(role)) throw new Error(`unsupported mission role: ${role}`);
-  if (!Array.isArray(plan.tasks) || plan.tasks.length === 0) throw new Error("mission plan tasks must be a non-empty array");
+  if (!plan.tasks || typeof plan.tasks !== "object" || Array.isArray(plan.tasks)) throw new Error("mission plan tasks must be an object");
+  const taskGroupKeys = MISSION_NATIVE_PLAN_SCHEMA.properties.tasks.required;
+  for (const key of Object.keys(plan.tasks)) if (!taskGroupKeys.includes(key)) throw new Error(`mission plan tasks has unsupported field: ${key}`);
+  for (const key of taskGroupKeys) if (!(key in plan.tasks)) throw new Error(`mission plan tasks is missing ${key}`);
+  if (!Array.isArray(plan.tasks.additional)) throw new Error("mission plan tasks.additional must be an array");
+  const tasks = missionPlanTasks(plan);
   const tasksById = new Map();
-  const taskKeys = new Set(MISSION_NATIVE_PLAN_SCHEMA.properties.tasks.items.required);
-  for (const task of plan.tasks) {
+  const taskKeys = new Set(TASK_FIELDS);
+  for (const task of tasks) {
     if (!task || typeof task !== "object" || Array.isArray(task)) throw new Error("mission plan task must be an object");
     for (const key of Object.keys(task)) if (!taskKeys.has(key)) throw new Error(`mission plan task has unsupported field: ${key}`);
     for (const key of taskKeys) if (!(key in task)) throw new Error(`mission plan task is missing ${key}`);
@@ -117,13 +145,15 @@ export function validateMissionPlanDraft(plan, { assertValidationCommand = null 
     assertStringArray(task.dependencies, `${task.taskId} dependencies`);
     if (new Set(task.dependencies).size !== task.dependencies.length) throw new Error(`${task.taskId} dependencies must be unique`);
     assertStringArray(task.acceptanceCriteria, `${task.taskId} acceptanceCriteria`, { nonEmpty: true });
-    if (!MISSION_NATIVE_PLAN_SCHEMA.properties.tasks.items.properties.kind.enum.includes(task.kind)) throw new Error(`${task.taskId} has invalid kind`);
+    if (!TASK_KINDS.includes(task.kind)) throw new Error(`${task.taskId} has invalid kind`);
     tasksById.set(task.taskId, task);
   }
-  if (!plan.tasks.some((task) => task.kind === "qa" && task.assignedRole === "QA Engineer")) throw new Error("mission plan must assign a QA task to QA Engineer");
-  if (!plan.tasks.some((task) => task.kind === "review" && task.assignedRole === "Code Reviewer")) throw new Error("mission plan must assign a review task to Code Reviewer");
-  if (!plan.tasks.some((task) => task.kind === "integration" && task.assignedRole === "Integration Agent")) throw new Error("mission plan must assign an integration task to Integration Agent");
-  for (const task of plan.tasks) {
+  if (!WORK_ROLES.includes(plan.tasks.primary.assignedRole) || !["planning", "coding", "review"].includes(plan.tasks.primary.kind)) throw new Error("mission plan primary task is malformed");
+  if (plan.tasks.additional.some((task) => !WORK_ROLES.includes(task.assignedRole) || !["planning", "coding", "review"].includes(task.kind))) throw new Error("mission plan additional work task is malformed");
+  if (plan.tasks.codeReview.assignedRole !== "Code Reviewer" || plan.tasks.codeReview.kind !== "review") throw new Error("mission plan codeReview task is malformed");
+  if (plan.tasks.qa.assignedRole !== "QA Engineer" || plan.tasks.qa.kind !== "qa") throw new Error("mission plan QA task is malformed");
+  if (plan.tasks.integration.assignedRole !== "Integration Agent" || plan.tasks.integration.kind !== "integration") throw new Error("mission plan integration task is malformed");
+  for (const task of tasks) {
     for (const dependency of task.dependencies) {
       if (!tasksById.has(dependency)) throw new Error(`${task.taskId} has unknown dependency: ${dependency}`);
       if (dependency === task.taskId) throw new Error(`${task.taskId} cannot depend on itself`);
@@ -138,7 +168,7 @@ export function validateMissionPlanDraft(plan, { assertValidationCommand = null 
     throw new Error("mission plan integrationOrder must contain every task exactly once");
   }
   const order = new Map(plan.integrationOrder.map((taskId, index) => [taskId, index]));
-  for (const task of plan.tasks) for (const dependency of task.dependencies) if (order.get(dependency) > order.get(task.taskId)) throw new Error(`mission plan integrationOrder places ${task.taskId} before dependency ${dependency}`);
+  for (const task of tasks) for (const dependency of task.dependencies) if (order.get(dependency) > order.get(task.taskId)) throw new Error(`mission plan integrationOrder places ${task.taskId} before dependency ${dependency}`);
   assertStringArray(plan.risks, "mission plan risks");
   assertStringArray(plan.approvalRequirements, "mission plan approvalRequirements");
   return plan;

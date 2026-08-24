@@ -34,20 +34,59 @@
       }
     },
     "tasks": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
-        "properties": {
-          "taskId": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
-          "title": { "type": "string", "minLength": 1 },
-          "description": { "type": "string", "minLength": 1 },
-          "assignedRole": { "type": "string", "enum": ["Product Manager", "Architect", "UI Designer", "Frontend Engineer", "Backend Engineer", "Database Engineer", "QA Engineer", "Security Reviewer", "Code Reviewer", "Fixer", "Integration Agent"] },
-          "dependencies": { "type": "array", "items": { "type": "string" } },
-          "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
-          "kind": { "type": "string", "enum": ["planning", "coding", "review", "qa", "integration"] }
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary", "additional", "codeReview", "qa", "integration"],
+      "properties": {
+        "primary": {
+          "type": "object", "additionalProperties": false,
+          "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
+          "properties": {
+            "taskId": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" }, "title": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 },
+            "assignedRole": { "type": "string", "enum": ["Product Manager", "Architect", "UI Designer", "Frontend Engineer", "Backend Engineer", "Database Engineer", "Security Reviewer", "Fixer"] },
+            "dependencies": { "type": "array", "items": { "type": "string" } }, "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "kind": { "type": "string", "enum": ["planning", "coding", "review"] }
+          }
+        },
+        "additional": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
+            "properties": {
+              "taskId": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" }, "title": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 },
+              "assignedRole": { "type": "string", "enum": ["Product Manager", "Architect", "UI Designer", "Frontend Engineer", "Backend Engineer", "Database Engineer", "Security Reviewer", "Fixer"] },
+              "dependencies": { "type": "array", "items": { "type": "string" } }, "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+              "kind": { "type": "string", "enum": ["planning", "coding", "review"] }
+            }
+          }
+        },
+        "codeReview": {
+          "type": "object", "additionalProperties": false,
+          "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
+          "properties": {
+            "taskId": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" }, "title": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 },
+            "assignedRole": { "type": "string", "enum": ["Code Reviewer"] }, "dependencies": { "type": "array", "items": { "type": "string" } },
+            "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }, "kind": { "type": "string", "enum": ["review"] }
+          }
+        },
+        "qa": {
+          "type": "object", "additionalProperties": false,
+          "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
+          "properties": {
+            "taskId": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" }, "title": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 },
+            "assignedRole": { "type": "string", "enum": ["QA Engineer"] }, "dependencies": { "type": "array", "items": { "type": "string" } },
+            "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }, "kind": { "type": "string", "enum": ["qa"] }
+          }
+        },
+        "integration": {
+          "type": "object", "additionalProperties": false,
+          "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
+          "properties": {
+            "taskId": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" }, "title": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 },
+            "assignedRole": { "type": "string", "enum": ["Integration Agent"] }, "dependencies": { "type": "array", "items": { "type": "string" } },
+            "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }, "kind": { "type": "string", "enum": ["integration"] }
+          }
         }
       }
     },

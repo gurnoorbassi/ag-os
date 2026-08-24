@@ -4,7 +4,7 @@ import process from "node:process";
 import { isoTimestamp, slugify, writeJson } from "./common.mjs";
 import { allowedToolsForRole, assertAllowedAgentCommand, executeAgentTool, runAgentToolLoop } from "./agent-runner.mjs";
 import { bootstrapMissionWorkspace } from "./mission-bootstrap.mjs";
-import { missionPlanRoles, SUPPORTED_MISSION_ROLES, validateMissionPlanDraft } from "./mission-plan.mjs";
+import { missionPlanRoles, missionPlanTasks, SUPPORTED_MISSION_ROLES, validateMissionPlanDraft } from "./mission-plan.mjs";
 import {
   appendMissionEvent,
   listMissionAgents,
@@ -138,8 +138,9 @@ export function buildMissionPlanFromDraft({ missionId, projectId, planDraft }) {
   validateMissionPlanDraft(planDraft, { assertValidationCommand: assertAllowedAgentCommand });
   const agents = missionPlanRoles(planDraft).map((role, index) => agentDefinition(missionId, role, index));
   const byRole = Object.fromEntries(agents.map((agent) => [agent.role, agent.agentRunId]));
-  const taskIds = new Map(planDraft.tasks.map((task) => [task.taskId, id("mission-task", `${missionId}-${task.taskId}`)]));
-  const tasks = planDraft.tasks.map((task) => ({
+  const draftTasks = missionPlanTasks(planDraft);
+  const taskIds = new Map(draftTasks.map((task) => [task.taskId, id("mission-task", `${missionId}-${task.taskId}`)]));
+  const tasks = draftTasks.map((task) => ({
     taskId: taskIds.get(task.taskId), missionId, projectId, title: task.title, description: task.description,
     assignedAgentRunId: byRole[task.assignedRole], assignedRole: task.assignedRole,
     status: task.dependencies.length === 0 ? "ready" : "waiting", dependencies: task.dependencies.map((dependency) => taskIds.get(dependency)),

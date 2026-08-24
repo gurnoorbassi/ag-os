@@ -11,6 +11,7 @@ import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-plann
 import { evaluateAnthropicWorkerReadiness } from "./lib/runtime/anthropic-worker-readiness.mjs";
 import { writeJson } from "./lib/runtime/common.mjs";
 import { createMission, runMission } from "./lib/runtime/mission-runtime.mjs";
+import { missionPlanTasks } from "./lib/runtime/mission-plan.mjs";
 
 if (process.env.AG_OS_LIVE_MISSION_SMOKE_APPROVED !== "true") throw new Error("live mission smoke requires AG_OS_LIVE_MISSION_SMOKE_APPROVED=true from the approving owner session");
 for (const name of ["ANTHROPIC_API_KEY", "ANTHROPIC_MODEL", "ANTHROPIC_INPUT_COST_PER_MILLION_USD", "ANTHROPIC_OUTPUT_COST_PER_MILLION_USD"]) {
@@ -173,7 +174,7 @@ const summary = {
   smokeRoot,
   missionId: finalMission.missionId,
   status: finalMission.status,
-  planning: { mode: finalMission.planning.mode, model: finalMission.planning.model, costUsd: finalMission.planning.costUsd, taskCount: planning.planDraft.tasks.length },
+  planning: { mode: finalMission.planning.mode, model: finalMission.planning.model, costUsd: finalMission.planning.costUsd, taskCount: missionPlanTasks(planning.planDraft).length },
   actualAgentRuns: paidAgents.map((agent) => ({ agentRunId: agent.agentRunId, role: agent.role, status: agent.status, costUsd: agent.costUsd, tokenUsage: agent.tokenUsage })),
   tasks: finalMission.tasks.map((task) => ({ taskId: task.taskId, role: task.assignedRole, kind: task.kind, status: task.status, attempt: task.attempt, tools: task.commandsExecuted.map((item) => item.command) })),
   isolatedWorktreeCount: new Set(taskWorkspaces.map((task) => task.workspace.path)).size,
