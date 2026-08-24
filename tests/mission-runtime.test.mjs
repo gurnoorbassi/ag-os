@@ -420,8 +420,9 @@ test("Anthropic mission planner returns and audits the mission-native graph with
     root,
     fetchImpl: async (_url, request) => {
       const body = JSON.parse(request.body);
-      assert.ok(body.output_config.format.schema.properties.tasks.properties.primary.properties.assignedRole);
-      assert.ok(body.output_config.format.schema.properties.tasks.properties.primary.properties.dependencies);
+      assert.equal(body.output_config.format.schema.properties.tasks.properties.primary.$ref, "#/$defs/missionTask");
+      assert.ok(body.output_config.format.schema.$defs.missionTask.properties.assignedRole);
+      assert.ok(body.output_config.format.schema.$defs.missionTask.properties.dependencies);
       return { ok: true, json: async () => ({ model: "fixture-model", stop_reason: "end_turn", usage: { input_tokens: 100, output_tokens: 200 }, content: [{ type: "text", text: JSON.stringify(expected) }] }) };
     }
   });

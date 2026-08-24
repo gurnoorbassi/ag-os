@@ -33,14 +33,12 @@ function taskSchema(roles, kinds) {
   };
 }
 
-const WORK_TASK_SCHEMA = taskSchema(WORK_ROLES, ["planning", "coding", "review"]);
-const CODE_REVIEW_TASK_SCHEMA = taskSchema(["Code Reviewer"], ["review"]);
-const QA_TASK_SCHEMA = taskSchema(["QA Engineer"], ["qa"]);
-const INTEGRATION_TASK_SCHEMA = taskSchema(["Integration Agent"], ["integration"]);
+const PROVIDER_TASK_SCHEMA = taskSchema(SUPPORTED_MISSION_ROLES.filter((role) => role !== "Commander"), TASK_KINDS);
 
 export const MISSION_NATIVE_PLAN_SCHEMA = {
   type: "object",
   additionalProperties: false,
+  $defs: { missionTask: PROVIDER_TASK_SCHEMA },
   required: ["summary", "requiredRoles", "tasks", "validationStrategy", "integrationOrder", "risks", "approvalRequirements"],
   properties: {
     summary: { type: "string", minLength: 1 },
@@ -66,11 +64,11 @@ export const MISSION_NATIVE_PLAN_SCHEMA = {
       additionalProperties: false,
       required: ["primary", "additional", "codeReview", "qa", "integration"],
       properties: {
-        primary: WORK_TASK_SCHEMA,
-        additional: { type: "array", items: WORK_TASK_SCHEMA },
-        codeReview: CODE_REVIEW_TASK_SCHEMA,
-        qa: QA_TASK_SCHEMA,
-        integration: INTEGRATION_TASK_SCHEMA
+        primary: { $ref: "#/$defs/missionTask" },
+        additional: { type: "array", items: { $ref: "#/$defs/missionTask" } },
+        codeReview: { $ref: "#/$defs/missionTask" },
+        qa: { $ref: "#/$defs/missionTask" },
+        integration: { $ref: "#/$defs/missionTask" }
       }
     },
     validationStrategy: { type: "array", minItems: 1, items: { type: "string", minLength: 1 } },
