@@ -1,0 +1,69 @@
+{
+  "proofVersion": 1,
+  "executedAt": "2026-08-24T10:36:06.841Z",
+  "repositoryCommit": "ae4e458e8717ab2c0243aafdd1ab24023b5c0a76",
+  "missionId": "mission-20260824101515-0790c2bd",
+  "status": "completed",
+  "model": "claude-sonnet-5",
+  "modelPlanUsedDirectly": true,
+  "missionCreatedEventCount": 1,
+  "missionResumedEventCount": 3,
+  "missionCompletedEventCount": 1,
+  "persistedEventCount": 312,
+  "persistedEventsSha256": "dae013297577055e0c29bb6784e0bb7a2e1608a30db9db0a9ed7fba9f38c90f0",
+  "actualAgentRuns": [
+    {
+      "role": "Backend Engineer",
+      "status": "complete",
+      "costUsd": 0.103544
+    },
+    {
+      "role": "Code Reviewer",
+      "status": "complete",
+      "costUsd": 0.130566
+    },
+    {
+      "role": "QA Engineer",
+      "status": "complete",
+      "costUsd": 0.065034
+    },
+    {
+      "role": "Integration Agent",
+      "status": "complete",
+      "costUsd": 0.150174
+    }
+  ],
+  "planningCostUsd": 0.024352,
+  "totalRecordedAnthropicCostUsd": 0.47367,
+  "toolCompletionCount": 94,
+  "isolatedTaskWorktreeCount": 4,
+  "dependencyBootstrapManagers": [
+    "npm"
+  ],
+  "dependencyLifecycleScriptsAllowed": false,
+  "validationStrategy": [
+    "npm test",
+    "npm run build"
+  ],
+  "qaValidationPassed": true,
+  "integrationValidationPassed": true,
+  "finalValidation": [
+    {
+      "command": "npm test",
+      "passed": true,
+      "status": 0
+    },
+    {
+      "command": "npm run build",
+      "passed": true,
+      "status": 0
+    }
+  ],
+  "finalApprovalId": "approval-20260824-pr175-live-smoke-worker-resume-3",
+  "finalApprovalStatus": "revoked",
+  "deploymentExecuted": false,
+  "protectedExternalActionsExecuted": false,
+  "productionServicesChanged": false,
+  "customerDataAccessed": false,
+  "secretsIncludedInEvidence": false
+}
