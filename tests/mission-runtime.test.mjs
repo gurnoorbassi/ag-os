@@ -9,7 +9,7 @@ import { buildDefaultMissionPlan, cancelMission, createMission, runMission } fro
 import { createAnthropicAgentProvider } from "../scripts/lib/runtime/anthropic-agent-provider.mjs";
 import { finalizeAnthropicBudgetReservation } from "../scripts/lib/runtime/anthropic-budget-guard.mjs";
 import { createAnthropicMissionPlan, DEFAULT_MISSION_PLANNER_TIMEOUT_MS } from "../scripts/lib/runtime/anthropic-mission-planner.mjs";
-import { detectWorkspacePackageManager } from "../scripts/lib/runtime/mission-bootstrap.mjs";
+import { bootstrapMissionWorkspace, detectWorkspacePackageManager } from "../scripts/lib/runtime/mission-bootstrap.mjs";
 import { missionPlanTasks, validateMissionPlanDraft } from "../scripts/lib/runtime/mission-plan.mjs";
 import { readMissionEvents } from "../scripts/lib/runtime/mission-store.mjs";
 
@@ -190,6 +190,26 @@ test("AgentRun role policies deny reviewer edits in both the loop and executor",
     provider: { nextAction: async () => ({ action: { tool: "write_file", input: { path: "denied.txt", content: "no" } }, costUsd: 0, usage: {} }) }, emit: () => {}
   }), /not allowed/);
   assert.equal(existsSync(path.join(repository, "denied.txt")), false);
+});
+
+test("QA terminates deterministically after every declared validation command passes", async () => {
+  const { repository } = readyFixture();
+  await bootstrapMissionWorkspace({ workspacePath: repository });
+  let calls = 0;
+  const result = await runAgentToolLoop({
+    agent: { role: "QA Engineer", allowedTools: allowedToolsForRole("QA Engineer") },
+    task: { title: "Validate", validationCommands: ["npm test", "npm run build"] },
+    workspace: { path: repository }, emit: () => {},
+    provider: { nextAction: async () => {
+      calls += 1;
+      if (calls === 1) return { action: { tool: "run_tests", input: { command: "npm test" } }, costUsd: 0, usage: {} };
+      if (calls === 2) return { action: { tool: "run_build", input: { command: "npm run build" } }, costUsd: 0, usage: {} };
+      throw new Error("QA requested another paid turn after complete validation evidence");
+    } }
+  });
+  assert.equal(result.outcome, "complete");
+  assert.equal(result.completionMode, "deterministic_validation_evidence");
+  assert.equal(calls, 2);
 });
 
 function missionRoles(...additional) {

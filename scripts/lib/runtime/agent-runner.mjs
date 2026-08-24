@@ -295,6 +295,26 @@ export async function runAgentToolLoop({ agent, task, workspace, provider, emit,
       }
     }
     transcript.push({ action, result });
+    if (["QA Engineer", "Integration Agent"].includes(agent.role) && Array.isArray(task.validationCommands) && task.validationCommands.length > 0) {
+      const evidence = new Map(commandsExecuted.map((entry) => [entry.command, entry]));
+      const allDeclaredValidationPassed = task.validationCommands.every((command) => evidence.get(command)?.passed === true);
+      const integrationEvidenceReady = agent.role !== "Integration Agent" || toolsUsed.includes("git_diff");
+      if (allDeclaredValidationPassed && integrationEvidenceReady) {
+        return {
+          outcome: "complete",
+          summary: `${agent.role} completed the full declared validation strategy with passing evidence.`,
+          defects: [],
+          filesChanged: [...filesChanged],
+          commandsExecuted,
+          testResults,
+          toolsUsed,
+          tokenUsage,
+          costUsd,
+          steps: step,
+          completionMode: "deterministic_validation_evidence"
+        };
+      }
+    }
   }
   throw new Error(`agent exceeded its bounded ${maxSteps}-step tool loop`);
 }

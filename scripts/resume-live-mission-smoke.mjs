@@ -12,6 +12,7 @@ for (const name of ["AG_OS_LIVE_MISSION_SMOKE_ROOT", "ANTHROPIC_API_KEY", "ANTHR
   if (!process.env[name]) throw new Error(`live mission smoke resume requires ${name}`);
 }
 const smokeRoot = path.resolve(process.env.AG_OS_LIVE_MISSION_SMOKE_ROOT);
+const resumeSequence = String(process.env.AG_OS_LIVE_MISSION_SMOKE_RESUME_SEQUENCE || "1").replace(/[^0-9]/g, "") || "1";
 const recordsRoot = path.join(smokeRoot, "records");
 const missionDirectory = path.join(recordsRoot, ".codex", "missions");
 const missionIds = existsSync(missionDirectory) ? readdirSync(missionDirectory, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name) : [];
@@ -20,7 +21,7 @@ const missionId = missionIds[0];
 const now = new Date();
 const approval = {
   ...buildApprovalLockRecord({
-    slug: "pr175-live-smoke-worker-resume",
+    slug: `pr175-live-smoke-worker-resume-${resumeSequence}`,
     ownerId: "owner-gurnoor-bassi",
     requestedBy: "pr-175-live-smoke-resume",
     approvedBy: "owner-gurnoor-bassi",
@@ -46,12 +47,12 @@ const approval = {
   }),
   budget: { required: true, maxUsd: 5, usageLedgerRef: ".codex/costs/" }
 };
-writeApprovalLockWithAudit({ approval, runId: "pr175-live-smoke-worker-resume", now, root: recordsRoot });
+writeApprovalLockWithAudit({ approval, runId: `pr175-live-smoke-worker-resume-${resumeSequence}`, now, root: recordsRoot });
 const runtimeEnv = {
   ...process.env,
   AG_OS_AI_WORKER_ENABLED: "true",
   AG_OS_AI_WORKER_APPROVAL_ID: approval.approvalId,
-  AG_OS_ANTHROPIC_DAILY_CALL_LIMIT: "60"
+  AG_OS_ANTHROPIC_DAILY_CALL_LIMIT: String(60 + Number(resumeSequence) * 20)
 };
 const readiness = evaluateAnthropicWorkerReadiness({ root: recordsRoot, env: runtimeEnv });
 if (!readiness.ready) throw new Error(`live smoke resume readiness failed: ${readiness.blockers.join("; ")}`);

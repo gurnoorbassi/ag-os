@@ -85,7 +85,7 @@ export function buildDefaultMissionPlan({ missionId, ownerOutcome, projectId, va
     taskId: id("mission-task", `${missionId}-${key}`), missionId, projectId, title, description, assignedAgentRunId: byRole[role], assignedRole: role,
     status: dependencies.length === 0 ? "ready" : "waiting", dependencies, acceptanceCriteria, attempt: 1, maximumAttempts: role === "QA Engineer" ? 3 : 2,
     workspace: null, artifacts: [], filesTouched: [], commandsExecuted: [], blockers: [], reviewState: "pending", kind,
-    validationCommands: role === "QA Engineer" ? validationCommands : [], createdAt: null, startedAt: null, completedAt: null, updatedAt: null
+    validationCommands: ["QA Engineer", "Integration Agent"].includes(role) ? validationCommands : [], createdAt: null, startedAt: null, completedAt: null, updatedAt: null
   });
   add("architecture", "Define implementation architecture", `Define the smallest implementation architecture and file boundaries for: ${ownerOutcome}`, "Architect", [], ["Architecture and component boundaries are explicit", "Parallel work can proceed without shared-file ambiguity"], "planning");
   const architectureId = tasks[0].taskId;
@@ -146,7 +146,7 @@ export function buildMissionPlanFromDraft({ missionId, projectId, planDraft }) {
     status: task.dependencies.length === 0 ? "ready" : "waiting", dependencies: task.dependencies.map((dependency) => taskIds.get(dependency)),
     acceptanceCriteria: [...task.acceptanceCriteria], attempt: 1, maximumAttempts: task.kind === "qa" ? 3 : 2,
     workspace: null, artifacts: [], filesTouched: [], commandsExecuted: [], blockers: [], reviewState: "pending", kind: task.kind,
-    validationCommands: task.kind === "qa" ? [...planDraft.validationStrategy] : [], createdAt: null, startedAt: null, completedAt: null, updatedAt: null
+    validationCommands: ["qa", "integration"].includes(task.kind) ? [...planDraft.validationStrategy] : [], createdAt: null, startedAt: null, completedAt: null, updatedAt: null
   }));
   return {
     summary: planDraft.summary,
