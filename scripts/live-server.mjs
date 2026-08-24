@@ -1,12 +1,13 @@
 import { createHash, timingSafeEqual } from "node:crypto";
-import { createReadStream, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { createReadStream, existsSync, lstatSync, readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { commandRequiresBuilder, listRecentOwnerCommands, submitOwnerCommand } from "./lib/runtime/live-command-service.mjs";
 import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
-import { createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
+import { calculateAnthropicCostUsd, createAnthropicPlanDraft } from "./lib/runtime/anthropic-planner.mjs";
+import { finalizeAnthropicBudgetReservation } from "./lib/runtime/anthropic-budget-guard.mjs";
 import { evaluateAnthropicPlannerReadiness } from "./lib/runtime/anthropic-planner-readiness.mjs";
 import { createAnthropicWorkProduct } from "./lib/runtime/anthropic-worker.mjs";
 import { evaluateAnthropicWorkerReadiness } from "./lib/runtime/anthropic-worker-readiness.mjs";
@@ -29,6 +30,9 @@ import { getJobDeliverable } from "./lib/runtime/deliverable-service.mjs";
 import { prepareJobRecovery } from "./lib/runtime/job-recovery-service.mjs";
 import { consumeMobileApproval, createMobileApprovalLink, deliverMobileApprovalLink, mobileApprovalReadiness } from "./lib/runtime/mobile-approval-service.mjs";
 import { recordExternalEvidence } from "./lib/runtime/external-evidence-service.mjs";
+import { cancelMission, createMission, listMissions, missionDetail, runMission } from "./lib/runtime/mission-runtime.mjs";
+import { listMissionAgents, listMissionHandoffs, listMissionTasks, missionPaths, readMissionEvents } from "./lib/runtime/mission-store.mjs";
+import { createAnthropicAgentProvider } from "./lib/runtime/anthropic-agent-provider.mjs";
 import {
   buildOwnerSessionCookie,
   clearOwnerSessionCookie,
@@ -53,6 +57,7 @@ const ownerSessionDays = Number.isInteger(configuredSessionDays) && configuredSe
   : 30;
 const allowedOrigin = process.env.AG_OS_ALLOWED_ORIGIN || "";
 const loginRateLimiter = createLoginRateLimiter();
+const activeMissionRuns = new Map();
 
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
@@ -241,11 +246,99 @@ function publicAiCriticStatus(readiness = aiCriticReadiness()) {
   return { ready: readiness.ready, enabled: readiness.enabled, required: readiness.required, credentialConfigured: readiness.credentialConfigured, model: readiness.model, approvalId: readiness.approvalId, uses: readiness.uses, blockers: readiness.blockers };
 }
 
+function projectWorkspacePath(projectId, body = {}) {
+  if (body.repositoryPath) return path.resolve(body.repositoryPath);
+  if (projectId === "project-ag-os-coordinator-runtime") return root;
+  try {
+    const configured = JSON.parse(process.env.AG_OS_PROJECT_WORKSPACES_JSON || "{}");
+    return configured[projectId] ? path.resolve(configured[projectId]) : null;
+  } catch {
+    throw new Error("AG_OS_PROJECT_WORKSPACES_JSON is invalid JSON");
+  }
+}
+
+function targetValidationCommands(repositoryPath, explicit) {
+  if (Array.isArray(explicit) && explicit.length > 0) return explicit;
+  const packagePath = path.join(repositoryPath, "package.json");
+  if (!existsSync(packagePath)) throw new Error("target project has no declared validation strategy; provide validationCommands");
+  const scripts = JSON.parse(readFileSync(packagePath, "utf8")).scripts || {};
+  const commands = ["test", "typecheck", "lint", "build"].filter((name) => scripts[name]).map((name) => name === "test" ? "npm test" : `npm run ${name}`);
+  if (commands.length === 0) throw new Error("target project package.json declares no test, typecheck, lint, or build command");
+  return commands;
+}
+
+function missionProvider(readiness = aiWorkerReadiness()) {
+  if (!readiness.ready) return null;
+  return createAnthropicAgentProvider({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+    model: readiness.model,
+    approvalId: readiness.approvalId,
+    approvalMaxUsd: readiness.approval?.budget?.maxUsd,
+    approvalUsesRemaining: (readiness.approval?.approvalKind === "standing" ? readiness.approval.maxUses : 1) - readiness.uses,
+    root,
+    baseUrl: process.env.ANTHROPIC_BASE_URL,
+    inputCostPerMillionUsd: readiness.inputCostPerMillionUsd,
+    outputCostPerMillionUsd: readiness.outputCostPerMillionUsd
+  });
+}
+
+async function continueMission(missionId) {
+  if (activeMissionRuns.has(missionId)) return activeMissionRuns.get(missionId);
+  const readiness = aiWorkerReadiness();
+  const provider = missionProvider(readiness);
+  if (!provider) return { status: "blocked", missionId, blockers: readiness.blockers };
+  const active = runMission({ missionId, provider, root }).finally(() => activeMissionRuns.delete(missionId));
+  activeMissionRuns.set(missionId, active);
+  return active;
+}
+
 async function submitRuntimeCommand(body, { recovery = null, forceReplan = false, disablePlanner = false } = {}) {
   const plannerReadiness = aiPlannerReadiness();
   const workerReadiness = aiWorkerReadiness();
   const criticReadiness = aiCriticReadiness();
   const builderRequired = !body.executionRequest && commandRequiresBuilder(body.command);
+  if (builderRequired && body.useMission !== false) {
+    const projectId = body.projectId || "project-one-off";
+    const repositoryPath = projectWorkspacePath(projectId, body);
+    if (!repositoryPath) throw new Error(`No local mission workspace is configured for ${projectId}. Configure AG_OS_PROJECT_WORKSPACES_JSON or provide repositoryPath.`);
+    const missionBudgetUsd = body.missionBudgetUsd ?? 5;
+    let planningEvidence = null;
+    if (plannerReadiness.ready) {
+      const planned = await createAnthropicPlanDraft({
+        commandIntake: { rawCommand: body.command, normalizedCommand: body.command.trim().toLowerCase(), classification: { kind: "software_delivery" }, productContext: { projectId } },
+        job: { jobId: `mission-planning-${Date.now()}`, projectId },
+        route: { riskLevel: "R1", assignedAgent: "mission-commander" },
+        apiKey: process.env.ANTHROPIC_API_KEY,
+        model: plannerReadiness.model,
+        baseUrl: process.env.ANTHROPIC_BASE_URL,
+        inputCostPerMillionUsd: plannerReadiness.inputCostPerMillionUsd,
+        outputCostPerMillionUsd: plannerReadiness.outputCostPerMillionUsd,
+        approvalId: plannerReadiness.approvalId,
+        approvalMaxUsd: Math.min(Number(plannerReadiness.approval?.budget?.maxUsd), Number(missionBudgetUsd)),
+        root,
+        env: process.env
+      });
+      const costUsd = calculateAnthropicCostUsd({ usage: planned.usage, inputCostPerMillionUsd: plannerReadiness.inputCostPerMillionUsd, outputCostPerMillionUsd: plannerReadiness.outputCostPerMillionUsd });
+      finalizeAnthropicBudgetReservation({ reservation: planned.budgetReservation, consumed: true, actualCostUsd: costUsd, root });
+      planningEvidence = { planDraft: planned.planDraft, model: planned.model, usage: planned.usage, usageAuditPath: planned.usageAuditPath, costUsd };
+    }
+    const mission = createMission({
+      ownerOutcome: body.command,
+      projectId,
+      repositoryPath,
+      baseRevision: body.baseRevision || "HEAD",
+      autonomyLevel: body.autonomyLevel || "balanced",
+      concurrencyLimit: body.concurrencyLimit ?? 3,
+      budgetUsd: missionBudgetUsd,
+      validationCommands: targetValidationCommands(repositoryPath, body.validationCommands),
+      planningEvidence,
+      root
+    });
+    const readiness = aiWorkerReadiness();
+    const shouldRun = readiness.ready && mission.autonomyLevel !== "supervised";
+    if (shouldRun) setImmediate(() => continueMission(mission.missionId).catch((error) => console.error(JSON.stringify({ service: "ag-os-coordinator", event: "mission-run-failed", missionId: mission.missionId, detail: error.message }))));
+    return { status: shouldRun ? "mission_running" : "mission_planned", missionId: mission.missionId, projectId, agentCount: mission.agents.length, taskCount: mission.tasks.length, planning: mission.planning, aiWorker: publicAiWorkerStatus(readiness), protectedExternalActionExecuted: false };
+  }
   const useAiWorker = body.useAiWorker === true || builderRequired;
   const useAiPlanner = !disablePlanner && (body.useAiPlanner === true || forceReplan || (builderRequired && plannerReadiness.ready));
   if (builderRequired && !workerReadiness.ready) {
@@ -487,8 +580,100 @@ const server = createServer(async (request, response) => {
         proposals: listProposals({ root }),
         outcomes: listOutcomes({ root }).slice(0, 20),
         jobs: listAutonomousJobs({ root }),
-        recentCommands: listRecentOwnerCommands({ root })
+        recentCommands: listRecentOwnerCommands({ root }),
+        missions: listMissions({ root })
       }, headers);
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/v1/missions") {
+      json(response, 200, { missions: listMissions({ root }) }, headers);
+      return;
+    }
+
+    const missionMatch = url.pathname.match(/^\/api\/v1\/missions\/([^/]+)$/);
+    if (request.method === "GET" && missionMatch) {
+      json(response, 200, missionDetail(decodeURIComponent(missionMatch[1]), root), headers);
+      return;
+    }
+
+    const missionPreviewMatch = url.pathname.match(/^\/api\/v1\/missions\/([^/]+)\/preview(?:\/(.*))?$/);
+    if (request.method === "GET" && missionPreviewMatch) {
+      const mission = missionDetail(decodeURIComponent(missionPreviewMatch[1]), root);
+      if (!mission.preview?.ready || !mission.preview.entryFile) {
+        json(response, 404, { error: "preview_not_available" }, headers);
+        return;
+      }
+      const requestedFile = decodeURIComponent(missionPreviewMatch[2] || mission.preview.entryFile).replaceAll("\\", "/");
+      const workspaceRoot = path.resolve(mission.integrationWorkspace.path);
+      const target = path.resolve(workspaceRoot, requestedFile);
+      if (!target.startsWith(`${workspaceRoot}${path.sep}`) || !existsSync(target) || lstatSync(target).isSymbolicLink() || !statSync(target).isFile()) {
+        json(response, 404, { error: "preview_file_not_found" }, headers);
+        return;
+      }
+      const realTarget = realpathSync(target);
+      if (!realTarget.startsWith(`${realpathSync(workspaceRoot)}${path.sep}`)) {
+        json(response, 404, { error: "preview_file_not_found" }, headers);
+        return;
+      }
+      response.writeHead(200, {
+        ...headers,
+        "content-type": MIME_TYPES[path.extname(target).toLowerCase()] || "text/plain; charset=utf-8",
+        "cache-control": "no-store",
+        "content-security-policy": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'self'",
+        "referrer-policy": "no-referrer",
+        "x-content-type-options": "nosniff"
+      });
+      createReadStream(realTarget).pipe(response);
+      return;
+    }
+
+    const missionCollectionMatch = url.pathname.match(/^\/api\/v1\/missions\/([^/]+)\/(agents|tasks|events|handoffs|artifacts)$/);
+    if (request.method === "GET" && missionCollectionMatch) {
+      const missionId = decodeURIComponent(missionCollectionMatch[1]);
+      const collection = missionCollectionMatch[2];
+      if (collection === "agents") json(response, 200, { agents: listMissionAgents(missionId, root) }, headers);
+      else if (collection === "tasks") json(response, 200, { tasks: listMissionTasks(missionId, root) }, headers);
+      else if (collection === "events") json(response, 200, { events: readMissionEvents(missionId, root, { after: Number(url.searchParams.get("after") || 0) }) }, headers);
+      else if (collection === "handoffs") json(response, 200, { handoffs: listMissionHandoffs(missionId, root) }, headers);
+      else {
+        const artifactPath = path.join(root, missionPaths(missionId).artifacts, "final-result.json");
+        json(response, 200, { artifacts: existsSync(artifactPath) ? [JSON.parse(readFileSync(artifactPath, "utf8"))] : [] }, headers);
+      }
+      return;
+    }
+
+    const missionStreamMatch = url.pathname.match(/^\/api\/v1\/missions\/([^/]+)\/events\/stream$/);
+    if (request.method === "GET" && missionStreamMatch) {
+      const missionId = decodeURIComponent(missionStreamMatch[1]);
+      let cursor = Number(url.searchParams.get("after") || 0);
+      response.writeHead(200, { ...headers, "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-store", connection: "keep-alive", "x-content-type-options": "nosniff" });
+      const send = () => {
+        for (const event of readMissionEvents(missionId, root, { after: cursor })) {
+          cursor = event.sequence;
+          response.write(`id: ${event.sequence}\ndata: ${JSON.stringify(event)}\n\n`);
+        }
+      };
+      send();
+      const interval = setInterval(() => { if (!response.destroyed) send(); }, 1000);
+      request.on("close", () => clearInterval(interval));
+      return;
+    }
+
+    const missionControlMatch = url.pathname.match(/^\/api\/v1\/missions\/([^/]+)\/controls$/);
+    if (request.method === "POST" && missionControlMatch) {
+      const missionId = decodeURIComponent(missionControlMatch[1]);
+      const body = await readJsonBody(request);
+      if (body.action === "cancel") json(response, 200, cancelMission({ missionId, reason: body.reason, root }), headers);
+      else if (body.action === "run" || body.action === "resume") {
+        const readiness = aiWorkerReadiness();
+        if (!readiness.ready) json(response, 409, { status: "blocked", missionId, blockers: readiness.blockers }, headers);
+        else {
+          setImmediate(() => continueMission(missionId).catch((error) => console.error(JSON.stringify({ service: "ag-os-coordinator", event: "mission-run-failed", missionId, detail: error.message }))));
+          json(response, 202, { status: "mission_running", missionId }, headers);
+        }
+      }
+      else throw new Error("mission control action must be run, resume, or cancel");
       return;
     }
 

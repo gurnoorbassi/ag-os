@@ -154,7 +154,12 @@ const requiredPaths = [
   "schemas/deliverable-critique.schema.json",
   "schemas/outcome.schema.json",
   "schemas/proposal.schema.json",
-  "schemas/mobile-approval.schema.json"
+  "schemas/mobile-approval.schema.json",
+  "schemas/mission.schema.json",
+  "schemas/agent-run.schema.json",
+  "schemas/mission-task.schema.json",
+  "schemas/mission-event.schema.json",
+  "schemas/handoff.schema.json"
 ];
 
 const forbiddenPatterns = [

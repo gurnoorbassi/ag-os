@@ -8,6 +8,9 @@ const state = {
   view: VALID_VIEWS.has(location.hash.slice(1)) ? location.hash.slice(1) : "console",
   status: null,
   previousJobs: new Map(),
+  activeMissionId: sessionStorage.getItem("ag_os_active_mission") || "",
+  mission: null,
+  missionStream: null,
   ownerToken: sessionStorage.getItem("ag_os_owner_token") || "",
   authenticated: false,
   busy: false
@@ -19,7 +22,6 @@ const drawer = $("#detail-drawer");
 const drawerBody = $("#drawer-body");
 const promptInput = $("#os-input");
 const consoleScreen = $("#con-screen");
-const keepStage = $("#keep-stage");
 
 function escapeHtml(value) {
   const node = document.createElement("div");
@@ -87,24 +89,43 @@ async function refreshStatus({ quiet = false } = {}) {
     state.status = next;
     setAuthenticated(true);
     processJobTransitions(next.jobs || []);
+    await refreshMission();
     renderAll();
   } catch (error) {
     if (!quiet && error.message !== "Owner sign-in required") consoleLine(`■ ${error.message}`, "bad");
   }
 }
 
-function processJobTransitions(jobs) {
-  for (const job of jobs) {
-    const previous = state.previousJobs.get(job.jobId);
-    if (previous && previous !== job.status) {
-      if (job.status === "running") keepPacketToForge(job.jobId);
-      if (job.status === "waiting_approval") keepPacketToGate(job);
-      if (job.status === "done") keepCompleteJob(job.jobId);
-      if (job.status === "failed") keepFailJob(job.jobId);
-    } else if (!previous && ["queued", "running", "waiting_approval"].includes(job.status)) {
-      keepSpawnPacket(job);
-    }
+async function refreshMission() {
+  const missions = state.status?.missions || [];
+  if (!state.activeMissionId || !missions.some((mission) => mission.missionId === state.activeMissionId)) {
+    state.activeMissionId = missions[0]?.missionId || "";
   }
+  if (!state.activeMissionId) {
+    state.mission = null;
+    connectMissionStream();
+    return;
+  }
+  state.mission = await api(`/api/v1/missions/${encodeURIComponent(state.activeMissionId)}`);
+  sessionStorage.setItem("ag_os_active_mission", state.activeMissionId);
+  connectMissionStream();
+}
+
+function connectMissionStream() {
+  const mission = state.mission;
+  const streamable = mission && !state.ownerToken && !["completed", "failed", "cancelled"].includes(mission.status);
+  if (state.missionStream?.missionId === mission?.missionId && streamable) return;
+  state.missionStream?.close();
+  state.missionStream = null;
+  if (!streamable) return;
+  const stream = new EventSource(`/api/v1/missions/${encodeURIComponent(mission.missionId)}/events/stream`);
+  stream.missionId = mission.missionId;
+  stream.onmessage = () => { void refreshMission().then(renderKeep).catch(() => {}); };
+  stream.onerror = () => stream.close();
+  state.missionStream = stream;
+}
+
+function processJobTransitions(jobs) {
   state.previousJobs = new Map(jobs.map((job) => [job.jobId, job.status]));
 }
 
@@ -188,11 +209,18 @@ async function submitCommand(command) {
     const planId = result.planId || result.plan?.planId || result.commandIntake?.nextRecord?.planId;
     const jobId = result.jobId || result.job?.jobId || result.commandIntake?.nextRecord?.jobId;
     const jobStatus = result.status || result.job?.status || "queued";
+    const missionId = result.missionId || result.mission?.missionId;
     consoleStep("intake", intakeId || "classified");
     if (planId) consoleStep("plan", planId);
     if (jobId) consoleStep("job", `${short(jobId, 70)} · ${titleCase(jobStatus)}`, statusTone(jobStatus));
+    if (missionId) {
+      state.activeMissionId = missionId;
+      sessionStorage.setItem("ag_os_active_mission", missionId);
+      consoleStep("mission", missionId);
+    }
     if (jobStatus === "waiting_approval") consoleLine("▲ The job is waiting in Ops for your decision.", "warn");
     await refreshStatus({ quiet: true });
+    if (missionId) setView("keep");
   } catch (error) {
     pending.remove();
     consoleLine(`■ ${error.message}`, "bad");
@@ -487,164 +515,68 @@ async function rateJob(jobId) {
   } catch (error) { alert(error.message); }
 }
 
-/* Interactive Keep */
-const figures = {};
-const packets = new Map();
-let gateNode;
-let gateTag;
-let stampNode;
-
-function keepElement(className, styles = {}, html = "", parent = keepStage) {
-  const node = document.createElement("div");
-  node.className = className;
-  Object.assign(node.style, styles);
-  node.innerHTML = html;
-  parent.appendChild(node);
-  return node;
-}
-
-function makeFigure({ key, name, x, y, torso, helmet = false, sword = false, mode = "idle", bubble = "" }) {
-  const node = keepElement(`kp-fig ${mode}${helmet ? " helm" : ""}${bubble ? " talk" : ""} kp-clicky`, { left: `${x}%`, top: `${y}%` });
-  node.innerHTML = `<div class="in"><span class="kp-name">${escapeHtml(name)}</span><span class="kp-head"></span><span class="kp-torso"></span>${sword ? '<span class="kp-sword"></span>' : ""}<span class="kp-legs"><span class="kp-la"></span><span class="kp-lb"></span></span>${bubble ? `<span class="kp-bubble">${escapeHtml(bubble)}</span>` : ""}</div>`;
-  $(".kp-torso", node).style.background = torso;
-  node.dataset.keepEntity = key;
-  figures[key] = { node, helmet, bubble };
-}
-
-function setFigureMode(key, mode) {
-  const figure = figures[key];
-  if (!figure) return;
-  figure.node.className = `kp-fig ${mode}${figure.helmet ? " helm" : ""}${figure.bubble ? " talk" : ""} kp-clicky`;
-}
-
-function buildKeep() {
-  const rooms = [
-    ["planning hall", 2, 5, 27, 42, "rgba(74,105,135,.045)"],
-    ["build forge", 71, 5, 27, 42, "rgba(183,105,67,.045)"],
-    ["library of lessons", 2, 56, 27, 39, "rgba(125,107,176,.045)"],
-    ["gatehouse", 71, 56, 27, 39, "rgba(78,125,91,.045)"]
-  ];
-  for (const [label, x, y, width, height, background] of rooms) keepElement("kp-room", { left: `${x}%`, top: `${y}%`, width: `${width}%`, height: `${height}%`, background }, `<span class="kp-tag">${label}</span>`);
-  const constitution = keepElement("kp-stone kp-clicky", {}, '<div class="t1">CONSTITUTION</div><div class="t2">v1.0</div>');
-  constitution.dataset.keepEntity = "constitution";
-  const archive = keepElement("kp-archive kp-clicky"); archive.dataset.keepEntity = "archive";
-  keepElement("kp-archive-label", {}, "archive");
-  const owner = keepElement("kp-owner kp-clicky", {}, '<span class="kp-tag">owner — you</span>'); owner.dataset.keepEntity = "owner";
-  keepElement("kp-scrolls", {}, "▤▤▤");
-  const ownerNote = keepElement("kp-owner-note"); ownerNote.id = "kp-owner-note";
-  const reactor = keepElement("kp-reactor kp-clicky"); reactor.id = "kp-reactor"; reactor.dataset.keepEntity = "reactor";
-  const reactorLabel = keepElement("kp-reactor-label", {}, "claude reactor"); reactorLabel.id = "kp-reactor-label";
-  for (const [x, y] of [[8,24],[18,37],[75,37]]) keepElement("kp-desk", { left: `${x}%`, top: `${y}%` }, '<span class="kp-monitor"></span>');
-  makeFigure({ key: "planner", name: "Planner", x: 9.5, y: 23, torso: "#3f6d9e", mode: "type" });
-  makeFigure({ key: "intake", name: "Intake", x: 19.5, y: 36, torso: "#3f6d9e", mode: "type" });
-  makeFigure({ key: "codex", name: "Codex", x: 76.5, y: 36, torso: "#16130f", helmet: true, sword: true, mode: "type" });
-  makeFigure({ key: "fable", name: "Fable", x: 16, y: 74, torso: "#d68b5d", bubble: "quality first" });
-  makeFigure({ key: "gatekeeper", name: "Gate", x: 81, y: 74, torso: "#4e7d5b" });
-  const brain = keepElement("kp-brain kp-clicky", { left: "24%", top: "88%" }, '<span class="bl"></span><span class="ey"></span><span class="ey"></span>'); brain.dataset.keepEntity = "memory";
-  keepElement("kp-name", { position: "absolute", left: "24%", top: "89.5%", transform: "translateX(-50%)" }, "Memory");
-  const shelf = keepElement("kp-shelf kp-clicky", {}, '<div class="books" id="kp-books"></div><div class="lbl" id="kp-books-label">accepted: —</div>'); shelf.dataset.keepEntity = "lessons";
-  const pile = keepElement("kp-pile kp-clicky", {}, '<div class="cnt" id="kp-pile-count">▤×—</div><div class="lbl">candidates await stamp</div>'); pile.dataset.keepEntity = "lessons";
-  gateNode = keepElement("kp-gate", {}, '<div class="post l"></div><div class="post r"></div>'); gateNode.dataset.keepEntity = "gate";
-  for (let index = 0; index < 3; index += 1) { const bar = keepElement("bar", { left: `${6 + index * 6}px` }, "", gateNode); void bar; }
-  gateTag = keepElement("kp-gate-tag", {}, "■ gate: closed");
-  stampNode = keepElement("kp-stamp", {}, "✓ approval stamped");
-  const dog = keepElement("kp-dog kp-clicky", { left: "33%", top: "96%" }, '<span class="tl"></span><span class="bd"></span><span class="hd"></span><span class="l1"></span><span class="l2"></span><span class="l3"></span><span class="l4"></span>'); dog.dataset.keepEntity = "watchdog";
-  keepElement("kp-name", { position: "absolute", left: "33%", top: "97.5%", transform: "translateX(-50%)" }, "Watchdog");
-}
-
-function keepSpawnPacket(job) {
-  if (!keepStage || packets.has(job.jobId) || packets.size >= 5) return;
-  const node = keepElement("kp-packet", { left: "15%", top: "33%" });
-  const label = keepElement("kp-packet-label", { left: "15%", top: "29.5%" }, escapeHtml(short(jobSummary(job), 24)));
-  packets.set(job.jobId, { node, label, x: 15, y: 33 });
-}
-
-function movePacket(packet, x, y, duration, done) {
-  if (!packet) return;
-  const startX = packet.x; const startY = packet.y; const started = performance.now();
-  function frame(now) {
-    const progress = Math.min(1, (now - started) / duration);
-    packet.x = startX + (x - startX) * progress; packet.y = startY + (y - startY) * progress;
-    packet.node.style.left = `${packet.x}%`; packet.node.style.top = `${packet.y}%`;
-    packet.label.style.left = `${packet.x}%`; packet.label.style.top = `${packet.y - 3.5}%`;
-    if (progress < 1) requestAnimationFrame(frame); else done?.();
-  }
-  requestAnimationFrame(frame);
-}
-
-function keepPacketToGate(job) {
-  if (!packets.has(job.jobId)) keepSpawnPacket(job);
-  movePacket(packets.get(job.jobId), 46, 31.5, 1100);
-}
-
-function keepPacketToForge(jobId) {
-  gateNode?.classList.add("open"); gateTag?.classList.add("open"); if (gateTag) gateTag.textContent = "□ gate: open"; stampNode?.classList.add("show");
-  setFigureMode("codex", "type");
-  movePacket(packets.get(jobId), 76, 32, 1400, () => setTimeout(() => { gateNode?.classList.remove("open"); gateTag?.classList.remove("open"); if (gateTag) gateTag.textContent = "■ gate: closed"; stampNode?.classList.remove("show"); }, 500));
-}
-
-function keepCompleteJob(jobId) {
-  const packet = packets.get(jobId); if (packet) { packet.node.remove(); packet.label.remove(); packets.delete(jobId); }
-  keepElement("kp-record");
-}
-
-function keepFailJob(jobId) { const packet = packets.get(jobId); if (packet) { packet.node.remove(); packet.label.remove(); packets.delete(jobId); } }
-
 function renderKeep() {
-  const jobs = state.status?.jobs || [];
-  const waiting = jobs.filter((job) => job.status === "waiting_approval");
-  const running = jobs.filter((job) => job.status === "running");
-  if ($("#kp-owner-note")) $("#kp-owner-note").textContent = waiting.length ? `${waiting.length} decision${waiting.length === 1 ? "" : "s"} wait` : "desk clear";
-  setFigureMode("codex", running.length ? "type" : "idle");
-  const lessons = state.status?.lessonDecisions;
-  if (lessons && $("#kp-books")) {
-    $("#kp-books").innerHTML = Array.from({ length: Math.max(4, Math.min(12, lessons.acceptedCount || 0)) }, (_, index) => `<span class="kp-book ${index < (lessons.acceptedCount || 0) ? "lit" : ""}"></span>`).join("");
-    $("#kp-books-label").textContent = `accepted: ${lessons.acceptedCount || 0}`;
-    $("#kp-pile-count").textContent = `▤×${lessons.activeCandidateCount || 0}`;
+  const detail = state.mission;
+  const mission = detail;
+  const agents = detail?.agents || [];
+  const tasks = detail?.tasks || [];
+  const events = detail?.events || [];
+  const activeCount = (state.status?.missions || []).filter((item) => ["planned", "running", "blocked"].includes(item.status)).length;
+  $("#mission-tab-count").hidden = activeCount === 0;
+  $("#mission-tab-count").textContent = String(activeCount);
+  if (!mission) {
+    $("#mission-title").textContent = "No mission selected";
+    $("#mission-agents").innerHTML = '<div class="empty-card">No persisted agent runs.</div>';
+    $("#mission-tasks").innerHTML = '<div class="empty-card">No task graph.</div>';
+    $("#mission-events").innerHTML = '<div class="empty-card">No mission events.</div>';
+    $("#mission-output").innerHTML = '<div class="empty-card">Mission artifacts will appear here.</div>';
+    return;
   }
-  const budget = budgetView();
-  if ($("#kp-reactor-label")) $("#kp-reactor-label").textContent = `claude reactor · ${budget.percent}%`;
-  const mode = waiting.length ? `${waiting.length} decision${waiting.length === 1 ? "" : "s"} at the gate` : running.length ? `${running.length} job${running.length === 1 ? "" : "s"} in the forge` : "Quiet · perimeter secure";
-  $("#keep-mode").textContent = mode;
-  for (const job of waiting) if (!packets.has(job.jobId)) keepPacketToGate(job);
+  $("#mission-title").textContent = mission.missionId;
+  $("#mission-outcome").textContent = mission.ownerOutcome;
+  $("#mission-status").className = `status-chip ${statusTone(mission.status)}`;
+  $("#mission-status").textContent = titleCase(mission.status);
+  $("#mission-progress").textContent = `${mission.progress?.completedTasks || 0} / ${mission.progress?.totalTasks || 0}`;
+  $("#mission-progress-bar").style.width = `${mission.progress?.percent || 0}%`;
+  $("#mission-budget").textContent = `$${Number(mission.budget?.spentUsd || 0).toFixed(3)} / $${Number(mission.budget?.limitUsd || 0).toFixed(2)}`;
+  $("#mission-concurrency").textContent = String(mission.concurrencyLimit || 1);
+  $("#mission-autonomy").textContent = titleCase(mission.autonomyLevel);
+  $("#mission-run").hidden = !["planned", "blocked"].includes(mission.status);
+  $("#mission-cancel").hidden = !["planned", "running", "blocked"].includes(mission.status);
+  $("#mission-agents").innerHTML = agents.map((agent) => `<button class="mission-agent" type="button" data-open-agent="${escapeHtml(agent.agentRunId)}"><span class="agent-avatar">${escapeHtml(agent.role.split(/\s+/).map((part) => part[0]).join("").slice(0, 2))}</span><span><strong>${escapeHtml(agent.displayName)}</strong><small>${escapeHtml(agent.provider)} · ${escapeHtml(short(agent.model, 30))}</small><small>${agent.currentTaskId ? escapeHtml(short(agent.currentTaskId, 34)) : "No active task"}</small></span>${statusChip(agent.status)}</button>`).join("") || '<div class="empty-card">No agent runs.</div>';
+  const taskById = new Map(tasks.map((task) => [task.taskId, task]));
+  $("#mission-tasks").innerHTML = tasks.map((task) => `<article class="mission-task"><div><strong>${escapeHtml(task.title)}</strong>${statusChip(task.status)}<small>${escapeHtml(task.assignedRole)} · attempt ${task.attempt}/${task.maximumAttempts}</small></div><p>${task.dependencies.length ? `After: ${task.dependencies.map((dependency) => escapeHtml(taskById.get(dependency)?.title || dependency)).join(" · ")}` : "Ready from mission start"}</p>${task.workspace ? `<code>${escapeHtml(short(task.workspace.branch, 72))}</code>` : ""}</article>`).join("") || '<div class="empty-card">No tasks.</div>';
+  $("#mission-events").innerHTML = events.slice(-80).reverse().map((event) => `<div class="mission-event"><i class="${statusTone(event.type.includes("failed") ? "failed" : event.type.includes("completed") || event.type.includes("passed") ? "complete" : "running")}"></i><div><strong>${escapeHtml(titleCase(event.type.replaceAll(".", " ")))}</strong><small>${escapeHtml(event.taskId ? short(event.taskId, 42) : event.agentRunId ? short(event.agentRunId, 42) : "mission")} · ${escapeHtml(timeAgo(event.timestamp))}</small></div></div>`).join("") || '<div class="empty-card">No events.</div>';
+  const blockers = mission.blockers || [];
+  const artifacts = detail.artifactRecords || [];
+  const previewUrl = typeof mission.preview?.url === "string" && mission.preview.url.startsWith(`/api/v1/missions/${encodeURIComponent(mission.missionId)}/preview/`) ? mission.preview.url : "";
+  const previewOutput = mission.preview?.ready && previewUrl
+    ? `<a class="quiet-button" href="${escapeHtml(previewUrl)}" target="_blank" rel="noopener">Open verified preview</a><p>${escapeHtml(mission.preview.entryFile)}</p>`
+    : "<p>No verified preview is available.</p>";
+  $("#mission-output").innerHTML = `${blockers.length ? `<div class="mission-blockers"><strong>Blockers</strong>${blockers.map((item) => `<p>${escapeHtml(item)}</p>`).join("")}</div>` : ""}<div class="drawer-item"><strong>${artifacts.length} persisted artifact${artifacts.length === 1 ? "" : "s"}</strong>${previewOutput}</div><div class="drawer-item"><strong>Integration branch</strong><p><code>${escapeHtml(mission.integrationWorkspace?.branch || "Not created")}</code></p></div>`;
 }
 
-function openKeepEntity(entity) {
-  const jobs = state.status?.jobs || [];
-  const systems = Object.fromEntries((state.status?.operatingSystems || []).map((item) => [item.id, item]));
-  if (entity === "owner" || entity === "gate") {
-    setView("ops");
-    return;
+function openMissionAgent(agentRunId) {
+  const agent = state.mission?.agents?.find((item) => item.agentRunId === agentRunId);
+  if (!agent) return;
+  const task = state.mission?.tasks?.find((item) => item.taskId === agent.currentTaskId);
+  openDrawer({
+    kicker: "Mission agent run",
+    title: agent.displayName,
+    html: `${keyValue("Role", agent.role)}${keyValue("Status", titleCase(agent.status))}${keyValue("Provider", `${agent.provider} · ${agent.model}`)}${keyValue("Current task", task?.title || "None")}${keyValue("Workspace", agent.workspacePath || "Not assigned")}${keyValue("Branch", agent.branch || "Not assigned")}${keyValue("Tokens", `${agent.tokenUsage?.input || 0} in · ${agent.tokenUsage?.output || 0} out`)}${keyValue("Cost", `$${Number(agent.costUsd || 0).toFixed(4)}`)}${keyValue("External actions", agent.permissions?.externalActions ? "Allowed" : "Blocked")}`
+  });
+}
+
+async function controlMission(action) {
+  const missionId = state.mission?.missionId;
+  if (!missionId) return;
+  try {
+    await api(`/api/v1/missions/${encodeURIComponent(missionId)}/controls`, { method: "POST", body: JSON.stringify({ action }) });
+    await refreshStatus();
+  } catch (error) {
+    consoleLine(`■ Mission ${action} failed: ${error.message}`, "bad");
+    setView("console");
   }
-  if (entity === "lessons" || entity === "memory") {
-    setView("ops");
-    $("#ops-decision-list")?.scrollIntoView({ behavior: "smooth" });
-    return;
-  }
-  if (entity === "reactor") {
-    const budget = budgetView();
-    openDrawer({ kicker: "Cost OS", title: "Claude reactor", html: `${keyValue("Spent this month", `$${budget.spent.toFixed(2)}`)}${keyValue("Monthly cap", `$${budget.cap.toFixed(2)}`)}${keyValue("Fuel used", `${budget.percent}%`)}${keyValue("Circuit breaker", "Armed")}` });
-    return;
-  }
-  if (entity === "watchdog" && systems["watchdog-os"]) return openSystem("watchdog-os");
-  if (entity === "constitution") {
-    openDrawer({ kicker: "Authority", title: "Constitution v1.0", html: '<section class="drawer-section"><h3>Authority order</h3><div class="drawer-item"><strong>1. Owner</strong><p>Your explicit decision.</p></div><div class="drawer-item"><strong>2. Constitution</strong><p>The system-wide operating boundary.</p></div><div class="drawer-item"><strong>3. Exact approval locks</strong><p>Scoped permission for sensitive actions.</p></div><div class="drawer-item"><strong>4. Security, quality, cost, and evidence</strong><p>Every worker remains inside these gates.</p></div></section>' });
-    return;
-  }
-  if (entity === "archive") {
-    const recent = jobs.filter((job) => ["done", "failed", "needs_revision"].includes(job.status)).slice(0, 12);
-    openDrawer({ kicker: "Records", title: "The archive", html: recent.map((job) => `<div class="drawer-item" data-open-job="${escapeHtml(job.jobId)}"><strong>${escapeHtml(short(jobSummary(job), 92))}</strong><p>${escapeHtml(titleCase(job.status))} · ${escapeHtml(timeAgo(job.updatedAt))}</p></div>`).join("") || '<div class="empty-card">No sealed records yet.</div>' });
-    return;
-  }
-  const bios = {
-    planner: ["Planner", "Turns the owner outcome into a bounded plan and quality bar."],
-    intake: ["Intake", "Classifies the project, risk, and correct worker route."],
-    codex: ["Codex", "Builds and repairs work through fail-closed execution adapters."],
-    fable: ["Fable", "Independent quality reviewer. Advisory, never authorizing."],
-    gatekeeper: ["Gatekeeper", "Holds sensitive actions until an exact owner approval matches."],
-    watchdog: ["Watchdog OS", "Patrols runtime integrity and reports any condition that needs attention."]
-  };
-  if (bios[entity]) openDrawer({ kicker: "Keep resident", title: bios[entity][0], html: `<p class="drawer-copy">${escapeHtml(bios[entity][1])}</p>` });
 }
 
 document.addEventListener("click", (event) => {
@@ -664,7 +596,7 @@ document.addEventListener("click", (event) => {
   const rating = event.target.closest("[data-rate-job]"); if (rating) return void rateJob(rating.dataset.rateJob);
   const targetProject = event.target.closest("[data-target-project]"); if (targetProject) { $("#os-project").value = targetProject.dataset.targetProject; closeDrawer(); setView("console"); promptInput.focus(); return; }
   const quick = event.target.closest("[data-quick-command]"); if (quick) return void submitCommand(quick.dataset.quickCommand);
-  const keepEntity = event.target.closest("[data-keep-entity]"); if (keepEntity) return openKeepEntity(keepEntity.dataset.keepEntity);
+  const agent = event.target.closest("[data-open-agent]"); if (agent) return openMissionAgent(agent.dataset.openAgent);
 });
 
 $("#command-form").addEventListener("submit", (event) => {
@@ -683,6 +615,8 @@ promptInput.addEventListener("keydown", (event) => {
 });
 
 $("#refresh-ops").addEventListener("click", () => void refreshStatus());
+$("#mission-run").addEventListener("click", () => void controlMission("run"));
+$("#mission-cancel").addEventListener("click", () => void controlMission("cancel"));
 
 $("#auth-form").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -721,7 +655,6 @@ window.addEventListener("keydown", (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); setView("console"); promptInput.focus(); }
 });
 
-buildKeep();
 setView(state.view);
 refreshStatus({ quiet: true });
 setInterval(() => { if (!document.hidden && state.authenticated) void refreshStatus({ quiet: true }); }, 5000);

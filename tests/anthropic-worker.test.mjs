@@ -234,12 +234,17 @@ test("Anthropic worker cannot write paid work-product evidence without an exact 
 
 test("planner approval cannot activate the separate Anthropic builder worker", () => {
   const root = tempWorkspace();
+  const approvalId = "approval-20260712-anthropic-planning";
+  cpSync(
+    path.join(root, ".codex", "approvals", "archive", `${approvalId}.json`),
+    path.join(root, ".codex", "approvals", `${approvalId}.json`)
+  );
   const readiness = evaluateAnthropicWorkerReadiness({
     root,
     env: {
       AG_OS_AI_WORKER_ENABLED: "true",
       ANTHROPIC_API_KEY: "configured",
-      AG_OS_AI_WORKER_APPROVAL_ID: "approval-20260712-anthropic-planning",
+      AG_OS_AI_WORKER_APPROVAL_ID: approvalId,
       ANTHROPIC_INPUT_COST_PER_MILLION_USD: "2",
       ANTHROPIC_OUTPUT_COST_PER_MILLION_USD: "10"
     },
