@@ -24,7 +24,8 @@ import {
   createMissionIntegrationWorkspace,
   createTaskWorkspace,
   gitRevision,
-  integrateTaskCommit
+  integrateTaskCommit,
+  removeTaskWorkspace
 } from "./mission-workspace.mjs";
 import { scanSecrets } from "../security/secret-scanner.mjs";
 
@@ -395,13 +396,19 @@ async function runMissionExecution({ missionId, provider, root = process.cwd(), 
   throwIfAborted(signal);
   let mission = readMission(missionId, root);
   if (["completed", "cancelled", "failed"].includes(mission.status)) return missionDetail(missionId, root);
+  for (const task of listMissionTasks(missionId, root)) {
+    if (["qa", "integration"].includes(task.kind) && (!Array.isArray(task.validationCommands) || task.validationCommands.length === 0)) {
+      updateTask(task, { validationCommands: [...mission.validationStrategy] }, root, now());
+    }
+  }
   if (mission.status === "blocked") {
     const resumablePattern = /(?:budget|approval).*(?:exhausted|blocked|remaining|cap|breaker)|(?:exhausted|blocked).*(?:budget|approval)/i;
     const blockedTasks = listMissionTasks(missionId, root).filter((task) => task.status === "blocked" && task.blockers.some((blocker) => resumablePattern.test(blocker)));
     if (blockedTasks.length === 0) return missionDetail(missionId, root);
     const agents = listMissionAgents(missionId, root);
     for (const task of blockedTasks) {
-      updateTask(task, { status: "ready", attempt: task.attempt + 1, workspace: null, blockers: [], completedAt: null }, root, now());
+      if (task.workspace) removeTaskWorkspace({ workspace: task.workspace });
+      updateTask(task, { status: "ready", workspace: null, blockers: [], completedAt: null }, root, now());
       const agent = agents.find((candidate) => candidate.agentRunId === task.assignedAgentRunId);
       if (agent) updateAgent(agent, { status: "waiting", currentTaskId: null, completedAt: null, failure: null }, root, now());
     }

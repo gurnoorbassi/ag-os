@@ -54,6 +54,19 @@ export function createTaskWorkspace({ missionId, taskId, repositoryPath, integra
   return { workspaceId: `workspace-${safeBranchFragment(taskId)}`, path: workspacePath, branch, baseRevision, reviewBaseRevision: integrationWorkspace.baseRevision, repository };
 }
 
+export function removeTaskWorkspace({ workspace }) {
+  const repository = assertGitRepository(workspace.repository);
+  const base = path.resolve(runtimeBase(repository));
+  const target = path.resolve(workspace.path);
+  if (!target.startsWith(`${base}${path.sep}`)) throw new Error("task worktree cleanup target escaped its verified runtime directory");
+  if (!String(workspace.branch || "").startsWith("codex/mission-")) throw new Error("task worktree cleanup refused an unexpected branch");
+  git(["worktree", "remove", "--force", target], { cwd: repository, allowFailure: true });
+  if (existsSync(target)) rmSync(target, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
+  git(["branch", "-D", workspace.branch], { cwd: repository, allowFailure: true });
+  git(["worktree", "prune"], { cwd: repository, allowFailure: true });
+  return { removed: target, branch: workspace.branch };
+}
+
 export function commitTaskWorkspace({ workspace, taskId }) {
   const status = git(["status", "--porcelain"], { cwd: workspace.path }).stdout;
   if (!status) return { changed: false, commit: null, files: [] };

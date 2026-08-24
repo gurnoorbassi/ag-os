@@ -344,10 +344,15 @@ test("a budget-blocked AgentRun resumes serially under fresh bounded capacity", 
   } };
   const blocked = await runMission({ missionId: created.missionId, provider: blockedProvider, root: records });
   assert.equal(blocked.status, "blocked");
+  const blockedTask = blocked.tasks.find((task) => task.status === "blocked");
+  const integrationTask = blocked.tasks.find((task) => task.kind === "integration");
+  write(records, `.codex/missions/${created.missionId}/tasks/${integrationTask.taskId}.json`, `${JSON.stringify({ ...integrationTask, validationCommands: [] }, null, 2)}\n`);
   const resumed = await runMission({ missionId: created.missionId, provider: new ScriptedProvider(), root: records });
   assert.equal(resumed.status, "completed", JSON.stringify(resumed.blockers));
   assert.ok(resumed.events.some((event) => event.type === "mission.resumed"));
   assert.equal(resumed.events.filter((event) => event.type === "mission.created").length, 1);
+  assert.equal(resumed.tasks.find((task) => task.taskId === blockedTask.taskId).attempt, blockedTask.attempt, "provider-capacity resume must not consume a repair attempt");
+  assert.deepEqual(resumed.tasks.find((task) => task.taskId === integrationTask.taskId).validationCommands, resumed.validationStrategy);
 });
 
 test("QA executes every declared validation command and deduplicates agent evidence", async () => {
