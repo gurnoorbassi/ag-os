@@ -16,7 +16,21 @@
         "qa": { "type": "string", "enum": ["QA Engineer"] },
         "codeReviewer": { "type": "string", "enum": ["Code Reviewer"] },
         "integration": { "type": "string", "enum": ["Integration Agent"] },
-        "additional": { "type": "array", "items": { "type": "string", "enum": ["Product Manager", "Architect", "UI Designer", "Frontend Engineer", "Backend Engineer", "Database Engineer", "Security Reviewer", "Fixer"] } }
+        "additional": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["productManager", "architect", "uiDesigner", "frontendEngineer", "backendEngineer", "databaseEngineer", "securityReviewer", "fixer"],
+          "properties": {
+            "productManager": { "type": "boolean" },
+            "architect": { "type": "boolean" },
+            "uiDesigner": { "type": "boolean" },
+            "frontendEngineer": { "type": "boolean" },
+            "backendEngineer": { "type": "boolean" },
+            "databaseEngineer": { "type": "boolean" },
+            "securityReviewer": { "type": "boolean" },
+            "fixer": { "type": "boolean" }
+          }
+        }
       }
     },
     "tasks": {

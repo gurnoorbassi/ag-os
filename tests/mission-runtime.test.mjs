@@ -193,7 +193,17 @@ test("AgentRun role policies deny reviewer edits in both the loop and executor",
 });
 
 function missionRoles(...additional) {
-  return { commander: "Commander", qa: "QA Engineer", codeReviewer: "Code Reviewer", integration: "Integration Agent", additional };
+  const fields = {
+    "Product Manager": "productManager", Architect: "architect", "UI Designer": "uiDesigner", "Frontend Engineer": "frontendEngineer",
+    "Backend Engineer": "backendEngineer", "Database Engineer": "databaseEngineer", "Security Reviewer": "securityReviewer", Fixer: "fixer"
+  };
+  const selected = Object.fromEntries(Object.values(fields).map((key) => [key, false]));
+  for (const role of additional) {
+    const field = fields[role];
+    if (field) selected[field] = true;
+    else selected[role] = true;
+  }
+  return { commander: "Commander", qa: "QA Engineer", codeReviewer: "Code Reviewer", integration: "Integration Agent", additional: selected };
 }
 
 function missionNativePlan(overrides = {}) {
@@ -221,7 +231,7 @@ test("mission-native plans reject unknown dependencies, cycles, unsupported role
   assert.equal(validateMissionPlanDraft(valid), valid);
   assert.throws(() => validateMissionPlanDraft(missionNativePlan({ tasks: missionNativePlan().tasks.map((task) => task.taskId === "review" ? { ...task, dependencies: ["missing"] } : task) })), /unknown dependency/);
   assert.throws(() => validateMissionPlanDraft(missionNativePlan({ tasks: missionNativePlan().tasks.map((task) => task.taskId === "backend" ? { ...task, dependencies: ["integration"] } : task) })), /cycle/);
-  assert.throws(() => validateMissionPlanDraft(missionNativePlan({ requiredRoles: missionRoles("Backend Engineer", "Wizard") })), /unsupported mission role/);
+  assert.throws(() => validateMissionPlanDraft(missionNativePlan({ requiredRoles: missionRoles("Backend Engineer", "wizard") })), /unsupported field/);
   assert.throws(() => validateMissionPlanDraft(missionNativePlan({ requiredRoles: missingQa })), /missing qa/);
   assert.throws(() => validateMissionPlanDraft(missionNativePlan({ integrationOrder: ["review", "backend", "qa", "integration"] })), /before dependency/);
 });

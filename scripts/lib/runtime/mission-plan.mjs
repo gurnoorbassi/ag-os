@@ -2,7 +2,16 @@ export const SUPPORTED_MISSION_ROLES = Object.freeze([
   "Commander", "Product Manager", "Architect", "UI Designer", "Frontend Engineer", "Backend Engineer", "Database Engineer",
   "QA Engineer", "Security Reviewer", "Code Reviewer", "Fixer", "Integration Agent"
 ]);
-const REQUIRED_QUALITY_ROLES = Object.freeze(["Commander", "QA Engineer", "Code Reviewer", "Integration Agent"]);
+const ADDITIONAL_ROLE_FIELDS = Object.freeze({
+  productManager: "Product Manager",
+  architect: "Architect",
+  uiDesigner: "UI Designer",
+  frontendEngineer: "Frontend Engineer",
+  backendEngineer: "Backend Engineer",
+  databaseEngineer: "Database Engineer",
+  securityReviewer: "Security Reviewer",
+  fixer: "Fixer"
+});
 
 export const MISSION_NATIVE_PLAN_SCHEMA = {
   type: "object",
@@ -19,7 +28,12 @@ export const MISSION_NATIVE_PLAN_SCHEMA = {
         qa: { type: "string", enum: ["QA Engineer"] },
         codeReviewer: { type: "string", enum: ["Code Reviewer"] },
         integration: { type: "string", enum: ["Integration Agent"] },
-        additional: { type: "array", items: { type: "string", enum: SUPPORTED_MISSION_ROLES.filter((role) => !REQUIRED_QUALITY_ROLES.includes(role)) } }
+        additional: {
+          type: "object",
+          additionalProperties: false,
+          required: Object.keys(ADDITIONAL_ROLE_FIELDS),
+          properties: Object.fromEntries(Object.keys(ADDITIONAL_ROLE_FIELDS).map((key) => [key, { type: "boolean" }]))
+        }
       }
     },
     tasks: {
@@ -81,9 +95,12 @@ export function validateMissionPlanDraft(plan, { assertValidationCommand = null 
   for (const key of Object.keys(plan.requiredRoles)) if (!requiredRoleKeys.includes(key)) throw new Error(`mission plan requiredRoles has unsupported field: ${key}`);
   for (const key of requiredRoleKeys) if (!(key in plan.requiredRoles)) throw new Error(`mission plan requiredRoles is missing ${key}`);
   if (plan.requiredRoles.commander !== "Commander" || plan.requiredRoles.qa !== "QA Engineer" || plan.requiredRoles.codeReviewer !== "Code Reviewer" || plan.requiredRoles.integration !== "Integration Agent") throw new Error("mission plan requiredRoles has malformed mandatory quality roles");
-  assertStringArray(plan.requiredRoles.additional, "mission plan requiredRoles.additional");
-  const requiredRoles = [plan.requiredRoles.commander, ...plan.requiredRoles.additional, plan.requiredRoles.codeReviewer, plan.requiredRoles.qa, plan.requiredRoles.integration];
-  if (new Set(requiredRoles).size !== requiredRoles.length) throw new Error("mission plan requiredRoles must be unique");
+  if (!plan.requiredRoles.additional || typeof plan.requiredRoles.additional !== "object" || Array.isArray(plan.requiredRoles.additional)) throw new Error("mission plan requiredRoles.additional must be an object");
+  const additionalRoleKeys = Object.keys(ADDITIONAL_ROLE_FIELDS);
+  for (const key of Object.keys(plan.requiredRoles.additional)) if (!additionalRoleKeys.includes(key)) throw new Error(`mission plan requiredRoles.additional has unsupported field: ${key}`);
+  for (const key of additionalRoleKeys) if (typeof plan.requiredRoles.additional[key] !== "boolean") throw new Error(`mission plan requiredRoles.additional.${key} must be boolean`);
+  const additionalRoles = additionalRoleKeys.filter((key) => plan.requiredRoles.additional[key]).map((key) => ADDITIONAL_ROLE_FIELDS[key]);
+  const requiredRoles = [plan.requiredRoles.commander, ...additionalRoles, plan.requiredRoles.codeReviewer, plan.requiredRoles.qa, plan.requiredRoles.integration];
   for (const role of requiredRoles) if (!SUPPORTED_MISSION_ROLES.includes(role)) throw new Error(`unsupported mission role: ${role}`);
   if (!Array.isArray(plan.tasks) || plan.tasks.length === 0) throw new Error("mission plan tasks must be a non-empty array");
   const tasksById = new Map();
@@ -129,5 +146,6 @@ export function validateMissionPlanDraft(plan, { assertValidationCommand = null 
 
 export function missionPlanRoles(plan) {
   validateMissionPlanDraft(plan);
-  return [plan.requiredRoles.commander, ...plan.requiredRoles.additional, plan.requiredRoles.codeReviewer, plan.requiredRoles.qa, plan.requiredRoles.integration];
+  const additionalRoles = Object.keys(ADDITIONAL_ROLE_FIELDS).filter((key) => plan.requiredRoles.additional[key]).map((key) => ADDITIONAL_ROLE_FIELDS[key]);
+  return [plan.requiredRoles.commander, ...additionalRoles, plan.requiredRoles.codeReviewer, plan.requiredRoles.qa, plan.requiredRoles.integration];
 }
