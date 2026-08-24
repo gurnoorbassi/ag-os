@@ -22,7 +22,7 @@ function taskSchema(roles, kinds) {
     additionalProperties: false,
     required: TASK_FIELDS,
     properties: {
-      taskId: { type: "string", minLength: 2 },
+      taskId: { type: "string", pattern: "^[A-Za-z][A-Za-z0-9-]{1,63}$" },
       title: { type: "string", minLength: 1 },
       description: { type: "string", minLength: 1 },
       assignedRole: { type: "string", enum: roles },
@@ -135,7 +135,7 @@ export function validateMissionPlanDraft(plan, { assertValidationCommand = null 
     if (!task || typeof task !== "object" || Array.isArray(task)) throw new Error("mission plan task must be an object");
     for (const key of Object.keys(task)) if (!taskKeys.has(key)) throw new Error(`mission plan task has unsupported field: ${key}`);
     for (const key of taskKeys) if (!(key in task)) throw new Error(`mission plan task is missing ${key}`);
-    if (!/^[a-z][a-z0-9-]{1,63}$/.test(task.taskId)) throw new Error(`mission plan taskId is invalid: ${task.taskId}`);
+    if (!/^[A-Za-z][A-Za-z0-9-]{1,63}$/.test(task.taskId)) throw new Error(`mission plan taskId is invalid: ${task.taskId}`);
     if (tasksById.has(task.taskId)) throw new Error(`duplicate mission plan taskId: ${task.taskId}`);
     assertNonEmptyString(task.title, `${task.taskId} title`);
     assertNonEmptyString(task.description, `${task.taskId} description`);
