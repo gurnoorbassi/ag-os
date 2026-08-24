@@ -18,6 +18,7 @@
     "safe-merge:check": "node scripts/check-safe-merge.mjs",
     "security:scan": "node scripts/scan-secrets.mjs",
     "mission:smoke:anthropic": "node scripts/run-live-mission-smoke.mjs",
+    "mission:smoke:anthropic:resume": "node scripts/resume-live-mission-smoke.mjs",
     "audit:v1": "node scripts/audit-v1-completion.mjs",
     "production:check": "node scripts/check-production-readiness.mjs",
     "production:check:coordinator": "node scripts/check-production-readiness.mjs --record .codex/production/production-readiness-ag-os-coordinator-v1.json",

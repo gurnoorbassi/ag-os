@@ -314,6 +314,22 @@ test("scheduler preserves concurrency for independent tasks on different AgentRu
   assert.equal(concurrentFirstTurns, 2);
 });
 
+test("a budget-blocked AgentRun resumes serially under fresh bounded capacity", async () => {
+  const { repository, records } = readyFixture();
+  const created = createMission({ ownerOutcome: "Build a small dependency-backed CRM", projectId: "resume-agent", repositoryPath: repository, planningEvidence: { planDraft: missionNativePlan(), model: "fixture", usage: {}, costUsd: 0 }, root: records });
+  const blockedProvider = { nextAction: async () => {
+    const error = new Error("Scoped Anthropic worker approval has no uses remaining");
+    error.code = "approval_exhausted";
+    throw error;
+  } };
+  const blocked = await runMission({ missionId: created.missionId, provider: blockedProvider, root: records });
+  assert.equal(blocked.status, "blocked");
+  const resumed = await runMission({ missionId: created.missionId, provider: new ScriptedProvider(), root: records });
+  assert.equal(resumed.status, "completed", JSON.stringify(resumed.blockers));
+  assert.ok(resumed.events.some((event) => event.type === "mission.resumed"));
+  assert.equal(resumed.events.filter((event) => event.type === "mission.created").length, 1);
+});
+
 test("QA executes every declared validation command and deduplicates agent evidence", async () => {
   const { repository, records } = readyFixture();
   const planDraft = {

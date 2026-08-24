@@ -394,7 +394,20 @@ function scheduleFinalValidationRetry({ mission, blockers, root, now }) {
 async function runMissionExecution({ missionId, provider, root = process.cwd(), now = () => new Date(), signal = null }) {
   throwIfAborted(signal);
   let mission = readMission(missionId, root);
-  if (["completed", "cancelled"].includes(mission.status)) return missionDetail(missionId, root);
+  if (["completed", "cancelled", "failed"].includes(mission.status)) return missionDetail(missionId, root);
+  if (mission.status === "blocked") {
+    const resumablePattern = /(?:budget|approval).*(?:exhausted|blocked|remaining|cap|breaker)|(?:exhausted|blocked).*(?:budget|approval)/i;
+    const blockedTasks = listMissionTasks(missionId, root).filter((task) => task.status === "blocked" && task.blockers.some((blocker) => resumablePattern.test(blocker)));
+    if (blockedTasks.length === 0) return missionDetail(missionId, root);
+    const agents = listMissionAgents(missionId, root);
+    for (const task of blockedTasks) {
+      updateTask(task, { status: "ready", attempt: task.attempt + 1, workspace: null, blockers: [], completedAt: null }, root, now());
+      const agent = agents.find((candidate) => candidate.agentRunId === task.assignedAgentRunId);
+      if (agent) updateAgent(agent, { status: "waiting", currentTaskId: null, completedAt: null, failure: null }, root, now());
+    }
+    mission = updateMissionRecord(mission, { status: "running", blockers: [] }, root, now());
+    appendMissionEvent({ missionId, type: "mission.resumed", payload: { requeuedTaskIds: blockedTasks.map((task) => task.taskId), reason: "fresh bounded provider approval or budget capacity" }, now: now(), root });
+  }
   mission = updateMissionRecord(mission, { status: "running", blockers: [] }, root, now());
   const commander = listMissionAgents(missionId, root).find((agent) => agent.role === "Commander");
   if (commander) updateAgent(commander, { status: "working", startedAt: commander.startedAt || isoTimestamp(now()) }, root, now());
