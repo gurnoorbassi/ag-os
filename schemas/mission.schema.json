@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/mission.schema.json",
+  "title": "AG OS Mission",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["missionId", "ownerOutcome", "projectId", "status", "team", "tasks", "budget", "progress", "createdAt", "updatedAt"],
+  "properties": {
+    "missionId": { "type": "string", "pattern": "^mission-[a-z0-9-]+$" },
+    "ownerOutcome": { "type": "string", "minLength": 3 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["created", "planning", "planned", "running", "blocked", "failed", "completed", "cancelled"] },
+    "team": { "type": "array", "items": { "type": "string" } },
+    "tasks": { "type": "array", "items": { "type": "string" } },
+    "budget": { "type": "object" },
+    "progress": { "type": "object" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

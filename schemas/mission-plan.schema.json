@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/mission-plan.schema.json",
+  "title": "AG OS Mission Native Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary", "requiredRoles", "tasks", "validationStrategy", "integrationOrder", "risks", "approvalRequirements"],
+  "properties": {
+    "summary": { "type": "string", "minLength": 1 },
+    "requiredRoles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commander", "qa", "codeReviewer", "integration", "additional"],
+      "properties": {
+        "commander": { "type": "string", "enum": ["Commander"] },
+        "qa": { "type": "string", "enum": ["QA Engineer"] },
+        "codeReviewer": { "type": "string", "enum": ["Code Reviewer"] },
+        "integration": { "type": "string", "enum": ["Integration Agent"] },
+        "additional": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["productManager", "architect", "uiDesigner", "frontendEngineer", "backendEngineer", "databaseEngineer", "securityReviewer", "fixer"],
+          "properties": {
+            "productManager": { "type": "boolean" },
+            "architect": { "type": "boolean" },
+            "uiDesigner": { "type": "boolean" },
+            "frontendEngineer": { "type": "boolean" },
+            "backendEngineer": { "type": "boolean" },
+            "databaseEngineer": { "type": "boolean" },
+            "securityReviewer": { "type": "boolean" },
+            "fixer": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "tasks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary", "additional", "codeReview", "qa", "integration"],
+      "properties": {
+        "primary": {
+          "type": "object", "additionalProperties": false,
+          "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
+          "properties": {
+            "taskId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9-]{1,63}$" }, "title": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 },
+            "assignedRole": { "type": "string", "enum": ["Product Manager", "Architect", "UI Designer", "Frontend Engineer", "Backend Engineer", "Database Engineer", "Security Reviewer", "Fixer"] },
+            "dependencies": { "type": "array", "items": { "type": "string" } }, "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "kind": { "type": "string", "enum": ["planning", "coding", "review"] }
+          }
+        },
+        "additional": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
+            "properties": {
+              "taskId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9-]{1,63}$" }, "title": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 },
+              "assignedRole": { "type": "string", "enum": ["Product Manager", "Architect", "UI Designer", "Frontend Engineer", "Backend Engineer", "Database Engineer", "Security Reviewer", "Fixer"] },
+              "dependencies": { "type": "array", "items": { "type": "string" } }, "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+              "kind": { "type": "string", "enum": ["planning", "coding", "review"] }
+            }
+          }
+        },
+        "codeReview": {
+          "type": "object", "additionalProperties": false,
+          "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
+          "properties": {
+            "taskId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9-]{1,63}$" }, "title": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 },
+            "assignedRole": { "type": "string", "enum": ["Code Reviewer"] }, "dependencies": { "type": "array", "items": { "type": "string" } },
+            "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }, "kind": { "type": "string", "enum": ["review"] }
+          }
+        },
+        "qa": {
+          "type": "object", "additionalProperties": false,
+          "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
+          "properties": {
+            "taskId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9-]{1,63}$" }, "title": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 },
+            "assignedRole": { "type": "string", "enum": ["QA Engineer"] }, "dependencies": { "type": "array", "items": { "type": "string" } },
+            "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }, "kind": { "type": "string", "enum": ["qa"] }
+          }
+        },
+        "integration": {
+          "type": "object", "additionalProperties": false,
+          "required": ["taskId", "title", "description", "assignedRole", "dependencies", "acceptanceCriteria", "kind"],
+          "properties": {
+            "taskId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9-]{1,63}$" }, "title": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 },
+            "assignedRole": { "type": "string", "enum": ["Integration Agent"] }, "dependencies": { "type": "array", "items": { "type": "string" } },
+            "acceptanceCriteria": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }, "kind": { "type": "string", "enum": ["integration"] }
+          }
+        }
+      }
+    },
+    "validationStrategy": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "integrationOrder": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "risks": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "approvalRequirements": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  }
+}

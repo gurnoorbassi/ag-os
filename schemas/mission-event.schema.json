@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/mission-event.schema.json",
+  "title": "AG OS Mission Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["eventId", "sequence", "type", "missionId", "artifactIds", "payload", "createdAt"],
+  "properties": {
+    "eventId": { "type": "string" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "type": { "type": "string", "minLength": 1 },
+    "missionId": { "type": "string", "pattern": "^mission-[a-z0-9-]+$" },
+    "agentRunId": { "type": ["string", "null"] },
+    "taskId": { "type": ["string", "null"] },
+    "workspaceId": { "type": ["string", "null"] },
+    "artifactIds": { "type": "array", "items": { "type": "string" } },
+    "payload": { "type": "object" },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}

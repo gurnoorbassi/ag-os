@@ -1,6 +1,6 @@
 {
   "approvalId": "approval-20260712-anthropic-planning",
-  "status": "approved",
+  "status": "expired",
   "approvalKind": "standing",
   "actionClass": "anthropic_plan_generation",
   "inclusionCriteria": [
@@ -56,7 +56,7 @@
     "external_connector_action",
     "production_change"
   ],
-  "revocationPath": "Owner may revoke this approval immediately by instruction. AG OS must set status to revoked, record an audit event, and stop every future Anthropic planning call before using the credential or API.",
+  "revocationPath": "Expired approval lock blocked or would block the mandatory boot sequence. Original expiration: 2026-08-13T06:59:59.000Z. This approval is no longer valid for gated actions. Historical proof remains preserved; any future action requires a new scoped owner approval lock.",
   "evidence": [
     {
       "type": "owner_instruction",
@@ -68,5 +68,5 @@
   "approvedAt": "2026-07-12T10:24:30.810Z",
   "expiresAt": "2026-08-13T06:59:59.000Z",
   "createdAt": "2026-07-12T10:24:30.810Z",
-  "updatedAt": "2026-07-12T10:24:30.810Z"
+  "updatedAt": "2026-08-23T21:09:13.197Z"
 }

@@ -16,7 +16,7 @@
     <nav class="os-tabs" id="os-tabs" aria-label="AG OS views">
       <button type="button" data-view="console"><span class="tab-glyph">›_</span><span>Console</span></button>
       <button type="button" data-view="ops"><span class="tab-glyph">⌁</span><span>Ops</span><span id="ops-tab-count" class="tab-count" hidden>0</span></button>
-      <button type="button" data-view="keep"><span class="tab-glyph">♜</span><span>Keep</span></button>
+      <button type="button" data-view="keep"><span class="tab-glyph">◎</span><span>Mission</span><span id="mission-tab-count" class="tab-count" hidden>0</span></button>
       <button type="button" data-view="dash"><span class="tab-glyph">◫</span><span>Dash</span></button>
     </nav>
     <div class="os-presence">
@@ -93,12 +93,31 @@
       </div>
     </section>
 
-    <section id="view-keep" class="os-view keep-view os-hidden" aria-label="AG OS Keep">
-      <div class="keep-toolbar">
-        <div><strong>The Keep</strong><span>Live map of your operating company</span></div>
-        <div id="keep-mode" class="keep-mode">Quiet</div>
+    <section id="view-keep" class="os-view mission-view os-hidden" aria-labelledby="mission-title">
+      <header class="view-intro mission-intro">
+        <div>
+          <p class="eyebrow">Mission Control · Constitution v1.0</p>
+          <h1 id="mission-title">No mission selected</h1>
+          <p id="mission-outcome">Submit a software outcome from the Console to assemble a real execution team.</p>
+        </div>
+        <div class="mission-controls">
+          <span id="mission-status" class="status-chip dim">Idle</span>
+          <button id="mission-run" class="quiet-button" type="button" hidden>Run mission</button>
+          <button id="mission-cancel" class="quiet-button danger" type="button" hidden>Cancel</button>
+        </div>
+      </header>
+      <div class="mission-summary">
+        <div><span>Progress</span><strong id="mission-progress">0 / 0</strong><div class="mission-progress-track"><i id="mission-progress-bar"></i></div></div>
+        <div><span>Cost OS</span><strong id="mission-budget">$0.00 / $0.00</strong></div>
+        <div><span>Concurrency</span><strong id="mission-concurrency">0</strong></div>
+        <div><span>Autonomy</span><strong id="mission-autonomy">—</strong></div>
       </div>
-      <div id="keep-stage" class="keep-stage" aria-label="Interactive AG OS operating map"></div>
+      <div class="mission-grid">
+        <section class="mission-panel mission-team-panel"><div class="panel-heading"><div><span class="eyebrow">Execution team</span><h2>Agent runs</h2></div></div><div id="mission-agents" class="mission-agent-grid"></div></section>
+        <section class="mission-panel mission-task-panel"><div class="panel-heading"><div><span class="eyebrow">Task graph</span><h2>Dependencies and workspaces</h2></div></div><div id="mission-tasks" class="mission-task-list"></div></section>
+        <section class="mission-panel mission-activity-panel"><div class="panel-heading"><div><span class="eyebrow">Evidence stream</span><h2>Live activity</h2></div></div><div id="mission-events" class="mission-event-list" aria-live="polite"></div></section>
+        <section class="mission-panel mission-output-panel"><div class="panel-heading"><div><span class="eyebrow">Outcome</span><h2>Artifacts and blockers</h2></div></div><div id="mission-output"></div></section>
+      </div>
     </section>
 
     <section id="view-dash" class="os-view dash-view os-hidden" aria-labelledby="dash-title">

@@ -109,7 +109,9 @@ for (const requiredOperatorPattern of [
   /\/api\/v1\/memory\/lessons\/decision/,
   /\/api\/v1\/proposals\/\$\{encodeURIComponent\(proposalId\)\}\/decision/,
   /\/api\/v1\/jobs\/\$\{encodeURIComponent\(jobId\)\}\/recover/,
-  /\/api\/v1\/jobs\/\$\{encodeURIComponent\(jobId\)\}\/outcome/
+  /\/api\/v1\/jobs\/\$\{encodeURIComponent\(jobId\)\}\/outcome/,
+  /\/api\/v1\/missions\/\$\{encodeURIComponent\(state\.activeMissionId\)\}/,
+  /new EventSource\(`\/api\/v1\/missions\//
 ]) {
   if (!requiredOperatorPattern.test(dashboardSource)) {
     fail(`dashboard authenticated operator console missing invariant: ${requiredOperatorPattern}`);
@@ -119,7 +121,10 @@ for (const requiredOperatorPattern of [
 for (const requiredText of [
   "Owner command deck",
   "Mission control",
-  "The Keep",
+  "Mission Control",
+  "Agent runs",
+  "Dependencies and workspaces",
+  "Live activity",
   "Everything important. Nothing extra.",
   "Projects",
   "Active work",
@@ -127,7 +132,6 @@ for (const requiredText of [
   "Operational posture",
   "Owner focus",
   "Cost OS",
-  "Watchdog OS",
   "Constitution v1.0"
 ]) {
   if (!dashboardSource.includes(requiredText)) {
@@ -460,7 +464,7 @@ if (!data.metrics?.cost || !data.metrics?.quality || !data.metrics?.rework || !d
 if (data.metrics.lessonReuse.acceptedLessonCount === 0 && data.metrics.lessonReuse.lessonReuseRatePercent !== 0) {
   fail("dashboard must report truthful zero lesson reuse when no accepted lessons exist");
 }
-if (data.approvals.standingCount < 1 || data.approvals.standingApprovals.length !== data.approvals.standingCount) {
+if (data.approvals.standingApprovals.length !== data.approvals.standingCount) {
   fail("dashboard control center must show every active scoped standing approval");
 }
 if (data.approvals.standingApprovals.some((approval) =>
@@ -470,14 +474,6 @@ if (data.approvals.standingApprovals.some((approval) =>
   approval.remainingUses < 0 ||
   approval.remainingUses > approval.maxUses)) {
   fail("dashboard control center standing approvals must show valid remaining uses and immediate revocation");
-}
-const codexDraftPrApproval = data.approvals.standingApprovals.find((approval) => approval.approvalId === "approval-20260709-ag-os-codex-draft-pr-standing");
-if (codexDraftPrApproval?.maxUses !== 10) {
-  fail("dashboard control center must preserve the Codex draft PR standing approval usage limit");
-}
-const anthropicPlanningApproval = data.approvals.standingApprovals.find((approval) => approval.approvalId === "approval-20260712-anthropic-planning");
-if (anthropicPlanningApproval?.maxUses !== 20 || anthropicPlanningApproval?.budget?.maxUsd !== 0.25) {
-  fail("dashboard control center must show the Anthropic planning approval use and cost limits");
 }
 if (data.dashboardActionQueue.approvalBatch?.mode !== "read_only" ||
   data.dashboardActionQueue.approvalBatch?.writeActionsAllowed !== false ||

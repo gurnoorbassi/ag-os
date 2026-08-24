@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/handoff.schema.json",
+  "title": "AG OS Agent Handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["handoffId", "missionId", "sourceAgentRunId", "destinationAgentRunId", "taskId", "reason", "artifacts", "requiredAction", "createdAt"],
+  "properties": {
+    "handoffId": { "type": "string" },
+    "missionId": { "type": "string", "pattern": "^mission-[a-z0-9-]+$" },
+    "sourceAgentRunId": { "type": "string" },
+    "destinationAgentRunId": { "type": "string" },
+    "taskId": { "type": "string" },
+    "reason": { "type": "string", "minLength": 1 },
+    "artifacts": { "type": "array" },
+    "requiredAction": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" }
+  }
+}
