@@ -4,7 +4,7 @@ import process from "node:process";
 import { isoTimestamp, slugify, writeJson } from "./common.mjs";
 import { allowedToolsForRole, assertAllowedAgentCommand, executeAgentTool, runAgentToolLoop } from "./agent-runner.mjs";
 import { bootstrapMissionWorkspace } from "./mission-bootstrap.mjs";
-import { SUPPORTED_MISSION_ROLES, validateMissionPlanDraft } from "./mission-plan.mjs";
+import { missionPlanRoles, SUPPORTED_MISSION_ROLES, validateMissionPlanDraft } from "./mission-plan.mjs";
 import {
   appendMissionEvent,
   listMissionAgents,
@@ -136,7 +136,7 @@ export function buildDefaultMissionPlan({ missionId, ownerOutcome, projectId, va
 
 export function buildMissionPlanFromDraft({ missionId, projectId, planDraft }) {
   validateMissionPlanDraft(planDraft, { assertValidationCommand: assertAllowedAgentCommand });
-  const agents = planDraft.requiredRoles.map((role, index) => agentDefinition(missionId, role, index));
+  const agents = missionPlanRoles(planDraft).map((role, index) => agentDefinition(missionId, role, index));
   const byRole = Object.fromEntries(agents.map((agent) => [agent.role, agent.agentRunId]));
   const taskIds = new Map(planDraft.tasks.map((task) => [task.taskId, id("mission-task", `${missionId}-${task.taskId}`)]));
   const tasks = planDraft.tasks.map((task) => ({

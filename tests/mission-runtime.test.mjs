@@ -192,10 +192,14 @@ test("AgentRun role policies deny reviewer edits in both the loop and executor",
   assert.equal(existsSync(path.join(repository, "denied.txt")), false);
 });
 
+function missionRoles(...additional) {
+  return { commander: "Commander", qa: "QA Engineer", codeReviewer: "Code Reviewer", integration: "Integration Agent", additional };
+}
+
 function missionNativePlan(overrides = {}) {
   return {
     summary: "Build a dependency-backed CRM through a mission-native graph.",
-    requiredRoles: ["Commander", "Backend Engineer", "QA Engineer", "Code Reviewer", "Integration Agent"],
+    requiredRoles: missionRoles("Backend Engineer"),
     tasks: [
       { taskId: "backend", title: "Build backend", description: "Build the backend.", assignedRole: "Backend Engineer", dependencies: [], acceptanceCriteria: ["Backend works"], kind: "coding" },
       { taskId: "review", title: "Review", description: "Review the integrated diff.", assignedRole: "Code Reviewer", dependencies: ["backend"], acceptanceCriteria: ["No blocking defect"], kind: "review" },
@@ -212,11 +216,13 @@ function missionNativePlan(overrides = {}) {
 
 test("mission-native plans reject unknown dependencies, cycles, unsupported roles, and malformed order", () => {
   const valid = missionNativePlan();
+  const missingQa = { ...valid.requiredRoles };
+  delete missingQa.qa;
   assert.equal(validateMissionPlanDraft(valid), valid);
   assert.throws(() => validateMissionPlanDraft(missionNativePlan({ tasks: missionNativePlan().tasks.map((task) => task.taskId === "review" ? { ...task, dependencies: ["missing"] } : task) })), /unknown dependency/);
   assert.throws(() => validateMissionPlanDraft(missionNativePlan({ tasks: missionNativePlan().tasks.map((task) => task.taskId === "backend" ? { ...task, dependencies: ["integration"] } : task) })), /cycle/);
-  assert.throws(() => validateMissionPlanDraft(missionNativePlan({ requiredRoles: [...missionNativePlan().requiredRoles, "Wizard"] })), /unsupported mission role/);
-  assert.throws(() => validateMissionPlanDraft(missionNativePlan({ requiredRoles: missionNativePlan().requiredRoles.filter((role) => role !== "QA Engineer") })), /must include QA Engineer/);
+  assert.throws(() => validateMissionPlanDraft(missionNativePlan({ requiredRoles: missionRoles("Backend Engineer", "Wizard") })), /unsupported mission role/);
+  assert.throws(() => validateMissionPlanDraft(missionNativePlan({ requiredRoles: missingQa })), /missing qa/);
   assert.throws(() => validateMissionPlanDraft(missionNativePlan({ integrationOrder: ["review", "backend", "qa", "integration"] })), /before dependency/);
 });
 
@@ -224,7 +230,7 @@ test("scheduler never runs two ready tasks on the same AgentRun concurrently", a
   const { repository, records } = fixture({ requireFinalRepair: false });
   const planDraft = {
     summary: "Build two independent files with one bounded backend AgentRun.",
-    requiredRoles: ["Commander", "Backend Engineer", "Code Reviewer", "QA Engineer", "Integration Agent"],
+    requiredRoles: missionRoles("Backend Engineer"),
     tasks: [
       { taskId: "server", title: "Build server", description: "Create the server module.", assignedRole: "Backend Engineer", dependencies: [], acceptanceCriteria: ["Server exists"], kind: "coding" },
       { taskId: "page", title: "Build page", description: "Create the public page.", assignedRole: "Backend Engineer", dependencies: [], acceptanceCriteria: ["Page exists"], kind: "coding" },
@@ -258,7 +264,7 @@ test("scheduler preserves concurrency for independent tasks on different AgentRu
   const { repository, records } = fixture({ requireFinalRepair: false });
   const planDraft = {
     summary: "Build independent frontend and backend work concurrently.",
-    requiredRoles: ["Commander", "Frontend Engineer", "Backend Engineer", "Code Reviewer", "QA Engineer", "Integration Agent"],
+    requiredRoles: missionRoles("Frontend Engineer", "Backend Engineer"),
     tasks: [
       { taskId: "frontend", title: "Build frontend", description: "Create the public page.", assignedRole: "Frontend Engineer", dependencies: [], acceptanceCriteria: ["Page exists"], kind: "coding" },
       { taskId: "backend", title: "Build backend", description: "Create the server module.", assignedRole: "Backend Engineer", dependencies: [], acceptanceCriteria: ["Server exists"], kind: "coding" },
@@ -293,7 +299,7 @@ test("scheduler preserves concurrency for independent tasks on different AgentRu
 test("QA executes every declared validation command and deduplicates agent evidence", async () => {
   const { repository, records } = readyFixture();
   const planDraft = {
-    summary: "Run deterministic QA.", requiredRoles: ["Commander", "Code Reviewer", "QA Engineer", "Integration Agent"],
+    summary: "Run deterministic QA.", requiredRoles: missionRoles(),
     tasks: [
       { taskId: "review", title: "Review", description: "Inspect the current diff.", assignedRole: "Code Reviewer", dependencies: [], acceptanceCriteria: ["Diff reviewed"], kind: "review" },
       { taskId: "qa", title: "QA all commands", description: "Validate everything.", assignedRole: "QA Engineer", dependencies: ["review"], acceptanceCriteria: ["All declared commands pass"], kind: "qa" },
@@ -325,7 +331,7 @@ test("mission cancellation persists terminal state and removes its worktrees", (
 test("long mission commands stay asynchronous and cancellation stops work without late mutations", async () => {
   const { repository, records } = fixture({ requireFinalRepair: false });
   const planDraft = {
-    summary: "Run one long cancellable QA command.", requiredRoles: ["Commander", "Code Reviewer", "QA Engineer", "Integration Agent"],
+    summary: "Run one long cancellable QA command.", requiredRoles: missionRoles(),
     tasks: [
       { taskId: "review", title: "Review", description: "Inspect the current diff.", assignedRole: "Code Reviewer", dependencies: [], acceptanceCriteria: ["Diff reviewed"], kind: "review" },
       { taskId: "qa", title: "Long QA", description: "Run the cancellable test.", assignedRole: "QA Engineer", dependencies: [], acceptanceCriteria: ["Command completes or cancellation stops it"], kind: "qa" },

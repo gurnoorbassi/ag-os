@@ -7,7 +7,18 @@
   "required": ["summary", "requiredRoles", "tasks", "validationStrategy", "integrationOrder", "risks", "approvalRequirements"],
   "properties": {
     "summary": { "type": "string", "minLength": 1 },
-    "requiredRoles": { "type": "array", "minItems": 1, "items": { "type": "string", "enum": ["Commander", "Product Manager", "Architect", "UI Designer", "Frontend Engineer", "Backend Engineer", "Database Engineer", "QA Engineer", "Security Reviewer", "Code Reviewer", "Fixer", "Integration Agent"] } },
+    "requiredRoles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commander", "qa", "codeReviewer", "integration", "additional"],
+      "properties": {
+        "commander": { "type": "string", "enum": ["Commander"] },
+        "qa": { "type": "string", "enum": ["QA Engineer"] },
+        "codeReviewer": { "type": "string", "enum": ["Code Reviewer"] },
+        "integration": { "type": "string", "enum": ["Integration Agent"] },
+        "additional": { "type": "array", "items": { "type": "string", "enum": ["Product Manager", "Architect", "UI Designer", "Frontend Engineer", "Backend Engineer", "Database Engineer", "Security Reviewer", "Fixer"] } }
+      }
+    },
     "tasks": {
       "type": "array",
       "minItems": 1,

@@ -10,7 +10,18 @@ export const MISSION_NATIVE_PLAN_SCHEMA = {
   required: ["summary", "requiredRoles", "tasks", "validationStrategy", "integrationOrder", "risks", "approvalRequirements"],
   properties: {
     summary: { type: "string", minLength: 1 },
-    requiredRoles: { type: "array", minItems: 1, items: { type: "string", enum: SUPPORTED_MISSION_ROLES } },
+    requiredRoles: {
+      type: "object",
+      additionalProperties: false,
+      required: ["commander", "qa", "codeReviewer", "integration", "additional"],
+      properties: {
+        commander: { type: "string", enum: ["Commander"] },
+        qa: { type: "string", enum: ["QA Engineer"] },
+        codeReviewer: { type: "string", enum: ["Code Reviewer"] },
+        integration: { type: "string", enum: ["Integration Agent"] },
+        additional: { type: "array", items: { type: "string", enum: SUPPORTED_MISSION_ROLES.filter((role) => !REQUIRED_QUALITY_ROLES.includes(role)) } }
+      }
+    },
     tasks: {
       type: "array",
       minItems: 1,
@@ -65,10 +76,15 @@ export function validateMissionPlanDraft(plan, { assertValidationCommand = null 
   for (const key of Object.keys(plan)) if (!expectedKeys.has(key)) throw new Error(`mission plan has unsupported field: ${key}`);
   for (const key of expectedKeys) if (!(key in plan)) throw new Error(`mission plan is missing ${key}`);
   assertNonEmptyString(plan.summary, "mission plan summary");
-  assertStringArray(plan.requiredRoles, "mission plan requiredRoles", { nonEmpty: true });
-  if (new Set(plan.requiredRoles).size !== plan.requiredRoles.length) throw new Error("mission plan requiredRoles must be unique");
-  for (const role of plan.requiredRoles) if (!SUPPORTED_MISSION_ROLES.includes(role)) throw new Error(`unsupported mission role: ${role}`);
-  for (const role of REQUIRED_QUALITY_ROLES) if (!plan.requiredRoles.includes(role)) throw new Error(`mission plan must include ${role}`);
+  if (!plan.requiredRoles || typeof plan.requiredRoles !== "object" || Array.isArray(plan.requiredRoles)) throw new Error("mission plan requiredRoles must be an object");
+  const requiredRoleKeys = MISSION_NATIVE_PLAN_SCHEMA.properties.requiredRoles.required;
+  for (const key of Object.keys(plan.requiredRoles)) if (!requiredRoleKeys.includes(key)) throw new Error(`mission plan requiredRoles has unsupported field: ${key}`);
+  for (const key of requiredRoleKeys) if (!(key in plan.requiredRoles)) throw new Error(`mission plan requiredRoles is missing ${key}`);
+  if (plan.requiredRoles.commander !== "Commander" || plan.requiredRoles.qa !== "QA Engineer" || plan.requiredRoles.codeReviewer !== "Code Reviewer" || plan.requiredRoles.integration !== "Integration Agent") throw new Error("mission plan requiredRoles has malformed mandatory quality roles");
+  assertStringArray(plan.requiredRoles.additional, "mission plan requiredRoles.additional");
+  const requiredRoles = [plan.requiredRoles.commander, ...plan.requiredRoles.additional, plan.requiredRoles.codeReviewer, plan.requiredRoles.qa, plan.requiredRoles.integration];
+  if (new Set(requiredRoles).size !== requiredRoles.length) throw new Error("mission plan requiredRoles must be unique");
+  for (const role of requiredRoles) if (!SUPPORTED_MISSION_ROLES.includes(role)) throw new Error(`unsupported mission role: ${role}`);
   if (!Array.isArray(plan.tasks) || plan.tasks.length === 0) throw new Error("mission plan tasks must be a non-empty array");
   const tasksById = new Map();
   const taskKeys = new Set(MISSION_NATIVE_PLAN_SCHEMA.properties.tasks.items.required);
@@ -80,7 +96,7 @@ export function validateMissionPlanDraft(plan, { assertValidationCommand = null 
     if (tasksById.has(task.taskId)) throw new Error(`duplicate mission plan taskId: ${task.taskId}`);
     assertNonEmptyString(task.title, `${task.taskId} title`);
     assertNonEmptyString(task.description, `${task.taskId} description`);
-    if (!plan.requiredRoles.includes(task.assignedRole) || task.assignedRole === "Commander") throw new Error(`${task.taskId} has unsupported assignedRole: ${task.assignedRole}`);
+    if (!requiredRoles.includes(task.assignedRole) || task.assignedRole === "Commander") throw new Error(`${task.taskId} has unsupported assignedRole: ${task.assignedRole}`);
     assertStringArray(task.dependencies, `${task.taskId} dependencies`);
     if (new Set(task.dependencies).size !== task.dependencies.length) throw new Error(`${task.taskId} dependencies must be unique`);
     assertStringArray(task.acceptanceCriteria, `${task.taskId} acceptanceCriteria`, { nonEmpty: true });
@@ -109,4 +125,9 @@ export function validateMissionPlanDraft(plan, { assertValidationCommand = null 
   assertStringArray(plan.risks, "mission plan risks");
   assertStringArray(plan.approvalRequirements, "mission plan approvalRequirements");
   return plan;
+}
+
+export function missionPlanRoles(plan) {
+  validateMissionPlanDraft(plan);
+  return [plan.requiredRoles.commander, ...plan.requiredRoles.additional, plan.requiredRoles.codeReviewer, plan.requiredRoles.qa, plan.requiredRoles.integration];
 }
