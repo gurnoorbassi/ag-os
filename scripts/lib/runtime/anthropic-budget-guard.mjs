@@ -53,15 +53,13 @@ function recordDate(record) {
 
 function actualSpend(records, predicate) {
   return records
-    .filter((record) => !record.costLedgerId?.startsWith("cost-ledger-anthropic-budget-blocked-"))
-    .filter((record) => !record.costLedgerId?.startsWith("cost-ledger-anthropic-call-") || record.summary?.billingReconciled === false)
     .filter(predicate)
-    .reduce((total, record) => total + Number(record.summary?.actualTaskCostUsd || 0), 0);
+    .reduce((total, record) => total + (record.entries || []).filter((entry) => entry.costType === "actual" && entry.status === "recorded").reduce((sum, entry) => sum + Number(entry.amountUsd || 0), 0), 0);
 }
 
 function activeReservedSpend(records, predicate) {
   return records
-    .filter((record) => record.status === "active" && record.costLedgerId?.startsWith("cost-ledger-anthropic-call-"))
+    .filter((record) => record.status === "active" && /^cost-ledger-(?:anthropic|paid)-call-/.test(record.costLedgerId || ""))
     .filter(predicate)
     .reduce((total, record) => total + Number(record.entries?.[0]?.amountUsd || 0), 0);
 }
@@ -106,7 +104,58 @@ function buildBudgetRecord({ ledgerId, status, jobId, projectId, approvalId, est
 }
 
 function atOrOver(current, estimate, limit) {
-  return current >= limit || current + estimate >= limit;
+  return current >= limit || current + estimate > limit;
+}
+
+function reserveKnownCost({ kind, job, estimatedCostUsd, approvalId, approvalMaxUsd, root, now }) {
+  if (!job?.jobId || !job?.projectId) throw new Error("paid-call budget check requires a jobId and projectId");
+  if (!approvalId) throw new Error("paid-call budget check requires an exact approvalId");
+  const estimate = requirePositiveNumber(estimatedCostUsd, "paid-call estimated cost");
+  const limits = loadBudget(root);
+  const records = readCostRecords(root);
+  const day = isoTimestamp(now).slice(0, 10);
+  const month = day.slice(0, 7);
+  const sameTask = (record) => recordJobId(record) === job.jobId;
+  const sameDay = (record) => recordDate(record)?.toISOString().slice(0, 10) === day;
+  const sameMonth = (record) => recordDate(record)?.toISOString().slice(0, 7) === month;
+  const taskActualUsd = actualSpend(records, sameTask);
+  const dailyActualUsd = actualSpend(records, sameDay);
+  const monthlyActualUsd = actualSpend(records, sameMonth);
+  const taskCommittedUsd = taskActualUsd + activeReservedSpend(records, sameTask);
+  const dailyCommittedUsd = dailyActualUsd + activeReservedSpend(records, sameDay);
+  const monthlyCommittedUsd = monthlyActualUsd + activeReservedSpend(records, sameMonth);
+  const reasons = [];
+  if (atOrOver(taskCommittedUsd, estimate, limits.perTaskMax)) reasons.push("per-task budget cap reached");
+  if (atOrOver(dailyCommittedUsd, estimate, limits.dailyMax)) reasons.push("daily budget cap reached");
+  if (atOrOver(monthlyCommittedUsd, estimate, limits.monthlyMax)) reasons.push("monthly budget cap reached");
+  if (!Number.isFinite(Number(approvalMaxUsd)) || atOrOver(0, estimate, Number(approvalMaxUsd))) reasons.push("approval per-use budget cap reached");
+  const status = reasons.length ? "budget-blocked" : "call";
+  const ledgerId = `cost-ledger-paid-${status}-${slugify(kind)}-${slugify(job.jobId)}-${isoTimestamp(now).replace(/[^0-9]/g, "")}-${randomUUID().slice(0, 8)}`;
+  const recordPath = `.codex/costs/${ledgerId}.json`;
+  writeJson(recordPath, buildBudgetRecord({
+    ledgerId,
+    status: reasons.length ? "blocked" : "active",
+    jobId: job.jobId,
+    projectId: job.projectId,
+    approvalId,
+    estimatedCostUsd: estimate,
+    taskActualUsd,
+    dailyActualUsd,
+    monthlyActualUsd,
+    limits,
+    now
+  }), root);
+  if (reasons.length) {
+    const error = new Error(`paid ${kind} blocked by budget: ${reasons.join("; ")}`);
+    error.code = "blocked_budget";
+    error.result = { status: "blocked_budget", reasons, recordPath, estimatedCostUsd: estimate };
+    throw error;
+  }
+  return { recordPath, estimatedCostUsd: estimate };
+}
+
+export function reservePaidCallBudget(options) {
+  return reserveKnownCost({ ...options, root: options.root || process.cwd(), now: options.now || new Date() });
 }
 
 export function estimateAnthropicCallCostUsd({ requestBody, maxTokens, inputCostPerMillionUsd, outputCostPerMillionUsd }) {
@@ -226,3 +275,5 @@ export function finalizeAnthropicBudgetReservation({ reservation, consumed, actu
   writeJson(reservation.recordPath, updated, root);
   return updated;
 }
+
+export const finalizePaidCallBudgetReservation = finalizeAnthropicBudgetReservation;

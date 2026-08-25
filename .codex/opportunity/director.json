@@ -6,7 +6,7 @@
   "objectiveControlledBy": "owner-gurnoor-bassi",
   "constitutionVersion": "1.0.0",
   "constitutionHash": "f728a308641f4da6105448b8817b054699cec6a28d033873f908d02fc05e7f66",
-  "strategyVersion": "1.0.0",
+  "strategyVersion": "1.1.0",
   "createdAt": "2026-08-24T00:00:00.000Z",
   "updatedAt": "2026-08-24T00:00:00.000Z",
   "lastWakeAt": null,
@@ -29,10 +29,27 @@
     "researchRunUsd": 0.5,
     "deepInvestigationUsd": 1.5
   },
+  "discoveryLimits": {
+    "maxBroadSearchQueries": 8,
+    "maxSearchResultsConsidered": 60,
+    "maxPagesFetched": 20,
+    "maxPagesForSynthesis": 12,
+    "maxCandidateOpportunities": 10,
+    "maxDeepResearchOpportunities": 3,
+    "maxMeaningfulCyclesPerDay": 3,
+    "minimumCycleIntervalMinutes": 480,
+    "duplicateDominanceRatio": 0.75
+  },
   "modelConfig": {
     "provider": "deterministic_fixture",
     "liveProviderEnabled": false,
     "maximumReasoningCyclesPerWake": 1
+  },
+  "scheduler": {
+    "enabled": true,
+    "status": "idle",
+    "maximumMeaningfulCyclesPerDay": 3,
+    "minimumCycleIntervalMinutes": 480
   },
   "treasuryId": "opportunity-treasury-v1",
   "lastInputHash": null,

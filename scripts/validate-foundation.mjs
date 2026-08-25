@@ -164,7 +164,8 @@ const requiredPaths = [
   "schemas/opportunity-director.schema.json",
   "schemas/opportunity.schema.json",
   "schemas/opportunity-evidence.schema.json",
-  "schemas/opportunity-treasury.schema.json"
+  "schemas/opportunity-treasury.schema.json",
+  "schemas/opportunity-seed.schema.json"
 ];
 
 const forbiddenPatterns = [
@@ -300,6 +301,11 @@ const schemaValidatedRecordDirectories = [
     name: "opportunity evidence",
     recordDir: ".codex/opportunity/evidence",
     schemaPath: "schemas/opportunity-evidence.schema.json"
+  },
+  {
+    name: "opportunity owner seed",
+    recordDir: ".codex/opportunity/seeds",
+    schemaPath: "schemas/opportunity-seed.schema.json"
   },
   {
     name: "n8n plan",

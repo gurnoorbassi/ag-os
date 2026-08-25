@@ -22,6 +22,7 @@
     "opportunity:wake:fixture": "node scripts/run-opportunity-director.mjs --fixture fixtures/opportunity-director-v1-world.json",
     "opportunity:brief": "node scripts/run-opportunity-director.mjs --brief",
     "opportunity:verify": "node scripts/verify-opportunity-director.mjs",
+    "opportunity:verify:v1-1": "node --test tests/opportunity-director.test.mjs tests/anthropic-budget-guard.test.mjs",
     "audit:v1": "node scripts/audit-v1-completion.mjs",
     "production:check": "node scripts/check-production-readiness.mjs",
     "production:check:coordinator": "node scripts/check-production-readiness.mjs --record .codex/production/production-readiness-ag-os-coordinator-v1.json",

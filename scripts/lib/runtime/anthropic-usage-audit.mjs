@@ -5,7 +5,8 @@ import { writeAuditEventRecord } from "./audit-writer.mjs";
 const KIND_DETAILS = {
   planner: { action: "plan generation", scope: "anthropic_plan_generation" },
   worker: { action: "work-product generation", scope: "anthropic_work_product_generation" },
-  critic: { action: "deliverable critique", scope: "anthropic_deliverable_critique" }
+  critic: { action: "deliverable critique", scope: "anthropic_deliverable_critique" },
+  opportunity: { action: "Opportunity Director synthesis", scope: "anthropic_opportunity_synthesis" }
 };
 
 function calculateCost({ usage, inputCostPerMillionUsd, outputCostPerMillionUsd, reservation }) {

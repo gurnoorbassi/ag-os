@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { finalizeAnthropicBudgetReservation, reserveAnthropicBudget } from "../scripts/lib/runtime/anthropic-budget-guard.mjs";
+import { finalizeAnthropicBudgetReservation, finalizePaidCallBudgetReservation, reserveAnthropicBudget, reservePaidCallBudget } from "../scripts/lib/runtime/anthropic-budget-guard.mjs";
 import { createAnthropicPlanDraft } from "../scripts/lib/runtime/anthropic-planner.mjs";
 
 const sourceRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -112,4 +112,22 @@ test("independent daily Anthropic call-count breaker refuses the next call", () 
   }), (error) => error.code === "blocked_budget" && error.result.reasons.some((reason) => reason.includes("call-count")));
   const records = readdirSync(path.join(root, ".codex", "costs")).filter((name) => name.includes("anthropic-budget-blocked"));
   assert.equal(records.length, 1);
+});
+
+test("repeated individually cheap paid discovery wakes cannot exceed cumulative Cost OS", () => {
+  const root = budgetRoot();
+  writeFileSync(path.join(root, ".codex", "costs", "budget.json"), `${JSON.stringify({ limits: { perTaskMaxUsd: 1, dailyMaxUsd: 1, monthlyMaxUsd: 1 } })}\n`);
+  for (let index = 0; index < 2; index += 1) {
+    const reservation = reservePaidCallBudget({ kind: "opportunity-search", job: { jobId: `wake-${index}`, projectId: "opportunity" }, estimatedCostUsd: 0.4, approvalId: "approval-discovery", approvalMaxUsd: 0.5, root, now });
+    finalizePaidCallBudgetReservation({ reservation, consumed: true, actualCostUsd: 0.4, root, now });
+  }
+  assert.throws(() => reservePaidCallBudget({ kind: "opportunity-search", job: { jobId: "wake-3", projectId: "opportunity" }, estimatedCostUsd: 0.4, approvalId: "approval-discovery", approvalMaxUsd: 0.5, root, now }), (error) => error.code === "blocked_budget" && error.result.reasons.some((reason) => reason.includes("daily")) && error.result.reasons.some((reason) => reason.includes("monthly")));
+});
+
+test("active paid discovery reservations prevent concurrent budget overbooking", () => {
+  const root = budgetRoot();
+  writeFileSync(path.join(root, ".codex", "costs", "budget.json"), `${JSON.stringify({ limits: { perTaskMaxUsd: 1, dailyMaxUsd: 0.5, monthlyMaxUsd: 5 } })}\n`);
+  const first = reservePaidCallBudget({ kind: "opportunity-search", job: { jobId: "parallel-a", projectId: "opportunity" }, estimatedCostUsd: 0.3, approvalId: "approval-discovery", approvalMaxUsd: 0.5, root, now });
+  assert.throws(() => reservePaidCallBudget({ kind: "opportunity-search", job: { jobId: "parallel-b", projectId: "opportunity" }, estimatedCostUsd: 0.3, approvalId: "approval-discovery", approvalMaxUsd: 0.5, root, now }), (error) => error.code === "blocked_budget" && error.result.reasons.some((reason) => reason.includes("daily")));
+  finalizePaidCallBudgetReservation({ reservation: first, consumed: false, root, now });
 });
