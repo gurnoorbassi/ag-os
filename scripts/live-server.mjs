@@ -34,7 +34,12 @@ import { recordExternalEvidence } from "./lib/runtime/external-evidence-service.
 import { cancelMission, createMission, listMissions, missionDetail, runMission } from "./lib/runtime/mission-runtime.mjs";
 import { listMissionAgents, listMissionHandoffs, listMissionTasks, missionPaths, readMissionEvents } from "./lib/runtime/mission-store.mjs";
 import { createAnthropicAgentProvider } from "./lib/runtime/anthropic-agent-provider.mjs";
-import { applyOpportunityOwnerAction, getOpportunityDirectorSnapshot, spawnMissionForOpportunity } from "./lib/runtime/opportunity-director.mjs";
+import { DEFAULT_OWNER_ID } from "./lib/runtime/common.mjs";
+import { applyOpportunityOwnerAction, confirmNetworkRelationship, getOpportunityDirectorSnapshot, spawnMissionForOpportunity, writeOutcome, writeOwnerDiscoverySeed } from "./lib/runtime/opportunity-director.mjs";
+import { createLiveResearchProvider } from "./lib/runtime/opportunity-research.mjs";
+import { createAnthropicOpportunitySynthesizer } from "./lib/runtime/anthropic-opportunity-synthesizer.mjs";
+import { evaluateOpportunityLiveReadiness } from "./lib/runtime/opportunity-live-readiness.mjs";
+import { runOpportunityDirectorSchedulerTick } from "./lib/runtime/opportunity-scheduler.mjs";
 import {
   buildOwnerSessionCookie,
   clearOwnerSessionCookie,
@@ -60,6 +65,7 @@ const ownerSessionDays = Number.isInteger(configuredSessionDays) && configuredSe
 const allowedOrigin = process.env.AG_OS_ALLOWED_ORIGIN || "";
 const loginRateLimiter = createLoginRateLimiter();
 const activeMissionRuns = new Map();
+let activeOpportunityWake = null;
 
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
@@ -89,6 +95,51 @@ async function runAutomaticQueue() {
     console.error(JSON.stringify({ service: "ag-os-coordinator", event: "automatic-run-failed", detail: error.message }));
     return { status: "failed", processed: [], error: error.message };
   }
+}
+
+function opportunityLiveRuntime() {
+  const readiness = evaluateOpportunityLiveReadiness({ root, env: process.env });
+  if (!readiness.ready) return { readiness, provider: null, synthesisProvider: null, researchApproval: null };
+  const provider = createLiveResearchProvider({
+    endpoint: process.env.AG_OS_OPPORTUNITY_SEARCH_ENDPOINT,
+    credential: process.env.AG_OS_OPPORTUNITY_SEARCH_KEY,
+    costPerSearchUsd: readiness.costPerSearchUsd,
+    timeoutMs: Number(process.env.AG_OS_OPPORTUNITY_RESEARCH_TIMEOUT_MS || 15_000)
+  });
+  const synthesisProvider = readiness.anthropicReady ? createAnthropicOpportunitySynthesizer({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+    model: readiness.anthropic.model,
+    approvalId: readiness.anthropic.approvalId,
+    approvalMaxUsd: Number(readiness.anthropic.approvalBudgetMaxUsd),
+    inputCostPerMillionUsd: Number(process.env.ANTHROPIC_INPUT_COST_PER_MILLION_USD),
+    outputCostPerMillionUsd: Number(process.env.ANTHROPIC_OUTPUT_COST_PER_MILLION_USD),
+    root,
+    env: process.env
+  }) : null;
+  const researchApproval = readiness.costPerSearchUsd > 0 ? { approvalId: readiness.approvalId, maxUsd: Math.min(1.5, Number(readiness.approvalBudgetMaxUsd)) } : null;
+  return { readiness, provider, synthesisProvider, researchApproval };
+}
+
+async function runOpportunityScheduler({ manual = false } = {}) {
+  if (activeOpportunityWake) return activeOpportunityWake;
+  const runtime = opportunityLiveRuntime();
+  const operation = runOpportunityDirectorSchedulerTick({ root, provider: runtime.provider, synthesisProvider: runtime.synthesisProvider, researchApproval: runtime.researchApproval, manual })
+    .finally(() => { activeOpportunityWake = null; });
+  activeOpportunityWake = operation;
+  return operation;
+}
+
+async function runScheduledOpportunityDiscovery() {
+  try { return await runOpportunityScheduler({ manual: false }); }
+  catch (error) {
+    console.error(JSON.stringify({ service: "ag-os-coordinator", event: "opportunity-discovery-failed", detail: error.message }));
+    return { status: "failed", error: error.message };
+  }
+}
+
+function publicOpportunityReadiness() {
+  const readiness = evaluateOpportunityLiveReadiness({ root, env: process.env });
+  return { ready: readiness.ready, enabled: readiness.enabled, provider: readiness.provider, endpointConfigured: readiness.endpointConfigured, credentialConfigured: readiness.credentialConfigured, paidProvider: Number(readiness.costPerSearchUsd || 0) > 0, anthropicEnabled: readiness.anthropicEnabled, anthropicReady: readiness.anthropicReady, blockers: readiness.blockers };
 }
 
 function json(response, status, body, extraHeaders = {}) {
@@ -586,6 +637,7 @@ const server = createServer(async (request, response) => {
         aiPlanner: publicAiPlannerStatus(),
         aiWorker: publicAiWorkerStatus(),
         aiCritic: publicAiCriticStatus(),
+        opportunityDiscovery: publicOpportunityReadiness(),
         mobileApprovals: mobileApprovalReadiness(),
         projects: listProjects({ root }),
         operatingSystems: getOperatingSystems({ root }),
@@ -605,6 +657,42 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "POST" && url.pathname === "/api/v1/opportunity/wake") {
+      const readiness = publicOpportunityReadiness();
+      if (!readiness.ready) { json(response, 409, { error: "opportunity_discovery_not_ready", readiness }, headers); return; }
+      const result = await runOpportunityScheduler({ manual: true });
+      refreshProposals({ root });
+      json(response, 200, { wake: result.wake, schedule: result.schedule, opportunityCount: result.opportunities.length, externalActionExecuted: false }, headers);
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/v1/opportunity/seeds") {
+      const body = await readJsonBody(request);
+      const seed = writeOwnerDiscoverySeed({ seed: { type: body.type, value: body.value }, actorId: DEFAULT_OWNER_ID, root });
+      json(response, 201, { seed, permissionGranted: false, externalActionExecuted: false }, headers);
+      return;
+    }
+
+    const relationshipMatch = url.pathname.match(/^\/api\/v1\/opportunity\/people\/([^/]+)\/relationship$/);
+    if (request.method === "POST" && relationshipMatch) {
+      const body = await readJsonBody(request);
+      const personId = decodeURIComponent(relationshipMatch[1]);
+      if (body.confirmation !== `CONFIRM RELATIONSHIP ${personId} ${body.relationshipState}`) throw new Error(`confirmation must equal CONFIRM RELATIONSHIP ${personId} ${body.relationshipState}`);
+      const person = confirmNetworkRelationship({ personId, relationshipState: body.relationshipState, introductionPersonIds: body.introductionPersonIds || [], actorId: DEFAULT_OWNER_ID, root });
+      json(response, 200, { person, externalActionExecuted: false }, headers);
+      return;
+    }
+
+    const opportunityOutcomeMatch = url.pathname.match(/^\/api\/v1\/opportunities\/([^/]+)\/outcomes$/);
+    if (request.method === "POST" && opportunityOutcomeMatch) {
+      const body = await readJsonBody(request);
+      const opportunityId = decodeURIComponent(opportunityOutcomeMatch[1]);
+      if (body.confirmation !== `RECORD ${opportunityId} ${body.type}`) throw new Error(`confirmation must equal RECORD ${opportunityId} ${body.type}`);
+      const result = writeOutcome({ outcome: { opportunityId, type: body.type, valueUsd: body.valueUsd, ownerConfirmed: true, evidenceIds: body.evidenceIds || [], note: body.note || "" }, root });
+      json(response, 201, { outcome: result.record, externalActionExecuted: false }, headers);
+      return;
+    }
+
     const opportunityMatch = url.pathname.match(/^\/api\/v1\/opportunities\/([^/]+)$/);
     if (request.method === "GET" && opportunityMatch) {
       const snapshot = getOpportunityDirectorSnapshot({ root });
@@ -615,6 +703,7 @@ const server = createServer(async (request, response) => {
         opportunity,
         people: snapshot.people.filter((item) => item.relatedOpportunityIds?.includes(opportunityId)),
         experiments: snapshot.experiments.filter((item) => item.opportunityId === opportunityId),
+        outcomes: snapshot.outcomes.filter((item) => item.opportunityId === opportunityId),
         activity: snapshot.activity.filter((item) => item.subjectId === opportunityId),
         missionLinks: snapshot.missionLinks.filter((item) => item.opportunityId === opportunityId)
       }, headers);
@@ -986,6 +1075,12 @@ if (isMain) {
         intervalMs: configuredInterval,
         onError: (error) => console.error(JSON.stringify({ service: "ag-os-coordinator", event: "internal-watchdog-failed", detail: error.message }))
       });
+    }
+    if (process.env.AG_OS_OPPORTUNITY_SCHEDULER_ENABLED === "true") {
+      const configuredInterval = Number(process.env.AG_OS_OPPORTUNITY_SCHEDULER_TICK_MS || 300_000);
+      const intervalMs = Number.isInteger(configuredInterval) && configuredInterval >= 60_000 ? configuredInterval : 300_000;
+      setImmediate(runScheduledOpportunityDiscovery);
+      setInterval(runScheduledOpportunityDiscovery, intervalMs).unref();
     }
   });
 }

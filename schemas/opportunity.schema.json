@@ -19,6 +19,11 @@
     "scoreBreakdown": { "type": "object" },
     "confidence": { "type": "number", "minimum": 0, "maximum": 100 },
     "economicModel": { "type": "object" },
+    "validationActionClass": { "type": "string", "enum": ["read_only_research", "outreach", "publish", "paid_ad", "contract", "account_creation", "external_change"] },
+    "researchSpendUsd": { "type": "number", "minimum": 0 },
+    "provenance": { "type": "string", "enum": ["fixture", "live_public_research"] },
+    "sourceUrls": { "type": "array", "items": { "type": "string", "format": "uri" } },
+    "evidenceFreshAt": { "type": "string", "format": "date-time" },
     "stopConditions": { "type": "array", "items": { "type": "string" } },
     "createdAt": { "type": "string", "format": "date-time" },
     "updatedAt": { "type": "string", "format": "date-time" }

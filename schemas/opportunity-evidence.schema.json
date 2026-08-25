@@ -10,7 +10,12 @@
     "sourceType": { "type": "string", "minLength": 1 },
     "sourceUrl": { "type": "string", "format": "uri" },
     "capturedAt": { "type": "string", "format": "date-time" },
+    "fetchedAt": { "type": "string", "format": "date-time" },
     "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "relevantClaims": { "type": "array", "items": { "type": "object" } }
+    "relevantClaims": { "type": "array", "items": { "type": "object" } },
+    "provenance": { "type": "string", "enum": ["fixture", "live_public_research"] },
+    "providerMode": { "type": "string", "enum": ["deterministic_fixture", "live_read_only"] },
+    "liveProviderUsed": { "type": "boolean" },
+    "privateCustomerDataUsed": { "const": false }
   }
 }

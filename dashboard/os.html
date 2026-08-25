@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b0a08">
   <title>AG OS — Owner Console</title>
-  <link rel="stylesheet" href="os.css?v=20260824-opportunity-v1">
+  <link rel="stylesheet" href="os.css?v=20260825-opportunity-v1-1">
 </head>
 <body>
   <header class="os-topbar">
@@ -103,7 +103,9 @@
         </div>
         <div class="director-state">
           <span id="director-status" class="status-chip dim">Waiting</span>
+          <span id="director-provenance" class="status-chip dim">FIXTURE</span>
           <span id="director-last-wake" class="state-line">No wake recorded</span>
+          <div class="director-owner-controls"><button id="director-seed" class="quiet-button" type="button">Seed curiosity</button><button id="director-wake" class="quiet-button" type="button">Wake now</button></div>
         </div>
       </header>
       <nav id="director-tabs" class="director-tabs" aria-label="Opportunity Director views">
@@ -200,6 +202,6 @@
     </form>
   </dialog>
 
-  <script src="os.js?v=20260824-opportunity-v1"></script>
+  <script src="os.js?v=20260825-opportunity-v1-1"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
   "title": "AG OS Opportunity Director",
   "type": "object",
   "additionalProperties": true,
-  "required": ["directorId", "status", "objective", "objectiveControlledBy", "constitutionVersion", "constitutionHash", "researchLimits", "modelConfig", "safeguards", "createdAt", "updatedAt"],
+  "required": ["directorId", "status", "objective", "objectiveControlledBy", "constitutionVersion", "constitutionHash", "researchLimits", "discoveryLimits", "modelConfig", "scheduler", "safeguards", "createdAt", "updatedAt"],
   "properties": {
     "directorId": { "type": "string", "pattern": "^opportunity-director-[a-z0-9-]+$" },
     "status": { "type": "string", "enum": ["active", "paused"] },
@@ -13,7 +13,33 @@
     "constitutionVersion": { "type": "string", "minLength": 1 },
     "constitutionHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
     "researchLimits": { "type": "object" },
+    "discoveryLimits": {
+      "type": "object",
+      "required": ["maxBroadSearchQueries", "maxSearchResultsConsidered", "maxPagesFetched", "maxPagesForSynthesis", "maxCandidateOpportunities", "maxDeepResearchOpportunities", "maxMeaningfulCyclesPerDay", "minimumCycleIntervalMinutes", "duplicateDominanceRatio"],
+      "properties": {
+        "maxBroadSearchQueries": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "maxSearchResultsConsidered": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "maxPagesFetched": { "type": "integer", "minimum": 1, "maximum": 30 },
+        "maxPagesForSynthesis": { "type": "integer", "minimum": 1, "maximum": 16 },
+        "maxCandidateOpportunities": { "type": "integer", "minimum": 1, "maximum": 15 },
+        "maxDeepResearchOpportunities": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "maxMeaningfulCyclesPerDay": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "minimumCycleIntervalMinutes": { "type": "integer", "minimum": 1 },
+        "duplicateDominanceRatio": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
     "modelConfig": { "type": "object" },
+    "scheduler": {
+      "type": "object",
+      "required": ["enabled", "status", "maximumMeaningfulCyclesPerDay", "minimumCycleIntervalMinutes"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["idle", "researching", "synthesizing", "blocked"] },
+        "maximumMeaningfulCyclesPerDay": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "minimumCycleIntervalMinutes": { "type": "integer", "minimum": 1 },
+        "lastMeaningfulCycleAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
     "safeguards": { "type": "object" },
     "createdAt": { "type": "string", "format": "date-time" },
     "updatedAt": { "type": "string", "format": "date-time" }

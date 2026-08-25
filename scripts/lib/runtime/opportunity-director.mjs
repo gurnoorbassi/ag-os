@@ -11,6 +11,7 @@ import {
   assertTacticalRuleBoundary
 } from "./opportunity-constitution.mjs";
 import { normalizedEvidenceFromPage, runDeterministicResearchWorker } from "./opportunity-research.mjs";
+import { DEFAULT_DISCOVERY_LIMITS, discoveryInputHash, executePublicDiscovery } from "./opportunity-discovery.mjs";
 
 export const OPPORTUNITY_TYPES = Object.freeze([
   "revenue_client", "business_problem", "strategic_relationship", "partnership", "market", "product",
@@ -54,7 +55,8 @@ const PATHS = Object.freeze({
   wakes: `${ROOT}/wakes`,
   briefs: `${ROOT}/briefs`,
   treasury: `${ROOT}/treasury`,
-  missionLinks: `${ROOT}/mission-links`
+  missionLinks: `${ROOT}/mission-links`,
+  seeds: `${ROOT}/seeds`
 });
 
 function bounded(value, maximum, label) {
@@ -66,6 +68,12 @@ function bounded(value, maximum, label) {
 function money(value) {
   const number = Number(value ?? 0);
   if (!Number.isFinite(number) || number < 0) throw new Error("money values must be finite and non-negative");
+  return Number(number.toFixed(6));
+}
+
+function signedMoney(value) {
+  const number = Number(value ?? 0);
+  if (!Number.isFinite(number)) throw new Error("signed money values must be finite");
   return Number(number.toFixed(6));
 }
 
@@ -117,7 +125,22 @@ export function createOpportunityDirector({
   securityBoundaryPresent(root);
   const timestamp = isoTimestamp(now);
   const existing = existsSync(path.join(root, PATHS.director)) ? readJson(PATHS.director, root) : null;
-  if (existing) return assertConstitutionReference(existing);
+  if (existing) {
+    const current = assertConstitutionReference(existing);
+    const normalized = {
+      ...current,
+      strategyVersion: current.strategyVersion === "1.0.0" ? "1.1.0" : current.strategyVersion,
+      discoveryLimits: current.discoveryLimits || DEFAULT_DISCOVERY_LIMITS,
+      scheduler: current.scheduler || {
+        enabled: true,
+        status: "idle",
+        maximumMeaningfulCyclesPerDay: DEFAULT_DISCOVERY_LIMITS.maxMeaningfulCyclesPerDay,
+        minimumCycleIntervalMinutes: DEFAULT_DISCOVERY_LIMITS.minimumCycleIntervalMinutes
+      }
+    };
+    if (JSON.stringify(normalized) !== JSON.stringify(current)) writeJson(PATHS.director, normalized, root);
+    return normalized;
+  }
   const record = {
     directorId: "opportunity-director-ag-digitalz-v1",
     name: "Opportunity Director",
@@ -126,7 +149,7 @@ export function createOpportunityDirector({
     objectiveControlledBy: DEFAULT_OWNER_ID,
     constitutionVersion: OPPORTUNITY_CONSTITUTION_VERSION,
     constitutionHash: OPPORTUNITY_CONSTITUTION_HASH,
-    strategyVersion: "1.0.0",
+    strategyVersion: "1.1.0",
     createdAt: timestamp,
     updatedAt: timestamp,
     lastWakeAt: null,
@@ -136,7 +159,9 @@ export function createOpportunityDirector({
     currentTheses: [],
     scoreWeights: OPPORTUNITY_SCORE_MAXIMA,
     researchLimits: DEFAULT_RESEARCH_LIMITS,
+    discoveryLimits: DEFAULT_DISCOVERY_LIMITS,
     modelConfig: { provider: "deterministic_fixture", liveProviderEnabled: false, maximumReasoningCyclesPerWake: 1 },
+    scheduler: { enabled: true, status: "idle", maximumMeaningfulCyclesPerDay: DEFAULT_DISCOVERY_LIMITS.maxMeaningfulCyclesPerDay, minimumCycleIntervalMinutes: DEFAULT_DISCOVERY_LIMITS.minimumCycleIntervalMinutes },
     treasuryId: "opportunity-treasury-v1",
     lastInputHash: null,
     safeguards: {
@@ -279,6 +304,38 @@ export function writeNetworkPerson({ person, root = process.cwd() }) {
   return writeRecord(PATHS.people, person.personId, { ...person, sensitivePersonalData: false }, root);
 }
 
+export function confirmNetworkRelationship({ personId, relationshipState, introductionPersonIds = [], actorId, root = process.cwd(), now = new Date() }) {
+  if (actorId !== DEFAULT_OWNER_ID) throw new Error("only the owner can confirm network relationships");
+  if (!["contacted", "known", "warm", "trusted"].includes(relationshipState)) throw new Error("relationship confirmation state is invalid");
+  const filePath = `${PATHS.people}/${slugify(personId)}.json`;
+  const person = readJson(filePath, root);
+  const updated = {
+    ...person,
+    relationshipState,
+    ownerConfirmed: true,
+    connectionSource: introductionPersonIds.length ? "introduction" : person.connectionSource,
+    warmPathPersonIds: [...new Set(introductionPersonIds)],
+    updatedAt: isoTimestamp(now)
+  };
+  writeNetworkPerson({ person: updated, root });
+  return updated;
+}
+
+export function writeOwnerDiscoverySeed({ seed, actorId, root = process.cwd(), now = new Date() }) {
+  if (actorId !== DEFAULT_OWNER_ID) throw new Error("only the owner can seed Opportunity Director discovery");
+  const types = ["company", "person", "industry", "problem", "url", "observation", "idea"];
+  if (!types.includes(seed?.type)) throw new Error("owner discovery seed type is invalid");
+  const value = String(seed.value || "").trim();
+  if (value.length < 2 || value.length > 500) throw new Error("owner discovery seed must be 2 to 500 characters");
+  if (seed.type === "url") {
+    const url = new URL(value);
+    if (url.protocol !== "https:" || url.username || url.password) throw new Error("owner discovery URL must be public HTTPS");
+  }
+  const seedId = seed.seedId || nextId("opportunity-seed", now, `${seed.type}-${stableHash(value).slice(0, 10)}`);
+  const record = { seedId, type: seed.type, value, status: "active", ownerId: actorId, createdAt: isoTimestamp(now), updatedAt: isoTimestamp(now), privateCustomerDataUsed: false };
+  return writeRecord(PATHS.seeds, seedId, record, root).record;
+}
+
 export function initializeTreasury({ treasuryId = "opportunity-treasury-v1", startingCapital = 0, root = process.cwd(), now = new Date() } = {}) {
   const filePath = `${PATHS.treasury}/${slugify(treasuryId)}.json`;
   if (existsSync(path.join(root, filePath))) return readJson(filePath, root);
@@ -331,7 +388,7 @@ export function applyTreasuryTransaction({ transaction, root = process.cwd(), no
   next.reservedCapital = money(next.reservedCapital);
   next.spentCapital = money(next.spentCapital);
   next.revenueAttributed = money(next.revenueAttributed);
-  next.netContribution = money(Math.max(0, next.revenueAttributed - next.spentCapital));
+  next.netContribution = signedMoney(next.revenueAttributed - next.spentCapital);
   next.transactions.push({
     transactionId: transaction.transactionId || nextId("treasury-transaction", now),
     ...transaction,
@@ -347,7 +404,7 @@ export function applyTreasuryTransaction({ transaction, root = process.cwd(), no
 
 export function writeExperiment({ experiment, root = process.cwd() }) {
   if (!experiment?.experimentId || !experiment.opportunityId || !experiment.hypothesis || !experiment.successMetric || !experiment.stopConditions?.length) throw new Error("experiment requires hypothesis, metric, and stop conditions");
-  const protectedActions = ["outreach", "publish", "paid_ad", "contract", "account_creation"];
+  const protectedActions = ["outreach", "publish", "paid_ad", "contract", "account_creation", "external_change"];
   const requiresOwnerApproval = protectedActions.includes(experiment.actionClass);
   return writeRecord(PATHS.experiments, experiment.experimentId, {
     ...experiment,
@@ -360,9 +417,9 @@ export function writeExperiment({ experiment, root = process.cwd() }) {
 }
 
 export function writeOutcome({ outcome, root = process.cwd(), now = new Date() }) {
-  const types = ["no_signal", "positive_signal", "conversation", "meeting", "proposal", "won", "lost", "revenue", "introduction", "relationship_formed", "experiment_success", "experiment_failure", "invalid_hypothesis"];
+  const types = ["no_signal", "positive_signal", "contacted", "replied", "conversation", "meeting", "proposal", "won", "lost", "revenue", "introduction", "relationship_formed", "experiment_success", "experiment_failure", "invalid_hypothesis"];
   if (!types.includes(outcome?.type) || !outcome.opportunityId) throw new Error("opportunity outcome is invalid");
-  const factual = ["conversation", "meeting", "proposal", "won", "revenue", "introduction", "relationship_formed"];
+  const factual = ["contacted", "replied", "conversation", "meeting", "proposal", "won", "revenue", "introduction", "relationship_formed"];
   if (factual.includes(outcome.type) && (outcome.ownerConfirmed !== true || !(outcome.evidenceIds || []).length)) throw new Error(`${outcome.type} requires owner confirmation and evidence`);
   const record = {
     outcomeId: outcome.outcomeId || nextId("opportunity-outcome", now),
@@ -435,6 +492,7 @@ function opportunityFromEntity({ entity, evidence, researchRuns, now }) {
     market: entity.market || null,
     problemHypothesis: entity.problemHypothesis,
     observations,
+    hypotheses: entity.assumptions || [],
     assumptions: (entity.assumptions || []).map((statement) => ({ kind: "hypothesis", statement })),
     signals: entity.signals || [],
     evidenceIds: evidence.map((item) => item.evidenceId),
@@ -464,16 +522,107 @@ function opportunityFromEntity({ entity, evidence, researchRuns, now }) {
     relatedPeople: entity.people?.map((person) => person.personId) || [],
     relatedOpportunities: [],
     researchRunIds: researchRuns.map((run) => run.researchRunId),
-    researchSpendUsd: money(researchRuns.reduce((sum, run) => sum + Number(run.costUsd || 0), 0)),
+    researchSpendUsd: money(researchRuns.reduce((sum, run) => sum + Number(run.costUsd || 0), 0) + Number(entity.allocatedResearchCostUsd || 0)),
+    provenance: evidence.some((item) => item.provenance === "live_public_research") ? "live_public_research" : "fixture",
+    sourceUrls: [...new Set(evidence.map((item) => item.sourceUrl))],
+    evidenceFreshAt: evidence.map((item) => item.fetchedAt || item.capturedAt).filter(Boolean).sort().at(-1) || isoTimestamp(now),
     createdAt: isoTimestamp(now),
     updatedAt: isoTimestamp(now)
   };
 }
 
-export async function runOpportunityWake({ trigger = "scheduled_tick", fixture = null, root = process.cwd(), now = new Date(), reasoningProvider = null } = {}) {
+async function runPublicDiscoveryWake({ trigger, director, researchProvider, synthesisProvider, researchApproval, discoveryLimits, root, now, signal }) {
+  const timestamp = isoTimestamp(now);
+  const seeds = recordList(PATHS.seeds, root).map(({ record }) => record).filter((item) => item.status === "active");
+  const existingOpportunities = recordList(PATHS.opportunities, root).map(({ record }) => record);
+  const existingEvidence = recordList(PATHS.evidence, root).map(({ record }) => record);
+  const inputHash = discoveryInputHash({ objective: director.objective, theses: director.currentTheses, seeds: seeds.map(({ type, value }) => ({ type, value })), watches: existingOpportunities.filter((item) => item.status === "watching").map(({ opportunityId, updatedAt }) => ({ opportunityId, updatedAt })) });
+  const wakeId = nextId("opportunity-wake", now, `${trigger}-${inputHash.slice(0, 8)}`);
+  writeRecord(PATHS.wakes, wakeId, {
+    wakeId, startedAt: timestamp, trigger, inputsChanged: [inputHash], providerMode: researchProvider.mode, provider: researchProvider.name || researchProvider.mode,
+    queries: [], pagesFetched: 0, modelUsed: null, modelCalls: 0, modelCost: 0, researchCost: 0, decisions: [], opportunitiesCreated: [], opportunitiesKilled: [], proposalsCreated: [], researchRunsStarted: [],
+    status: "researching", liveProviderUsed: researchProvider.mode === "live_read_only", externalActionExecuted: false, privateCustomerDataUsed: false, completedAt: null
+  }, root);
+  writeJson(PATHS.director, { ...director, scheduler: { ...(director.scheduler || {}), status: "researching" }, updatedAt: timestamp }, root);
+  try {
+    const discovery = await executePublicDiscovery({
+      director,
+      provider: researchProvider,
+      synthesisProvider,
+      existingOpportunities,
+      existingEvidence,
+      seeds,
+      limits: discoveryLimits || director.discoveryLimits || DEFAULT_DISCOVERY_LIMITS,
+      approval: researchApproval,
+      root,
+      now,
+      signal,
+      onStage: (status) => writeJson(PATHS.director, { ...director, scheduler: { ...(director.scheduler || {}), status }, updatedAt: isoTimestamp(now) }, root)
+    });
+    for (const evidence of discovery.evidence) writeEvidence({ evidence, root });
+    for (const run of discovery.researchRuns) writeRecord(PATHS.researchRuns, `${run.researchRunId}-${wakeId}`, { ...run, researchRunId: `${run.researchRunId}-${wakeId}`, providerMode: discovery.mode, liveProviderUsed: discovery.liveProviderUsed }, root);
+    const allocatedResearchCostUsd = discovery.candidates.length ? (discovery.providerCostUsd + discovery.modelCostUsd) / discovery.candidates.length : 0;
+    const candidateOpportunities = discovery.candidates.map((candidate) => {
+      const evidence = candidate.evidenceIds.map((id) => discovery.evidence.find((item) => item.evidenceId === id)).filter(Boolean);
+      const runs = discovery.researchRuns.filter((run) => run.entity === (candidate.organization || candidate.title));
+      const opportunity = opportunityFromEntity({ entity: { ...candidate, allocatedResearchCostUsd }, evidence, researchRuns: runs, now });
+      for (const person of candidate.people || []) {
+        writeNetworkPerson({ person: {
+          personId: `person-${slugify(`${person.name}-${person.organization}`)}`, name: person.name, organization: person.organization, publicRole: person.publicRole,
+          publicSourceUrls: [...new Set(person.sourceUrls)], relationshipState: "identified", connectionSource: "public_professional", whyRelevant: person.whyRelevant,
+          relatedOpportunityIds: [opportunity.opportunityId], ownerNotes: "", lastInteractionAt: null, nextFollowupAt: null, warmPathPersonIds: [], ownerConfirmed: false,
+          createdAt: isoTimestamp(now), updatedAt: isoTimestamp(now)
+        }, root });
+      }
+      return opportunity;
+    });
+    const opportunities = dedupeOpportunities([...existingOpportunities, ...candidateOpportunities]);
+    const decisions = [];
+    for (const opportunity of opportunities) {
+      writeOpportunity({ opportunity, root });
+      if (!candidateOpportunities.some((item) => stableOpportunityKey(item) === stableOpportunityKey(opportunity))) continue;
+      const decisionType = opportunity.status === "killed" ? "kill" : opportunity.status === "validation_ready" ? "prepare_validation" : "watch";
+      decisions.push(createOpportunityDecision({
+        wakeId, decisionType, subjectId: opportunity.opportunityId, summary: `${opportunity.title} moved to ${opportunity.status}.`, evidenceIds: opportunity.evidenceIds,
+        alternativesConsidered: ["research_deeper", "watch", "kill", "prepare_validation"], chosenAction: opportunity.status,
+        reasonSummary: opportunity.status === "killed" ? "Public evidence, access, economics, or skeptic findings did not justify more work." : "Normalized public evidence, explicit assumptions, deterministic scoring, and skeptic findings support this state.",
+        scoreBefore: null, scoreAfter: opportunity.score, confidence: opportunity.confidence, estimatedCost: opportunity.estimatedValidationCost, actualCost: opportunity.researchSpendUsd, root, now
+      }));
+    }
+    const wake = {
+      wakeId, startedAt: timestamp, trigger, inputsChanged: [inputHash], providerMode: discovery.mode, provider: discovery.provider,
+      queries: discovery.queries, resultsConsidered: discovery.resultsConsidered, pagesFetched: discovery.pagesFetched, duplicateRatio: discovery.duplicateRatio,
+      modelUsed: discovery.model, modelCalls: discovery.model ? 1 : 0, modelCost: discovery.modelCostUsd, researchCost: discovery.providerCostUsd,
+      decisions: decisions.map((item) => item.decisionId), opportunitiesCreated: candidateOpportunities.map((item) => item.opportunityId), opportunitiesKilled: candidateOpportunities.filter((item) => item.status === "killed").map((item) => item.opportunityId),
+      proposalsCreated: candidateOpportunities.filter((item) => item.status === "validation_ready").map((item) => `proposal-opportunity-validation-${slugify(item.opportunityId)}`),
+      researchRunsStarted: discovery.researchRuns.map((item) => `${item.researchRunId}-${wakeId}`), failures: discovery.failures,
+      status: discovery.evidence.length === 0 ? "skipped_no_change" : "complete", liveProviderUsed: discovery.liveProviderUsed, externalActionExecuted: false, privateCustomerDataUsed: false, completedAt: isoTimestamp(now)
+    };
+    writeRecord(PATHS.wakes, wakeId, wake, root);
+    const ranked = opportunities.filter((item) => item.status !== "killed").sort((a, b) => b.score - a.score);
+    writeJson(PATHS.director, {
+      ...director, lastWakeAt: timestamp, lastReasoningWakeAt: wake.modelCalls ? timestamp : director.lastReasoningWakeAt, wakeCount: director.wakeCount + 1,
+      currentFocus: ranked[0]?.title || director.currentFocus, currentTheses: ranked.slice(0, 5).map((item) => item.problemHypothesis), lastInputHash: inputHash,
+      scheduler: { ...(director.scheduler || {}), status: "idle", lastMeaningfulCycleAt: discovery.evidence.length ? timestamp : director.scheduler?.lastMeaningfulCycleAt || null }, updatedAt: timestamp
+    }, root);
+    generateDailyBrief({ root, now });
+    return { wake, opportunities: candidateOpportunities, researchRuns: discovery.researchRuns, decisions, modelCalls: wake.modelCalls, discovery };
+  } catch (error) {
+    writeRecord(PATHS.wakes, wakeId, {
+      wakeId, startedAt: timestamp, trigger, inputsChanged: [inputHash], providerMode: researchProvider.mode, provider: researchProvider.name || researchProvider.mode,
+      queries: [], pagesFetched: 0, modelUsed: null, modelCalls: 0, modelCost: 0, researchCost: 0, decisions: [], opportunitiesCreated: [], opportunitiesKilled: [], proposalsCreated: [], researchRunsStarted: [],
+      status: "blocked", blockers: [String(error.message)], liveProviderUsed: researchProvider.mode === "live_read_only", externalActionExecuted: false, privateCustomerDataUsed: false, completedAt: isoTimestamp(now)
+    }, root);
+    writeJson(PATHS.director, { ...director, lastWakeAt: timestamp, wakeCount: director.wakeCount + 1, scheduler: { ...(director.scheduler || {}), status: "blocked" }, updatedAt: timestamp }, root);
+    throw error;
+  }
+}
+
+export async function runOpportunityWake({ trigger = "scheduled_tick", fixture = null, root = process.cwd(), now = new Date(), reasoningProvider = null, researchProvider = null, researchApproval = null, discoveryLimits = null, signal = null } = {}) {
   securityBoundaryPresent(root);
   const director = createOpportunityDirector({ root, now });
   if (director.status !== "active") throw new Error("Opportunity Director is paused");
+  if (!fixture && researchProvider) return runPublicDiscoveryWake({ trigger, director, researchProvider, synthesisProvider: reasoningProvider, researchApproval, discoveryLimits, root, now, signal });
   const inputDescriptor = fixture ? { worldId: fixture.worldId, revision: fixture.revision, entities: fixture.entities } : { worldId: "no-input", revision: 0, entities: [] };
   const inputHash = stableHash(inputDescriptor);
   const wakeId = nextId("opportunity-wake", now, `${trigger}-${inputHash.slice(0, 8)}`);
@@ -568,7 +717,7 @@ export function createValidationExperimentForOpportunity({ opportunityId, root =
     successMetric: "Observe the fixture-defined real-world signal without treating outreach or build completion as proof.", baseline: "No validated signal yet",
     target: "At least one owner-confirmed or source-backed validation signal", budgetCap: opportunity.estimatedValidationCost,
     ownerTimeEstimate: opportunity.economicModel.ownerHours, startAt: null, stopAt: null,
-    stopConditions: opportunity.stopConditions, actionClass: "read_only_research", status: "proposed", result: null,
+    stopConditions: opportunity.stopConditions, actionClass: opportunity.validationActionClass, status: "proposed", result: null,
     evidenceIds: opportunity.evidenceIds, cost: 0, outcome: null, createdAt: isoTimestamp(now), updatedAt: isoTimestamp(now)
   }, root }).record;
 }
@@ -687,30 +836,44 @@ export function getOpportunityDirectorSnapshot({ root = process.cwd(), now = new
   const wakes = recordList(PATHS.wakes, root).map(({ record }) => record).sort((a, b) => String(b.completedAt).localeCompare(String(a.completedAt)));
   const decisions = recordList(PATHS.decisions, root).map(({ record }) => record).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
   const missionLinks = recordList(PATHS.missionLinks, root).map(({ record }) => record);
+  const seeds = recordList(PATHS.seeds, root).map(({ record }) => record).sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  const evidence = recordList(PATHS.evidence, root).map(({ record }) => record);
+  const researchRuns = recordList(PATHS.researchRuns, root).map(({ record }) => record);
+  const outcomes = recordList(PATHS.outcomes, root).map(({ record }) => record);
   const treasury = initializeTreasury({ treasuryId: director.treasuryId, root, now });
   const costs = wakes.reduce((sum, item) => sum + Number(item.modelCost || 0) + Number(item.researchCost || 0), 0);
+  const liveWake = wakes.find((item) => item.liveProviderUsed === true && item.status === "complete") || null;
+  const displayOpportunities = opportunities.map((item) => {
+    const freshAt = item.evidenceFreshAt || item.updatedAt;
+    const ageDays = Number.isFinite(Date.parse(freshAt)) ? Math.max(0, Math.floor((now.getTime() - Date.parse(freshAt)) / 86_400_000)) : null;
+    return { ...item, ageDays, freshness: ageDays == null ? "unknown" : ageDays <= 2 ? "fresh" : ageDays <= 14 ? "aging" : "stale" };
+  });
   return {
     director,
     constitution: { version: OPPORTUNITY_CONSTITUTION_VERSION, hash: OPPORTUNITY_CONSTITUTION_HASH, immutable: true },
-    statusLabel: opportunities.some((item) => item.status === "validating") ? "Validating" : opportunities.some((item) => item.status === "researching") ? "Researching" : opportunities.some((item) => item.status === "watching") ? "Watching" : "Waiting",
+    statusLabel: director.scheduler?.status === "researching" ? "Researching" : director.scheduler?.status === "synthesizing" ? "Synthesizing" : director.scheduler?.status === "blocked" ? "Blocked" : "Idle",
+    discoveryStatus: director.scheduler?.status || "idle",
+    lastRealResearch: liveWake ? { time: liveWake.completedAt, provider: liveWake.provider, queries: liveWake.queries?.length || 0, pages: liveWake.pagesFetched || 0, costUsd: money(Number(liveWake.modelCost || 0) + Number(liveWake.researchCost || 0)) } : null,
     aiSpendUsd: money(costs),
     costLimitUsd: activeCostLimits(root).monthlyMaxUsd,
     treasury,
-    topOpportunities: opportunities.slice(0, 8),
-    opportunities,
+    topOpportunities: displayOpportunities.slice(0, 8),
+    opportunities: displayOpportunities,
     people,
     experiments,
+    outcomes,
     learned: rules,
     activity: decisions.slice(0, 50),
     killed: opportunities.filter((item) => item.status === "killed"),
     ownerDecisionsRequired: opportunities.filter((item) => item.status === "validation_ready"),
     missionLinks,
+    seeds,
     recentWakes: wakes.slice(0, 12),
     truth: {
-      externalActionExecuted: false,
-      realMoneyMoved: false,
-      privateCustomerDataUsed: false,
-      liveProviderUsed: false,
+      externalActionExecuted: [...wakes, ...experiments, ...missionLinks, ...outcomes].some((item) => item.externalActionExecuted === true),
+      realMoneyMoved: treasury.transactions.some((item) => item.realMoneyMoved === true),
+      privateCustomerDataUsed: [...wakes, ...researchRuns, ...evidence].some((item) => item.privateCustomerDataUsed === true || item.privateDataUsed === true),
+      liveProviderUsed: [...wakes, ...researchRuns, ...evidence].some((item) => item.liveProviderUsed === true || item.providerMode === "live_read_only" || item.provenance === "live_public_research"),
       fabricatedActivity: false
     }
   };

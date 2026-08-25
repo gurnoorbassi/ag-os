@@ -367,9 +367,9 @@ function moneyText(value) {
 
 function opportunityCard(opportunity) {
   return `<article class="director-card" data-open-opportunity="${escapeHtml(opportunity.opportunityId)}" tabindex="0">
-    <div class="director-card-head"><div><span class="eyebrow">${escapeHtml(titleCase(opportunity.type))}</span><h3>${escapeHtml(opportunity.title)}</h3></div><strong class="opportunity-score">${escapeHtml(opportunity.score)}</strong></div>
+    <div class="director-card-head"><div><span class="eyebrow">${escapeHtml(titleCase(opportunity.type))} · ${opportunity.provenance === "live_public_research" ? "LIVE PUBLIC RESEARCH" : "FIXTURE"}</span><h3>${escapeHtml(opportunity.title)}</h3></div><strong class="opportunity-score">${escapeHtml(opportunity.score)}</strong></div>
     <p>${escapeHtml(short(opportunity.summary, 180))}</p>
-    <div class="director-card-meta">${statusChip(opportunity.status)}<span>${escapeHtml(opportunity.confidence)}% confidence</span><span>${escapeHtml(opportunity.evidenceIds?.length || 0)} evidence</span><span>${escapeHtml(opportunity.reachability)} access</span></div>
+    <div class="director-card-meta">${statusChip(opportunity.status)}<span>${escapeHtml(opportunity.confidence)}% confidence</span><span>${escapeHtml(opportunity.evidenceIds?.length || 0)} evidence</span><span>${escapeHtml(opportunity.freshness || "unknown")} · ${opportunity.ageDays == null ? "unknown age" : `${escapeHtml(opportunity.ageDays)}d`}</span><span>${moneyText(opportunity.researchSpendUsd)} research</span></div>
   </article>`;
 }
 
@@ -387,6 +387,8 @@ function renderDirector() {
   $("#director-status").textContent = data.statusLabel || "Waiting";
   $("#director-status").className = `status-chip ${statusTone(data.statusLabel)}`;
   $("#director-last-wake").textContent = data.director?.lastWakeAt ? `Last wake ${timeAgo(data.director.lastWakeAt)}` : "No wake recorded";
+  $("#director-provenance").textContent = data.truth?.liveProviderUsed ? "LIVE PUBLIC RESEARCH" : "FIXTURE";
+  $("#director-provenance").className = `status-chip ${data.truth?.liveProviderUsed ? "complete" : "dim"}`;
   $("#director-tab-count").hidden = !(data.ownerDecisionsRequired || []).length;
   $("#director-tab-count").textContent = String((data.ownerDecisionsRequired || []).length);
 
@@ -395,7 +397,8 @@ function renderDirector() {
     ["AI spend", moneyText(data.aiSpendUsd), `of ${moneyText(data.costLimitUsd)} Cost OS cap`],
     ["Treasury", moneyText(data.treasury?.availableCapital), "simulation only · $0 until funded"],
     ["Pipeline EV", moneyText(top.filter((item) => item.status !== "killed").reduce((sum, item) => sum + Number(item.economicModel?.expectedValueUsd || 0), 0)), "estimate · assumptions visible"],
-    ["Needs you", String((data.ownerDecisionsRequired || []).length), "validation proposals only"]
+    ["Needs you", String((data.ownerDecisionsRequired || []).length), "validation proposals only"],
+    ["Last research", data.lastRealResearch ? timeAgo(data.lastRealResearch.time) : "None", data.lastRealResearch ? `${data.lastRealResearch.provider} · ${data.lastRealResearch.queries} queries · ${data.lastRealResearch.pages} pages · ${moneyText(data.lastRealResearch.costUsd)}` : "No live provider evidence"]
   ];
   const people = data.people || [];
   const experiments = data.experiments || [];
@@ -409,7 +412,7 @@ function renderDirector() {
       </div>
     </div>`;
   $("#director-opportunities").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">Opportunity graph</span><h2>Observed facts before hypotheses</h2></div><small>${top.length} persisted</small></div><div class="director-card-list director-all">${top.map(opportunityCard).join("") || '<div class="empty-card">No opportunities persisted.</div>'}</div>`;
-  $("#director-people").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">People</span><h2>Professional network map</h2></div><small>No relationship is inferred</small></div><div class="director-table"><div class="director-table-head"><span>Person</span><span>Why relevant</span><span>Relationship</span><span>Next follow-up</span></div>${people.map((person) => `<div><span><strong>${escapeHtml(person.name)}</strong><small>${escapeHtml(person.organization)}</small></span><span>${escapeHtml(person.whyRelevant)}</span><span>${statusChip(person.relationshipState)}</span><span>${escapeHtml(person.nextFollowupAt || "Not scheduled")}</span></div>`).join("") || '<div class="empty-card">No people recorded.</div>'}</div>`;
+  $("#director-people").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">People</span><h2>Professional network map</h2></div><small>No relationship is inferred</small></div><div class="director-table"><div class="director-table-head"><span>Person</span><span>Why relevant</span><span>Relationship</span><span>Owner confirmation</span></div>${people.map((person) => `<div><span><strong>${escapeHtml(person.name)}</strong><small>${escapeHtml(person.organization)} · ${escapeHtml(person.publicRole)}</small></span><span>${escapeHtml(person.whyRelevant)}</span><span>${statusChip(person.relationshipState)}</span><span><button type="button" class="quiet-button" data-confirm-relationship="${escapeHtml(person.personId)}">Confirm state</button></span></div>`).join("") || '<div class="empty-card">No people recorded.</div>'}</div>`;
   $("#director-experiments").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">Experiments</span><h2>Signal, metric, stop condition</h2></div><small>No endless research</small></div><div class="director-card-list">${experiments.map((item) => `<article class="director-card"><div class="director-card-head"><div><span class="eyebrow">${escapeHtml(titleCase(item.actionClass))}</span><h3>${escapeHtml(item.hypothesis)}</h3></div>${statusChip(item.status)}</div><p><strong>Metric:</strong> ${escapeHtml(item.successMetric)}</p><div class="director-card-meta"><span>Target: ${escapeHtml(item.target)}</span><span>Cost ${moneyText(item.cost)} / ${moneyText(item.budgetCap)}</span></div><small class="stop-line">Stop: ${escapeHtml((item.stopConditions || []).join(" · "))}</small></article>`).join("") || '<div class="empty-card">No active experiments. An idea does not graduate because a model likes it.</div>'}</div>`;
   $("#director-learned").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">Learned</span><h2>Tactical rules, never new permissions</h2></div><small>Memory OS promotion required</small></div><div class="director-card-list">${(data.learned || []).map((rule) => `<article class="director-card"><div class="director-card-head"><h3>${escapeHtml(rule.statement)}</h3>${statusChip(rule.status)}</div><p>${escapeHtml(rule.scope)} · ${escapeHtml(rule.confidence)}% confidence</p><div class="director-card-meta"><span>${escapeHtml(rule.supportingOutcomeIds?.length || 0)} supporting outcomes</span><span>${escapeHtml(rule.contradictingOutcomeIds?.length || 0)} contradictions</span></div></article>`).join("") || '<div class="empty-card">No tactical rule has earned activation.</div>'}</div>`;
   $("#director-activity").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">Decision journal</span><h2>Concise rationale, not model traces</h2></div><small>${escapeHtml((data.activity || []).length)} decisions</small></div><div class="activity-timeline">${(data.activity || []).map((item) => `<article><i class="${statusTone(item.chosenAction)}"></i><div><strong>${escapeHtml(item.summary)}</strong><p>${escapeHtml(item.reasonSummary)}</p><small>${escapeHtml(titleCase(item.decisionType))} · ${timeAgo(item.createdAt)} · cost ${moneyText(item.actualCost)}</small></div></article>`).join("") || '<div class="empty-card">No meaningful decision recorded.</div>'}</div>`;
@@ -643,6 +646,8 @@ async function openOpportunity(opportunityId) {
     const item = detail.opportunity;
     const evidence = (item.observations || []).map((observation) => `<div class="drawer-item"><strong>Observed</strong><p>${escapeHtml(observation.statement)}</p><small>${escapeHtml(observation.evidenceId)}</small></div>`).join("");
     const assumptions = (item.assumptions || []).map((assumption) => `<div class="drawer-item"><strong>${escapeHtml(titleCase(assumption.kind))}</strong><p>${escapeHtml(assumption.statement)}</p></div>`).join("");
+    const sources = (item.sourceUrls || []).filter((url) => String(url).startsWith("https://")).map((url) => `<div class="drawer-item"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(short(url, 120))}</a></div>`).join("");
+    const outcomes = (detail.outcomes || []).map((outcome) => `<div class="drawer-item"><strong>${escapeHtml(titleCase(outcome.type))}</strong><p>${escapeHtml(outcome.note || "Owner-confirmed outcome")}</p><small>${escapeHtml(outcome.createdAt)}</small></div>`).join("");
     const score = Object.entries(item.scoreBreakdown || {}).map(([key, value]) => keyValue(titleCase(key), value)).join("");
     const economics = item.economicModel || {};
     openDrawer({
@@ -650,10 +655,12 @@ async function openOpportunity(opportunityId) {
       title: item.title,
       html: `<section class="drawer-section">${keyValue("Status", titleCase(item.status))}${keyValue("Confidence", `${item.confidence}%`)}${keyValue("Access", titleCase(item.reachability))}${keyValue("Evidence", item.evidenceIds?.length || 0)}${keyValue("Research spend", moneyText(item.researchSpendUsd))}</section>
         <section class="drawer-section"><h3>Observed facts</h3>${evidence || '<div class="empty-card">No verified observation recorded.</div>'}</section>
+        <section class="drawer-section"><h3>Public sources</h3>${sources || '<div class="empty-card">No public source URL recorded.</div>'}</section>
         <section class="drawer-section"><h3>Hypothesis and assumptions</h3><p class="drawer-copy">${escapeHtml(item.problemHypothesis)}</p>${assumptions}</section>
         <section class="drawer-section"><h3>Score breakdown</h3>${score}</section>
         <section class="drawer-section"><h3>Economics · estimates, not facts</h3>${keyValue("Low / base / high", `${moneyText(economics.lowValueUsd)} / ${moneyText(economics.baseValueUsd)} / ${moneyText(economics.highValueUsd)}`)}${keyValue("Expected value", moneyText(economics.expectedValueUsd))}${keyValue("Validation cost", moneyText(economics.estimatedValidationSpendUsd))}${keyValue("Days to signal", item.estimatedDaysToSignal)}<div class="drawer-item"><strong>Assumptions</strong><p>${escapeHtml((economics.assumptions || []).join(" · "))}</p></div></section>
         <section class="drawer-section"><h3>Cheapest next test</h3><p class="drawer-copy">${escapeHtml(item.cheapestValidation || "Not recorded")}</p><div class="drawer-item"><strong>Stop conditions</strong><p>${escapeHtml((item.stopConditions || []).join(" · "))}</p></div></section>
+        <section class="drawer-section"><h3>Real-world outcomes</h3>${outcomes || '<div class="empty-card">No owner-confirmed outcome recorded.</div>'}<div class="drawer-actions"><button type="button" data-record-opportunity-outcome="${escapeHtml(item.opportunityId)}">Record outcome</button></div></section>
         <section class="drawer-section"><h3>Owner actions</h3><div class="drawer-actions"><button type="button" data-opportunity-action="research_deeper" data-opportunity-id="${escapeHtml(item.opportunityId)}">Research deeper</button><button type="button" data-opportunity-action="watch" data-opportunity-id="${escapeHtml(item.opportunityId)}">Watch</button><button type="button" class="danger" data-opportunity-action="kill" data-opportunity-id="${escapeHtml(item.opportunityId)}">Kill</button><button type="button" class="primary" data-opportunity-action="prepare_validation" data-opportunity-id="${escapeHtml(item.opportunityId)}">Prepare validation</button><button type="button" data-opportunity-action="spawn_build_mission" data-opportunity-id="${escapeHtml(item.opportunityId)}">Spawn build mission</button></div><p class="drawer-copy">Build missions require an accepted matching owner proposal and still grant no downstream live permission.</p></section>`
     });
   } catch (error) {
@@ -674,6 +681,51 @@ async function applyOpportunityAction(opportunityId, action) {
   }
 }
 
+async function wakeOpportunityDirector() {
+  if (!confirm("Run one bounded public research cycle now? Cost OS and exact provider approvals still apply.")) return;
+  try {
+    $("#director-wake").disabled = true;
+    await api("/api/v1/opportunity/wake", { method: "POST", body: "{}" });
+    await refreshStatus();
+  } catch (error) { alert(error.message); }
+  finally { $("#director-wake").disabled = false; }
+}
+
+async function seedOpportunityDirector() {
+  const type = String(prompt("Seed type: company, person, industry, problem, URL, observation, or idea") || "").trim().toLowerCase();
+  if (!type) return;
+  const value = String(prompt(`What ${type} should Opportunity Director investigate?`) || "").trim();
+  if (!value) return;
+  try {
+    await api("/api/v1/opportunity/seeds", { method: "POST", body: JSON.stringify({ type, value }) });
+    await refreshStatus();
+  } catch (error) { alert(error.message); }
+}
+
+async function confirmRelationship(personId) {
+  const relationshipState = String(prompt("Confirmed relationship state: contacted, known, warm, or trusted") || "").trim().toLowerCase();
+  if (!relationshipState) return;
+  if (!confirm(`Confirm ${personId} as ${relationshipState}? Public research alone never sets this state.`)) return;
+  try {
+    await api(`/api/v1/opportunity/people/${encodeURIComponent(personId)}/relationship`, { method: "POST", body: JSON.stringify({ relationshipState, introductionPersonIds: [], confirmation: `CONFIRM RELATIONSHIP ${personId} ${relationshipState}` }) });
+    await refreshStatus();
+  } catch (error) { alert(error.message); }
+}
+
+async function recordOpportunityOutcome(opportunityId) {
+  const type = String(prompt("Outcome: contacted, replied, conversation, meeting, introduction, proposal, won, lost, revenue, no_signal, experiment_success, or experiment_failure") || "").trim().toLowerCase();
+  if (!type) return;
+  const note = String(prompt("Brief owner note or evidence summary") || "").trim();
+  if (!note) return;
+  const evidenceReference = String(prompt("Evidence reference (required for real contact, relationship, proposal, win, or revenue outcomes)") || "").trim();
+  const valueUsd = type === "revenue" ? Number(prompt("Owner-confirmed revenue in USD")) : null;
+  try {
+    await api(`/api/v1/opportunities/${encodeURIComponent(opportunityId)}/outcomes`, { method: "POST", body: JSON.stringify({ type, note, valueUsd, evidenceIds: evidenceReference ? [evidenceReference] : [], confirmation: `RECORD ${opportunityId} ${type}` }) });
+    closeDrawer();
+    await refreshStatus();
+  } catch (error) { alert(error.message); }
+}
+
 document.addEventListener("click", (event) => {
   const viewButton = event.target.closest("[data-view]");
   if (viewButton) return setView(viewButton.dataset.view);
@@ -685,6 +737,10 @@ document.addEventListener("click", (event) => {
   const directorTab = event.target.closest("[data-director-view]"); if (directorTab) return setDirectorView(directorTab.dataset.directorView);
   const opportunity = event.target.closest("[data-open-opportunity]"); if (opportunity) return void openOpportunity(opportunity.dataset.openOpportunity);
   const opportunityAction = event.target.closest("[data-opportunity-action]"); if (opportunityAction) return void applyOpportunityAction(opportunityAction.dataset.opportunityId, opportunityAction.dataset.opportunityAction);
+  const relationship = event.target.closest("[data-confirm-relationship]"); if (relationship) return void confirmRelationship(relationship.dataset.confirmRelationship);
+  const opportunityOutcome = event.target.closest("[data-record-opportunity-outcome]"); if (opportunityOutcome) return void recordOpportunityOutcome(opportunityOutcome.dataset.recordOpportunityOutcome);
+  if (event.target.closest("#director-wake")) return void wakeOpportunityDirector();
+  if (event.target.closest("#director-seed")) return void seedOpportunityDirector();
   if (event.target.closest("[data-open-decision-queue]")) return openDecisionQueue();
   const jobDecision = event.target.closest("[data-job-decision]"); if (jobDecision) return void decideJob(jobDecision.dataset.jobId, jobDecision.dataset.jobDecision);
   const jobRecovery = event.target.closest("[data-job-recovery]"); if (jobRecovery) return void recoverJob(jobRecovery.dataset.jobId, jobRecovery.dataset.jobRecovery);

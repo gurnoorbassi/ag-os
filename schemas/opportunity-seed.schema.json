@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/opportunity-seed.schema.json",
+  "title": "AG OS Owner Discovery Seed",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["seedId", "type", "value", "status", "ownerId", "createdAt", "updatedAt", "privateCustomerDataUsed"],
+  "properties": {
+    "seedId": { "type": "string", "pattern": "^opportunity-seed-[a-z0-9-]+$" },
+    "type": { "type": "string", "enum": ["company", "person", "industry", "problem", "url", "observation", "idea"] },
+    "value": { "type": "string", "minLength": 2, "maxLength": 500 },
+    "status": { "const": "active" },
+    "ownerId": { "type": "string", "pattern": "^owner-[a-z0-9-]+$" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "privateCustomerDataUsed": { "const": false }
+  }
+}

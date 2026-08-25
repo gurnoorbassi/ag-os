@@ -216,11 +216,12 @@ body {
 .director-view { overflow-y: auto; padding-bottom: 28px; }
 .director-intro { align-items: center; }
 .director-state { display: flex; flex-direction: column; align-items: flex-end; gap: 9px; }
+.director-owner-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
 .director-tabs { position: sticky; top: 0; z-index: 10; display: flex; gap: 4px; margin: 0 28px 14px; padding: 5px; border: 1px solid var(--line); border-radius: 10px; background: rgba(12,13,16,.96); backdrop-filter: blur(14px); }
 .director-tabs button { min-height: 34px; flex: 1; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font: 650 9px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; cursor: pointer; }
 .director-tabs button:hover, .director-tabs button.active { color: var(--accent); background: var(--panel-3); }
 .director-subview { padding: 0 28px; }
-.director-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin-bottom: 10px; }
+.director-metrics { display: grid; grid-template-columns: repeat(auto-fit,minmax(155px,1fr)); gap: 10px; margin-bottom: 10px; }
 .director-metrics article { min-height: 104px; padding: 15px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); }
 .director-metrics span, .director-metrics small, .director-metrics strong { display: block; }
 .director-metrics span { color: var(--muted); font: 650 9px/1 var(--mono); text-transform: uppercase; letter-spacing: .09em; }
