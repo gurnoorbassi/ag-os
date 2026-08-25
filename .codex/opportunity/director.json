@@ -1,0 +1,47 @@
+{
+  "directorId": "opportunity-director-ag-digitalz-v1",
+  "name": "Opportunity Director",
+  "status": "active",
+  "objective": "Find and develop high-value legitimate opportunities for AG Digitalz.",
+  "objectiveControlledBy": "owner-gurnoor-bassi",
+  "constitutionVersion": "1.0.0",
+  "constitutionHash": "f728a308641f4da6105448b8817b054699cec6a28d033873f908d02fc05e7f66",
+  "strategyVersion": "1.0.0",
+  "createdAt": "2026-08-24T00:00:00.000Z",
+  "updatedAt": "2026-08-24T00:00:00.000Z",
+  "lastWakeAt": null,
+  "lastReasoningWakeAt": null,
+  "wakeCount": 0,
+  "currentFocus": "Waiting for evidence-backed signals",
+  "currentTheses": [],
+  "scoreWeights": {
+    "painSeverity": 20,
+    "potentialEconomicValue": 20,
+    "evidenceStrength": 15,
+    "reachabilityAccess": 15,
+    "agCapabilityFit": 10,
+    "validationSpeedCost": 10,
+    "competitiveWhitespace": 5,
+    "networkReputationValue": 5
+  },
+  "researchLimits": {
+    "directorReasoningWakeUsd": 0.15,
+    "researchRunUsd": 0.5,
+    "deepInvestigationUsd": 1.5
+  },
+  "modelConfig": {
+    "provider": "deterministic_fixture",
+    "liveProviderEnabled": false,
+    "maximumReasoningCyclesPerWake": 1
+  },
+  "treasuryId": "opportunity-treasury-v1",
+  "lastInputHash": null,
+  "safeguards": {
+    "canChangeConstitution": false,
+    "canWeakenCostOs": false,
+    "canWeakenSecurityOs": false,
+    "canSelfApprove": false,
+    "canExecuteExternalActions": false,
+    "canMoveRealMoney": false
+  }
+}

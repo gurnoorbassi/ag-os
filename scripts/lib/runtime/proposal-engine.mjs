@@ -17,8 +17,8 @@ function proposalKey(sourceType, sourceId) {
   return `${sourceType}:${sourceId}`;
 }
 
-function candidate({ sourceType, sourceId, projectId = "project-one-off", title, command, reason, priority, evidence = [] }) {
-  return { sourceType, sourceId, projectId, title, command, reason, priority, evidence };
+function candidate({ sourceType, sourceId, projectId = "project-one-off", title, command, reason, priority, evidence = [], details = null }) {
+  return { sourceType, sourceId, projectId, title, command, reason, priority, evidence, details };
 }
 
 export function discoverProposalCandidates({ root = process.cwd(), now = new Date() } = {}) {
@@ -71,6 +71,35 @@ export function discoverProposalCandidates({ root = process.cwd(), now = new Dat
     }));
   }
 
+  for (const { recordPath, record: opportunity } of records(".codex/opportunity/opportunities", root)) {
+    if (opportunity.status !== "validation_ready") continue;
+    candidates.push(candidate({
+      sourceType: "opportunity_validation",
+      sourceId: opportunity.opportunityId,
+      projectId: opportunity.projectId || "project-one-off",
+      title: `Validate opportunity: ${opportunity.title}`,
+      command: opportunity.cheapestValidation,
+      reason: `${opportunity.summary} Score ${opportunity.score}/100 at ${opportunity.confidence}% confidence.`,
+      priority: opportunity.score >= 80 ? "high" : "medium",
+      evidence: [recordPath, ...(opportunity.evidenceIds || []).map((id) => `.codex/opportunity/evidence/${slugify(id)}.json`)],
+      details: {
+        opportunityId: opportunity.opportunityId,
+        whyNow: opportunity.summary,
+        score: opportunity.score,
+        confidence: opportunity.confidence,
+        expectedValue: opportunity.economicModel,
+        cheapestValidation: opportunity.cheapestValidation,
+        expectedCostUsd: opportunity.estimatedValidationCost,
+        expectedOwnerHours: opportunity.economicModel?.ownerHours ?? 0,
+        successMetric: "Obtain source-backed or owner-confirmed signal; completing activity alone is not success.",
+        stopConditions: opportunity.stopConditions || [],
+        actionClass: opportunity.validationActionClass || "read_only_research",
+        softwareValidationRequested: opportunity.softwareValidationRequested === true,
+        validationCommands: opportunity.validationCommands || ["npm test"]
+      }
+    }));
+  }
+
   return candidates
     .sort((left, right) => ({ high: 0, medium: 1, low: 2 }[left.priority] - ({ high: 0, medium: 1, low: 2 }[right.priority])))
     .slice(0, MAX_ACTIVE_PROPOSALS);
@@ -108,6 +137,7 @@ export function refreshProposals({ root = process.cwd(), now = new Date() } = {}
       proposedCommand: item.command,
       projectId: item.projectId,
       source: { type: item.sourceType, id: item.sourceId, evidence: item.evidence },
+      ...(item.details ? { opportunity: item.details } : {}),
       safety: {
         mayExecuteWithoutOwnerDecision: false,
         grantsPermission: false,

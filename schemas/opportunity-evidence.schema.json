@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/opportunity-evidence.schema.json",
+  "title": "AG OS Opportunity Evidence",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["evidenceId", "sourceType", "sourceUrl", "capturedAt", "contentHash", "relevantClaims"],
+  "properties": {
+    "evidenceId": { "type": "string", "pattern": "^evidence-[a-z0-9-]+$" },
+    "sourceType": { "type": "string", "minLength": 1 },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "capturedAt": { "type": "string", "format": "date-time" },
+    "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "relevantClaims": { "type": "array", "items": { "type": "object" } }
+  }
+}

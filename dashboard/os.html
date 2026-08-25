@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b0a08">
   <title>AG OS — Owner Console</title>
-  <link rel="stylesheet" href="os.css?v=20260721b">
+  <link rel="stylesheet" href="os.css?v=20260824-opportunity-v1">
 </head>
 <body>
   <header class="os-topbar">
@@ -16,6 +16,7 @@
     <nav class="os-tabs" id="os-tabs" aria-label="AG OS views">
       <button type="button" data-view="console"><span class="tab-glyph">›_</span><span>Console</span></button>
       <button type="button" data-view="ops"><span class="tab-glyph">⌁</span><span>Ops</span><span id="ops-tab-count" class="tab-count" hidden>0</span></button>
+      <button type="button" data-view="director"><span class="tab-glyph">◇</span><span>Opportunity</span><span id="director-tab-count" class="tab-count" hidden>0</span></button>
       <button type="button" data-view="keep"><span class="tab-glyph">◎</span><span>Mission</span><span id="mission-tab-count" class="tab-count" hidden>0</span></button>
       <button type="button" data-view="dash"><span class="tab-glyph">◫</span><span>Dash</span></button>
     </nav>
@@ -91,6 +92,34 @@
           <div id="ops-decision-list" class="card-list"></div>
         </section>
       </div>
+    </section>
+
+    <section id="view-director" class="os-view director-view os-hidden" aria-labelledby="director-title">
+      <header class="view-intro director-intro">
+        <div>
+          <p class="eyebrow">Persistent agent · evidence first</p>
+          <h1 id="director-title">Opportunity Director</h1>
+          <p id="director-objective">Find and develop high-value legitimate opportunities for AG Digitalz.</p>
+        </div>
+        <div class="director-state">
+          <span id="director-status" class="status-chip dim">Waiting</span>
+          <span id="director-last-wake" class="state-line">No wake recorded</span>
+        </div>
+      </header>
+      <nav id="director-tabs" class="director-tabs" aria-label="Opportunity Director views">
+        <button type="button" data-director-view="overview" class="active">Overview</button>
+        <button type="button" data-director-view="opportunities">Opportunities</button>
+        <button type="button" data-director-view="people">People</button>
+        <button type="button" data-director-view="experiments">Experiments</button>
+        <button type="button" data-director-view="learned">Learned</button>
+        <button type="button" data-director-view="activity">Activity</button>
+      </nav>
+      <div id="director-overview" class="director-subview"></div>
+      <div id="director-opportunities" class="director-subview os-hidden"></div>
+      <div id="director-people" class="director-subview os-hidden"></div>
+      <div id="director-experiments" class="director-subview os-hidden"></div>
+      <div id="director-learned" class="director-subview os-hidden"></div>
+      <div id="director-activity" class="director-subview os-hidden"></div>
     </section>
 
     <section id="view-keep" class="os-view mission-view os-hidden" aria-labelledby="mission-title">
@@ -171,6 +200,6 @@
     </form>
   </dialog>
 
-  <script src="os.js?v=20260721b"></script>
+  <script src="os.js?v=20260824-opportunity-v1"></script>
 </body>
 </html>

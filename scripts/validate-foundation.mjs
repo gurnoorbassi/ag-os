@@ -160,7 +160,11 @@ const requiredPaths = [
   "schemas/mission-task.schema.json",
   "schemas/mission-event.schema.json",
   "schemas/handoff.schema.json",
-  "schemas/mission-plan.schema.json"
+  "schemas/mission-plan.schema.json",
+  "schemas/opportunity-director.schema.json",
+  "schemas/opportunity.schema.json",
+  "schemas/opportunity-evidence.schema.json",
+  "schemas/opportunity-treasury.schema.json"
 ];
 
 const forbiddenPatterns = [
@@ -274,9 +278,29 @@ const schemaValidatedRecords = [
     name: "project registry",
     recordPath: ".codex/projects/registry.json",
     schemaPath: "schemas/project-registry.schema.json"
+  },
+  {
+    name: "opportunity director",
+    recordPath: ".codex/opportunity/director.json",
+    schemaPath: "schemas/opportunity-director.schema.json"
+  },
+  {
+    name: "opportunity treasury",
+    recordPath: ".codex/opportunity/treasury/opportunity-treasury-v1.json",
+    schemaPath: "schemas/opportunity-treasury.schema.json"
   }
 ];
 const schemaValidatedRecordDirectories = [
+  {
+    name: "opportunity",
+    recordDir: ".codex/opportunity/opportunities",
+    schemaPath: "schemas/opportunity.schema.json"
+  },
+  {
+    name: "opportunity evidence",
+    recordDir: ".codex/opportunity/evidence",
+    schemaPath: "schemas/opportunity-evidence.schema.json"
+  },
   {
     name: "n8n plan",
     recordDir: ".codex/n8n",
