@@ -23,7 +23,8 @@ for (const relativePath of [
   "dashboard/index.html",
   "dashboard/os.html",
   "dashboard/os.css",
-  "dashboard/os.js"
+  "dashboard/os.js",
+  "dashboard/graph-adapter.js"
 ]) {
   requireFile(relativePath);
 }
@@ -57,6 +58,7 @@ const dashboardSource = `${consoleHtml}\n${consoleApp}`;
 
 for (const requiredInterfacePattern of [
   /color-scheme:\s*dark/,
+  /data-view="map"/,
   /data-view="console"/,
   /data-view="ops"/,
   /data-view="keep"/,
@@ -68,7 +70,7 @@ for (const requiredInterfacePattern of [
   }
 }
 
-const expectedDashboardViews = new Set(["console", "ops", "keep", "dash", "director"]);
+const expectedDashboardViews = new Set(["map", "console", "ops", "keep", "dash", "director"]);
 const navigationControls = [...consoleHtml.matchAll(/<button\b[^>]*data-view="([^"]+)"[^>]*>([\s\S]*?)<\/button>/gi)]
   .map((match) => ({ view: match[1], label: match[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() }));
 for (const view of expectedDashboardViews) {
@@ -121,6 +123,7 @@ for (const requiredOperatorPattern of [
 
 for (const requiredText of [
   "Owner command deck",
+  "Living company map",
   "Mission control",
   "Mission Control",
   "Agent runs",
@@ -155,7 +158,7 @@ for (const forbiddenOwnerUx of [
   }
 }
 
-if (!/url=os\.html#console/.test(index)) {
+if (!/url=os\.html#map/.test(index)) {
   fail("legacy dashboard entry must redirect to the unified owner console");
 }
 

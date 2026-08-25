@@ -4,16 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b0a08">
-  <title>AG OS — Owner Console</title>
-  <link rel="stylesheet" href="os.css?v=20260825-opportunity-v1-1">
+  <title>AG OS — Living Company Map</title>
+  <link rel="stylesheet" href="os.css?v=20260825-graph-v1-2">
 </head>
 <body>
   <header class="os-topbar">
-    <button class="os-brand" type="button" data-view="console" aria-label="Open AG OS console">
+    <button class="os-brand" type="button" data-view="map" aria-label="Open AG OS system map">
       <span class="brand-mark" aria-hidden="true"></span>
       <span>AG OS</span>
     </button>
     <nav class="os-tabs" id="os-tabs" aria-label="AG OS views">
+      <button type="button" data-view="map"><span class="tab-glyph">⌘</span><span>Map</span></button>
       <button type="button" data-view="console"><span class="tab-glyph">›_</span><span>Console</span></button>
       <button type="button" data-view="ops"><span class="tab-glyph">⌁</span><span>Ops</span><span id="ops-tab-count" class="tab-count" hidden>0</span></button>
       <button type="button" data-view="director"><span class="tab-glyph">◇</span><span>Opportunity</span><span id="director-tab-count" class="tab-count" hidden>0</span></button>
@@ -27,6 +28,42 @@
   </header>
 
   <main class="os-main">
+    <section id="view-map" class="os-view graph-view" aria-labelledby="graph-title">
+      <header class="graph-overlay graph-overlay-top">
+        <div class="graph-title-block">
+          <p class="eyebrow">Living company map</p>
+          <h1 id="graph-title">AG OS</h1>
+          <p id="graph-subtitle">Persisted state, relationships, and work in motion.</p>
+        </div>
+        <div id="graph-metrics" class="graph-metrics" aria-label="System map status"></div>
+      </header>
+      <div class="graph-toolbar" aria-label="Map controls">
+        <div id="graph-modes" class="graph-modes" role="group" aria-label="Map mode">
+          <button type="button" data-graph-mode="system" class="active">System map</button>
+          <button type="button" data-graph-mode="opportunity">Opportunity focus</button>
+          <button type="button" data-graph-mode="mission">Mission focus</button>
+        </div>
+        <label class="graph-search"><span class="visually-hidden">Search map</span><input id="graph-search" type="search" placeholder="Search the system…" autocomplete="off"><span>⌕</span></label>
+        <button type="button" class="graph-tool" id="graph-fit">Fit selection</button>
+        <button type="button" class="graph-tool" id="graph-reset">Reset</button>
+      </div>
+      <div id="graph-search-results" class="graph-search-results" hidden></div>
+      <div id="graph-stage" class="graph-stage" tabindex="0" aria-label="Interactive AG OS relationship graph">
+        <svg id="graph-canvas" viewBox="0 0 1600 900" role="img" aria-labelledby="graph-title graph-subtitle">
+          <defs>
+            <pattern id="graph-grid-pattern" width="36" height="36" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="rgba(196,207,226,.09)"/></pattern>
+            <filter id="graph-glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <marker id="graph-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z"/></marker>
+          </defs>
+          <rect class="graph-grid" width="100%" height="100%" fill="url(#graph-grid-pattern)"/>
+          <g id="graph-world"><g id="graph-edges"></g><g id="graph-nodes"></g></g>
+        </svg>
+        <div id="graph-empty" class="graph-empty" hidden>No persisted work is available yet.</div>
+        <div class="graph-help">Drag to pan · Scroll to zoom · Double-click to expand</div>
+      </div>
+      <div class="graph-zoom" aria-label="Zoom controls"><button id="graph-zoom-out" type="button" aria-label="Zoom out">−</button><span id="graph-zoom-label">100%</span><button id="graph-zoom-in" type="button" aria-label="Zoom in">+</button></div>
+    </section>
+
     <section id="view-console" class="os-view console-view" aria-labelledby="console-title">
       <div class="console-shell">
         <header class="view-intro compact">
@@ -202,6 +239,6 @@
     </form>
   </dialog>
 
-  <script src="os.js?v=20260825-opportunity-v1-1"></script>
+  <script type="module" src="os.js?v=20260825-graph-v1-2"></script>
 </body>
 </html>

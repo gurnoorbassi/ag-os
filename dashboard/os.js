@@ -1,11 +1,13 @@
 "use strict";
 
+import { ancestorsOf, buildAgOsGraph, graphStateClass, layoutGraph, renderGraphNodeDetail, searchGraph, toggleGraphExpansion, visibleGraph } from "./graph-adapter.js";
+
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-const VALID_VIEWS = new Set(["console", "ops", "director", "keep", "dash"]);
+const VALID_VIEWS = new Set(["map", "console", "ops", "director", "keep", "dash"]);
 const state = {
-  view: VALID_VIEWS.has(location.hash.slice(1)) ? location.hash.slice(1) : "console",
+  view: VALID_VIEWS.has(location.hash.slice(1)) ? location.hash.slice(1) : "map",
   status: null,
   previousJobs: new Map(),
   activeMissionId: sessionStorage.getItem("ag_os_active_mission") || "",
@@ -14,7 +16,14 @@ const state = {
   directorView: "overview",
   ownerToken: sessionStorage.getItem("ag_os_owner_token") || "",
   authenticated: false,
-  busy: false
+  busy: false,
+  graph: null,
+  graphMode: sessionStorage.getItem("ag_os_graph_mode") || "system",
+  graphFocusId: null,
+  graphSelectedId: "ag-os",
+  graphExpanded: new Set(["ag-os"]),
+  graphTransform: { x: null, y: null, scale: 1 },
+  graphDragging: null
 };
 
 const connBadge = $("#os-conn");
@@ -131,7 +140,7 @@ function processJobTransitions(jobs) {
 }
 
 function setView(view) {
-  if (!VALID_VIEWS.has(view)) view = "console";
+  if (!VALID_VIEWS.has(view)) view = "map";
   state.view = view;
   history.replaceState(null, "", `#${view}`);
   for (const button of $$("#os-tabs button[data-view]")) {
@@ -140,6 +149,7 @@ function setView(view) {
     button.setAttribute("aria-pressed", String(active));
   }
   for (const name of VALID_VIEWS) $(`#view-${name}`).classList.toggle("os-hidden", name !== view);
+  if (view === "map") requestAnimationFrame(renderGraph);
 }
 
 function consoleLine(text, tone = "") {
@@ -419,7 +429,107 @@ function renderDirector() {
   setDirectorView(state.directorView);
 }
 
+const GRAPH_ICONS = { root: "AG", director: "◇", mission: "M", opportunity: "O", person: "P", person_group: "P·", experiment: "E", rule: "L", cost: "$", outcome: "✓", signal: "S", evidence: "↗", skeptic: "?", distribution: "D", planner: "Π", agent: "A", task: "T", blocker: "!", artifact: "□" };
+
+function graphNodeMarkup(node, position, childCount, expanded, selected) {
+  const x = Number(position?.x || 0);
+  const y = Number(position?.y || 0);
+  const root = node.type === "root";
+  const branch = ["director", "mission", "person", "experiment", "rule", "cost", "outcome"].includes(node.type) && node.parentId === "ag-os";
+  const width = root ? 156 : branch ? 148 : 132;
+  const height = root ? 72 : 58;
+  const icon = GRAPH_ICONS[node.type] || "·";
+  const label = escapeHtml(short(node.label, root ? 24 : 25));
+  return `<g class="graph-node ${graphStateClass(node.state)} graph-type-${escapeHtml(node.type)}${selected ? " selected" : ""}" data-graph-node="${escapeHtml(node.id)}" transform="translate(${x} ${y})" tabindex="0" role="button" aria-label="${label}, ${escapeHtml(titleCase(node.state))}">
+    <rect x="${-width / 2}" y="${-height / 2}" width="${width}" height="${height}" rx="${root ? 24 : 16}"/>
+    <circle class="graph-node-icon" cx="${-width / 2 + 24}" cy="0" r="13"/><text class="graph-icon-text" x="${-width / 2 + 24}" y="4">${escapeHtml(icon)}</text>
+    <text class="graph-node-label" x="${-width / 2 + 45}" y="-3">${label}</text><text class="graph-node-state" x="${-width / 2 + 45}" y="13">${escapeHtml(titleCase(node.state))}</text>
+    ${childCount ? `<g class="graph-expand" data-expand-node="${escapeHtml(node.id)}" transform="translate(${width / 2 - 8} ${-height / 2 + 8})"><circle r="10"/><text y="4">${expanded ? "−" : "+"}</text></g>` : ""}
+  </g>`;
+}
+
+function renderGraph() {
+  if (!$("#graph-world")) return;
+  const stageBounds = $("#graph-stage").getBoundingClientRect();
+  const viewport = { width: Math.max(320, Math.round(stageBounds.width)), height: Math.max(480, Math.round(stageBounds.height)) };
+  $("#graph-canvas").setAttribute("viewBox", `0 0 ${viewport.width} ${viewport.height}`);
+  if (!Number.isFinite(state.graphTransform.x)) state.graphTransform.x = viewport.width / 2;
+  if (!Number.isFinite(state.graphTransform.y)) state.graphTransform.y = viewport.height / 2;
+  const details = state.mission ? [state.mission] : [];
+  state.graph = buildAgOsGraph({ status: state.status || {}, missionDetails: details });
+  const allNodes = state.graph.nodes;
+  if (state.graphMode !== "system" && !state.graphFocusId) {
+    const first = allNodes.find((node) => node.type === state.graphMode && node.parentId?.startsWith("branch-"));
+    if (first) { state.graphFocusId = first.id; state.graphSelectedId = first.id; state.graphExpanded.add(first.id); }
+    else state.graphMode = "system";
+  }
+  if (!allNodes.some((node) => node.id === state.graphSelectedId)) state.graphSelectedId = state.graph.rootId;
+  if (state.graphFocusId && !allNodes.some((node) => node.id === state.graphFocusId)) state.graphFocusId = null;
+  const graph = visibleGraph(state.graph, { expanded: state.graphExpanded, focusId: state.graphFocusId });
+  const positions = layoutGraph(graph, { focusId: state.graphFocusId });
+  const children = new Map();
+  for (const node of allNodes) if (node.parentId) children.set(node.parentId, (children.get(node.parentId) || 0) + 1);
+  $("#graph-edges").innerHTML = graph.edges.map((edge) => {
+    const source = positions.get(edge.source); const target = positions.get(edge.target);
+    if (!source || !target) return "";
+    const cross = edge.relation !== "contains";
+    return `<path class="graph-edge${cross ? " graph-edge-cross" : ""}" d="M ${source.x} ${source.y} C ${(source.x + target.x) / 2} ${source.y}, ${(source.x + target.x) / 2} ${target.y}, ${target.x} ${target.y}"${cross ? ' marker-end="url(#graph-arrow)"' : ""}><title>${escapeHtml(titleCase(edge.relation))}</title></path>`;
+  }).join("");
+  $("#graph-nodes").innerHTML = graph.nodes.map((node) => graphNodeMarkup(node, positions.get(node.id), children.get(node.id) || 0, state.graphExpanded.has(node.id), node.id === state.graphSelectedId)).join("");
+  $("#graph-world").setAttribute("transform", `translate(${state.graphTransform.x} ${state.graphTransform.y}) scale(${state.graphTransform.scale})`);
+  $("#graph-empty").hidden = allNodes.length > 1;
+  const counts = { active: 0, blocked: 0, waiting: 0, completed: 0, archived: 0 };
+  for (const node of allNodes) { const value = graphStateClass(node.state).replace("graph-state-", ""); if (value in counts) counts[value] += 1; }
+  $("#graph-metrics").innerHTML = `<span><i class="active"></i>${counts.active} active</span><span><i class="blocked"></i>${counts.blocked} blocked</span><span><i class="waiting"></i>${counts.waiting} waiting</span><span><i class="completed"></i>${counts.completed} completed</span>${counts.archived ? `<span><i class="archived"></i>${counts.archived} archived</span>` : ""}<strong>${graph.nodes.length}/${allNodes.length} visible</strong>`;
+  $("#graph-zoom-label").textContent = `${Math.round(state.graphTransform.scale * 100)}%`;
+  for (const button of $$("[data-graph-mode]")) button.classList.toggle("active", button.dataset.graphMode === state.graphMode);
+}
+
+function focusGraphNode(nodeId, { open = true } = {}) {
+  const node = state.graph?.nodes.find((item) => item.id === nodeId);
+  if (!node) return;
+  state.graphSelectedId = nodeId;
+  for (const ancestor of ancestorsOf(state.graph, nodeId)) state.graphExpanded.add(ancestor);
+  renderGraph();
+  if (open) {
+    const hasChildren = state.graph.nodes.some((candidate) => candidate.parentId === node.id);
+    const graphActions = `<section class="drawer-section"><div class="drawer-actions">${hasChildren ? `<button type="button" class="quiet-button" data-focus-subtree="${escapeHtml(node.id)}">Focus subtree</button>` : ""}${state.graphFocusId ? '<button type="button" class="quiet-button" data-clear-graph-focus>Show system map</button>' : ""}</div></section>`;
+    openDrawer({ kicker: `${titleCase(node.type)} · ${titleCase(node.state)}`, title: node.label, html: renderGraphNodeDetail(node, state.graph) + graphActions });
+  }
+}
+
+async function selectGraphNode(nodeId) {
+  const node = state.graph?.nodes.find((item) => item.id === nodeId);
+  if (node?.type === "mission" && nodeId !== state.activeMissionId) {
+    state.activeMissionId = nodeId;
+    try { await refreshMission(); } catch { /* Summary remains available when detail fetch fails. */ }
+    renderGraph();
+  }
+  focusGraphNode(nodeId);
+}
+
+function setGraphMode(mode) {
+  if (!["system", "opportunity", "mission"].includes(mode)) return;
+  state.graphMode = mode;
+  sessionStorage.setItem("ag_os_graph_mode", mode);
+  if (mode === "system") state.graphFocusId = null;
+  else {
+    const preferred = state.graph?.nodes.find((node) => node.id === state.graphSelectedId && node.type === mode);
+    const first = preferred || state.graph?.nodes.find((node) => node.type === mode && node.parentId?.startsWith("branch-"));
+    state.graphFocusId = first?.id || null;
+    if (first) { state.graphSelectedId = first.id; state.graphExpanded.add(first.id); }
+  }
+  state.graphTransform = { x: null, y: null, scale: mode === "system" ? 1 : 1.1 };
+  renderGraph();
+}
+
+function changeGraphZoom(delta) {
+  state.graphTransform.scale = Math.min(2.2, Math.max(.38, state.graphTransform.scale + delta));
+  renderGraph();
+}
+
 function renderAll() {
+  renderGraph();
   renderProjectTarget();
   renderOps();
   renderDash();
@@ -727,6 +837,17 @@ async function recordOpportunityOutcome(opportunityId) {
 }
 
 document.addEventListener("click", (event) => {
+  const focusSubtree = event.target.closest("[data-focus-subtree]");
+  if (focusSubtree) { state.graphFocusId = focusSubtree.dataset.focusSubtree; state.graphExpanded.add(state.graphFocusId); renderGraph(); return; }
+  if (event.target.closest("[data-clear-graph-focus]")) { state.graphFocusId = null; state.graphMode = "system"; sessionStorage.setItem("ag_os_graph_mode", "system"); renderGraph(); return; }
+  const expandNode = event.target.closest("[data-expand-node]");
+  if (expandNode) { state.graphExpanded = toggleGraphExpansion(state.graphExpanded, expandNode.dataset.expandNode); renderGraph(); return; }
+  const graphNode = event.target.closest("[data-graph-node]");
+  if (graphNode) return void selectGraphNode(graphNode.dataset.graphNode);
+  const graphMode = event.target.closest("[data-graph-mode]");
+  if (graphMode) return setGraphMode(graphMode.dataset.graphMode);
+  const graphResult = event.target.closest("[data-graph-result]");
+  if (graphResult) { $("#graph-search-results").hidden = true; return focusGraphNode(graphResult.dataset.graphResult); }
   const viewButton = event.target.closest("[data-view]");
   if (viewButton) return setView(viewButton.dataset.view);
   if (event.target.closest("[data-close-drawer]")) return closeDrawer();
@@ -772,6 +893,51 @@ $("#refresh-ops").addEventListener("click", () => void refreshStatus());
 $("#mission-run").addEventListener("click", () => void controlMission("run"));
 $("#mission-cancel").addEventListener("click", () => void controlMission("cancel"));
 
+$("#graph-reset").addEventListener("click", () => {
+  state.graphMode = "system"; state.graphFocusId = null; state.graphSelectedId = "ag-os";
+  state.graphExpanded = new Set(["ag-os"]); state.graphTransform = { x: null, y: null, scale: 1 };
+  sessionStorage.setItem("ag_os_graph_mode", "system"); renderGraph();
+});
+$("#graph-fit").addEventListener("click", () => {
+  const graph = visibleGraph(state.graph, { expanded: state.graphExpanded, focusId: state.graphFocusId });
+  const point = layoutGraph(graph, { focusId: state.graphFocusId }).get(state.graphSelectedId) || { x: 0, y: 0 };
+  const bounds = $("#graph-stage").getBoundingClientRect();
+  state.graphTransform = { x: bounds.width / 2 - point.x, y: bounds.height / 2 - point.y, scale: 1 }; renderGraph();
+});
+$("#graph-zoom-in").addEventListener("click", () => changeGraphZoom(.15));
+$("#graph-zoom-out").addEventListener("click", () => changeGraphZoom(-.15));
+$("#graph-search").addEventListener("input", (event) => {
+  const results = searchGraph(state.graph, event.target.value).slice(0, 8);
+  const panel = $("#graph-search-results");
+  panel.hidden = !event.target.value.trim();
+  panel.innerHTML = results.length ? results.map((node) => `<button type="button" data-graph-result="${escapeHtml(node.id)}"><span>${escapeHtml(node.label)}</span><small>${escapeHtml(titleCase(node.type))} · ${escapeHtml(titleCase(node.state))}</small></button>`).join("") : '<div class="graph-search-none">No persisted node matches.</div>';
+});
+$("#graph-canvas").addEventListener("dblclick", (event) => {
+  const node = event.target.closest("[data-graph-node]");
+  if (!node) return;
+  event.preventDefault(); state.graphExpanded = toggleGraphExpansion(state.graphExpanded, node.dataset.graphNode); renderGraph();
+});
+$("#graph-canvas").addEventListener("keydown", (event) => {
+  const node = event.target.closest("[data-graph-node]");
+  if (!node || !["Enter", " "].includes(event.key)) return;
+  event.preventDefault(); void selectGraphNode(node.dataset.graphNode);
+});
+$("#graph-stage").addEventListener("wheel", (event) => { event.preventDefault(); changeGraphZoom(event.deltaY < 0 ? .09 : -.09); }, { passive: false });
+$("#graph-stage").addEventListener("pointerdown", (event) => {
+  if (event.target.closest("[data-graph-node]")) return;
+  state.graphDragging = { x: event.clientX, y: event.clientY, originX: state.graphTransform.x, originY: state.graphTransform.y };
+  $("#graph-stage").setPointerCapture(event.pointerId); $("#graph-stage").classList.add("dragging");
+});
+$("#graph-stage").addEventListener("pointermove", (event) => {
+  if (!state.graphDragging) return;
+  state.graphTransform.x = state.graphDragging.originX + event.clientX - state.graphDragging.x;
+  state.graphTransform.y = state.graphDragging.originY + event.clientY - state.graphDragging.y;
+  $("#graph-world").setAttribute("transform", `translate(${state.graphTransform.x} ${state.graphTransform.y}) scale(${state.graphTransform.scale})`);
+});
+const stopGraphDrag = (event) => { if (!state.graphDragging) return; state.graphDragging = null; $("#graph-stage").classList.remove("dragging"); try { $("#graph-stage").releasePointerCapture(event.pointerId); } catch {} };
+$("#graph-stage").addEventListener("pointerup", stopGraphDrag);
+$("#graph-stage").addEventListener("pointercancel", stopGraphDrag);
+
 $("#auth-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const message = $("#auth-message");
@@ -804,6 +970,7 @@ $("#owner-menu").addEventListener("click", () => {
 });
 
 window.addEventListener("hashchange", () => setView(location.hash.slice(1)));
+window.addEventListener("resize", () => { state.graphTransform.x = null; state.graphTransform.y = null; renderGraph(); });
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeDrawer();
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); setView("console"); promptInput.focus(); }

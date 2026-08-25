@@ -8,12 +8,15 @@ test("the unified owner console is the only dashboard entry and reads the live r
   const script = readFileSync("dashboard/os.js", "utf8");
   const server = readFileSync("scripts/live-server.mjs", "utf8");
 
-  assert.match(redirect, /url=os\.html#console/);
-  for (const view of ["console", "ops", "keep", "dash"]) {
+  assert.match(redirect, /url=os\.html#map/);
+  for (const view of ["map", "console", "ops", "director", "keep", "dash"]) {
     assert.match(html, new RegExp(`data-view="${view}"`));
   }
   assert.doesNotMatch(html, /href="index\.html"/);
   assert.match(html, /id="os-input"/);
+  assert.match(html, /id="graph-canvas"/);
+  assert.match(html, /type="module" src="os\.js/);
+  assert.match(script, /buildAgOsGraph/);
   assert.match(script, /result\.commandIntakeId/);
   assert.match(script, /result\.planId/);
   assert.match(script, /result\.jobId/);
