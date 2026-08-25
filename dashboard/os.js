@@ -1,6 +1,6 @@
 "use strict";
 
-import { ancestorsOf, buildAgOsGraph, graphStateClass, layoutGraph, renderGraphNodeDetail, searchGraph, toggleGraphExpansion, visibleGraph } from "./graph-adapter.js";
+import { ancestorsOf, buildAgOsGraph, graphLayoutBounds, graphState, graphStateClass, layoutGraph, nodeDimensions, reconcileGraphViewState, renderGraphNodeDetail, searchGraph, toggleGraphExpansion, visibleGraph } from "./graph-adapter.js?v=20260825-graph-owner-v9";
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -23,7 +23,13 @@ const state = {
   graphSelectedId: "ag-os",
   graphExpanded: new Set(["ag-os"]),
   graphTransform: { x: null, y: null, scale: 1 },
-  graphDragging: null
+  graphDragging: null,
+  graphPositions: new Map(),
+  graphVisible: null,
+  graphInitialFit: true,
+  graphHasInitialDataFit: false,
+  graphSearchQuery: "",
+  graphSearchMatches: new Set()
 };
 
 const connBadge = $("#os-conn");
@@ -189,28 +195,33 @@ function budgetView() {
 }
 
 function renderProjectTarget() {
-  const select = $("#os-project");
-  const selected = select.value;
-  select.replaceChildren(new Option("One-off work", ""));
-  for (const project of state.status?.projects || []) select.add(new Option(project.name, project.id));
-  if ([...select.options].some((option) => option.value === selected)) select.value = selected;
+  for (const select of [$("#os-project"), $("#graph-project")].filter(Boolean)) {
+    const selected = select.value;
+    select.replaceChildren(new Option(select.id === "graph-project" ? "One-off" : "One-off work", ""));
+    for (const project of state.status?.projects || []) select.add(new Option(project.name, project.id));
+    if ([...select.options].some((option) => option.value === selected)) select.value = selected;
+  }
 }
 
-async function submitCommand(command) {
+async function submitCommand(command, { stayOnMap = false, projectId: suppliedProjectId } = {}) {
   const text = String(command || "").trim();
   if (!text || state.busy) return;
-  setView("console");
+  if (!stayOnMap) setView("console");
+  const graphStatus = $("#graph-command-status");
+  if (graphStatus && stayOnMap) graphStatus.textContent = "Routing…";
   consoleLine(`› ${text}`, "con-user");
   const local = text.toLowerCase();
   if (["status", "jobs", "budget", "lessons", "projects", "help"].includes(local)) {
     renderLocalCommand(local);
+    if (graphStatus && stayOnMap) graphStatus.textContent = "Updated · open Console for detail";
+    if (stayOnMap) $("#graph-command-send").disabled = false;
     return;
   }
   state.busy = true;
   $("#send-command").disabled = true;
   const pending = consoleLine("◌ AG OS is routing the work…", "warn");
   try {
-    const projectId = $("#os-project").value || undefined;
+    const projectId = suppliedProjectId || $("#os-project").value || undefined;
     const result = await api("/api/v1/commands", {
       method: "POST",
       body: JSON.stringify({ command: text, ...(projectId ? { projectId } : {}) })
@@ -231,13 +242,18 @@ async function submitCommand(command) {
     }
     if (jobStatus === "waiting_approval") consoleLine("▲ The job is waiting in Ops for your decision.", "warn");
     await refreshStatus({ quiet: true });
-    if (missionId) setView("keep");
+    if (stayOnMap) {
+      if (graphStatus) graphStatus.textContent = missionId ? "Mission created" : titleCase(jobStatus);
+      if (missionId) { state.graphMode = "mission"; state.graphFocusId = missionId; expandFocusedEntity(state.graph?.nodes.find((node) => node.id === missionId)); state.graphInitialFit = true; renderGraph(); }
+    } else if (missionId) setView("keep");
   } catch (error) {
     pending.remove();
     consoleLine(`■ ${error.message}`, "bad");
+    if (graphStatus && stayOnMap) graphStatus.textContent = error.message;
   } finally {
     state.busy = false;
     $("#send-command").disabled = false;
+    if ($("#graph-command-send")) $("#graph-command-send").disabled = false;
   }
 }
 
@@ -429,23 +445,96 @@ function renderDirector() {
   setDirectorView(state.directorView);
 }
 
-const GRAPH_ICONS = { root: "AG", director: "◇", mission: "M", opportunity: "O", person: "P", person_group: "P·", experiment: "E", rule: "L", cost: "$", outcome: "✓", signal: "S", evidence: "↗", skeptic: "?", distribution: "D", planner: "Π", agent: "A", task: "T", blocker: "!", artifact: "□" };
+const GRAPH_ICONS = { root: "AG", director: "◇", mission: "M", opportunity: "O", person: "P", person_group: "P·", group: "⋯", capability: "○", experiment: "E", rule: "L", cost: "$", outcome: "✓", signal: "S", evidence: "↗", skeptic: "?", distribution: "D", planner: "Π", agent: "A", task: "T", blocker: "!", artifact: "□" };
 
-function graphNodeMarkup(node, position, childCount, expanded, selected) {
-  const x = Number(position?.x || 0);
-  const y = Number(position?.y || 0);
-  const root = node.type === "root";
-  const branch = ["director", "mission", "person", "experiment", "rule", "cost", "outcome"].includes(node.type) && node.parentId === "ag-os";
-  const width = root ? 156 : branch ? 148 : 132;
-  const height = root ? 72 : 58;
-  const icon = GRAPH_ICONS[node.type] || "·";
-  const label = escapeHtml(short(node.label, root ? 24 : 25));
-  return `<g class="graph-node ${graphStateClass(node.state)} graph-type-${escapeHtml(node.type)}${selected ? " selected" : ""}" data-graph-node="${escapeHtml(node.id)}" transform="translate(${x} ${y})" tabindex="0" role="button" aria-label="${label}, ${escapeHtml(titleCase(node.state))}">
-    <rect x="${-width / 2}" y="${-height / 2}" width="${width}" height="${height}" rx="${root ? 24 : 16}"/>
-    <circle class="graph-node-icon" cx="${-width / 2 + 24}" cy="0" r="13"/><text class="graph-icon-text" x="${-width / 2 + 24}" y="4">${escapeHtml(icon)}</text>
-    <text class="graph-node-label" x="${-width / 2 + 45}" y="-3">${label}</text><text class="graph-node-state" x="${-width / 2 + 45}" y="13">${escapeHtml(titleCase(node.state))}</text>
-    ${childCount ? `<g class="graph-expand" data-expand-node="${escapeHtml(node.id)}" transform="translate(${width / 2 - 8} ${-height / 2 + 8})"><circle r="10"/><text y="4">${expanded ? "−" : "+"}</text></g>` : ""}
+function graphNodeMeta(node) {
+  const record = node.detail?.record || {};
+  if (node.kind === "capability") return ["READY · IDLE"];
+  if (node.kind === "group") return [`${node.detail?.count || 0} ${node.detail?.collectionType || "records"}`];
+  if (node.type === "opportunity") return [`Score ${record.score ?? "—"} · ${record.confidence ?? "—"}% confidence`, titleCase(record.status || node.state)];
+  if (node.type === "mission") return record.progress ? [`${record.progress.completedTasks || 0} / ${record.progress.totalTasks || 0} tasks`, titleCase(node.state)] : [titleCase(node.state)];
+  if (node.type === "person") return [record.organization || record.publicRole || titleCase(node.state), titleCase(node.state)];
+  if (node.type === "agent") return [record.currentTask || titleCase(node.state), [record.toolCallCount == null ? null : `${record.toolCallCount} tools`, record.costUsd == null ? null : `$${Number(record.costUsd).toFixed(2)}`].filter(Boolean).join(" · ")];
+  if (node.type === "cost") return [record.spentUsd == null && node.detail?.spentUsd == null ? titleCase(node.state) : `$${Number(record.spentUsd ?? node.detail.spentUsd).toFixed(2)}`];
+  return [titleCase(node.state)];
+}
+
+function nodeShapeMarkup(node, width, height) {
+  const x = -width / 2; const y = -height / 2;
+  if (node.type === "opportunity") return `<path class="node-surface" d="M ${x + 16} ${y} H ${width / 2 - 16} L ${width / 2} 0 L ${width / 2 - 16} ${height / 2} H ${x + 16} L ${x} 0 Z"/>`;
+  if (node.type === "experiment") return `<path class="node-surface" d="M ${x + 20} ${y} H ${width / 2 - 20} L ${width / 2} 0 L ${width / 2 - 20} ${height / 2} H ${x + 20} L ${x} 0 Z"/>`;
+  if (node.type === "evidence") return `<path class="node-surface" d="M ${x} ${y + 10} Q ${x} ${y} ${x + 10} ${y} H ${width / 2 - 18} L ${width / 2} ${y + 18} V ${height / 2 - 10} Q ${width / 2} ${height / 2} ${width / 2 - 10} ${height / 2} H ${x + 10} Q ${x} ${height / 2} ${x} ${height / 2 - 10} Z"/>`;
+  if (node.type === "skeptic") return `<path class="node-surface" d="M 0 ${y} L ${width / 2} ${height / 2} H ${x} Z"/>`;
+  if (node.type === "outcome") return `<path class="node-surface" d="M ${x} ${y} H ${width / 2 - 12} L ${width / 2} 0 L ${width / 2 - 12} ${height / 2} H ${x} Z"/>`;
+  return `<rect class="node-surface" x="${x}" y="${y}" width="${width}" height="${height}" rx="${node.type === "person" ? height / 2 : node.kind === "root" ? 32 : node.kind === "system" ? 22 : 16}"/>`;
+}
+
+function wrapGraphLabel(value, maxCharacters) {
+  const words = String(value || "").trim().split(/\s+/).filter(Boolean);
+  const lines = [""];
+  for (const word of words) {
+    const candidate = `${lines.at(-1)} ${word}`.trim();
+    if (candidate.length <= maxCharacters || lines.at(-1) === "") lines[lines.length - 1] = candidate;
+    else if (lines.length === 1) lines.push(word); else { lines[1] = short(`${lines[1]} ${word}`, maxCharacters + 1); break; }
+  }
+  return lines.slice(0, 2);
+}
+
+function graphNodeMarkup(node, position, childCount, expanded, selected, previous, searchMatch) {
+  const { width, height } = position || nodeDimensions(node);
+  const x = Number(position?.x || 0); const y = Number(position?.y || 0);
+  const icon = GRAPH_ICONS[node.type] || GRAPH_ICONS[node.kind] || "·";
+  const labelLines = wrapGraphLabel(node.label, node.kind === "root" ? 24 : node.kind === "system" ? 22 : node.kind === "entity" ? 20 : 17);
+  const ariaLabel = escapeHtml(short(node.label, 80));
+  const meta = graphNodeMeta(node).filter(Boolean).slice(0, 2);
+  const iconX = -width / 2 + (node.kind === "root" ? 34 : 26);
+  const textX = -width / 2 + (node.kind === "root" ? 68 : 50);
+  const animation = !matchMedia("(prefers-reduced-motion: reduce)").matches && previous ? `<animateTransform attributeName="transform" type="translate" from="${previous.x} ${previous.y}" to="${x} ${y}" dur="420ms" calcMode="spline" keySplines="0.2 0.8 0.2 1" fill="freeze"/>` : "";
+  const labelStartY = node.kind === "root" ? (labelLines.length > 1 ? -22 : -10) : labelLines.length > 1 ? -18 : meta.length > 1 ? -11 : -6;
+  const metaStartY = node.kind === "root" ? (labelLines.length > 1 ? 22 : 20) : labelLines.length > 1 ? 12 : 8;
+  return `<g class="graph-node ${graphStateClass(node.state)} graph-kind-${escapeHtml(node.kind)} graph-type-${escapeHtml(node.type)}${selected ? " selected" : ""}${state.graphSearchQuery && !searchMatch ? " search-dim" : ""}${searchMatch ? " search-match" : ""}" data-graph-node="${escapeHtml(node.id)}" transform="translate(${x} ${y})" tabindex="0" role="button" aria-label="${ariaLabel}, ${escapeHtml(titleCase(node.state))}">
+    ${animation}${nodeShapeMarkup(node, width, height)}
+    <circle class="graph-node-icon" cx="${iconX}" cy="0" r="${node.kind === "root" ? 21 : 15}"/><text class="graph-icon-text" x="${iconX}" y="4">${escapeHtml(icon)}</text>
+    <text class="graph-node-label" x="${textX}" y="${labelStartY}">${labelLines.map((line, index) => `<tspan x="${textX}" dy="${index ? 15 : 0}">${escapeHtml(line)}</tspan>`).join("")}</text>
+    ${meta.map((line, index) => `<text class="graph-node-meta${index === meta.length - 1 ? " graph-node-state" : ""}" x="${textX}" y="${metaStartY + index * 13}">${escapeHtml(short(line, 28))}</text>`).join("")}
+    ${childCount ? `<g class="graph-expand" data-expand-node="${escapeHtml(node.id)}" transform="translate(${width / 2 - 5} ${-height / 2 + 7})"><circle r="13"/><text y="4">${expanded ? "−" : "+"}</text><title>${expanded ? "Collapse" : `Expand ${childCount} branches`}</title></g>` : ""}
   </g>`;
+}
+
+function graphEdgePath(source, target) {
+  const dx = target.x - source.x; const dy = target.y - source.y; const distance = Math.max(1, Math.hypot(dx, dy));
+  const ux = dx / distance; const uy = dy / distance; const nx = -uy; const ny = ux;
+  const start = { x: source.x + ux * Math.min(source.width / 2, 78), y: source.y + uy * Math.min(source.height / 2, 46) };
+  const end = { x: target.x - ux * Math.min(target.width / 2, 68), y: target.y - uy * Math.min(target.height / 2, 40) };
+  const bend = Math.min(54, distance * .11) * (source.angle <= target.angle ? 1 : -1);
+  return `M ${start.x} ${start.y} C ${start.x + dx * .34 + nx * bend} ${start.y + dy * .34 + ny * bend}, ${start.x + dx * .72 + nx * bend} ${start.y + dy * .72 + ny * bend}, ${end.x} ${end.y}`;
+}
+
+function applyGraphTransform() {
+  $("#graph-world").setAttribute("transform", `translate(${state.graphTransform.x} ${state.graphTransform.y}) scale(${state.graphTransform.scale})`);
+  $("#graph-zoom-label").textContent = `${Math.round(state.graphTransform.scale * 100)}%`;
+}
+
+function fitGraph(nodeIds = null, { maxScale = 1.18 } = {}) {
+  const graph = state.graphVisible; const positions = state.graphPositions;
+  if (!graph?.nodes?.length) return;
+  const selected = nodeIds ? new Set(nodeIds) : null;
+  const subset = selected ? { ...graph, nodes: graph.nodes.filter((node) => selected.has(node.id)) } : graph;
+  if (!subset.nodes.length) return;
+  const bounds = graphLayoutBounds(subset, positions);
+  const stage = $("#graph-stage").getBoundingClientRect();
+  const usableWidth = Math.max(320, stage.width - 120); const usableHeight = Math.max(360, stage.height - 150);
+  const scale = Math.min(maxScale, Math.max(.45, Math.min(usableWidth / Math.max(1, bounds.width), usableHeight / Math.max(1, bounds.height))));
+  state.graphTransform = { x: stage.width / 2 - ((bounds.minX + bounds.maxX) / 2) * scale, y: stage.height / 2 - 46 - ((bounds.minY + bounds.maxY) / 2) * scale, scale };
+  applyGraphTransform();
+}
+
+function renderGraphBreadcrumb() {
+  const breadcrumb = $("#graph-breadcrumb");
+  if (!state.graphFocusId) { breadcrumb.hidden = true; breadcrumb.innerHTML = ""; return; }
+  const ids = [...ancestorsOf(state.graph, state.graphFocusId), state.graphFocusId];
+  breadcrumb.hidden = false;
+  breadcrumb.innerHTML = `${ids.map((id) => `<button type="button" data-graph-result="${escapeHtml(id)}">${escapeHtml(state.graph.nodes.find((node) => node.id === id)?.label || id)}</button>`).join("<span>/</span>")}<button type="button" class="back-system" data-clear-graph-focus>Back to system</button>`;
 }
 
 function renderGraph() {
@@ -453,36 +542,72 @@ function renderGraph() {
   const stageBounds = $("#graph-stage").getBoundingClientRect();
   const viewport = { width: Math.max(320, Math.round(stageBounds.width)), height: Math.max(480, Math.round(stageBounds.height)) };
   $("#graph-canvas").setAttribute("viewBox", `0 0 ${viewport.width} ${viewport.height}`);
-  if (!Number.isFinite(state.graphTransform.x)) state.graphTransform.x = viewport.width / 2;
-  if (!Number.isFinite(state.graphTransform.y)) state.graphTransform.y = viewport.height / 2;
+  const previousPositions = state.graphPositions;
   const details = state.mission ? [state.mission] : [];
   state.graph = buildAgOsGraph({ status: state.status || {}, missionDetails: details });
   const allNodes = state.graph.nodes;
+  const reconciled = reconcileGraphViewState(state.graph, { expanded: state.graphExpanded, selectedId: state.graphSelectedId, focusId: state.graphFocusId });
+  state.graphExpanded = reconciled.expanded;
+  state.graphSelectedId = reconciled.selectedId;
+  state.graphFocusId = reconciled.focusId;
+  state.graphExpanded.add(state.graph.rootId);
+  if (state.graphInitialFit && allNodes.some((node) => node.id === "branch-opportunity-director") && !(state.status?.opportunityDirector?.opportunities || []).length) state.graphExpanded.add("branch-opportunity-director");
   if (state.graphMode !== "system" && !state.graphFocusId) {
-    const first = allNodes.find((node) => node.type === state.graphMode && node.parentId?.startsWith("branch-"));
-    if (first) { state.graphFocusId = first.id; state.graphSelectedId = first.id; state.graphExpanded.add(first.id); }
-    else state.graphMode = "system";
+    const first = allNodes.find((node) => node.type === state.graphMode && node.kind === "entity");
+    if (first) { state.graphFocusId = first.id; state.graphSelectedId = first.id; expandFocusedEntity(first); }
   }
-  if (!allNodes.some((node) => node.id === state.graphSelectedId)) state.graphSelectedId = state.graph.rootId;
-  if (state.graphFocusId && !allNodes.some((node) => node.id === state.graphFocusId)) state.graphFocusId = null;
   const graph = visibleGraph(state.graph, { expanded: state.graphExpanded, focusId: state.graphFocusId });
   const positions = layoutGraph(graph, { focusId: state.graphFocusId });
+  state.graphVisible = graph; state.graphPositions = positions;
   const children = new Map();
   for (const node of allNodes) if (node.parentId) children.set(node.parentId, (children.get(node.parentId) || 0) + 1);
   $("#graph-edges").innerHTML = graph.edges.map((edge) => {
-    const source = positions.get(edge.source); const target = positions.get(edge.target);
-    if (!source || !target) return "";
-    const cross = edge.relation !== "contains";
-    return `<path class="graph-edge${cross ? " graph-edge-cross" : ""}" d="M ${source.x} ${source.y} C ${(source.x + target.x) / 2} ${source.y}, ${(source.x + target.x) / 2} ${target.y}, ${target.x} ${target.y}"${cross ? ' marker-end="url(#graph-arrow)"' : ""}><title>${escapeHtml(titleCase(edge.relation))}</title></path>`;
+    const source = positions.get(edge.source); const target = positions.get(edge.target); if (!source || !target) return "";
+    const directional = edge.relation !== "contains";
+    const isNew = !previousPositions.has(edge.target);
+    return `<path class="graph-edge graph-relation-${escapeHtml(edge.relation)} graph-edge-depth-${Math.min(source.depth, 4)}${directional ? " graph-edge-directional" : ""}${edge.active ? " active-flow" : ""}${isNew ? " branch-enter" : ""}" data-edge-source="${escapeHtml(edge.source)}" data-edge-target="${escapeHtml(edge.target)}" d="${graphEdgePath(source, target)}"${directional ? ' marker-end="url(#graph-arrow)"' : ""}><title>${escapeHtml(titleCase(edge.relation))}</title></path>`;
   }).join("");
-  $("#graph-nodes").innerHTML = graph.nodes.map((node) => graphNodeMarkup(node, positions.get(node.id), children.get(node.id) || 0, state.graphExpanded.has(node.id), node.id === state.graphSelectedId)).join("");
-  $("#graph-world").setAttribute("transform", `translate(${state.graphTransform.x} ${state.graphTransform.y}) scale(${state.graphTransform.scale})`);
+  $("#graph-nodes").innerHTML = graph.nodes.map((node) => graphNodeMarkup(node, positions.get(node.id), children.get(node.id) || 0, state.graphExpanded.has(node.id), node.id === state.graphSelectedId, previousPositions.get(node.id) || positions.get(node.parentId), state.graphSearchMatches.has(node.id))).join("");
+  if (!Number.isFinite(state.graphTransform.x)) state.graphTransform.x = viewport.width / 2;
+  if (!Number.isFinite(state.graphTransform.y)) state.graphTransform.y = viewport.height / 2;
+  applyGraphTransform();
   $("#graph-empty").hidden = allNodes.length > 1;
+  $("#graph-focus-empty").hidden = !(state.graphMode !== "system" && !state.graphFocusId);
   const counts = { active: 0, blocked: 0, waiting: 0, completed: 0, archived: 0 };
-  for (const node of allNodes) { const value = graphStateClass(node.state).replace("graph-state-", ""); if (value in counts) counts[value] += 1; }
-  $("#graph-metrics").innerHTML = `<span><i class="active"></i>${counts.active} active</span><span><i class="blocked"></i>${counts.blocked} blocked</span><span><i class="waiting"></i>${counts.waiting} waiting</span><span><i class="completed"></i>${counts.completed} completed</span>${counts.archived ? `<span><i class="archived"></i>${counts.archived} archived</span>` : ""}<strong>${graph.nodes.length}/${allNodes.length} visible</strong>`;
-  $("#graph-zoom-label").textContent = `${Math.round(state.graphTransform.scale * 100)}%`;
+  for (const node of allNodes.filter((item) => item.kind !== "capability")) { const value = graphState(node.state); if (value in counts) counts[value] += 1; }
+  $("#graph-metrics").innerHTML = `<span><i class="active"></i>${counts.active} active</span><span><i class="blocked"></i>${counts.blocked} blocked</span><span><i class="completed"></i>${counts.completed} completed</span><strong>${graph.nodes.length} visible</strong>`;
   for (const button of $$("[data-graph-mode]")) button.classList.toggle("active", button.dataset.graphMode === state.graphMode);
+  renderGraphBreadcrumb();
+  if (allNodes.length > 1 && (state.graphInitialFit || !state.graphHasInitialDataFit)) {
+    state.graphInitialFit = false;
+    state.graphHasInitialDataFit = true;
+    fitGraph();
+  }
+}
+
+function expandFocusedEntity(node) {
+  if (!node) return;
+  state.graphExpanded.add(node.id);
+  if (node.type === "mission") {
+    for (const child of state.graph.nodes.filter((candidate) => candidate.parentId === node.id && candidate.kind === "group" && ["agent", "task"].includes(candidate.detail?.collectionType))) state.graphExpanded.add(child.id);
+  }
+}
+
+function toggleGraphNodeExpansion(nodeId) {
+  const collapsing = state.graphExpanded.has(nodeId);
+  if (collapsing && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const descendants = new Set();
+    const visit = (id) => {
+      for (const child of state.graph.nodes.filter((node) => node.parentId === id)) { descendants.add(child.id); visit(child.id); }
+    };
+    visit(nodeId);
+    for (const element of $$("[data-graph-node]")) if (descendants.has(element.dataset.graphNode)) element.classList.add("branch-exit");
+    for (const edge of $$("[data-edge-source]")) if (descendants.has(edge.dataset.edgeSource) || descendants.has(edge.dataset.edgeTarget)) edge.classList.add("branch-exit");
+    setTimeout(() => { state.graphExpanded = toggleGraphExpansion(state.graphExpanded, nodeId); renderGraph(); }, 190);
+    return;
+  }
+  state.graphExpanded = toggleGraphExpansion(state.graphExpanded, nodeId);
+  renderGraph();
 }
 
 function focusGraphNode(nodeId, { open = true } = {}) {
@@ -493,7 +618,10 @@ function focusGraphNode(nodeId, { open = true } = {}) {
   renderGraph();
   if (open) {
     const hasChildren = state.graph.nodes.some((candidate) => candidate.parentId === node.id);
-    const graphActions = `<section class="drawer-section"><div class="drawer-actions">${hasChildren ? `<button type="button" class="quiet-button" data-focus-subtree="${escapeHtml(node.id)}">Focus subtree</button>` : ""}${state.graphFocusId ? '<button type="button" class="quiet-button" data-clear-graph-focus>Show system map</button>' : ""}</div></section>`;
+    const opportunityActions = node.type === "opportunity" ? `<button type="button" data-opportunity-action="research_deeper" data-opportunity-id="${escapeHtml(node.id)}">Research deeper</button><button type="button" data-opportunity-action="watch" data-opportunity-id="${escapeHtml(node.id)}">Watch</button><button type="button" class="primary" data-opportunity-action="prepare_validation" data-opportunity-id="${escapeHtml(node.id)}">Prepare validation</button><button type="button" data-opportunity-action="spawn_build_mission" data-opportunity-id="${escapeHtml(node.id)}">Spawn build mission</button><button type="button" class="danger" data-opportunity-action="kill" data-opportunity-id="${escapeHtml(node.id)}">Kill</button>` : "";
+    const missionActions = node.type === "mission" ? `${["planned", "blocked"].includes(node.state) ? '<button type="button" data-graph-mission-action="run">Run mission</button>' : ""}${["running", "planned", "blocked"].includes(node.state) ? '<button type="button" class="danger" data-graph-mission-action="cancel">Cancel</button>' : ""}` : "";
+    const personActions = node.type === "person" ? `<button type="button" data-confirm-relationship="${escapeHtml(node.id)}">Confirm relationship</button>` : "";
+    const graphActions = `<section class="drawer-section inspector-actions"><h3>Available actions</h3><div class="drawer-actions">${hasChildren ? `<button type="button" class="primary" data-focus-subtree="${escapeHtml(node.id)}">Focus this branch</button>` : ""}${state.graphFocusId ? '<button type="button" data-clear-graph-focus>Back to system</button>' : ""}${opportunityActions}${missionActions}${personActions}</div></section>`;
     openDrawer({ kicker: `${titleCase(node.type)} · ${titleCase(node.state)}`, title: node.label, html: renderGraphNodeDetail(node, state.graph) + graphActions });
   }
 }
@@ -514,18 +642,24 @@ function setGraphMode(mode) {
   sessionStorage.setItem("ag_os_graph_mode", mode);
   if (mode === "system") state.graphFocusId = null;
   else {
-    const preferred = state.graph?.nodes.find((node) => node.id === state.graphSelectedId && node.type === mode);
-    const first = preferred || state.graph?.nodes.find((node) => node.type === mode && node.parentId?.startsWith("branch-"));
+    const preferred = state.graph?.nodes.find((node) => node.id === state.graphSelectedId && node.type === mode && node.kind === "entity");
+    const first = preferred || state.graph?.nodes.find((node) => node.type === mode && node.kind === "entity");
     state.graphFocusId = first?.id || null;
-    if (first) { state.graphSelectedId = first.id; state.graphExpanded.add(first.id); }
+    if (first) { state.graphSelectedId = first.id; expandFocusedEntity(first); }
   }
-  state.graphTransform = { x: null, y: null, scale: mode === "system" ? 1 : 1.1 };
+  state.graphTransform = { x: null, y: null, scale: 1 };
+  state.graphInitialFit = true;
   renderGraph();
 }
 
-function changeGraphZoom(delta) {
-  state.graphTransform.scale = Math.min(2.2, Math.max(.38, state.graphTransform.scale + delta));
-  renderGraph();
+function changeGraphZoom(delta, anchor = null) {
+  const oldScale = state.graphTransform.scale;
+  const nextScale = Math.min(2.25, Math.max(.45, oldScale + delta));
+  if (anchor) {
+    const worldX = (anchor.x - state.graphTransform.x) / oldScale; const worldY = (anchor.y - state.graphTransform.y) / oldScale;
+    state.graphTransform.x = anchor.x - worldX * nextScale; state.graphTransform.y = anchor.y - worldY * nextScale;
+  }
+  state.graphTransform.scale = nextScale; applyGraphTransform();
 }
 
 function renderAll() {
@@ -838,16 +972,27 @@ async function recordOpportunityOutcome(opportunityId) {
 
 document.addEventListener("click", (event) => {
   const focusSubtree = event.target.closest("[data-focus-subtree]");
-  if (focusSubtree) { state.graphFocusId = focusSubtree.dataset.focusSubtree; state.graphExpanded.add(state.graphFocusId); renderGraph(); return; }
-  if (event.target.closest("[data-clear-graph-focus]")) { state.graphFocusId = null; state.graphMode = "system"; sessionStorage.setItem("ag_os_graph_mode", "system"); renderGraph(); return; }
+  if (focusSubtree) {
+    state.graphFocusId = focusSubtree.dataset.focusSubtree;
+    const focused = state.graph.nodes.find((node) => node.id === state.graphFocusId);
+    expandFocusedEntity(focused);
+    state.graphMode = ["opportunity", "mission"].includes(focused?.type) ? focused.type : state.graphMode;
+    state.graphInitialFit = true; closeDrawer(); renderGraph(); return;
+  }
+  if (event.target.closest("[data-clear-graph-focus]")) { state.graphFocusId = null; state.graphMode = "system"; state.graphInitialFit = true; sessionStorage.setItem("ag_os_graph_mode", "system"); closeDrawer(); renderGraph(); return; }
   const expandNode = event.target.closest("[data-expand-node]");
-  if (expandNode) { state.graphExpanded = toggleGraphExpansion(state.graphExpanded, expandNode.dataset.expandNode); renderGraph(); return; }
+  if (expandNode) { toggleGraphNodeExpansion(expandNode.dataset.expandNode); return; }
   const graphNode = event.target.closest("[data-graph-node]");
   if (graphNode) return void selectGraphNode(graphNode.dataset.graphNode);
   const graphMode = event.target.closest("[data-graph-mode]");
   if (graphMode) return setGraphMode(graphMode.dataset.graphMode);
   const graphResult = event.target.closest("[data-graph-result]");
-  if (graphResult) { $("#graph-search-results").hidden = true; return focusGraphNode(graphResult.dataset.graphResult); }
+  if (graphResult) {
+    const nodeId = graphResult.dataset.graphResult;
+    const target = state.graph.nodes.find((node) => node.id === nodeId);
+    if (!state.graphVisible?.nodes.some((node) => node.id === nodeId) || target?.kind === "system" || target?.kind === "root") { state.graphFocusId = null; state.graphMode = "system"; }
+    $("#graph-search-results").hidden = true; focusGraphNode(nodeId); requestAnimationFrame(() => fitGraph([nodeId], { maxScale: 1.28 })); return;
+  }
   const viewButton = event.target.closest("[data-view]");
   if (viewButton) return setView(viewButton.dataset.view);
   if (event.target.closest("[data-close-drawer]")) return closeDrawer();
@@ -858,6 +1003,7 @@ document.addEventListener("click", (event) => {
   const directorTab = event.target.closest("[data-director-view]"); if (directorTab) return setDirectorView(directorTab.dataset.directorView);
   const opportunity = event.target.closest("[data-open-opportunity]"); if (opportunity) return void openOpportunity(opportunity.dataset.openOpportunity);
   const opportunityAction = event.target.closest("[data-opportunity-action]"); if (opportunityAction) return void applyOpportunityAction(opportunityAction.dataset.opportunityId, opportunityAction.dataset.opportunityAction);
+  const graphMissionAction = event.target.closest("[data-graph-mission-action]"); if (graphMissionAction) return void controlMission(graphMissionAction.dataset.graphMissionAction);
   const relationship = event.target.closest("[data-confirm-relationship]"); if (relationship) return void confirmRelationship(relationship.dataset.confirmRelationship);
   const opportunityOutcome = event.target.closest("[data-record-opportunity-outcome]"); if (opportunityOutcome) return void recordOpportunityOutcome(opportunityOutcome.dataset.recordOpportunityOutcome);
   if (event.target.closest("#director-wake")) return void wakeOpportunityDirector();
@@ -893,21 +1039,28 @@ $("#refresh-ops").addEventListener("click", () => void refreshStatus());
 $("#mission-run").addEventListener("click", () => void controlMission("run"));
 $("#mission-cancel").addEventListener("click", () => void controlMission("cancel"));
 
+$("#graph-command-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const input = $("#graph-command-input"); const command = input.value.trim(); if (!command) return;
+  input.value = ""; $("#graph-command-send").disabled = true;
+  void submitCommand(command, { stayOnMap: true, projectId: $("#graph-project").value || undefined });
+});
+
 $("#graph-reset").addEventListener("click", () => {
   state.graphMode = "system"; state.graphFocusId = null; state.graphSelectedId = "ag-os";
   state.graphExpanded = new Set(["ag-os"]); state.graphTransform = { x: null, y: null, scale: 1 };
+  state.graphInitialFit = true; state.graphSearchQuery = ""; state.graphSearchMatches.clear(); $("#graph-search").value = "";
   sessionStorage.setItem("ag_os_graph_mode", "system"); renderGraph();
 });
-$("#graph-fit").addEventListener("click", () => {
-  const graph = visibleGraph(state.graph, { expanded: state.graphExpanded, focusId: state.graphFocusId });
-  const point = layoutGraph(graph, { focusId: state.graphFocusId }).get(state.graphSelectedId) || { x: 0, y: 0 };
-  const bounds = $("#graph-stage").getBoundingClientRect();
-  state.graphTransform = { x: bounds.width / 2 - point.x, y: bounds.height / 2 - point.y, scale: 1 }; renderGraph();
-});
+$("#graph-fit-all").addEventListener("click", () => fitGraph());
+$("#graph-fit").addEventListener("click", () => fitGraph([state.graphSelectedId], { maxScale: 1.28 }));
 $("#graph-zoom-in").addEventListener("click", () => changeGraphZoom(.15));
 $("#graph-zoom-out").addEventListener("click", () => changeGraphZoom(-.15));
 $("#graph-search").addEventListener("input", (event) => {
-  const results = searchGraph(state.graph, event.target.value).slice(0, 8);
+  state.graphSearchQuery = event.target.value.trim();
+  const results = searchGraph(state.graph, state.graphSearchQuery).slice(0, 8);
+  for (const node of results) for (const ancestor of ancestorsOf(state.graph, node.id)) state.graphExpanded.add(ancestor);
+  state.graphSearchMatches = new Set(results.map((node) => node.id)); renderGraph();
   const panel = $("#graph-search-results");
   panel.hidden = !event.target.value.trim();
   panel.innerHTML = results.length ? results.map((node) => `<button type="button" data-graph-result="${escapeHtml(node.id)}"><span>${escapeHtml(node.label)}</span><small>${escapeHtml(titleCase(node.type))} · ${escapeHtml(titleCase(node.state))}</small></button>`).join("") : '<div class="graph-search-none">No persisted node matches.</div>';
@@ -915,14 +1068,15 @@ $("#graph-search").addEventListener("input", (event) => {
 $("#graph-canvas").addEventListener("dblclick", (event) => {
   const node = event.target.closest("[data-graph-node]");
   if (!node) return;
-  event.preventDefault(); state.graphExpanded = toggleGraphExpansion(state.graphExpanded, node.dataset.graphNode); renderGraph();
+  event.preventDefault(); toggleGraphNodeExpansion(node.dataset.graphNode);
 });
 $("#graph-canvas").addEventListener("keydown", (event) => {
   const node = event.target.closest("[data-graph-node]");
-  if (!node || !["Enter", " "].includes(event.key)) return;
-  event.preventDefault(); void selectGraphNode(node.dataset.graphNode);
+  if (!node || !["Enter", " "].includes(event.key)) return; event.preventDefault();
+  if (event.key === " ") toggleGraphNodeExpansion(node.dataset.graphNode);
+  else void selectGraphNode(node.dataset.graphNode);
 });
-$("#graph-stage").addEventListener("wheel", (event) => { event.preventDefault(); changeGraphZoom(event.deltaY < 0 ? .09 : -.09); }, { passive: false });
+$("#graph-stage").addEventListener("wheel", (event) => { const bounds = $("#graph-stage").getBoundingClientRect(); event.preventDefault(); changeGraphZoom(event.deltaY < 0 ? .09 : -.09, { x: event.clientX - bounds.left, y: event.clientY - bounds.top }); }, { passive: false });
 $("#graph-stage").addEventListener("pointerdown", (event) => {
   if (event.target.closest("[data-graph-node]")) return;
   state.graphDragging = { x: event.clientX, y: event.clientY, originX: state.graphTransform.x, originY: state.graphTransform.y };
@@ -970,10 +1124,14 @@ $("#owner-menu").addEventListener("click", () => {
 });
 
 window.addEventListener("hashchange", () => setView(location.hash.slice(1)));
-window.addEventListener("resize", () => { state.graphTransform.x = null; state.graphTransform.y = null; renderGraph(); });
+window.addEventListener("resize", () => { state.graphTransform.x = null; state.graphTransform.y = null; state.graphInitialFit = true; renderGraph(); });
 window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") closeDrawer();
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); setView("console"); promptInput.focus(); }
+  if (event.key === "Escape") {
+    if (state.graphSearchQuery) { state.graphSearchQuery = ""; state.graphSearchMatches.clear(); $("#graph-search").value = ""; $("#graph-search-results").hidden = true; renderGraph(); }
+    else closeDrawer();
+  }
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); if (state.view === "map") $("#graph-command-input").focus(); else { setView("console"); promptInput.focus(); } }
+  if (event.key === "/" && state.view === "map" && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) { event.preventDefault(); $("#graph-command-input").focus(); }
 });
 
 setView(state.view);
