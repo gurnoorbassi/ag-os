@@ -3,7 +3,7 @@
   "generatedAt": "2026-08-24T12:00:00.000Z",
   "repository": "gurnoorbassi/ag-os",
   "branch": "codex/opportunity-director-v1",
-  "head": "90714d7248e4a9d264b700224cb7ae5fcec89c94",
+  "head": "3ebe37db1f721ac052138e534a50043b26778f91",
   "requiredBaseCommit": "90714d7248e4a9d264b700224cb7ae5fcec89c94",
   "verificationMode": "deterministic_fixture_only",
   "focusedTests": {
