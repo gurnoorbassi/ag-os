@@ -4,21 +4,22 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b0a08">
-  <title>AG OS — Owner Console</title>
-  <link rel="stylesheet" href="os.css?v=20260825-opportunity-v1-1">
+  <title>AG OS — Living Company Map</title>
+  <link rel="stylesheet" href="os.css?v=20260825-graph-owner-v9">
 </head>
 <body>
   <header class="os-topbar">
-    <button class="os-brand" type="button" data-view="console" aria-label="Open AG OS console">
+    <button class="os-brand" type="button" data-view="map" aria-label="Open AG OS system map">
       <span class="brand-mark" aria-hidden="true"></span>
       <span>AG OS</span>
     </button>
-    <nav class="os-tabs" id="os-tabs" aria-label="AG OS views">
-      <button type="button" data-view="console"><span class="tab-glyph">›_</span><span>Console</span></button>
-      <button type="button" data-view="ops"><span class="tab-glyph">⌁</span><span>Ops</span><span id="ops-tab-count" class="tab-count" hidden>0</span></button>
-      <button type="button" data-view="director"><span class="tab-glyph">◇</span><span>Opportunity</span><span id="director-tab-count" class="tab-count" hidden>0</span></button>
-      <button type="button" data-view="keep"><span class="tab-glyph">◎</span><span>Mission</span><span id="mission-tab-count" class="tab-count" hidden>0</span></button>
-      <button type="button" data-view="dash"><span class="tab-glyph">◫</span><span>Dash</span></button>
+    <nav class="os-tabs" id="os-tabs" aria-label="AG OS utility views">
+      <button type="button" data-view="map" class="primary-nav"><span class="tab-glyph">⌘</span><span>System map</span></button>
+      <button type="button" data-view="console" title="Console"><span class="tab-glyph">›_</span><span>Console</span></button>
+      <button type="button" data-view="ops" title="Operations"><span class="tab-glyph">⌁</span><span>Ops</span><span id="ops-tab-count" class="tab-count" hidden>0</span></button>
+      <button type="button" data-view="director" title="Opportunity Director"><span class="tab-glyph">◇</span><span>Opportunity</span><span id="director-tab-count" class="tab-count" hidden>0</span></button>
+      <button type="button" data-view="keep" title="Mission Control"><span class="tab-glyph">◎</span><span>Mission</span><span id="mission-tab-count" class="tab-count" hidden>0</span></button>
+      <button type="button" data-view="dash" title="Owner dashboard"><span class="tab-glyph">◫</span><span>Dash</span></button>
     </nav>
     <div class="os-presence">
       <span id="os-conn" class="presence-pill" role="status"><span></span>Connecting</span>
@@ -27,6 +28,53 @@
   </header>
 
   <main class="os-main">
+    <section id="view-map" class="os-view graph-view" aria-labelledby="graph-title">
+      <header class="graph-overlay graph-overlay-top">
+        <div class="graph-title-block">
+          <p class="eyebrow">Living company map</p>
+          <h1 id="graph-title">Living system</h1>
+          <p id="graph-subtitle">Every visible branch is grounded in AG OS state.</p>
+        </div>
+        <div id="graph-metrics" class="graph-metrics" aria-label="System map status"></div>
+      </header>
+      <nav id="graph-breadcrumb" class="graph-breadcrumb" aria-label="Focused graph path" hidden></nav>
+      <div class="graph-toolbar" aria-label="Map controls">
+        <div id="graph-modes" class="graph-modes" role="group" aria-label="Map mode">
+          <button type="button" data-graph-mode="system" class="active">System</button>
+          <button type="button" data-graph-mode="opportunity">Opportunity</button>
+          <button type="button" data-graph-mode="mission">Mission</button>
+        </div>
+        <label class="graph-search"><span class="visually-hidden">Search map</span><input id="graph-search" type="search" placeholder="Search the system…" autocomplete="off"><span>⌕</span></label>
+        <button type="button" class="graph-tool" id="graph-fit-all">Fit all</button>
+        <button type="button" class="graph-tool" id="graph-fit">Fit selection</button>
+        <button type="button" class="graph-tool" id="graph-reset">Reset</button>
+      </div>
+      <div id="graph-search-results" class="graph-search-results" hidden></div>
+      <div id="graph-stage" class="graph-stage" tabindex="0" aria-label="Interactive AG OS relationship graph">
+        <svg id="graph-canvas" viewBox="0 0 1600 900" role="img" aria-labelledby="graph-title graph-subtitle">
+          <defs>
+            <pattern id="graph-grid-pattern" width="36" height="36" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="rgba(196,207,226,.09)"/></pattern>
+            <filter id="graph-glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <marker id="graph-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z"/></marker>
+          </defs>
+          <rect class="graph-grid" width="100%" height="100%" fill="url(#graph-grid-pattern)"/>
+          <g id="graph-world"><g id="graph-edges"></g><g id="graph-nodes"></g></g>
+        </svg>
+        <div id="graph-empty" class="graph-empty" hidden><strong>No active branch yet</strong><span>AG OS will only show work that exists.</span></div>
+        <div id="graph-focus-empty" class="graph-empty" hidden><strong>No matching entity yet</strong><span>This focus mode will remain truthful until one exists.</span></div>
+        <div class="graph-help">Drag to pan · Scroll to zoom · Enter selects · Space expands</div>
+      </div>
+      <div class="graph-zoom" aria-label="Zoom controls"><button id="graph-zoom-out" type="button" aria-label="Zoom out">−</button><span id="graph-zoom-label">100%</span><button id="graph-zoom-in" type="button" aria-label="Zoom in">+</button></div>
+      <form id="graph-command-form" class="graph-command-bar">
+        <button type="button" class="graph-command-mark" data-view="console" aria-label="Open command console">⌘</button>
+        <label class="visually-hidden" for="graph-command-input">Ask AG OS anything</label>
+        <input id="graph-command-input" maxlength="10000" autocomplete="off" placeholder="Ask AG OS anything…">
+        <select id="graph-project" aria-label="Command project"><option value="">One-off</option></select>
+        <button id="graph-command-send" type="submit" aria-label="Send command">↑</button>
+        <span id="graph-command-status" role="status" aria-live="polite"></span>
+      </form>
+    </section>
+
     <section id="view-console" class="os-view console-view" aria-labelledby="console-title">
       <div class="console-shell">
         <header class="view-intro compact">
@@ -176,7 +224,7 @@
 
   <aside id="detail-drawer" class="detail-drawer" aria-hidden="true">
     <div class="drawer-backdrop" data-close-drawer></div>
-    <section class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <section class="drawer-panel" role="dialog" aria-modal="false" aria-labelledby="drawer-title">
       <header class="drawer-head">
         <div><p id="drawer-kicker" class="eyebrow">AG OS</p><h2 id="drawer-title">Details</h2></div>
         <button type="button" class="drawer-close" data-close-drawer aria-label="Close details">×</button>
@@ -202,6 +250,6 @@
     </form>
   </dialog>
 
-  <script src="os.js?v=20260825-opportunity-v1-1"></script>
+  <script type="module" src="os.js?v=20260825-graph-owner-v9"></script>
 </body>
 </html>
