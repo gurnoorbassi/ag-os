@@ -1,0 +1,15 @@
+{
+  "treasuryId": "opportunity-treasury-v1",
+  "currency": "USD",
+  "startingCapital": 0,
+  "availableCapital": 0,
+  "reservedCapital": 0,
+  "spentCapital": 0,
+  "revenueAttributed": 0,
+  "netContribution": 0,
+  "executionMode": "simulation_only",
+  "realMoneyMovementAdapter": null,
+  "transactions": [],
+  "createdAt": "2026-08-24T00:00:00.000Z",
+  "updatedAt": "2026-08-24T00:00:00.000Z"
+}

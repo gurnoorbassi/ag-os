@@ -34,6 +34,7 @@ import { recordExternalEvidence } from "./lib/runtime/external-evidence-service.
 import { cancelMission, createMission, listMissions, missionDetail, runMission } from "./lib/runtime/mission-runtime.mjs";
 import { listMissionAgents, listMissionHandoffs, listMissionTasks, missionPaths, readMissionEvents } from "./lib/runtime/mission-store.mjs";
 import { createAnthropicAgentProvider } from "./lib/runtime/anthropic-agent-provider.mjs";
+import { applyOpportunityOwnerAction, getOpportunityDirectorSnapshot, spawnMissionForOpportunity } from "./lib/runtime/opportunity-director.mjs";
 import {
   buildOwnerSessionCookie,
   clearOwnerSessionCookie,
@@ -593,8 +594,44 @@ const server = createServer(async (request, response) => {
         outcomes: listOutcomes({ root }).slice(0, 20),
         jobs: listAutonomousJobs({ root }),
         recentCommands: listRecentOwnerCommands({ root }),
-        missions: listMissions({ root })
+        missions: listMissions({ root }),
+        opportunityDirector: getOpportunityDirectorSnapshot({ root })
       }, headers);
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/v1/opportunity") {
+      json(response, 200, getOpportunityDirectorSnapshot({ root }), headers);
+      return;
+    }
+
+    const opportunityMatch = url.pathname.match(/^\/api\/v1\/opportunities\/([^/]+)$/);
+    if (request.method === "GET" && opportunityMatch) {
+      const snapshot = getOpportunityDirectorSnapshot({ root });
+      const opportunityId = decodeURIComponent(opportunityMatch[1]);
+      const opportunity = snapshot.opportunities.find((item) => item.opportunityId === opportunityId);
+      if (!opportunity) { json(response, 404, { error: "opportunity_not_found" }, headers); return; }
+      json(response, 200, {
+        opportunity,
+        people: snapshot.people.filter((item) => item.relatedOpportunityIds?.includes(opportunityId)),
+        experiments: snapshot.experiments.filter((item) => item.opportunityId === opportunityId),
+        activity: snapshot.activity.filter((item) => item.subjectId === opportunityId),
+        missionLinks: snapshot.missionLinks.filter((item) => item.opportunityId === opportunityId)
+      }, headers);
+      return;
+    }
+
+    const opportunityActionMatch = url.pathname.match(/^\/api\/v1\/opportunities\/([^/]+)\/actions$/);
+    if (request.method === "POST" && opportunityActionMatch) {
+      const body = await readJsonBody(request);
+      const result = applyOpportunityOwnerAction({
+        opportunityId: decodeURIComponent(opportunityActionMatch[1]),
+        action: body.action,
+        confirmation: body.confirmation,
+        root
+      });
+      refreshProposals({ root });
+      json(response, result.status === "blocked_owner_proposal_required" ? 409 : 200, result, headers);
       return;
     }
 
@@ -750,7 +787,22 @@ const server = createServer(async (request, response) => {
       const decision = decideProposal({ proposalId: decodeURIComponent(proposalDecisionMatch[1]), decision: body.decision, confirmation: body.confirmation, reason: body.reason, root });
       let commandResult = null;
       if (decision.acceptedCommand) {
-        try { commandResult = await submitRuntimeCommand(decision.acceptedCommand); }
+        try {
+          if (decision.proposal.source?.type === "opportunity_validation") {
+            const repositoryPath = projectWorkspacePath(decision.proposal.projectId, decision.acceptedCommand);
+            if (!repositoryPath) throw new Error(`No local mission workspace is configured for ${decision.proposal.projectId}.`);
+            const bridge = spawnMissionForOpportunity({
+              opportunityId: decision.proposal.source.id,
+              proposalId: decision.proposal.proposalId,
+              repositoryPath,
+              projectId: decision.proposal.projectId,
+              root
+            });
+            commandResult = { status: "mission_planned", missionId: bridge.mission.missionId, projectId: bridge.mission.projectId, opportunityId: decision.proposal.source.id, protectedExternalActionExecuted: false };
+          } else {
+            commandResult = await submitRuntimeCommand(decision.acceptedCommand);
+          }
+        }
         catch (error) { markProposalStartFailed({ proposalId: decision.proposal.proposalId, error: error.message, root }); throw error; }
       }
       json(response, 200, { ...decision, commandResult }, headers);

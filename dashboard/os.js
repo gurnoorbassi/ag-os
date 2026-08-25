@@ -3,7 +3,7 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-const VALID_VIEWS = new Set(["console", "ops", "keep", "dash"]);
+const VALID_VIEWS = new Set(["console", "ops", "director", "keep", "dash"]);
 const state = {
   view: VALID_VIEWS.has(location.hash.slice(1)) ? location.hash.slice(1) : "console",
   status: null,
@@ -11,6 +11,7 @@ const state = {
   activeMissionId: sessionStorage.getItem("ag_os_active_mission") || "",
   mission: null,
   missionStream: null,
+  directorView: "overview",
   ownerToken: sessionStorage.getItem("ag_os_owner_token") || "",
   authenticated: false,
   busy: false
@@ -360,10 +361,66 @@ function renderDash() {
   void qualityJobs;
 }
 
+function moneyText(value) {
+  return `$${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: Number(value || 0) < 100 ? 2 : 0, maximumFractionDigits: 2 })}`;
+}
+
+function opportunityCard(opportunity) {
+  return `<article class="director-card" data-open-opportunity="${escapeHtml(opportunity.opportunityId)}" tabindex="0">
+    <div class="director-card-head"><div><span class="eyebrow">${escapeHtml(titleCase(opportunity.type))}</span><h3>${escapeHtml(opportunity.title)}</h3></div><strong class="opportunity-score">${escapeHtml(opportunity.score)}</strong></div>
+    <p>${escapeHtml(short(opportunity.summary, 180))}</p>
+    <div class="director-card-meta">${statusChip(opportunity.status)}<span>${escapeHtml(opportunity.confidence)}% confidence</span><span>${escapeHtml(opportunity.evidenceIds?.length || 0)} evidence</span><span>${escapeHtml(opportunity.reachability)} access</span></div>
+  </article>`;
+}
+
+function setDirectorView(view) {
+  const valid = new Set(["overview", "opportunities", "people", "experiments", "learned", "activity"]);
+  state.directorView = valid.has(view) ? view : "overview";
+  for (const button of $$("#director-tabs [data-director-view]")) button.classList.toggle("active", button.dataset.directorView === state.directorView);
+  for (const name of valid) $(`#director-${name}`).classList.toggle("os-hidden", name !== state.directorView);
+}
+
+function renderDirector() {
+  const data = state.status?.opportunityDirector;
+  if (!data) return;
+  $("#director-objective").textContent = data.director?.objective || "Owner objective not recorded.";
+  $("#director-status").textContent = data.statusLabel || "Waiting";
+  $("#director-status").className = `status-chip ${statusTone(data.statusLabel)}`;
+  $("#director-last-wake").textContent = data.director?.lastWakeAt ? `Last wake ${timeAgo(data.director.lastWakeAt)}` : "No wake recorded";
+  $("#director-tab-count").hidden = !(data.ownerDecisionsRequired || []).length;
+  $("#director-tab-count").textContent = String((data.ownerDecisionsRequired || []).length);
+
+  const top = data.topOpportunities || [];
+  const overviewMetrics = [
+    ["AI spend", moneyText(data.aiSpendUsd), `of ${moneyText(data.costLimitUsd)} Cost OS cap`],
+    ["Treasury", moneyText(data.treasury?.availableCapital), "simulation only · $0 until funded"],
+    ["Pipeline EV", moneyText(top.filter((item) => item.status !== "killed").reduce((sum, item) => sum + Number(item.economicModel?.expectedValueUsd || 0), 0)), "estimate · assumptions visible"],
+    ["Needs you", String((data.ownerDecisionsRequired || []).length), "validation proposals only"]
+  ];
+  const people = data.people || [];
+  const experiments = data.experiments || [];
+  const killed = data.killed || [];
+  $("#director-overview").innerHTML = `<div class="director-metrics">${overviewMetrics.map(([label, value, note]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(note)}</small></article>`).join("")}</div>
+    <div class="director-overview-grid">
+      <section class="director-panel director-top"><div class="panel-heading"><div><span class="eyebrow">Top opportunities</span><h2>Ranked by evidence and economics</h2></div></div><div class="director-card-list">${top.filter((item) => item.status !== "killed").slice(0, 5).map(opportunityCard).join("") || '<div class="empty-card">No evidence-backed opportunity yet. The Director is waiting rather than inventing activity.</div>'}</div></section>
+      <div class="director-side-stack">
+        <section class="director-panel"><div class="panel-heading"><div><span class="eyebrow">People worth knowing</span><h2>Legitimate network paths</h2></div></div><div class="compact-list">${people.slice(0, 5).map((person) => `<div><strong>${escapeHtml(person.name)}</strong><span>${escapeHtml(person.organization)} · ${escapeHtml(titleCase(person.relationshipState))}</span><small>${escapeHtml(short(person.whyRelevant, 100))}</small></div>`).join("") || '<div class="empty-card">No public or owner-confirmed people recorded.</div>'}</div></section>
+        <section class="director-panel"><div class="panel-heading"><div><span class="eyebrow">What it killed</span><h2>Time not wasted</h2></div></div><div class="compact-list">${killed.slice(0, 4).map((item) => `<div data-open-opportunity="${escapeHtml(item.opportunityId)}" tabindex="0"><strong>${escapeHtml(item.title)}</strong><span>Score ${escapeHtml(item.score)} · ${escapeHtml(item.confidence)}% confidence</span><small>${escapeHtml(short(item.recommendedNextAction, 110))}</small></div>`).join("") || '<div class="empty-card">No killed opportunities recorded.</div>'}</div></section>
+      </div>
+    </div>`;
+  $("#director-opportunities").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">Opportunity graph</span><h2>Observed facts before hypotheses</h2></div><small>${top.length} persisted</small></div><div class="director-card-list director-all">${top.map(opportunityCard).join("") || '<div class="empty-card">No opportunities persisted.</div>'}</div>`;
+  $("#director-people").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">People</span><h2>Professional network map</h2></div><small>No relationship is inferred</small></div><div class="director-table"><div class="director-table-head"><span>Person</span><span>Why relevant</span><span>Relationship</span><span>Next follow-up</span></div>${people.map((person) => `<div><span><strong>${escapeHtml(person.name)}</strong><small>${escapeHtml(person.organization)}</small></span><span>${escapeHtml(person.whyRelevant)}</span><span>${statusChip(person.relationshipState)}</span><span>${escapeHtml(person.nextFollowupAt || "Not scheduled")}</span></div>`).join("") || '<div class="empty-card">No people recorded.</div>'}</div>`;
+  $("#director-experiments").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">Experiments</span><h2>Signal, metric, stop condition</h2></div><small>No endless research</small></div><div class="director-card-list">${experiments.map((item) => `<article class="director-card"><div class="director-card-head"><div><span class="eyebrow">${escapeHtml(titleCase(item.actionClass))}</span><h3>${escapeHtml(item.hypothesis)}</h3></div>${statusChip(item.status)}</div><p><strong>Metric:</strong> ${escapeHtml(item.successMetric)}</p><div class="director-card-meta"><span>Target: ${escapeHtml(item.target)}</span><span>Cost ${moneyText(item.cost)} / ${moneyText(item.budgetCap)}</span></div><small class="stop-line">Stop: ${escapeHtml((item.stopConditions || []).join(" · "))}</small></article>`).join("") || '<div class="empty-card">No active experiments. An idea does not graduate because a model likes it.</div>'}</div>`;
+  $("#director-learned").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">Learned</span><h2>Tactical rules, never new permissions</h2></div><small>Memory OS promotion required</small></div><div class="director-card-list">${(data.learned || []).map((rule) => `<article class="director-card"><div class="director-card-head"><h3>${escapeHtml(rule.statement)}</h3>${statusChip(rule.status)}</div><p>${escapeHtml(rule.scope)} · ${escapeHtml(rule.confidence)}% confidence</p><div class="director-card-meta"><span>${escapeHtml(rule.supportingOutcomeIds?.length || 0)} supporting outcomes</span><span>${escapeHtml(rule.contradictingOutcomeIds?.length || 0)} contradictions</span></div></article>`).join("") || '<div class="empty-card">No tactical rule has earned activation.</div>'}</div>`;
+  $("#director-activity").innerHTML = `<div class="director-page-head"><div><span class="eyebrow">Decision journal</span><h2>Concise rationale, not model traces</h2></div><small>${escapeHtml((data.activity || []).length)} decisions</small></div><div class="activity-timeline">${(data.activity || []).map((item) => `<article><i class="${statusTone(item.chosenAction)}"></i><div><strong>${escapeHtml(item.summary)}</strong><p>${escapeHtml(item.reasonSummary)}</p><small>${escapeHtml(titleCase(item.decisionType))} · ${timeAgo(item.createdAt)} · cost ${moneyText(item.actualCost)}</small></div></article>`).join("") || '<div class="empty-card">No meaningful decision recorded.</div>'}</div>`;
+  setDirectorView(state.directorView);
+}
+
 function renderAll() {
   renderProjectTarget();
   renderOps();
   renderDash();
+  renderDirector();
   renderKeep();
 }
 
@@ -579,6 +636,44 @@ async function controlMission(action) {
   }
 }
 
+async function openOpportunity(opportunityId) {
+  openDrawer({ kicker: "Opportunity Director", title: "Loading…", html: '<div class="empty-card">Loading persisted evidence and economics…</div>' });
+  try {
+    const detail = await api(`/api/v1/opportunities/${encodeURIComponent(opportunityId)}`);
+    const item = detail.opportunity;
+    const evidence = (item.observations || []).map((observation) => `<div class="drawer-item"><strong>Observed</strong><p>${escapeHtml(observation.statement)}</p><small>${escapeHtml(observation.evidenceId)}</small></div>`).join("");
+    const assumptions = (item.assumptions || []).map((assumption) => `<div class="drawer-item"><strong>${escapeHtml(titleCase(assumption.kind))}</strong><p>${escapeHtml(assumption.statement)}</p></div>`).join("");
+    const score = Object.entries(item.scoreBreakdown || {}).map(([key, value]) => keyValue(titleCase(key), value)).join("");
+    const economics = item.economicModel || {};
+    openDrawer({
+      kicker: `${titleCase(item.type)} · Score ${item.score}`,
+      title: item.title,
+      html: `<section class="drawer-section">${keyValue("Status", titleCase(item.status))}${keyValue("Confidence", `${item.confidence}%`)}${keyValue("Access", titleCase(item.reachability))}${keyValue("Evidence", item.evidenceIds?.length || 0)}${keyValue("Research spend", moneyText(item.researchSpendUsd))}</section>
+        <section class="drawer-section"><h3>Observed facts</h3>${evidence || '<div class="empty-card">No verified observation recorded.</div>'}</section>
+        <section class="drawer-section"><h3>Hypothesis and assumptions</h3><p class="drawer-copy">${escapeHtml(item.problemHypothesis)}</p>${assumptions}</section>
+        <section class="drawer-section"><h3>Score breakdown</h3>${score}</section>
+        <section class="drawer-section"><h3>Economics · estimates, not facts</h3>${keyValue("Low / base / high", `${moneyText(economics.lowValueUsd)} / ${moneyText(economics.baseValueUsd)} / ${moneyText(economics.highValueUsd)}`)}${keyValue("Expected value", moneyText(economics.expectedValueUsd))}${keyValue("Validation cost", moneyText(economics.estimatedValidationSpendUsd))}${keyValue("Days to signal", item.estimatedDaysToSignal)}<div class="drawer-item"><strong>Assumptions</strong><p>${escapeHtml((economics.assumptions || []).join(" · "))}</p></div></section>
+        <section class="drawer-section"><h3>Cheapest next test</h3><p class="drawer-copy">${escapeHtml(item.cheapestValidation || "Not recorded")}</p><div class="drawer-item"><strong>Stop conditions</strong><p>${escapeHtml((item.stopConditions || []).join(" · "))}</p></div></section>
+        <section class="drawer-section"><h3>Owner actions</h3><div class="drawer-actions"><button type="button" data-opportunity-action="research_deeper" data-opportunity-id="${escapeHtml(item.opportunityId)}">Research deeper</button><button type="button" data-opportunity-action="watch" data-opportunity-id="${escapeHtml(item.opportunityId)}">Watch</button><button type="button" class="danger" data-opportunity-action="kill" data-opportunity-id="${escapeHtml(item.opportunityId)}">Kill</button><button type="button" class="primary" data-opportunity-action="prepare_validation" data-opportunity-id="${escapeHtml(item.opportunityId)}">Prepare validation</button><button type="button" data-opportunity-action="spawn_build_mission" data-opportunity-id="${escapeHtml(item.opportunityId)}">Spawn build mission</button></div><p class="drawer-copy">Build missions require an accepted matching owner proposal and still grant no downstream live permission.</p></section>`
+    });
+  } catch (error) {
+    drawerBody.innerHTML = `<div class="empty-card">${escapeHtml(error.message)}</div>`;
+  }
+}
+
+async function applyOpportunityAction(opportunityId, action) {
+  try {
+    await api(`/api/v1/opportunities/${encodeURIComponent(opportunityId)}/actions`, { method: "POST", body: JSON.stringify({ action, confirmation: `${action.toUpperCase()} ${opportunityId}` }) });
+    closeDrawer();
+    await refreshStatus();
+    setView("director");
+  } catch (error) {
+    closeDrawer();
+    setView("console");
+    consoleLine(`■ Opportunity action stopped: ${error.message}`, "warn");
+  }
+}
+
 document.addEventListener("click", (event) => {
   const viewButton = event.target.closest("[data-view]");
   if (viewButton) return setView(viewButton.dataset.view);
@@ -587,6 +682,9 @@ document.addEventListener("click", (event) => {
   const job = event.target.closest("[data-open-job]"); if (job) return openJob(job.dataset.openJob);
   const proposal = event.target.closest("[data-open-proposal]"); if (proposal) return openProposal(proposal.dataset.openProposal);
   const system = event.target.closest("[data-open-system]"); if (system) return openSystem(system.dataset.openSystem);
+  const directorTab = event.target.closest("[data-director-view]"); if (directorTab) return setDirectorView(directorTab.dataset.directorView);
+  const opportunity = event.target.closest("[data-open-opportunity]"); if (opportunity) return void openOpportunity(opportunity.dataset.openOpportunity);
+  const opportunityAction = event.target.closest("[data-opportunity-action]"); if (opportunityAction) return void applyOpportunityAction(opportunityAction.dataset.opportunityId, opportunityAction.dataset.opportunityAction);
   if (event.target.closest("[data-open-decision-queue]")) return openDecisionQueue();
   const jobDecision = event.target.closest("[data-job-decision]"); if (jobDecision) return void decideJob(jobDecision.dataset.jobId, jobDecision.dataset.jobDecision);
   const jobRecovery = event.target.closest("[data-job-recovery]"); if (jobRecovery) return void recoverJob(jobRecovery.dataset.jobId, jobRecovery.dataset.jobRecovery);

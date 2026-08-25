@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ag-os.local/schemas/opportunity-director.schema.json",
+  "title": "AG OS Opportunity Director",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["directorId", "status", "objective", "objectiveControlledBy", "constitutionVersion", "constitutionHash", "researchLimits", "modelConfig", "safeguards", "createdAt", "updatedAt"],
+  "properties": {
+    "directorId": { "type": "string", "pattern": "^opportunity-director-[a-z0-9-]+$" },
+    "status": { "type": "string", "enum": ["active", "paused"] },
+    "objective": { "type": "string", "minLength": 1 },
+    "objectiveControlledBy": { "type": "string", "minLength": 1 },
+    "constitutionVersion": { "type": "string", "minLength": 1 },
+    "constitutionHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "researchLimits": { "type": "object" },
+    "modelConfig": { "type": "object" },
+    "safeguards": { "type": "object" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

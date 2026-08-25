@@ -60,14 +60,15 @@ for (const requiredInterfacePattern of [
   /data-view="console"/,
   /data-view="ops"/,
   /data-view="keep"/,
-  /data-view="dash"/
+  /data-view="dash"/,
+  /data-view="director"/
 ]) {
   if (!requiredInterfacePattern.test(`${dashboardSource}\n${consoleStyles}`)) {
     fail(`dashboard navigation or dark-theme invariant missing: ${requiredInterfacePattern}`);
   }
 }
 
-const expectedDashboardViews = new Set(["console", "ops", "keep", "dash"]);
+const expectedDashboardViews = new Set(["console", "ops", "keep", "dash", "director"]);
 const navigationControls = [...consoleHtml.matchAll(/<button\b[^>]*data-view="([^"]+)"[^>]*>([\s\S]*?)<\/button>/gi)]
   .map((match) => ({ view: match[1], label: match[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() }));
 for (const view of expectedDashboardViews) {
@@ -132,7 +133,10 @@ for (const requiredText of [
   "Operational posture",
   "Owner focus",
   "Cost OS",
-  "Constitution v1.0"
+  "Constitution v1.0",
+  "Opportunity Director",
+  "Cheapest next test",
+  "What it killed"
 ]) {
   if (!dashboardSource.includes(requiredText)) {
     fail(`dashboard missing required visible section: ${requiredText}`);

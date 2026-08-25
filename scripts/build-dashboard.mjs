@@ -5,6 +5,7 @@ import { listDirectJson, readJson } from "./lib/runtime/common.mjs";
 import { computeOperationalMetrics } from "./lib/runtime/metrics-processor.mjs";
 import { evaluateProductionReadiness } from "./lib/runtime/production-readiness-processor.mjs";
 import { summarizeSafeMergeRuntime } from "./lib/runtime/safe-merge-runtime.mjs";
+import { getOpportunityDirectorSnapshot } from "./lib/runtime/opportunity-director.mjs";
 
 const root = process.cwd();
 
@@ -1145,6 +1146,7 @@ export function collectDashboardData() {
   const operationalMetrics = computeOperationalMetrics({ root });
   const safeMergeRuntime = summarizeSafeMergeRuntime({ root });
   const skills = collectSkills();
+  const opportunityDirector = getOpportunityDirectorSnapshot({ root });
   const clientManagement = collectClientManagement();
   const firstClientReadiness = collectFirstClientReadiness(clientManagement);
   const socialMediaBuildRecord = latestConnectorRecord(
@@ -1442,6 +1444,7 @@ export function collectDashboardData() {
     clientManagement,
     firstClientReadiness,
     socialPosting,
+    opportunityDirector,
     ownerAttention: collectOwnerAttention({ firstClientReadiness, approvals, qualityReview, connectorAuth, socialPosting }),
     connectorAuth,
     dashboardActionQueue: collectDashboardActionQueue({

@@ -1,0 +1,114 @@
+{
+  "verificationId": "opportunity-director-v1-verification-2026-08-24",
+  "generatedAt": "2026-08-24T12:00:00.000Z",
+  "repository": "gurnoorbassi/ag-os",
+  "branch": "codex/opportunity-director-v1",
+  "head": "3ebe37db1f721ac052138e534a50043b26778f91",
+  "requiredBaseCommit": "90714d7248e4a9d264b700224cb7ae5fcec89c94",
+  "verificationMode": "deterministic_fixture_only",
+  "focusedTests": {
+    "passed": 26,
+    "failed": 0,
+    "command": "node --test tests/opportunity-director.test.mjs"
+  },
+  "wake": {
+    "status": "complete",
+    "modelCalls": 0,
+    "modelCostUsd": 0,
+    "researchCostUsd": 0,
+    "externalActionExecuted": false,
+    "researchRunCount": 21,
+    "workerRoles": [
+      "market_researcher",
+      "customer_problem_researcher",
+      "competitor_researcher",
+      "economics_analyst",
+      "network_mapper",
+      "distribution_researcher",
+      "skeptic"
+    ],
+    "outcomes": {
+      "Company B": {
+        "opportunityId": "opportunity-company-b-quote-follow-up",
+        "status": "validation_ready",
+        "score": 85,
+        "confidence": 74
+      },
+      "Company A": {
+        "opportunityId": "opportunity-company-a-lead-operations",
+        "status": "watching",
+        "score": 68,
+        "confidence": 59
+      },
+      "Company C": {
+        "opportunityId": "opportunity-company-c-moonshot",
+        "status": "killed",
+        "score": 18,
+        "confidence": 20
+      }
+    }
+  },
+  "noChangeWake": {
+    "status": "skipped_no_change",
+    "modelCalls": 0,
+    "modelCostUsd": 0,
+    "researchCostUsd": 0
+  },
+  "skeptic": {
+    "present": true,
+    "confidenceCanOnlyBeReducedByFixtureSkeptic": true
+  },
+  "proposalBridge": {
+    "proposalId": "proposal-opportunity-validation-opportunity-company-b-quote-follow-up",
+    "grantsPermission": false,
+    "downstreamApprovalsStillRequired": true,
+    "acceptedForDeterministicBridgeTest": true,
+    "missionId": "mission-opportunity-director-verification",
+    "autonomyLevel": "supervised",
+    "realMissionExecutionStarted": false
+  },
+  "experiment": {
+    "experimentId": "experiment-opportunity-company-b-quote-follow-up-validation-v1",
+    "status": "proposed",
+    "budgetCapUsd": 40,
+    "externalActionExecuted": false
+  },
+  "tacticalLearning": {
+    "status": "candidate",
+    "memoryOsPromotionRequired": true
+  },
+  "dailyBrief": {
+    "topOpportunityCount": 2,
+    "killedCount": 1,
+    "aiSpendUsd": 0,
+    "pipelineExpectedValueUsd": 5621.56
+  },
+  "treasury": {
+    "executionMode": "simulation_only",
+    "availableCapitalUsd": 0,
+    "realMoneyMovementAdapter": null
+  },
+  "constitution": {
+    "version": "1.0.0",
+    "hash": "f728a308641f4da6105448b8817b054699cec6a28d033873f908d02fc05e7f66",
+    "immutable": true
+  },
+  "safety": {
+    "liveAnthropicCalled": false,
+    "liveWebProviderCalled": false,
+    "outreachSent": false,
+    "contentPublished": false,
+    "spendExecuted": false,
+    "accountCreated": false,
+    "productionCustomerDataAccessed": false,
+    "productionDeployed": false
+  },
+  "requiredRepositoryGates": [
+    "npm test",
+    "npm run validate",
+    "npm run boot:check",
+    "npm run security:scan",
+    "npm run audit:v1",
+    "git diff --check"
+  ]
+}
